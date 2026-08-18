@@ -1,0 +1,927 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Agents Learning Portal — Eddie</title>
+<style>
+  :root{
+    --bg:#0f1020; --panel:#17182b; --panel2:#1f2138; --ink:#e9e9f4; --muted:#a2a3c0;
+    --line:#2c2e4a; --brand:#7c6cff; --brand2:#5ad1c4; --accent:#ffb454; --good:#4ade80;
+    --chip:#25264a; --shadow:0 10px 30px rgba(0,0,0,.35); --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:radial-gradient(1200px 600px at 80% -10%,#26224a 0%,transparent 55%),
+               radial-gradient(900px 500px at -10% 10%,#123a3a 0%,transparent 45%),
+               var(--bg);
+    color:var(--ink); font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    min-height:100vh;
+  }
+  a{color:var(--brand2);text-decoration:none} a:hover{text-decoration:underline}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px 80px}
+  header.hero{padding:44px 0 18px}
+  .kicker{color:var(--brand2);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:12px}
+  h1{font-size:34px;line-height:1.15;margin:8px 0 6px}
+  .sub{color:var(--muted);max-width:720px}
+  .progwrap{margin:22px 0 6px;background:var(--panel);border:1px solid var(--line);border-radius:999px;overflow:hidden;height:14px}
+  .progbar{height:100%;width:0;background:linear-gradient(90deg,var(--brand),var(--brand2));transition:width .4s ease}
+  .progmeta{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;color:var(--muted);font-size:13px;margin-top:8px}
+  .progmeta button{background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:4px 10px;cursor:pointer;font-size:12px}
+  .progmeta button:hover{color:var(--ink);border-color:var(--brand)}
+  .progbtns{display:flex;gap:6px;flex-wrap:wrap}
+  .syncbox{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:10px}
+  .syncbox label{display:block;color:var(--muted);font-size:13px;margin-bottom:6px}
+  .syncbox textarea{width:100%;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;resize:vertical}
+  .syncactions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .syncactions button{background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:5px 12px;cursor:pointer;font-size:12px}
+  .syncactions button:hover{color:var(--ink);border-color:var(--brand)}
+  nav.tabs{position:sticky;top:0;z-index:20;display:flex;flex-wrap:wrap;gap:6px;padding:12px 0;margin-top:14px;
+    background:linear-gradient(180deg,var(--bg),rgba(15,16,32,.85));backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+  .tab{padding:8px 14px;border-radius:999px;border:1px solid var(--line);color:var(--muted);cursor:pointer;font-weight:600;font-size:14px;white-space:nowrap}
+  .tab:hover{color:var(--ink)}
+  .tab.active{background:var(--brand);border-color:var(--brand);color:#fff}
+  section.panel{display:none;animation:fade .3s ease}
+  section.panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  h2{font-size:24px;margin:30px 0 6px}
+  h3{font-size:18px;margin:0 0 4px}
+  .lead{color:var(--muted);margin:0 0 18px;max-width:760px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin:16px 0;box-shadow:var(--shadow)}
+  .phase .phhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .badge{background:var(--chip);border:1px solid var(--line);color:var(--brand2);font-weight:700;font-size:12px;padding:4px 10px;border-radius:999px}
+  .badge.accent{color:var(--accent)}
+  .outcome{color:var(--muted);font-size:14px;margin:8px 0 14px}
+  ul.lessons{list-style:none;margin:0;padding:0}
+  ul.lessons li{display:flex;gap:12px;align-items:flex-start;padding:9px 0;border-top:1px dashed var(--line)}
+  ul.lessons li:first-child{border-top:none}
+  ul.lessons input[type=checkbox]{appearance:none;-webkit-appearance:none;min-width:20px;height:20px;margin-top:2px;border:2px solid var(--line);border-radius:6px;cursor:pointer;position:relative;background:var(--panel2)}
+  ul.lessons input[type=checkbox]:checked{background:var(--brand);border-color:var(--brand)}
+  ul.lessons input[type=checkbox]:checked::after{content:"✓";position:absolute;color:#fff;font-size:13px;font-weight:800;left:3px;top:-1px}
+  ul.lessons label{cursor:pointer}
+  li.done label{color:var(--muted);text-decoration:line-through}
+  .tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;margin-left:6px;vertical-align:middle}
+  .tag.build{background:rgba(255,180,84,.14);color:var(--accent)}
+  .tag.check{background:rgba(90,209,196,.14);color:var(--brand2)}
+  .note{font-size:13px;color:var(--muted);margin-top:10px;border-left:2px solid var(--brand);padding-left:12px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+  .mini{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+  .mini h3{display:flex;align-items:center;gap:8px}
+  .pill{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--chip);color:var(--brand2);border:1px solid var(--line)}
+  .kv{font-size:14px;margin:8px 0}
+  .kv b{color:var(--ink)} .kv span{color:var(--muted)}
+  .stat{color:var(--good);font-weight:700}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+  th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--brand2);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+  .glo{margin:10px 0} .glo b{color:var(--ink)}
+  .callout{background:linear-gradient(180deg,rgba(124,108,255,.12),rgba(90,209,196,.06));border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin:16px 0}
+  footer{color:var(--muted);font-size:12px;margin-top:40px;border-top:1px solid var(--line);padding-top:16px}
+  .steps{counter-reset:s;list-style:none;padding:0;margin:0}
+  .steps li{counter-increment:s;padding:8px 0 8px 40px;position:relative;border-top:1px dashed var(--line)}
+  .steps li:first-child{border-top:none}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:8px;width:26px;height:26px;border-radius:50%;background:var(--brand);color:#fff;font-weight:800;font-size:13px;display:grid;place-items:center}
+  code{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:13px}
+  /* Learning log (per-phase checkpoint answers) */
+  .loglog{margin-top:16px;background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--brand2);border-radius:12px;padding:14px 16px}
+  .logtitle{font-weight:700;font-size:14px;color:var(--brand2);display:flex;align-items:center;gap:8px}
+  .loghint{color:var(--muted);font-size:13px;margin:6px 0 10px} .loghint b{color:var(--ink)}
+  textarea.logta{width:100%;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font:15px/1.55 inherit;resize:vertical;min-height:84px}
+  textarea.logta:focus{outline:none;border-color:var(--brand)}
+  .logsaved{display:inline-block;color:var(--muted);font-size:12px;margin-top:6px}
+  .logsaved.on{color:var(--good)}
+  /* My Projects */
+  .projadd{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+  #projinput{flex:1;min-width:220px;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:11px 13px;font:16px/1.4 inherit}
+  #projinput:focus{outline:none;border-color:var(--brand)}
+  #projaddbtn{background:var(--brand);border:1px solid var(--brand);color:#fff;border-radius:10px;padding:11px 18px;font-weight:700;cursor:pointer;font-size:15px}
+  #projaddbtn:hover{filter:brightness(1.08)}
+  ul.projlist{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+  ul.projlist li{display:flex;gap:8px;align-items:center}
+  input.projitem{flex:1;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:15px/1.4 inherit}
+  input.projitem:focus{outline:none;border-color:var(--brand)}
+  button.projremove{background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:8px 12px;cursor:pointer;font-size:13px;white-space:nowrap}
+  button.projremove:hover{color:#fff;border-color:#b4455e;background:rgba(180,69,94,.18)}
+  #projempty{margin-top:12px}
+  /* Cloud auto-sync bar */
+  .cloudbar{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-top:10px}
+  .cloudrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .cloudicon{font-size:15px}
+  #cloudemail{flex:1;min-width:180px;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:14px/1.4 inherit}
+  #cloudemail:focus{outline:none;border-color:var(--brand)}
+  #cloudsignin{background:var(--brand);border:1px solid var(--brand);color:#fff;border-radius:8px;padding:8px 14px;font-weight:700;cursor:pointer;font-size:14px}
+  #cloudsignin:hover{filter:brightness(1.08)} #cloudsignin:disabled{opacity:.6;cursor:default}
+  #cloudsignout{background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px}
+  #cloudsignout:hover{color:var(--ink);border-color:var(--brand)}
+  .cloudstatus{color:var(--good);font-size:13px;font-weight:600;margin-left:auto}
+  .cloudhint{color:var(--muted);font-size:12px;margin-top:8px}
+  /* Per-phase "Learn it here" box */
+  .learnbox{margin:12px 0 16px;background:linear-gradient(180deg,rgba(255,180,84,.10),rgba(124,108,255,.05));border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:12px;padding:12px 15px}
+  .lbtitle{font-weight:800;font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+  .learnbox p{margin:5px 0;font-size:14.5px}
+  .learnbox .lbdo{color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">Custom AI Agents · Personal Portal</div>
+    <h1>Your Agents Learning Portal</h1>
+    <p class="sub">Learn how AI agents work, build your first ones with no code, and apply them to the podcast and to small-business operations. Check off each lesson as you go — your progress saves automatically. Turn on sync below to carry it across all your devices.</p>
+    <div class="progwrap"><div class="progbar" id="progbar"></div></div>
+    <div class="progmeta">
+      <span id="progtext">0 of 0 lessons complete</span>
+      <span class="progbtns">
+        <button id="exportbtn" title="Copy your progress, learning log, and projects to move them to another device">Export</button>
+        <button id="importbtn" title="Paste a sync code from another device">Import</button>
+        <button id="resetbtn" title="Clear all checkmarks (keeps your notes and projects)">Reset checkmarks</button>
+      </span>
+    </div>
+    <div id="cloudbar" class="cloudbar">
+      <div id="cloud-out" class="cloudrow">
+        <span class="cloudicon">☁️</span>
+        <input id="cloudemail" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com" aria-label="Email address for sync" />
+        <button id="cloudsignin" type="button">Turn on auto-sync</button>
+      </div>
+      <div id="cloud-in" class="cloudrow" hidden>
+        <span class="cloudicon">☁️</span>
+        <span>Auto-syncing as <b id="cloudwho">your account</b></span>
+        <span id="cloudstatus" class="cloudstatus">Synced ✓</span>
+        <button id="cloudsignout" type="button">Sign out</button>
+      </div>
+      <div id="cloudhint" class="cloudhint">Sign in once per device with your email to sync everything automatically across your laptop and phone — no Export/Import needed. (Export/Import below still works as a manual backup.)</div>
+    </div>
+    <div id="syncbox" class="syncbox" hidden>
+      <label id="synclabel" for="syncta"></label>
+      <textarea id="syncta" rows="3" spellcheck="false" placeholder="Progress code…"></textarea>
+      <div class="syncactions">
+        <button id="synccopy" hidden>Copy code</button>
+        <button id="syncapply" hidden>Apply code</button>
+        <button id="syncclose">Close</button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <div class="tab active" data-t="start">Start Here</div>
+    <div class="tab" data-t="path">Learning Path</div>
+    <div class="tab" data-t="projects">My Projects</div>
+    <div class="tab" data-t="podcast">Podcast Agents</div>
+    <div class="tab" data-t="smb">Small-Business Agents</div>
+    <div class="tab" data-t="lanes">Build Lanes</div>
+    <div class="tab" data-t="resources">Resources</div>
+    <div class="tab" data-t="glossary">Glossary</div>
+  </nav>
+
+  <!-- ================= START HERE ================= -->
+  <section class="panel active" id="start">
+    <h2>Start here</h2>
+    <p class="lead">Five minutes of orientation before Phase 1.</p>
+
+    <div class="callout">
+      <h3>The one idea that makes everything click</h3>
+      <p style="margin:.4em 0 0">An agent is just a <b>model + instructions + tools + memory + a loop</b>. It reads a goal, picks a next step, uses a tool, looks at the result, and repeats until the job is done. Every framework and platform in this portal is a variation on that single loop. Hold onto it.</p>
+    </div>
+
+    <div class="grid">
+      <div class="mini"><h3>🤖 Agent vs. chatbot</h3><p class="kv"><span>A chatbot answers. A workflow follows fixed steps. An <b>agent decides its own steps</b> toward a goal and uses tools to act.</span></p></div>
+      <div class="mini"><h3>🧭 How to use this portal</h3><p class="kv"><span>Work the Learning Path top to bottom. Do the <span class="tag build">BUILD</span> item in each phase — don't just read. Tick lessons off as you finish them.</span></p></div>
+      <div class="mini"><h3>🗓️ Pace</h3><p class="kv"><span>~6 weeks at 3–5 hrs/week, or faster if you go full-time. One phase per week is a comfortable rhythm.</span></p></div>
+      <div class="mini"><h3>🎯 The finish line</h3><p class="kv"><span>By the end you'll have <b>one real agent running</b> for the podcast or a business, plus a plan for the rest.</span></p></div>
+    </div>
+
+    <div class="card">
+      <h3>Do these three things now</h3>
+      <ol class="steps">
+        <li>Open the <b>Learning Path</b> tab and read Phase 0 + Phase 1.</li>
+        <li>Use the <b>learning log</b> at the bottom of each phase (on the <b>Learning Path</b> tab) to write, in your own words, the answer to that phase's checkpoint. It saves as you type.</li>
+        <li>Open the <b>My Projects</b> tab and start your <b>project list</b>: the podcast, plus any small business you'd like to design agents for. Add to it anytime — you'll map agents onto these in Phase 7.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= LEARNING PATH ================= -->
+  <section class="panel" id="path">
+    <h2>The learning path</h2>
+    <p class="lead">Eight phases. Each one opens with a <b>📚 Learn it here</b> box — the exact free thing to read or watch for that phase — then a checklist of what you'll know by the end, plus a <span class="tag build">BUILD</span> (make something) and a <span class="tag check">CHECK</span> (self-test). Start each phase by opening its Learn-it-here link; the checkboxes are your progress through it.</p>
+
+    <!-- Phase 0 -->
+    <div class="card phase">
+      <div class="phhead"><span class="badge">Phase 0</span><h3>Orientation</h3><span class="pill">½ week</span></div>
+      <div class="outcome">Outcome: you know what you're aiming at and your toolkit is ready.</div>
+      <div class="learnbox">
+        <div class="lbtitle">📚 Learn it here</div>
+        <p><b>Read (skim, ~20 min):</b> Anthropic's <a href="https://www.anthropic.com/engineering/building-effective-agents" target="_blank" rel="noopener">"Building Effective Agents"</a> for the durable ideas, then its 2025 companion <a href="https://www.anthropic.com/engineering/building-agents-with-the-claude-agent-sdk" target="_blank" rel="noopener">"Building agents with the Claude Agent SDK"</a>.</p>
+        <p class="lbdo">Goal here is the vibe, not the details — you'll re-read the first one in Phase 4 and it'll click.</p>
+      </div>
+      <ul class="lessons" data-phase="0">
+        <li><input type="checkbox" id="l0-1"><label for="l0-1">Skim Anthropic's essay <a href="https://www.anthropic.com/engineering/building-effective-agents" target="_blank" rel="noopener">"Building Effective Agents"</a> once (don't sweat the details yet) — <span style="color:var(--muted)">it's dated Dec 2024, so read it for the durable <b>concepts</b>; Anthropic itself notes the <em>tooling</em> has changed since. Pair it with the current <a href="https://www.anthropic.com/engineering/building-agents-with-the-claude-agent-sdk" target="_blank" rel="noopener">"Building agents with the Claude Agent SDK"</a> (2025).</span></label></li>
+        <li><input type="checkbox" id="l0-2"><label for="l0-2">Set up free accounts: Claude/Cowork, plus one no-code tool (n8n or Zapier)</label></li>
+        <li><input type="checkbox" id="l0-3"><label for="l0-3"><span class="tag build">BUILD</span> Create your learning log and write your project list</label></li>
+      </ul>
+
+      <div class="loglog">
+        <div class="logtitle">📝 Your learning log — Phase 0 checkpoint</div>
+        <p class="loghint">Checkpoint: <b>Why is an "agent" different from just a really good prompt?</b> Write it the way you'd explain it to a friend.</p>
+        <textarea class="logta" data-log="0" rows="4" placeholder="Write your answer in your own words — this saves automatically on this device."></textarea>
+        <div><span class="logsaved">Saves automatically on this device · included when you Export</span></div>
+      </div>
+    </div>
+
+    <!-- Phase 1 -->
+    <div class="card phase">
+      <div class="phhead"><span class="badge">Phase 1</span><h3>Foundations &amp; vocabulary</h3><span class="pill">1 week</span></div>
+      <div class="outcome">Outcome: you can define an agent, describe its loop, and understand every term you'll keep hearing.</div>
+      <div class="learnbox">
+        <div class="lbtitle">📚 Learn it here</div>
+        <p><b>Do this (free, ~1–2 hrs):</b> <a href="https://huggingface.co/learn/agents-course/unit1/introduction" target="_blank" rel="noopener">Hugging Face AI Agents Course — Unit 1</a>. It teaches the agent loop (Think → Act → Observe), the building blocks, and tools — every checkbox below. Ends with a short quiz and a certificate.</p>
+        <p class="lbdo">For the vocabulary line, the <b>Glossary</b> tab in this portal defines each term in one sentence.</p>
+      </div>
+      <ul class="lessons" data-phase="1">
+        <li><input type="checkbox" id="l1-1"><label for="l1-1">Learn the difference: agent vs. chatbot vs. workflow vs. single prompt</label></li>
+        <li><input type="checkbox" id="l1-2"><label for="l1-2">Learn the agent loop: perceive → reason/plan → act → observe → repeat</label></li>
+        <li><input type="checkbox" id="l1-3"><label for="l1-3">Learn the five building blocks: model, instructions, tools, memory, control loop</label></li>
+        <li><input type="checkbox" id="l1-4"><label for="l1-4">Learn the key terms (see Glossary tab): tool use, ReAct, RAG, MCP, evals, guardrails, human-in-the-loop</label></li>
+        <li><input type="checkbox" id="l1-5"><label for="l1-5">Do <a href="https://huggingface.co/learn/agents-course" target="_blank" rel="noopener">Hugging Face AI Agents Course</a> — Unit 1</label></li>
+        <li><input type="checkbox" id="l1-6"><label for="l1-6"><span class="tag build">BUILD</span> Write a one-page "how an AI agent works" explainer in plain English</label></li>
+        <li><input type="checkbox" id="l1-7"><label for="l1-7"><span class="tag check">CHECK</span> Explain the agent loop and five building blocks without notes</label></li>
+      </ul>
+
+      <div class="loglog">
+        <div class="logtitle">📝 Your learning log — Phase 1 checkpoint</div>
+        <p class="loghint">Checkpoint: <b>Describe the agent loop and the five building blocks — from memory, in your own words.</b></p>
+        <textarea class="logta" data-log="1" rows="4" placeholder="Write your answer in your own words — this saves automatically on this device."></textarea>
+        <div><span class="logsaved">Saves automatically on this device · included when you Export</span></div>
+      </div>
+    </div>
+
+    <!-- Phase 2 -->
+    <div class="card phase">
+      <div class="phhead"><span class="badge">Phase 2</span><h3>Build your first agent (no code)</h3><span class="pill">1 week</span></div>
+      <div class="outcome">Outcome: you've shipped a real, working agent without writing code.</div>
+      <div class="learnbox">
+        <div class="lbtitle">📚 Learn it here</div>
+        <p><b>Follow this walkthrough:</b> n8n's <a href="https://blog.n8n.io/how-to-build-ai-agent/" target="_blank" rel="noopener">"How to build your first AI agent"</a> — a no-code, step-by-step build of a research assistant. Do it start to finish; that one build covers every checkbox below.</p>
+        <p class="lbdo">Prefer a different tool? Getting-started guides for <a href="https://help.zapier.com/" target="_blank" rel="noopener">Zapier Agents</a> or <a href="https://docs.dify.ai/" target="_blank" rel="noopener">Dify</a>.</p>
+      </div>
+      <ul class="lessons" data-phase="2">
+        <li><input type="checkbox" id="l2-1"><label for="l2-1">Pick one platform: n8n (most capable), Zapier Agents (easiest if you use Zapier), or Dify (best for chat/Q&amp;A)</label></li>
+        <li><input type="checkbox" id="l2-2"><label for="l2-2">Learn the pieces in practice: triggers, tools/actions, connecting apps, and a human-approval step</label></li>
+        <li><input type="checkbox" id="l2-3"><label for="l2-3"><span class="tag build">BUILD</span> Ship a small agent: a research assistant, an inbox-triage helper, or a document Q&amp;A bot</label></li>
+        <li><input type="checkbox" id="l2-4"><label for="l2-4">Test it on 3–5 real inputs and note what it got wrong</label></li>
+        <li><input type="checkbox" id="l2-5"><label for="l2-5"><span class="tag check">CHECK</span> Explain the difference between an automation and an agent, from having built one</label></li>
+      </ul>
+
+      <div class="loglog">
+        <div class="logtitle">📝 Your learning log — Phase 2 checkpoint</div>
+        <p class="loghint">Checkpoint: <b>What's the real difference between an automation (fixed steps) and an agent (decides its own steps)?</b> Answer from having built one.</p>
+        <textarea class="logta" data-log="2" rows="4" placeholder="Write your answer in your own words — this saves automatically on this device."></textarea>
+        <div><span class="logsaved">Saves automatically on this device · included when you Export</span></div>
+      </div>
+    </div>
+
+    <!-- Phase 3 -->
+    <div class="card phase">
+      <div class="phhead"><span class="badge">Phase 3</span><h3>The Claude &amp; Cowork ecosystem</h3><span class="pill">1 week</span></div>
+      <div class="outcome">Outcome: you can build custom agents inside the tools you already have.</div>
+      <div class="learnbox">
+        <div class="lbtitle">📚 Learn it here</div>
+        <p><b>Do these (free):</b> <a href="https://www.anthropic.com/learn" target="_blank" rel="noopener">Anthropic Academy</a> — start with the <b>MCP course</b> and the "Claude in action" material. Keep the <a href="https://docs.claude.com/" target="_blank" rel="noopener">Anthropic docs</a> open for Projects, Skills, MCP, and the Agent SDK as you go.</p>
+      </div>
+      <ul class="lessons" data-phase="3">
+        <li><input type="checkbox" id="l3-1"><label for="l3-1">Learn Claude Projects &amp; Cowork — giving Claude a role, files, and the ability to act</label></li>
+        <li><input type="checkbox" id="l3-2"><label for="l3-2">Learn Skills — reusable capability packs Claude auto-uses (you already use docx, pptx, etc.)</label></li>
+        <li><input type="checkbox" id="l3-3"><label for="l3-3">Learn MCP &amp; connectors — the standard that plugs agents into your apps (Gmail, Notion, Drive…)</label></li>
+        <li><input type="checkbox" id="l3-4"><label for="l3-4">Learn subagents &amp; hooks (concept only) — how a main agent delegates bounded jobs</label></li>
+        <li><input type="checkbox" id="l3-5"><label for="l3-5">Do <a href="https://www.anthropic.com/learn" target="_blank" rel="noopener">Anthropic Academy</a> — the MCP course + "Claude in action"</label></li>
+        <li><input type="checkbox" id="l3-6"><label for="l3-6"><span class="tag build">BUILD</span> Set up a Claude Project / Cowork workflow for one recurring task of yours</label></li>
+        <li><input type="checkbox" id="l3-7"><label for="l3-7"><span class="tag check">CHECK</span> Explain how MCP, Skills, and the Agent SDK stack together</label></li>
+      </ul>
+
+      <div class="loglog">
+        <div class="logtitle">📝 Your learning log — Phase 3 checkpoint</div>
+        <p class="loghint">Checkpoint: <b>How do MCP, Skills, and the Agent SDK fit together — and which layer would you reach for on a given job?</b></p>
+        <textarea class="logta" data-log="3" rows="4" placeholder="Write your answer in your own words — this saves automatically on this device."></textarea>
+        <div><span class="logsaved">Saves automatically on this device · included when you Export</span></div>
+      </div>
+    </div>
+
+    <!-- Phase 4 -->
+    <div class="card phase">
+      <div class="phhead"><span class="badge">Phase 4</span><h3>Design patterns &amp; multi-agent thinking</h3><span class="pill">½ week</span></div>
+      <div class="outcome">Outcome: you can design an agent on paper and know when to use more than one.</div>
+      <div class="learnbox">
+        <div class="lbtitle">📚 Learn it here</div>
+        <p><b>Watch (free to audit):</b> Andrew Ng's <a href="https://www.deeplearning.ai/courses/agentic-ai/" target="_blank" rel="noopener">"Agentic AI" course</a> (DeepLearning.AI) — it teaches the core patterns (Reflection, Tool Use, Planning, Multi-Agent) in plain language. Then <b>re-read</b> Anthropic's <a href="https://www.anthropic.com/engineering/building-effective-agents" target="_blank" rel="noopener">"Building Effective Agents"</a> for the rest (Evaluator-Optimizer, routing).</p>
+        <p class="lbdo">Watching the videos (auditing) is free; the paid certificate is optional — you don't need it.</p>
+      </div>
+      <ul class="lessons" data-phase="4">
+        <li><input type="checkbox" id="l4-1"><label for="l4-1">Learn the 7 patterns: Reflection, Tool Use, ReAct, Planning, Multi-Agent, Evaluator-Optimizer, Human-in-the-Loop</label></li>
+        <li><input type="checkbox" id="l4-2"><label for="l4-2">Learn single-agent vs. multi-agent trade-offs (more agents = more power AND more cost/complexity)</label></li>
+        <li><input type="checkbox" id="l4-3"><label for="l4-3">Learn memory: short-term (context window) vs. long-term (stored/retrievable)</label></li>
+        <li><input type="checkbox" id="l4-4"><label for="l4-4">Re-read "Building Effective Agents" — it lands now</label></li>
+        <li><input type="checkbox" id="l4-5"><label for="l4-5"><span class="tag build">BUILD</span> Sketch (in words/boxes) an agent design for one of your projects using these patterns</label></li>
+      </ul>
+
+      <div class="loglog">
+        <div class="logtitle">📝 Your learning log — Phase 4 checkpoint</div>
+        <p class="loghint">Checkpoint: <b>When is a second agent worth the extra cost and complexity — and when is it just overkill?</b></p>
+        <textarea class="logta" data-log="4" rows="4" placeholder="Write your answer in your own words — this saves automatically on this device."></textarea>
+        <div><span class="logsaved">Saves automatically on this device · included when you Export</span></div>
+      </div>
+    </div>
+
+    <!-- Phase 5 -->
+    <div class="card phase">
+      <div class="phhead"><span class="badge">Phase 5</span><h3>Understanding the code frameworks</h3><span class="pill">½ week · conceptual</span></div>
+      <div class="outcome">Outcome: you can tell which framework a builder or AI should use — without writing the code.</div>
+      <div class="learnbox">
+        <div class="lbtitle">📚 Learn it here</div>
+        <p><b>Skim (free):</b> <a href="https://huggingface.co/learn/agents-course/unit2/introduction" target="_blank" rel="noopener">Hugging Face AI Agents Course — Unit 2</a>, which builds the same agent across three real frameworks (smolagents, LlamaIndex, LangGraph). Watch to <em>recognize the shape</em> of each — you're not memorizing code.</p>
+      </div>
+      <ul class="lessons" data-phase="5">
+        <li><input type="checkbox" id="l5-1"><label for="l5-1"><b>LangGraph</b> — graph of steps with branches/loops; most battle-tested for complex, stateful production agents</label></li>
+        <li><input type="checkbox" id="l5-2"><label for="l5-2"><b>CrewAI</b> — role-based "crews" of agents; lowest barrier for team-of-agents prototypes</label></li>
+        <li><input type="checkbox" id="l5-3"><label for="l5-3"><b>Microsoft Agent Framework</b> — multi-agent conversations, code-heavy tasks; the 2026 merger of Semantic Kernel + AutoGen (AutoGen itself is now in maintenance mode)</label></li>
+        <li><input type="checkbox" id="l5-4"><label for="l5-4"><b>OpenAI Agents SDK</b> — lightweight, good for handoff patterns between agents</label></li>
+        <li><input type="checkbox" id="l5-5"><label for="l5-5"><b>Claude Agent SDK</b> — Anthropic-native runtime with subagents, Skills, hooks, deepest MCP; powers Cowork</label></li>
+        <li><input type="checkbox" id="l5-6"><label for="l5-6"><span class="tag check">CHECK</span> Say "use LangGraph when…, CrewAI when…, Claude Agent SDK when…" in one line each</label></li>
+      </ul>
+
+      <div class="loglog">
+        <div class="logtitle">📝 Your learning log — Phase 5 checkpoint</div>
+        <p class="loghint">Checkpoint: <b>Finish each line — "Use LangGraph when…, CrewAI when…, Claude Agent SDK when…."</b></p>
+        <textarea class="logta" data-log="5" rows="4" placeholder="Write your answer in your own words — this saves automatically on this device."></textarea>
+        <div><span class="logsaved">Saves automatically on this device · included when you Export</span></div>
+      </div>
+    </div>
+
+    <!-- Phase 6 -->
+    <div class="card phase">
+      <div class="phhead"><span class="badge">Phase 6</span><h3>Reliability, evals, safety &amp; cost</h3><span class="pill">½ week</span></div>
+      <div class="outcome">Outcome: you know how to tell if an agent works and keep it safe and affordable.</div>
+      <div class="learnbox">
+        <div class="lbtitle">📚 Learn it here</div>
+        <p><b>Do this (free):</b> Hugging Face's <a href="https://huggingface.co/learn/agents-course/bonus-unit2/introduction" target="_blank" rel="noopener">Agent Observability &amp; Evaluation</a> unit — how to watch what an agent does and score whether it's actually working. Pair it with Anthropic's <a href="https://www.anthropic.com/engineering/writing-tools-for-agents" target="_blank" rel="noopener">"Writing effective tools for AI agents"</a> for the safety/guardrails side.</p>
+      </div>
+      <ul class="lessons" data-phase="6">
+        <li><input type="checkbox" id="l6-1"><label for="l6-1">Learn evals: test on real examples and score results, don't trust one lucky demo</label></li>
+        <li><input type="checkbox" id="l6-2"><label for="l6-2">Learn guardrails &amp; permissions: require human approval before it sends, deletes, spends, or posts</label></li>
+        <li><input type="checkbox" id="l6-3"><label for="l6-3">Learn cost drivers: tokens, number of tool calls, multi-agent fan-out — and how to keep them low</label></li>
+        <li><input type="checkbox" id="l6-4"><label for="l6-4">Learn privacy: what to weigh before an agent touches your email, files, or accounts</label></li>
+        <li><input type="checkbox" id="l6-5"><label for="l6-5"><span class="tag build">BUILD</span> Write a 5–10 item test set for your Phase 2/3 agent, run it, add one guardrail</label></li>
+      </ul>
+
+      <div class="loglog">
+        <div class="logtitle">📝 Your learning log — Phase 6 checkpoint</div>
+        <p class="loghint">Checkpoint: <b>How would you prove to yourself that an agent is reliable enough to trust?</b></p>
+        <textarea class="logta" data-log="6" rows="4" placeholder="Write your answer in your own words — this saves automatically on this device."></textarea>
+        <div><span class="logsaved">Saves automatically on this device · included when you Export</span></div>
+      </div>
+    </div>
+
+    <!-- Phase 7 -->
+    <div class="card phase">
+      <div class="phhead"><span class="badge accent">Phase 7</span><h3>Capstone: apply agents to your projects</h3><span class="pill">1 week</span></div>
+      <div class="outcome">Outcome: at least one custom agent running for a real project, plus a plan for the rest.</div>
+      <div class="learnbox">
+        <div class="lbtitle">📚 Nothing new to learn here</div>
+        <p>This phase is about <b>applying</b> Phases 1–6 to your own work. Use the <b>Project → Agent worksheet</b> below with the ideas on your <b>My Projects</b> tab. Your best reference is whichever build lane you learned in Phase 2 or 3.</p>
+      </div>
+      <ul class="lessons" data-phase="7">
+        <li><input type="checkbox" id="l7-1"><label for="l7-1">Fill the Project → Agent worksheet (below) for each project</label></li>
+        <li><input type="checkbox" id="l7-2"><label for="l7-2">Pick the highest-value, lowest-effort agent to build first</label></li>
+        <li><input type="checkbox" id="l7-3"><label for="l7-3"><span class="tag build">BUILD</span> Ship a weekend v1 of that agent</label></li>
+        <li><input type="checkbox" id="l7-4"><label for="l7-4">Write the one-paragraph spec (below) for the next one</label></li>
+        <li><input type="checkbox" id="l7-5"><label for="l7-5"><span class="tag check">CHECK</span> For each project, name the simplest agent that would help and how you'd build it</label></li>
+      </ul>
+
+      <div class="loglog">
+        <div class="logtitle">📝 Your learning log — Phase 7 checkpoint</div>
+        <p class="loghint">Checkpoint: <b>For each of your projects, what's the simplest agent that would help — and how would you build it?</b> (Your list lives on the <b>My Projects</b> tab.)</p>
+        <textarea class="logta" data-log="7" rows="4" placeholder="Write your answer in your own words — this saves automatically on this device."></textarea>
+        <div><span class="logsaved">Saves automatically on this device · included when you Export</span></div>
+      </div>
+
+      <div class="callout" style="margin-top:18px">
+        <h3>Project → Agent worksheet (copy per project)</h3>
+        <ol class="steps">
+          <li><b>The job</b> — in one sentence, what should this agent accomplish?</li>
+          <li><b>Trigger</b> — what starts it? (a schedule, a new email, you asking, a file appearing)</li>
+          <li><b>Steps &amp; tools</b> — what does it do, and what apps/tools does each step need?</li>
+          <li><b>Inputs &amp; memory</b> — what does it need up front, and what should it remember between runs?</li>
+          <li><b>Human-in-the-loop</b> — which steps must you approve first?</li>
+          <li><b>Build lane</b> — no-code, Claude/Cowork, or commission a coded build? Why?</li>
+          <li><b>Weekend v1</b> — the smallest version you could get working fast.</li>
+          <li><b>Grown-up version</b> — what it becomes if it proves useful.</li>
+          <li><b>How you'll test it</b> — 5 real examples and what "good" looks like.</li>
+        </ol>
+        <p class="note" style="margin-top:14px"><b>One-paragraph spec to hand a builder or Claude:</b> "Build an agent that [job]. It triggers when [trigger]. It should [step 1], [step 2], [step 3], using [tools]. Before [risky step], it must ask me to approve. It remembers [memory]. Build v1 in [lane]. I'll test it on [examples] and call it working if [criteria]."</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Suggested 6-week schedule</h3>
+      <table>
+        <tr><th>Week</th><th>Focus</th><th>You finish with</th></tr>
+        <tr><td>1</td><td>Phases 0–1</td><td>Your "how agents work" explainer</td></tr>
+        <tr><td>2</td><td>Phase 2</td><td>A working no-code agent</td></tr>
+        <tr><td>3</td><td>Phase 3</td><td>A Claude Project / Cowork workflow</td></tr>
+        <tr><td>4</td><td>Phases 4–5</td><td>A paper design for a project agent</td></tr>
+        <tr><td>5</td><td>Phase 6</td><td>A test set + one guardrail</td></tr>
+        <tr><td>6</td><td>Phase 7</td><td>One custom agent live + a plan</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================= MY PROJECTS ================= -->
+  <section class="panel" id="projects">
+    <h2>My project list</h2>
+    <p class="lead">Every project you might point an agent at. Jot ideas the moment they strike — this list saves on this device and travels with <b>Export/Import</b>. In Phase 7 you'll map a concrete agent onto each one.</p>
+    <div class="card">
+      <div class="projadd">
+        <input id="projinput" type="text" placeholder="e.g. Podcast · the family restaurant · my Etsy shop…" aria-label="New project" />
+        <button id="projaddbtn" type="button">Add project</button>
+      </div>
+      <p class="note" style="margin-top:4px">Keep them short. Press <b>Enter</b> to add fast. Click any line to edit it, or <b>Remove</b> to delete.</p>
+      <ul id="projlist" class="projlist"></ul>
+      <p class="note" id="projempty" hidden>No projects yet — add your first one above.</p>
+    </div>
+    <div class="callout">
+      <h3>Not sure what counts as a "project"?</h3>
+      <p style="margin:.4em 0 0">Anything with repeating work an agent could take off your plate: the <b>podcast</b> (research, show notes, shorts, publishing), a <b>small business</b> you run or want to help (front-desk calls, booking, follow-ups), or a <b>personal system</b> (inbox triage, file organizing, research). Add the rough idea now — you'll sharpen it in Phase 7.</p>
+    </div>
+  </section>
+
+  <!-- ================= PODCAST AGENTS ================= -->
+  <section class="panel" id="podcast">
+    <h2>Agents for the podcast</h2>
+    <p class="lead">Concrete agents mapped to your weekly production pipeline (research → script → record → edit → publish). Golden rule for this project: an agent should <b>wrap the working scripts and skills you already have</b>, not reinvent them.</p>
+
+    <div class="grid">
+      <div class="mini"><h3>🔎 Episode research &amp; SEO title agent <span class="pill">MON</span></h3>
+        <p class="kv"><span>Scans reality-TV news for the shows you cover, proposes episode topics and SEO titles, and drafts the Notion episode card.</span></p>
+        <p class="kv"><b>Lane:</b> <span>Claude/Cowork + web search + Notion connector</span></p></div>
+
+      <div class="mini"><h3>✍️ Script + teleprompter agent <span class="pill">TUE</span></h3>
+        <p class="kv"><span>Drafts the production script in Ruby's voice, strips it to the clean teleprompter version, and cross-checks every cast member against the manifest.</span></p>
+        <p class="kv"><b>Lane:</b> <span>Claude Skill (you already have <code>reality-recap-script</code>) wrapped as an agent</span></p></div>
+
+      <div class="mini"><h3>📝 Show notes &amp; chapters agent <span class="pill">THU</span></h3>
+        <p class="kv"><span>Turns the YouTube auto-transcript into show notes, description, and timestamped chapters — writes to the Content Calendar &amp; Show Notes Library.</span></p>
+        <p class="kv"><b>Lane:</b> <span>Claude/Cowork + Notion</span></p></div>
+
+      <div class="mini"><h3>✂️ Shorts picker agent <span class="pill">THU</span></h3>
+        <p class="kv"><span>Reads the final master's transcript, nominates the best 30–60s moments by timecode, and hands windows to your <code>make_shorts.py</code>.</span></p>
+        <p class="kv"><b>Lane:</b> <span>Agent proposes → existing script cuts (human confirms picks)</span></p></div>
+
+      <div class="mini"><h3>🎬 Caption / karaoke build agent</h3>
+        <p class="kv"><span>Wraps your locked caption pipeline (own word-level transcript → karaoke burn) so a run is one instruction, with the dense timing check built in.</span></p>
+        <p class="kv"><b>Lane:</b> <span>Agent orchestrates your existing caption-capable render scripts</span></p></div>
+
+      <div class="mini"><h3>📣 Publishing &amp; social agent <span class="pill">FRI</span></h3>
+        <p class="kv"><span>On publish day, drafts the Facebook post and email newsletter, and preps the RSS/Zap checklist for you to fire.</span></p>
+        <p class="kv"><b>Lane:</b> <span>Claude/Cowork drafts → you approve &amp; publish</span></p></div>
+
+      <div class="mini"><h3>✅ QA / verification agent</h3>
+        <p class="kv"><span>Before "done," checks cast roll-call count vs. the manifest, runtime vs. the 15:00 cap, and caption alignment — mirroring your self-check block.</span></p>
+        <p class="kv"><b>Lane:</b> <span>Claude subagent dedicated to verification</span></p></div>
+
+      <div class="mini"><h3>🔁 Repurposing agent</h3>
+        <p class="kv"><span>Spins each episode into a blog post / newsletter section for search and reach, from the same transcript.</span></p>
+        <p class="kv"><b>Lane:</b> <span>Claude/Cowork</span></p></div>
+    </div>
+
+    <p class="note">Where to start: the <b>show notes &amp; chapters agent</b> or the <b>QA / verification agent</b> — both are low-risk, save real time every episode, and build on transcripts/scripts you already produce.</p>
+  </section>
+
+  <!-- ================= SMB AGENTS ================= -->
+  <section class="panel" id="smb">
+    <h2>Agents for small-business operations</h2>
+    <p class="lead">In 2026 most small businesses don't automate their <em>craft</em> — they automate the <b>front office</b>: answering every call, booking, follow-up, reminders, and paperwork. Below are the highest-value agent patterns per industry, with the kind of results being reported. A voice/receptionist agent is the common first win almost everywhere.</p>
+
+    <div class="grid">
+
+      <div class="mini"><h3>🦷 Dental / medical office</h3>
+        <p class="kv"><b>Pain:</b> <span>Front desk drowns in scheduling, reminders, intake, insurance checks.</span></p>
+        <p class="kv"><b>Agent does:</b> <span>24/7 scheduling &amp; confirmations, recall/reactivation outreach, insurance verification, intake, payment posting.</span></p>
+        <p class="kv"><b>Tools:</b> <span>Patientdesk.ai, Weave, Dental Intelligence, Vapi voice; PMS: Dentrix / Open Dental / Eaglesoft.</span></p>
+        <p class="kv"><b>Reported:</b> <span class="stat">~32% fewer no-shows, 45% faster intake</span></p></div>
+
+      <div class="mini"><h3>🔨 Construction / remodeling</h3>
+        <p class="kv"><b>Pain:</b> <span>Missed calls become lost jobs; estimating &amp; follow-up eat evenings.</span></p>
+        <p class="kv"><b>Agent does:</b> <span>Answers every call, schedules estimates, follows up on quotes, organizes project data, updates the CRM.</span></p>
+        <p class="kv"><b>Tools:</b> <span>Procore AI, Buildertrend, Handoff, GoHighLevel, Vapi.</span></p>
+        <p class="kv"><b>Reported:</b> <span class="stat">40–65% more lead capture, 30–45% better estimate conversion</span></p></div>
+
+      <div class="mini"><h3>🔧 Home services (HVAC / plumbing / electrical)</h3>
+        <p class="kv"><b>Pain:</b> <span>Missed calls cost $45k–$125k/yr; emergencies go to voicemail.</span></p>
+        <p class="kv"><b>Agent does:</b> <span>24/7 answering, detects emergency keywords &amp; dispatches, books jobs, runs re-engagement drips.</span></p>
+        <p class="kv"><b>Tools:</b> <span>Voice agents (Vapi/PolyAI-style), ServiceTitan, GoHighLevel.</span></p>
+        <p class="kv"><b>Reported:</b> <span class="stat">pays for itself in ~4–6 weeks at $30k+/mo</span></p></div>
+
+      <div class="mini"><h3>🍽️ Restaurant</h3>
+        <p class="kv"><b>Pain:</b> <span>Nobody free to answer the phone during service; missed reservations.</span></p>
+        <p class="kv"><b>Agent does:</b> <span>Takes reservations &amp; phone orders, answers hours/menu questions, handles simple complaints, syncs to POS.</span></p>
+        <p class="kv"><b>Tools:</b> <span>PolyAI, Bookline, Voiceflow; POS &amp; booking integrations.</span></p>
+        <p class="kv"><b>Reported:</b> <span class="stat">~74% of diners comfortable with AI booking</span></p></div>
+
+      <div class="mini"><h3>💇 Salon / spa</h3>
+        <p class="kv"><b>Pain:</b> <span>Stylists can't book while hands are busy; slow off-peak hours.</span></p>
+        <p class="kv"><b>Agent does:</b> <span>24/7 voice booking, answers service/pricing questions, logs to CRM, suggests off-peak discounts to fill gaps.</span></p>
+        <p class="kv"><b>Tools:</b> <span>AI receptionist (CloudTalk-style), AgentZap, salon booking suites.</span></p>
+        <p class="kv"><b>Best lane:</b> <span>hosted vertical product or no-code voice agent</span></p></div>
+
+      <div class="mini"><h3>⚖️ Law firm</h3>
+        <p class="kv"><b>Pain:</b> <span>Billable hours lost to intake, drafting, and document review.</span></p>
+        <p class="kv"><b>Agent does:</b> <span>Client intake &amp; qualification, first-draft memos/letters in the firm's voice, document summarization, deadline tracking.</span></p>
+        <p class="kv"><b>Tools:</b> <span>Custom agents on firm templates/playbooks; Claude/GPT + doc tools.</span></p>
+        <p class="kv"><b>Best lane:</b> <span>Claude Project trained on firm templates (careful with confidentiality)</span></p></div>
+
+      <div class="mini"><h3>🏠 Real estate / property mgmt</h3>
+        <p class="kv"><b>Pain:</b> <span>Lead response speed, listing paperwork, tenant maintenance tickets.</span></p>
+        <p class="kv"><b>Agent does:</b> <span>Instant lead reply &amp; qualification, listing/description drafts, opens maintenance tickets, dispatches vendors, messages tenants.</span></p>
+        <p class="kv"><b>Tools:</b> <span>CRM automation + voice/chat agents; real-estate AI suites.</span></p>
+        <p class="kv"><b>Best lane:</b> <span>no-code (n8n/GoHighLevel) + voice agent</span></p></div>
+
+      <div class="mini"><h3>🚗 Auto repair</h3>
+        <p class="kv"><b>Pain:</b> <span>Phone rings during work; quotes &amp; status updates slip.</span></p>
+        <p class="kv"><b>Agent does:</b> <span>Books appointments, triages urgent vs. routine, sends status updates &amp; service reminders.</span></p>
+        <p class="kv"><b>Tools:</b> <span>Ciela-style shop agents, voice answering, shop CRM.</span></p>
+        <p class="kv"><b>Best lane:</b> <span>hosted vertical product or no-code voice agent</span></p></div>
+
+      <div class="mini"><h3>🛍️ Retail / e-commerce shop</h3>
+        <p class="kv"><b>Pain:</b> <span>Repetitive support tickets, order status, inventory questions.</span></p>
+        <p class="kv"><b>Agent does:</b> <span>Answers product/order/returns questions across chat/email/DM, triages tickets, flags inventory gaps.</span></p>
+        <p class="kv"><b>Tools:</b> <span>Support agents (Botpress/Fini/LiveChatAI-style), Dify for product Q&amp;A.</span></p>
+        <p class="kv"><b>Best lane:</b> <span>no-code chat agent (Dify) + support platform</span></p></div>
+
+      <div class="mini"><h3>📚 Bookkeeping / accounting</h3>
+        <p class="kv"><b>Pain:</b> <span>Invoice chasing, receipt sorting, reconciliation, reminders.</span></p>
+        <p class="kv"><b>Agent does:</b> <span>Sends invoice follow-ups, categorizes transactions, drafts monthly reports, flags anomalies.</span></p>
+        <p class="kv"><b>Tools:</b> <span>n8n/Zapier + accounting app connectors.</span></p>
+        <p class="kv"><b>Best lane:</b> <span>no-code workflow agent (keep a human on the money moves)</span></p></div>
+
+      <div class="mini"><h3>🏋️ Fitness studio / gym</h3>
+        <p class="kv"><b>Pain:</b> <span>Class booking, membership questions, win-back of lapsed members.</span></p>
+        <p class="kv"><b>Agent does:</b> <span>Books classes, answers membership/pricing questions, runs re-engagement drips, collects reviews.</span></p>
+        <p class="kv"><b>Tools:</b> <span>Voice/chat agent + booking software + CRM.</span></p>
+        <p class="kv"><b>Best lane:</b> <span>no-code + hosted booking</span></p></div>
+
+      <div class="mini"><h3>💡 The universal starter agent</h3>
+        <p class="kv"><span>Whatever the industry, the first agent to build is almost always the <b>24/7 receptionist</b>: answer every call/text/DM, book or route, and follow up. It's the fastest ROI and the easiest to scope.</span></p>
+        <p class="kv"><b>Selective wins:</b> <span>invoice follow-ups, reminders, lead qualification, review requests, reporting.</span></p></div>
+
+    </div>
+
+    <p class="note">Reality check from the research: the businesses that win aren't automating <em>everything</em> — they're selective, they test carefully, and they keep a human wherever judgment, empathy, or relationships matter. Reported median payback across functions is ~5 months.</p>
+  </section>
+
+  <!-- ================= BUILD LANES ================= -->
+  <section class="panel" id="lanes">
+    <h2>Four ways to build a custom agent</h2>
+    <p class="lead">As a non-coder you'll live in the first two lanes. The last two are worth understanding so you can commission builds intelligently.</p>
+    <table>
+      <tr><th>Lane</th><th>What it is</th><th>Best for</th><th>Effort</th><th>Pick it when…</th></tr>
+      <tr><td><b>No-code / low-code</b><br><span style="color:var(--muted)">n8n · Zapier Agents · Make · Dify · Lindy · Botpress</span></td><td>Visual builders that connect apps and add autonomous AI steps.</td><td>Front-office automation, app-to-app agents, chat/Q&amp;A bots.</td><td>Low–Med</td><td>You want to ship something useful this week without code.</td></tr>
+      <tr><td><b>Claude / Cowork stack</b><br><span style="color:var(--muted)">Projects · Cowork · Skills · MCP · Agent SDK</span></td><td>Give Claude a role, files, connectors, and reusable skills to act on your machine.</td><td>Personal/creative workflows, your podcast, document &amp; research work.</td><td>Low–Med</td><td>The job lives in your files, docs, and existing tools.</td></tr>
+      <tr><td><b>Code frameworks</b><br><span style="color:var(--muted)">LangGraph · CrewAI · AutoGen · OpenAI Agents SDK</span></td><td>Developer libraries for building custom, complex, multi-agent systems.</td><td>Bespoke products, intricate logic, scale.</td><td>High</td><td>You've outgrown no-code and are commissioning a real build.</td></tr>
+      <tr><td><b>Hosted vertical products</b><br><span style="color:var(--muted)">Patientdesk, Vapi, PolyAI, GoHighLevel, etc.</span></td><td>Ready-made agents for a specific industry.</td><td>Standard needs like a dental receptionist or contractor voice agent.</td><td>Low</td><td>Someone already sells exactly the agent you need.</td></tr>
+    </table>
+    <p class="note">Rule of thumb: buy a hosted product for a standard job, build no-code for anything custom-but-simple, use Claude/Cowork when it touches your own files and content, and only commission a coded framework build when the logic is genuinely complex.</p>
+  </section>
+
+  <!-- ================= RESOURCES ================= -->
+  <section class="panel" id="resources">
+    <h2>Resources (ranked, mostly free)</h2>
+    <div class="card">
+      <h3>Start here</h3>
+      <p class="kv"><b><a href="https://huggingface.co/learn/agents-course" target="_blank" rel="noopener">Hugging Face AI Agents Course</a></b> — <span>best free, vendor-neutral entry point; earns a certificate.</span></p>
+      <p class="kv"><b><a href="https://www.anthropic.com/engineering/building-effective-agents" target="_blank" rel="noopener">Anthropic — "Building Effective Agents"</a></b> — <span>the canonical, re-readable essay on agent design.</span></p>
+    </div>
+    <div class="card">
+      <h3>Go deeper</h3>
+      <p class="kv"><b><a href="https://www.anthropic.com/learn" target="_blank" rel="noopener">Anthropic Academy</a></b> — <span>free courses incl. MCP (co-built with Hugging Face) and Claude agents in action.</span></p>
+      <p class="kv"><b><a href="https://huggingface.co/learn/mcp-course" target="_blank" rel="noopener">Hugging Face MCP Course</a></b> — <span>the tool-connectivity standard every framework relies on.</span></p>
+      <p class="kv"><b><a href="https://www.deeplearning.ai/courses/" target="_blank" rel="noopener">DeepLearning.AI short courses</a></b> — <span>bite-size, project-based, videos free to watch.</span></p>
+    </div>
+    <div class="card">
+      <h3>Newest Anthropic guidance (2025 — post-dates the 2024 essay)</h3>
+      <p class="kv"><b><a href="https://www.anthropic.com/engineering/building-agents-with-the-claude-agent-sdk" target="_blank" rel="noopener">"Building agents with the Claude Agent SDK"</a></b> — <span>the current companion to the 2024 essay; note the Claude <em>Code</em> SDK was renamed the Claude <em>Agent</em> SDK.</span></p>
+      <p class="kv"><b><a href="https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills" target="_blank" rel="noopener">"Equipping agents with Agent Skills"</a></b> — <span>Agent Skills became an open standard in Dec 2025; the what &amp; why.</span></p>
+      <p class="kv"><b><a href="https://www.anthropic.com/engineering/writing-tools-for-agents" target="_blank" rel="noopener">"Writing effective tools for AI agents"</a></b> — <span>how to design an agent's "hands" so it uses them reliably.</span></p>
+    </div>
+    <div class="card">
+      <h3>Tool docs (reference as you build)</h3>
+      <p class="kv"><b><a href="https://docs.n8n.io/" target="_blank" rel="noopener">n8n docs</a></b> · <b><a href="https://help.zapier.com/" target="_blank" rel="noopener">Zapier help</a></b> · <b><a href="https://docs.dify.ai/" target="_blank" rel="noopener">Dify docs</a></b> · <b><a href="https://docs.claude.com/" target="_blank" rel="noopener">Anthropic docs</a></b> — <span>Projects, Skills, MCP connectors, Agent SDK.</span></p>
+    </div>
+    <p class="note">The specifics (framework versions, the "best" no-code pick) shift monthly. Re-run your <code>Agents_Research_Prompt.md</code> every 1–2 months to refresh anything that's gone stale.</p>
+  </section>
+
+  <!-- ================= GLOSSARY ================= -->
+  <section class="panel" id="glossary">
+    <h2>Glossary</h2>
+    <div class="card">
+      <p class="glo"><b>Agent</b> — an AI system that pursues a goal by deciding its own steps and using tools, looping until done.</p>
+      <p class="glo"><b>Tool use / function calling</b> — the model's ability to call external actions (search, send email, run code).</p>
+      <p class="glo"><b>ReAct</b> — interleaving reasoning ("think") and acting ("do") step by step.</p>
+      <p class="glo"><b>RAG</b> — Retrieval-Augmented Generation; the agent looks up relevant documents and uses them to answer.</p>
+      <p class="glo"><b>MCP (Model Context Protocol)</b> — the open standard that lets agents plug into tools and data — "USB-C for AI."</p>
+      <p class="glo"><b>Skill</b> — a reusable capability package an agent auto-uses when relevant.</p>
+      <p class="glo"><b>Subagent</b> — a specialist agent a main agent delegates a bounded task to, with its own context.</p>
+      <p class="glo"><b>Orchestration</b> — coordinating multiple steps or agents toward one goal.</p>
+      <p class="glo"><b>Memory</b> — short-term (the current context window) or long-term (stored, retrievable facts/history).</p>
+      <p class="glo"><b>Evals</b> — tests that measure whether an agent produces good results, run on real examples.</p>
+      <p class="glo"><b>Guardrails</b> — rules/permissions that limit what an agent can do and require human approval for risky actions.</p>
+      <p class="glo"><b>Human-in-the-loop</b> — a person reviews or approves certain agent steps.</p>
+      <p class="glo"><b>Context window</b> — how much text the model can consider at once.</p>
+      <p class="glo"><b>Token</b> — the unit of text models process and are billed on; more tokens = more cost.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>Built for Eddie · August 2026 (resources re-checked 14 Aug 2026). The agent field changes fast — treat specific tools as "true this month" and refresh with your research prompt periodically. Your checkmarks, learning-log notes, and project list are saved per-device; use <b>Export</b> on one device and <b>Import</b> on another to carry them all across. Companion files: <code>Agents_Research_Prompt.md</code> and <code>Agents_Learning_Path.md</code>.</p>
+  </footer>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+  var STORAGE_KEY = "eddie_agents_portal_v1";
+  var state = {boxes:{}, log:{}, projects:[], _ts:0};
+
+  // ---- Cloud auto-sync config (Supabase) ----
+  var SUPABASE_URL = "https://wprdiyhoucmhlxiabkup.supabase.co";
+  var SUPABASE_KEY = "sb_publishable_NVXzNMh6AZppYE5tD0zk0g_i_4Qx4sq";
+  var CLOUD_REDIRECT = "https://tsunamicstraw420.github.io/agents-portal/";
+  var sb = (window.supabase && window.supabase.createClient)
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+    : null;
+  var cloudUser = null, pushTimer = null;
+
+  // ---- Tabs ----
+  var tabs = document.querySelectorAll(".tab");
+  var panels = document.querySelectorAll("section.panel");
+  tabs.forEach(function(tab){
+    tab.addEventListener("click", function(){
+      tabs.forEach(function(t){t.classList.remove("active");});
+      panels.forEach(function(p){p.classList.remove("active");});
+      tab.classList.add("active");
+      var el = document.getElementById(tab.getAttribute("data-t"));
+      if(el) el.classList.add("active");
+      window.scrollTo({top:0, behavior:"smooth"});
+    });
+  });
+
+  // ---- Elements ----
+  var boxes    = Array.prototype.slice.call(document.querySelectorAll('ul.lessons input[type=checkbox]'));
+  var logAreas = Array.prototype.slice.call(document.querySelectorAll('textarea.logta'));
+  var bar = document.getElementById("progbar");
+  var txt = document.getElementById("progtext");
+  var projlist  = document.getElementById("projlist");
+  var projinput = document.getElementById("projinput");
+  var projempty = document.getElementById("projempty");
+
+  // ---- Base64 (unicode-safe, so notes with emoji/curly quotes survive) ----
+  function b64encode(str){ return btoa(unescape(encodeURIComponent(str))); }
+  function b64decode(b64){ return decodeURIComponent(escape(atob(b64))); }
+
+  // ---- State (checkboxes + learning log + projects in one object) ----
+  // Accepts the current format, the new-but-partial format, and the original
+  // flat "{id:1}" checkbox-only format (migrated on first load).
+  function normalize(raw, seed, base){
+    var s = {boxes:{}, log:null, projects:null};
+    if(raw && typeof raw === "object"){
+      if(raw.boxes || raw.log || raw.projects){
+        s.boxes    = raw.boxes || {};
+        s.log      = (raw.log && typeof raw.log === "object") ? raw.log : null;
+        s.projects = Array.isArray(raw.projects) ? raw.projects : null;
+      } else {
+        s.boxes = raw; // legacy flat format = checkbox map only
+      }
+    }
+    if(s.log === null){ s.log = base ? base.log : {}; }
+    if(s.projects === null){ s.projects = base ? base.projects : (seed ? ["Podcast"] : []); }
+    s._ts = (raw && typeof raw._ts === "number") ? raw._ts : ((base && base._ts) || 0);
+    return s;
+  }
+  function applyToUI(){
+    boxes.forEach(function(b){ b.checked = !!state.boxes[b.id]; syncRow(b); });
+    logAreas.forEach(function(t){ t.value = state.log[t.getAttribute("data-log")] || ""; });
+    renderProjects();
+    refresh();
+  }
+  function save(){
+    var bx = {};
+    boxes.forEach(function(b){ if(b.checked) bx[b.id] = 1; });
+    state.boxes = bx; // DOM is source of truth for checkboxes; log/projects live on state
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+  }
+  function syncRow(b){
+    var li = b.closest("li");
+    if(li){ li.classList.toggle("done", b.checked); }
+  }
+  function refresh(){
+    var done = boxes.filter(function(b){return b.checked;}).length;
+    var total = boxes.length;
+    var pct = total ? Math.round(done/total*100) : 0;
+    bar.style.width = pct + "%";
+    txt.textContent = done + " of " + total + " lessons complete · " + pct + "%";
+  }
+
+  // ---- Checkboxes ----
+  boxes.forEach(function(b){
+    b.addEventListener("change", function(){ syncRow(b); markChanged(); refresh(); });
+  });
+  document.getElementById("resetbtn").addEventListener("click", function(){
+    if(!confirm("Clear all your checkmarks? Your learning log and project list are kept.")) return;
+    boxes.forEach(function(b){ b.checked = false; syncRow(b); });
+    markChanged(); refresh();
+  });
+
+  // ---- Learning log (auto-saves as you type) ----
+  logAreas.forEach(function(t){
+    t.addEventListener("input", function(){
+      state.log[t.getAttribute("data-log")] = t.value;
+      markChanged();
+      var s = t.parentNode.querySelector(".logsaved");
+      if(s){ s.textContent = "Saved ✓ on this device"; s.classList.add("on"); }
+    });
+  });
+
+  // ---- Projects ----
+  function renderProjects(){
+    projlist.innerHTML = "";
+    state.projects.forEach(function(name, i){
+      var li  = document.createElement("li");
+      var inp = document.createElement("input");
+      inp.type = "text"; inp.className = "projitem"; inp.value = name;
+      inp.setAttribute("aria-label", "Project " + (i+1));
+      inp.addEventListener("input", function(){ state.projects[i] = inp.value; markChanged(); });
+      var rm = document.createElement("button");
+      rm.type = "button"; rm.className = "projremove"; rm.textContent = "Remove";
+      rm.addEventListener("click", function(){ state.projects.splice(i,1); markChanged(); renderProjects(); });
+      li.appendChild(inp); li.appendChild(rm);
+      projlist.appendChild(li);
+    });
+    if(projempty){ projempty.hidden = state.projects.length > 0; }
+  }
+  function addProject(){
+    var v = projinput.value.trim();
+    if(!v) return;
+    state.projects.push(v); markChanged(); renderProjects();
+    projinput.value = ""; projinput.focus();
+  }
+  document.getElementById("projaddbtn").addEventListener("click", addProject);
+  projinput.addEventListener("keydown", function(e){
+    if(e.key === "Enter"){ e.preventDefault(); addProject(); }
+  });
+
+  // ---- Cross-device carry-over (progress + learning log + projects) ----
+  var syncbox   = document.getElementById("syncbox");
+  var syncta    = document.getElementById("syncta");
+  var synclabel = document.getElementById("synclabel");
+  var synccopy  = document.getElementById("synccopy");
+  var syncapply = document.getElementById("syncapply");
+
+  function currentCode(){ save(); return b64encode(JSON.stringify(state)); }
+  function copyText(t){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      return navigator.clipboard.writeText(t).then(function(){return true;}).catch(function(){return false;});
+    }
+    try{ syncta.select(); document.execCommand("copy"); return Promise.resolve(true); }
+    catch(e){ return Promise.resolve(false); }
+  }
+
+  document.getElementById("exportbtn").addEventListener("click", function(){
+    syncbox.hidden = false;
+    synclabel.textContent = "Your sync code (progress + learning log + projects) — copy it, open the portal on your other device, press Import, and paste it:";
+    syncta.value = currentCode();
+    synccopy.hidden = false; synccopy.textContent = "Copy code"; syncapply.hidden = true;
+    syncta.focus(); syncta.select();
+    copyText(syncta.value).then(function(ok){ if(ok) synccopy.textContent = "Copied ✓"; });
+  });
+
+  document.getElementById("importbtn").addEventListener("click", function(){
+    syncbox.hidden = false;
+    synclabel.textContent = "Paste the sync code from your other device, then press Apply (this replaces what's on this device):";
+    syncta.value = ""; synccopy.hidden = true; syncapply.hidden = false;
+    syncta.focus();
+  });
+
+  synccopy.addEventListener("click", function(){
+    copyText(syncta.value).then(function(ok){ synccopy.textContent = ok ? "Copied ✓" : "Press ⌘/Ctrl+C"; });
+  });
+
+  syncapply.addEventListener("click", function(){
+    var raw;
+    try{ raw = JSON.parse(b64decode(syncta.value.trim())); }
+    catch(e){ alert("That code didn't look right. Copy the full code shown by Export on your other device."); return; }
+    state = normalize(raw, false, state); // legacy codes only replace checkmarks; keep this device's notes/projects
+    applyToUI(); markChanged();
+    synclabel.textContent = "Imported ✓ — progress, learning log, and projects are synced.";
+  });
+
+  document.getElementById("syncclose").addEventListener("click", function(){
+    syncbox.hidden = true;
+  });
+
+  // ---- Cloud auto-sync (Supabase): auth + push/pull ----
+  function setCloudStatus(t){ var el = document.getElementById("cloudstatus"); if(el) el.textContent = t; }
+
+  // A user change: save locally, stamp the time, and schedule a cloud push.
+  function markChanged(){ state._ts = Date.now(); save(); scheduleCloudPush(); }
+
+  function scheduleCloudPush(){
+    if(!sb || !cloudUser) return;
+    setCloudStatus("Saving…");
+    if(pushTimer) clearTimeout(pushTimer);
+    pushTimer = setTimeout(cloudPush, 700);
+  }
+  function cloudPush(){
+    if(!sb || !cloudUser) return;
+    if(!state._ts) state._ts = Date.now();
+    sb.from("portal_state").upsert(
+      { user_id: cloudUser.id, data: state, updated_at: new Date().toISOString() },
+      { onConflict: "user_id" }
+    ).then(function(res){
+      if(res.error){ setCloudStatus("Sync error — will retry on next change"); console.warn("cloud push", res.error); }
+      else { setCloudStatus("Synced ✓"); }
+    });
+  }
+  function cloudPull(){
+    if(!sb || !cloudUser) return;
+    sb.from("portal_state").select("data").eq("user_id", cloudUser.id).maybeSingle().then(function(res){
+      if(res.error){ console.warn("cloud pull", res.error); setCloudStatus("Sync error"); return; }
+      var cloud = res.data && res.data.data;
+      if(!cloud){ cloudPush(); return; }                 // nothing in cloud yet -> seed it from this device
+      var cloudTs = (typeof cloud._ts === "number") ? cloud._ts : 0;
+      var localTs = (typeof state._ts === "number") ? state._ts : 0;
+      if(cloudTs > localTs){                              // cloud is newer -> pull it in
+        state = normalize(cloud, false, state);
+        state._ts = cloudTs;
+        applyToUI(); save();
+      } else if(localTs > cloudTs){                       // this device is newer -> push up
+        cloudPush();
+      }
+      setCloudStatus("Synced ✓");
+    });
+  }
+  function renderCloudUI(){
+    var out = document.getElementById("cloud-out");
+    var inn = document.getElementById("cloud-in");
+    var who = document.getElementById("cloudwho");
+    if(!out || !inn) return;
+    out.hidden = !!cloudUser;
+    inn.hidden = !cloudUser;
+    if(cloudUser && who){ who.textContent = cloudUser.email || "your account"; }
+  }
+  function wireCloud(){
+    var bar = document.getElementById("cloudbar");
+    if(!sb){ if(bar) bar.hidden = true; return; }         // library didn't load -> stay local-only
+    var emailInput = document.getElementById("cloudemail");
+    var signinBtn  = document.getElementById("cloudsignin");
+    var signoutBtn = document.getElementById("cloudsignout");
+    var hint       = document.getElementById("cloudhint");
+    signinBtn.addEventListener("click", function(){
+      var email = (emailInput.value || "").trim();
+      if(email.indexOf("@") < 1){ hint.textContent = "Enter your email address first."; return; }
+      signinBtn.disabled = true; hint.textContent = "Sending your sign-in link…";
+      sb.auth.signInWithOtp({ email: email, options: { emailRedirectTo: CLOUD_REDIRECT } })
+        .then(function(res){
+          signinBtn.disabled = false;
+          hint.textContent = res.error
+            ? ("Couldn't send the link: " + res.error.message)
+            : "Check your email and click the link to finish. You can keep working here in the meantime.";
+        });
+    });
+    emailInput.addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); signinBtn.click(); } });
+    signoutBtn.addEventListener("click", function(){ sb.auth.signOut(); });
+    sb.auth.onAuthStateChange(function(_evt, session){
+      cloudUser = session ? session.user : null;
+      renderCloudUI();
+      if(cloudUser){ setTimeout(cloudPull, 0); }          // deferred per Supabase guidance
+    });
+    document.addEventListener("visibilitychange", function(){
+      if(!document.hidden && cloudUser){ cloudPull(); }   // returning to the tab pulls the latest
+    });
+    renderCloudUI();
+  }
+
+  // ---- Init ----
+  (function initState(){
+    var raw = null;
+    try{ raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null"); }catch(e){ raw = null; }
+    state = normalize(raw, true, null);
+    applyToUI();
+    save(); // persist migration/seed in the new format
+  })();
+
+  wireCloud();
+})();
+</script>
+</body>
+</html>

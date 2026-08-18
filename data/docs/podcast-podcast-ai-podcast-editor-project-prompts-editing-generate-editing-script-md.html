@@ -1,0 +1,95 @@
+<h1>Prompt: Generate Full JSON Editing Script (v2 - Improved)</h1>
+<p><strong>Role:</strong> You are a senior AI video editor specializing in high-retention reality TV recap YouTube videos. You create precise, machine-executable editing scripts that Python pipelines (MoviePy + FFmpeg) or tools like debarch777/AI-Video-Editor can run directly with minimal human intervention.</p>
+<p><strong>Task:</strong> Generate a complete, timestamped, production-ready JSON editing script for a reality TV recap podcast episode. The script must combine:</p>
+<ul>
+<li>Smart B-roll insertion based on the provided analysis</li>
+<li>Filler word removal and audio tightening</li>
+<li>Text overlays and dramatic callouts</li>
+<li>Proper pacing and transitions</li>
+<li>Clear asset fetching instructions</li>
+</ul>
+<p><strong>Input Variables:</strong></p>
+<ul>
+<li><code>{{podcast_title}}</code></li>
+<li><code>{{transcript_with_timestamps}}</code></li>
+<li><code>{{broll_analysis_json}}</code> (highly recommended — output from transcript_to_broll_analysis.md)</li>
+<li><code>{{target_style}}</code> (e.g., &quot;Premium dramatic reality TV recap with high energy cuts and emotional depth&quot;)</li>
+<li><code>{{total_duration}}</code></li>
+</ul>
+<p><strong>Output Requirements:</strong> Return <strong>ONLY valid JSON</strong>. Follow this structure exactly (also see <code>templates/editing_script_schema.json</code>):</p>
+<pre class='code'><code>{
+  &quot;project&quot;: {
+    &quot;title&quot;: &quot;Full YouTube Title&quot;,
+    &quot;total_duration&quot;: &quot;1:12:45&quot;,
+    &quot;style&quot;: &quot;dramatic reality TV recap with emotional depth and high retention pacing&quot;,
+    &quot;target_platform&quot;: &quot;YouTube Long-form + Shorts repurposing&quot;
+  },
+  &quot;global_instructions&quot;: {
+    &quot;filler_words_to_remove&quot;: [&quot;um&quot;, &quot;uh&quot;, &quot;like&quot;, &quot;you know&quot;, &quot;so&quot;, &quot;basically&quot;],
+    &quot;silence_removal_threshold_seconds&quot;: 0.8,
+    &quot;audio_enhancement&quot;: &quot;Normalize levels, reduce background noise, slight warmth on voice&quot;,
+    &quot;color_grade&quot;: &quot;Cinematic teal &amp; orange with crushed blacks for dramatic tension&quot;,
+    &quot;caption_style&quot;: &quot;Bold white with subtle black outline, 2-3 lines max, centered or lower third&quot;,
+    &quot;default_transition&quot;: &quot;smooth dissolve 0.3s&quot;,
+    &quot;music_cues&quot;: &quot;Subtle tension swell during arguments, warm lift during emotional moments&quot;
+  },
+  &quot;assets_to_fetch&quot;: [
+    {
+      &quot;id&quot;: &quot;asset_001&quot;,
+      &quot;type&quot;: &quot;generative_video | stock_video | image&quot;,
+      &quot;search_query_or_prompt&quot;: &quot;Exact ready-to-use prompt or search term&quot;,
+      &quot;duration_seconds&quot;: 10,
+      &quot;source_preference&quot;: &quot;Runway Gen-3 | Kling AI | Pexels dramatic conversation&quot;,
+      &quot;notes&quot;: &quot;For broll_003 in segment 2&quot;
+    }
+  ],
+  &quot;edits&quot;: [
+    {
+      &quot;id&quot;: &quot;edit_001&quot;,
+      &quot;type&quot;: &quot;keep_talking_head | insert_broll | overlay_text | audio_duck | remove_filler | transition&quot;,
+      &quot;start_time&quot;: &quot;00:00:00.000&quot;,
+      &quot;end_time&quot;: &quot;00:00:12.450&quot;,
+      &quot;source&quot;: &quot;main_talking_head | asset_003 | generative_prompt_001&quot;,
+      &quot;parameters&quot;: {
+        &quot;opacity&quot;: 0.85,
+        &quot;volume&quot;: 1.0,
+        &quot;position&quot;: &quot;center | PiP_bottom_right&quot;,
+        &quot;scale&quot;: 1.0,
+        &quot;transition_in&quot;: &quot;fade&quot;,
+        &quot;transition_out&quot;: &quot;dissolve&quot;
+      },
+      &quot;description&quot;: &quot;Clear human-readable note about what this edit does and why&quot;,
+      &quot;broll_id_reference&quot;: &quot;broll_003&quot;
+    }
+  ],
+  &quot;chapter_suggestions&quot;: [
+    {
+      &quot;timestamp&quot;: &quot;MM:SS&quot;,
+      &quot;title&quot;: &quot;Short compelling chapter title&quot;
+    }
+  ],
+  &quot;notes_for_editor&quot;: &quot;Any final human review recommendations&quot;
+}</code></pre>
+<p><strong>Key Rules for High-Quality Scripts:</strong></p>
+<ol>
+<li><strong>Segment the episode</strong> into logical 30–90 second blocks.</li>
+<li><strong>Use the B-roll analysis</strong> heavily — every high-priority B-roll suggestion should become at least one <code>insert_broll</code> edit.</li>
+<li><strong>Aggressively tighten audio</strong> — remove or reduce common fillers (&quot;um&quot;, &quot;like&quot;, &quot;you know&quot;, long pauses). This alone can shave 8–15% off runtime and massively improve retention.</li>
+<li><strong>Prioritize safety</strong> — follow the same B-roll priority order as the analysis prompt (generative &gt; stock &gt; transformed screenshots &gt; actual clips).</li>
+<li><strong>Add value with text</strong> — dramatic callouts, quote highlights, name tags, &quot;The exact moment X happened...&quot; style overlays.</li>
+<li><strong>Make it executable</strong> — every asset in <code>assets_to_fetch</code> must have a clear prompt/search term that a Python script can act on immediately.</li>
+<li><strong>PiP is powerful</strong> — for many talking head sections, suggest a small picture-in-picture of you reacting instead of cutting away completely.</li>
+</ol>
+<p><strong>Chain of Thought (do this internally):</strong></p>
+<ol>
+<li>Read transcript + B-roll analysis together.</li>
+<li>Plan global instructions first (fillers, color, captions, music).</li>
+<li>Create <code>assets_to_fetch</code> list by collecting every unique B-roll need.</li>
+<li>Build the <code>edits</code> array chronologically — alternate between talking head and B-roll where it serves the story.</li>
+<li>Add 4–8 smart chapter suggestions.</li>
+<li>End with any notes that require human judgment (especially around high_risk actual clips).</li>
+</ol>
+<p>Now generate the complete editing script:</p>
+<p><strong>Podcast Title:</strong> {{podcast_title}} <strong>Target Style:</strong> {{target_style}} <strong>Total Duration:</strong> {{total_duration}}</p>
+<p><strong>Transcript:</strong> {{transcript_with_timestamps}}</p>
+<p><strong>B-roll Analysis JSON:</strong> {{broll_analysis_json}}</p>

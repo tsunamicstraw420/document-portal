@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ShowKit — Unit Economics Calculator</title>
+<style>
+  :root{--bg:#0b0b12;--card:#16151f;--line:rgba(255,255,255,.12);--text:#f2f1f8;--muted:#a7a5bd;--accent:#7c5cff;--good:#12d0b4;--bad:#ff5c8a}
+  *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:28px 20px 70px}
+  h1{font-size:20px;font-weight:600;margin:0 0 4px}.sub{color:var(--muted);font-size:13px;margin:0 0 22px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+  .card h2{font-size:13px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:0 0 14px;font-weight:600}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0}
+  .row label{font-size:13.5px;color:var(--text)}.row .val{font-size:13.5px;color:var(--accent);font-variant-numeric:tabular-nums;min-width:64px;text-align:right}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  .slider{margin:6px 0 2px}
+  .presets{display:flex;gap:8px;margin:2px 0 8px}
+  .presets button{all:unset;cursor:pointer;font-size:12.5px;padding:6px 12px;border-radius:9px;border:1px solid var(--line);color:var(--muted)}
+  .presets button:hover,.presets button.on{color:#fff;background:rgba(124,92,255,.25);border-color:transparent}
+  .out{margin-top:20px}
+  .big{display:flex;align-items:baseline;gap:10px;margin:2px 0 16px}
+  .big .n{font-size:38px;font-weight:600;font-variant-numeric:tabular-nums}
+  .big .n.pos{color:var(--good)}.big .n.neg{color:var(--bad)}
+  .big .l{font-size:13px;color:var(--muted)}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  td{padding:7px 0;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+  td:last-child{text-align:right}tr:last-child td{border-bottom:none;font-weight:600}
+  .neg{color:var(--bad)}.pos{color:var(--good)}
+  .note{color:var(--muted);font-size:12px;margin-top:16px;line-height:1.6}
+  .bar{height:10px;border-radius:6px;background:#26243a;overflow:hidden;display:flex;margin:6px 0 2px}
+  .bar span{height:100%}
+</style></head><body><div class="wrap">
+<h1>ShowKit — unit economics</h1>
+<p class="sub">Rough model. Defaults from <code>unit-economics.md</code>. Everything is monthly. Play with the sliders.</p>
+<div class="grid">
+  <div class="card">
+    <h2>Inputs</h2>
+    <div class="presets" id="presets">
+      <button data-u="100">100 users</button><button data-u="1000" class="on">1,000</button><button data-u="10000">10,000</button>
+    </div>
+    <div class="slider"><div class="row"><label>Paying users</label><span class="val" id="v_users">1,000</span></div><input type="range" id="users" min="10" max="20000" step="10" value="1000"></div>
+    <div class="slider"><div class="row"><label>Avg revenue / user / mo (ARPPU)</label><span class="val" id="v_arppu">$19</span></div><input type="range" id="arppu" min="5" max="60" step="1" value="19"></div>
+    <div class="slider"><div class="row"><label>Wholesale COGS (% of revenue)</label><span class="val" id="v_cogs">30%</span></div><input type="range" id="cogs" min="10" max="70" step="1" value="30"></div>
+    <div class="slider"><div class="row"><label>Stripe fees (% of revenue)</label><span class="val" id="v_stripe">3.5%</span></div><input type="range" id="stripe" min="2" max="6" step="0.1" value="3.5"></div>
+    <div class="slider"><div class="row"><label>Refunds / chargebacks (%)</label><span class="val" id="v_refund">2%</span></div><input type="range" id="refund" min="0" max="10" step="0.5" value="2"></div>
+    <div class="slider"><div class="row"><label>Fixed infra / mo</label><span class="val" id="v_infra">$500</span></div><input type="range" id="infra" min="0" max="5000" step="50" value="500"></div>
+    <div class="slider"><div class="row"><label>Other opex (salary, tools) / mo</label><span class="val" id="v_opex">$0</span></div><input type="range" id="opex" min="0" max="20000" step="250" value="0"></div>
+  </div>
+  <div class="card out">
+    <h2>Monthly result</h2>
+    <div class="big"><span class="n" id="net">$0</span><span class="l">net profit / mo</span></div>
+    <div class="bar" id="bar"></div>
+    <table>
+      <tr><td>Revenue</td><td id="r_rev">$0</td></tr>
+      <tr><td>− Wholesale (COGS)</td><td class="neg" id="r_cogs">$0</td></tr>
+      <tr><td>= Gross profit</td><td class="pos" id="r_gross">$0</td></tr>
+      <tr><td>− Stripe fees</td><td class="neg" id="r_stripe">$0</td></tr>
+      <tr><td>− Refunds</td><td class="neg" id="r_refund">$0</td></tr>
+      <tr><td>− Infra</td><td class="neg" id="r_infra">$0</td></tr>
+      <tr><td>− Other opex</td><td class="neg" id="r_opex">$0</td></tr>
+      <tr><td>Net profit / mo</td><td id="r_net">$0</td></tr>
+    </table>
+    <p class="note">Gross margin: <b id="gm">0%</b> · Net margin: <b id="nm">0%</b> · Annualized net: <b id="yr">$0</b>.<br>
+    This ignores CAC and churn timing — it's a steady-state snapshot at the given paying-user count. Wholesale % is the biggest lever: as providers cut prices it drops (good), but power users over-consuming their allowance pushes it up.</p>
+  </div>
+</div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const usd=n=>(n<0?'-$':'$')+Math.abs(Math.round(n)).toLocaleString();
+function calc(){
+  const users=+$('users').value, arppu=+$('arppu').value, cogs=+$('cogs').value/100,
+        stripe=+$('stripe').value/100, refund=+$('refund').value/100, infra=+$('infra').value, opex=+$('opex').value;
+  $('v_users').textContent=users.toLocaleString();$('v_arppu').textContent='$'+arppu;
+  $('v_cogs').textContent=(cogs*100).toFixed(0)+'%';$('v_stripe').textContent=(stripe*100).toFixed(1)+'%';
+  $('v_refund').textContent=(refund*100).toFixed(1)+'%';$('v_infra').textContent='$'+infra.toLocaleString();$('v_opex').textContent='$'+opex.toLocaleString();
+  const rev=users*arppu, cCogs=rev*cogs, gross=rev-cCogs, cStripe=rev*stripe, cRefund=rev*refund;
+  const net=gross-cStripe-cRefund-infra-opex;
+  $('r_rev').textContent=usd(rev);$('r_cogs').textContent='−'+usd(cCogs);$('r_gross').textContent=usd(gross);
+  $('r_stripe').textContent='−'+usd(cStripe);$('r_refund').textContent='−'+usd(cRefund);
+  $('r_infra').textContent='−'+usd(infra);$('r_opex').textContent='−'+usd(opex);
+  $('r_net').textContent=usd(net);
+  const netEl=$('net');netEl.textContent=usd(net);netEl.className='n '+(net>=0?'pos':'neg');
+  $('r_net').className=net>=0?'pos':'neg';
+  $('gm').textContent=rev?Math.round(gross/rev*100)+'%':'0%';
+  $('nm').textContent=rev?Math.round(net/rev*100)+'%':'0%';
+  $('yr').textContent=usd(net*12);
+  const parts=[[cCogs,'#5b567a'],[cStripe,'#8a63ff'],[cRefund,'#ff5c8a'],[infra,'#3a3852'],[opex,'#26243a'],[Math.max(0,net),'#12d0b4']];
+  $('bar').innerHTML=parts.map(([v,c])=>rev?`<span style="width:${Math.max(0,v)/rev*100}%;background:${c}"></span>`:'').join('');
+}
+document.querySelectorAll('input').forEach(i=>i.addEventListener('input',calc));
+$('presets').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('#presets button').forEach(x=>x.classList.remove('on'));b.classList.add('on');$('users').value=b.dataset.u;calc();});
+calc();
+</script></body></html>

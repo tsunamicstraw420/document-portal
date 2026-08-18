@@ -1,0 +1,22 @@
+<h1>Ruby Lip-Sync — Batch 1 (supervised)</h1>
+<p>Tool = <strong>Kling AI Lip Sync</strong> (your Standard plan, ~10 credits each). We do these 3 by hand first, you check the look, then we keep going in batches — and once you&#x27;re happy I can prep the whole episode&#x27;s list.</p>
+<p>The idea: take a <strong>booth clip</strong> (Ruby&#x27;s face + motion) as the base, feed it the <strong>narration segment</strong> for that moment, and Kling animates her mouth to match. We do NOT generate a new Ruby — Kling edits the clip you upload.</p>
+<h2>Batch 1 — 3 cutaways</h2>
+<p>Use the <strong>lean base clips in <code>lipsync/base/</code></strong> (small = fast upload; same picture as the originals).</p>
+<table><thead><tr><th>#</th><th>Base clip (upload this)</th><th>Narration to add</th><th>Length</th><th>She&#x27;s saying…</th></tr></thead><tbody><tr><td>cut02</td><td><code>lipsync/base/S03_ruby_intro.mp4</code></td><td><code>lipsync/segments_v4/cut02.wav</code></td><td>10s</td><td>&quot;Welcome back to Reality Recaps Unfiltered. I&#x27;m Ruby…&quot;</td></tr><tr><td>cut03</td><td><code>lipsync/base/S05_ruby_booth.mp4</code></td><td><code>lipsync/segments_v4/cut03.wav</code></td><td>5s</td><td>&quot;Oh yeah, I&#x27;m starting there.&quot;</td></tr><tr><td>cut04</td><td><code>lipsync/base/RL-1_booth_loop.mp4</code></td><td><code>lipsync/segments_v4/cut04.wav</code></td><td>10s</td><td>&quot;Six couples, six different ways to be completely unraveling…&quot;</td></tr></tbody></table>
+<p><em>(I tried driving Kling for you but its uploader stalls on automated file uploads — your manual uploads work, so this step is yours. I handle everything after.)</em></p>
+<h2>Steps in Kling (repeat for each of the 3)</h2>
+<ol>
+<li>Kling AI → <strong>All Tools → Lip Sync</strong>.</li>
+<li><strong>Upload the base clip</strong> (the <code>videos/…mp4</code> in the table). It must be ≥512px on each side — these are 720p, so fine. (If Kling ever rejects one as too small, tell me and I&#x27;ll export it bigger.)</li>
+<li>Switch to the <strong>&quot;Upload Local Dubbing&quot;</strong> tab → add the matching <strong><code>cutNN.wav</code></strong>.</li>
+<li>Click <strong>Add Speech</strong>, then <strong>Generate</strong> (~10 credits, ~5 min in the Standard queue).</li>
+<li><strong>Download</strong> the result. Kling saves it to your Chrome Downloads as a blob — rename it to <code>cutNN_lipsync.mp4</code> and drop it into <code>lipsync/lipsynced/</code>.</li>
+</ol>
+<h2>When the 3 are done</h2>
+<p>Tell me they&#x27;re in <code>lipsync/lipsynced/</code>. I&#x27;ll drop them into the timeline in place of the plain booth clips and give you an updated FCPXML to import — you&#x27;ll see Ruby actually talking at those three spots. If the look&#x27;s good, we roll to the next batch.</p>
+<h2>Notes / things we&#x27;ll sort out as we go</h2>
+<ul>
+<li>The long Ruby stretches that are currently <strong>frozen stills with a slow zoom</strong> can&#x27;t be lip-synced onto a 10s loop. We&#x27;ll break those into shorter talking cutaways (+ B-roll) once the flow feels good. For now they stay as stills.</li>
+<li>Adjacent booth cutaways reuse the same base motion — if that reads repetitive after lip-sync, I&#x27;ll rotate in the other booth takes (RL-2, RL-6) so the motion varies.</li>
+</ul>

@@ -1,0 +1,84 @@
+<h1>Pair-Sum Maker Bot — Full Implementation Plan</h1>
+<p><strong>Status:</strong> READY TO EXECUTE once capital is available. Do not run below the capital floor (see §3). <strong>Last updated:</strong> 2026-06-12 <strong>Companion docs:</strong> <a href="PAIRSUM_FINDINGS.md" target="_blank" rel="noopener">PAIRSUM_FINDINGS.md</a> (the edge), memory <code>project_guru_pairsum_edge</code>, <code>feedback_replicate_guru_faithfully</code>.</p>
+<hr>
+<h2>1. The goal &amp; the proven edge</h2>
+<p>Replicate — faithfully, not approximately — the guru wallet <code>0xb945945d5bcaf7b56834d4da8cdf8f8f94b2db68</code> (+$20,945 all-time, verified). Its edge, decomposed from 3,500 real fills:</p>
+<ul>
+<li><strong>ARB component +$1,555</strong> (balanced both-sides pairs, direction-independent)</li>
+<li><strong>DIRECTIONAL component −$1,015</strong> (the unmatched imbalance — he eats it, out-volumes it)</li>
+<li><strong>Net +$540 / 58 windows ≈ +$9/window</strong> on ~$340 deployed/window (~2.6% gross/window, high variance)</li>
+</ul>
+<p>The edge is <strong>maker market-making</strong>: rest bids on both UP and DOWN across the whole price curve; buy the pair for an average ~94¢; collect $1.00 at resolution. It is NOT directional and NOT latency.</p>
+<p><strong>Standing rule for this build:</strong> copy the guru&#x27;s measured method exactly. The ONLY permitted deviation is capital scale, applied as proportional scaling — never a redesign. No improvised variants (no chasing, no flatten exit, no &quot;balanced-only entry&quot;, no &quot;cut the side&quot;) without first proving they beat the guru.</p>
+<hr>
+<h2>2. The measured blueprint (what to replicate)</h2>
+<p>From his 3,500 fills:</p>
+<table><thead><tr><th>Parameter</th><th>Guru&#x27;s actual value</th><th>Source</th></tr></thead><tbody><tr><td>Rung spacing</td><td><strong>1¢</strong> (bids at nearly every penny)</td><td>measured</td></tr><tr><td>Price span covered</td><td><strong>~0.03 → 0.96</strong> (93% of the curve), BOTH sides</td><td>measured</td></tr><tr><td>Distinct levels / window</td><td><strong>~35</strong> (median; up to 57)</td><td>measured</td></tr><tr><td>Fills / window</td><td><strong>~70</strong> (22–130)</td><td>measured</td></tr><tr><td>Order size</td><td><strong>~20–30 shares</strong> (median 20; ≈$5 because most sit cheap)</td><td>measured</td></tr><tr><td>Shape</td><td>by count weighted cheap (longshots); by $ weighted to 0.85–1.00 (winners)</td><td>measured</td></tr><tr><td>Exit</td><td><strong>HOLD to resolution; winners auto-redeem</strong> (no selling)</td><td>verified (93 redeems, 0 stuck winners)</td></tr><tr><td>Sells</td><td><strong>zero</strong> — pure buy-and-hold</td><td>measured</td></tr></tbody></table>
+<p><strong>Fees (verified):</strong> makers pay <strong>0%</strong>; crypto takers pay <code>shares × 0.072 × p × (1−p)</code> (peak 1.8¢/share at p=0.5). Makers also receive <strong>~20% of taker fees back</strong> (daily rebate). → Our resting bids are fee-free + earn rebate; holding to resolution avoids the taker fee entirely. <strong>Never flatten</strong> (that incurs the taker fee the guru avoids).</p>
+<p><strong>Redemption (verified):</strong> winners (non-zero) auto-redeem to cash within minutes; only $0 losers hang harmlessly. So hold-to-resolution recycles capital on its own.</p>
+<hr>
+<h2>3. Capital requirement — the hard floor</h2>
+<p>A faithful carpet has a fixed cost. Resting 5-share (the exchange minimum) bids at 1¢ spacing across 0.05–0.95 on both sides:</p>
+<pre class='code'><code>cost ≈ 5 shares × Σ(prices 0.05..0.95) × 2 sides ≈ 5 × 45.5 × 2 ≈ $455</code></pre>
+<p>Plus filled bids become positions held to resolution (~15–20 min) → capital stays tied up until auto-redeem. So <strong>working capital ≈ the full carpet cost.</strong></p>
+<table><thead><tr><th>Tier</th><th>Working capital</th><th>What it buys</th></tr></thead><tbody><tr><td><strong>Below floor</strong></td><td>&lt; $200</td><td>Cannot carpet. Sparse ladder → one-sided fills → directional drag dominates. <strong>This is the $25 trap that lost 40%. Do not run here.</strong></td></tr><tr><td><strong>Minimum faithful</strong></td><td><strong>~$500</strong></td><td>1¢ carpet, 5-share orders, one window at a time. The smallest honest test.</td></tr><tr><td><strong>Comfortable</strong></td><td><strong>~$1,000</strong></td><td>Overlapping windows (cover the redeem lag) + room for the drawdown buffer. <strong>Recommended start.</strong></td></tr><tr><td><strong>Guru-like</strong></td><td>$2,000+</td><td>20–30 share orders, full density, continuous.</td></tr></tbody></table>
+<p><strong>Recommendation: fund ~$1,000 to start</strong> (allows a −20% / $200 drawdown buffer and still carpets). Absolute minimum to test faithfully: <strong>$500.</strong> Never run below ~$200 — the math doesn&#x27;t carpet and it degenerates into the version that bled.</p>
+<hr>
+<h2>4. The bot — what&#x27;s built vs. what&#x27;s left</h2>
+<p>Base file: <code>pairsum_test.py</code> (already on the box + in repo). <strong>Already built &amp; verified:</strong></p>
+<ul>
+<li>✅ No-chase <strong>static ladder</strong> (anchored once/window, never chases) — the v1→v2 fix</li>
+<li>✅ <strong>Hold to resolution</strong> (no flatten) + auto-redeem — the guru&#x27;s exit</li>
+<li>✅ <strong>Partial-fill tracking</strong> (polls each rung to full; records incremental deltas)</li>
+<li>✅ <strong>Graceful shutdown</strong> (SIGTERM cancels unfilled, holds filled — no orphans)</li>
+<li>✅ Balance <strong>stop</strong>, live <strong>state feed</strong> + <strong>web cockpit</strong> (<code>pairsum_cockpit.py</code>, :8090)</li>
+<li>✅ Fee model understood (maker 0%), redemption verified</li>
+</ul>
+<p><strong>To build for faithful replication (the deltas):</strong></p>
+<ol>
+<li><strong>Full-curve carpet ladder.</strong> Replace the 3-rung <code>[0.03,0.07,0.12]</code>-below-mid ladder with bids at <strong>every 1¢ from PMIN→PMAX (0.05→0.95) on both sides</strong>, placed once at window open, held. Config: <code>SPACING=0.01, PMIN=0.05, PMAX=0.95</code>.</li>
+<li><strong>Capital-aware carpet builder.</strong> At window start, compute the carpet&#x27;s total cost; if it exceeds the per-window budget, trim to fit <em>without</em> breaking faithfulness order-of-preference: (a) skip the most expensive high-price rungs first, then (b) widen spacing to 2¢, then (c) narrow the range. Log exactly what was trimmed (no silent caps).</li>
+<li><strong>Order size by capital.</strong> <code>SHARES = 5</code> at the $500 tier; scale toward 10–20 as capital grows. Keep ≥5 (exchange minimum).</li>
+<li><strong>Inventory / exposure cap.</strong> Track total committed (resting bids + held positions); stop placing new bids when within a margin of <code>WORKING_CAPITAL</code>. Prevents over-commit on a fast-filling trend.</li>
+<li><strong>Drawdown kill.</strong> Halt if wallet balance &lt; <code>START_BAL × (1 − MAX_DD)</code>, <code>MAX_DD = 0.20</code>. Protects the bankroll from a bad run (the directional drag is real and will produce losing stretches).</li>
+<li><strong>PnL = wallet truth.</strong> Session PnL from real balance deltas (already wired); the cockpit&#x27;s cumulative-PnL line is the verdict, NOT the combined-entry metric (which only measures the good half).</li>
+</ol>
+<hr>
+<h2>5. Risk controls (non-negotiable)</h2>
+<ul>
+<li><strong>One bot per wallet.</strong> The latency bot (<code>polymarket-arb-bot</code>) must stay STOPPED while this runs (shared wallet → double trades).</li>
+<li><strong>Drawdown kill at −20%</strong> of starting balance.</li>
+<li><strong>Per-window exposure cap</strong> ≤ working capital.</li>
+<li><strong>Geo:</strong> Vilnius VPS is Polymarket-permitted; verify before any move.</li>
+<li><strong>Deploy via the <code>docker compose run</code> mount pattern</strong> (not the git image, not scp into <code>/opt/polymarket-bot</code>). Container name <code>pairsum-live</code>, source in <code>/opt/pairsum/</code>.</li>
+</ul>
+<hr>
+<h2>6. Rollout sequence</h2>
+<ol>
+<li><strong>Dry-run</strong> (no <code>--live</code>): confirm the carpet builds correctly, fits budget, and the cockpit renders the full ladder. Zero capital.</li>
+<li><strong>Fund ~$1,000</strong> (or min $500) to the arb wallet <code>0x06b4e8aa…ae204</code>.</li>
+<li><strong>Go live, one window at a time</strong>, 5-share orders. Watch the cockpit.</li>
+<li><strong>Measure over ≥50 windows</strong> (≈1–2 days): fills/window (target → 35–70), combined entry (target → 0.94), <strong>% two-sided windows</strong>, and above all the <strong>wallet balance trend</strong>.</li>
+<li><strong>Scale up only if the wallet trend is positive</strong> over that real sample. Increase order size / overlap windows toward guru density.</li>
+<li>If the wallet trend is <strong>negative over 50+ faithful windows</strong> → that is a real verdict (the strongest version tested), and we stop.</li>
+</ol>
+<hr>
+<h2>7. Honest expectations &amp; kill criteria</h2>
+<ul>
+<li>This is a <strong>thin-edge, high-variance grind</strong>: ~6¢/pair, only meaningful across hundreds of windows. Expect losing stretches — the directional drag (−$1,015 in the guru&#x27;s own data) is inherent; the arb only out-earns it on volume.</li>
+<li><strong>Realistic upside at $1,000:</strong> if we hit ~half the guru&#x27;s density and his per-pair edge, low-single-digit-% per day, swingy. Not a money printer — a grind.</li>
+<li><strong>Maker rebate</strong> (~20% of taker fees) is a small tailwind on top.</li>
+<li><strong>Kill criteria:</strong> wallet down −20% (auto), OR negative wallet trend across 50+ faithful (carpeted, ≥$500) windows. Below $200 capital: don&#x27;t start at all.</li>
+<li>The combined-entry number on the cockpit will look rosy even when losing — <strong>judge by the wallet, not the dashboard.</strong></li>
+</ul>
+<hr>
+<h2>8. Pre-flight checklist (to pull the trigger)</h2>
+<ul>
+<li>[ ] Working capital ≥ $500 (ideally ~$1,000) in <code>0x06b4e8aa…ae204</code></li>
+<li>[ ] Latency bot (<code>polymarket-arb-bot</code>) confirmed STOPPED</li>
+<li>[ ] Carpet builder (§4.1–4.2) implemented + dry-run verified</li>
+<li>[ ] Drawdown kill (§4.5) + exposure cap (§4.4) implemented</li>
+<li>[ ] Cockpit live on :8090, showing the full carpet</li>
+<li>[ ] Start one-window-at-a-time; review wallet trend at 50 windows before scaling</li>
+</ul>
+<p><strong>Estimated build time for the §4 deltas:</strong> ~half a day of work once funded. The hard parts (no-chase ladder, hold-to-resolution, partial fills, graceful shutdown, cockpit, fee/redeem verification) are already done.</p>

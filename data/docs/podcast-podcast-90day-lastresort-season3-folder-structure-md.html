@@ -1,0 +1,37 @@
+<h1>90 Day: The Last Resort — folder structure (the rule)</h1>
+<p>Set up July 25 2026. <strong>Every episode follows this. No more guessing where anything is.</strong></p>
+<pre class='code'><code>90Day_LastResort_Season3/
+│
+├── _READY_TO_UPLOAD/          ⬆️  THE ONLY FOLDER YOU OPEN TO UPLOAD
+│     └── EP01_S3E1/               finished episode + shorts + captions + thumbnails + UPLOAD_ME.md
+│     └── EP02_S3E2/  (next)
+│
+├── _SHARED/                   ♻️  reused on every episode — never duplicated
+│     ├── still frames/            logo, Ruby sets, style anchors
+│     ├── fonts/                   Bangers
+│     ├── 90_Day..._Cast/          cast art
+│     ├── characters/  locations/  music/  sfx/
+│     └── (shared reference docs: animation pipeline, booth/glam angles, lipsync, speech-bubble cues)
+│
+├── EP01_S3E1/                 🛠️  the WORKSHOP for this episode (raw materials + project files)
+│     ├── roughcut/               .fcpxml / .xml timelines, music+sfx stems, caption source
+│     ├── lipsync/                word-level timing JSON
+│     ├── videos/  kb_v8/         animated scene clips + camera-motion clips  (Resolve&#x27;s source media)
+│     ├── overlays/               this episode&#x27;s date cards, bubbles, endcard
+│     ├── audio/                  narration
+│     ├── shorts/  social/  thumbnails/   working outputs
+│     ├── shorts_pipeline/        the Shorts tool (make_shorts.py)
+│     └── EP-02_*.md              this episode&#x27;s guides/plans
+│
+├── EP02_S3E2/  (next episode — same skeleton)
+│
+└── _TRASH_review/             🗑️  dead files swept here — empty when you&#x27;re ready</code></pre>
+<h2>The rule going forward</h2>
+<ol>
+<li><strong>New episode → make a new <code>EPxx_S3Ey/</code> folder</strong> (copy EP01&#x27;s skeleton) for the workshop, and a matching <code>_READY_TO_UPLOAD/EPxx_S3Ey/</code> for deliverables.</li>
+<li><strong>Shared stuff stays in <code>_SHARED/</code></strong> — never copy the font, cast art, logo, etc. into an episode folder.</li>
+<li><strong>When an episode is finished, its final files go in <code>_READY_TO_UPLOAD/EPxx/</code></strong> with an <code>UPLOAD_ME.md</code>. That&#x27;s the only place you look to publish.</li>
+<li>The Shorts tool writes finished Shorts straight into the upload folder; scratch stays in the workshop.</li>
+</ol>
+<h2>⚠️ One-time thing after this reorg (EP-02)</h2>
+<p>Your DaVinci Resolve project for EP-02 links to source clips that just moved into <code>EP01_S3E1/</code>. Next time you open it, Resolve may show <strong>Media Offline</strong>. Fix: right-click in the Media Pool → <strong>Relink Clips</strong> → point it at <code>EP01_S3E1/</code> (videos, kb_v8, audio, overlays). You only need to do this if you re-open or re-export EP-02 — the finished file is already exported and safe in <code>_READY_TO_UPLOAD/</code>.</p>

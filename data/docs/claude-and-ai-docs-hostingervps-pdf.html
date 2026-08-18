@@ -1,0 +1,324 @@
+<div class="pdfpages"><img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-hostingervps-pdf/p-1.jpg" alt="page 1">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-hostingervps-pdf/p-2.jpg" alt="page 2">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-hostingervps-pdf/p-3.jpg" alt="page 3">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-hostingervps-pdf/p-4.jpg" alt="page 4">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-hostingervps-pdf/p-5.jpg" alt="page 5">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-hostingervps-pdf/p-6.jpg" alt="page 6"></div><div class="pdftext" hidden><pre> Hostinger VPS Setup Guide
+ Jakarta, Indonesia
+ Complete Post-Reinstall Configuration Documentation
+ April 20, 2026
+
+
+  Section 1 — VPS Overview &amp; Specifications
+ After migrating from Boston, USA to Jakarta, Indonesia, the VPS details are:
+
+ Parameter                             Value
+
+ Hostname                              srv1514238.hstgr.cloud
+
+ IP Address                            72.61.209.224
+
+ Location                              Jakarta, Indonesia (Country code: ID)
+
+ OS                                    Ubuntu 22.04 LTS
+
+ Plan                                  KVM 2
+
+ CPU Cores                             2
+
+ Memory                                8 GB
+
+ Disk Space                            100 GB
+
+ Timezone                              Asia/Jakarta
+
+ Organization                          AS47583 Hostinger International Limited
+
+
+
+ Location Verification
+ Location was verified with:
+            curl -s https://ipinfo.io/json
+
+ Result confirmed country: &quot;ID&quot;, city: &quot;Jakarta&quot;
+
+  NOTE: WHY INDONESIA: Chosen for lowest latency to Binance exchange servers (located primarily in
+  Singapore, ~20ms from Jakarta vs ~35ms from Mumbai). Both Binance and Polymarket trading are permitted
+  from Indonesia.
+
+
+  Section 2 — Uninstalling OpenVPN Access Server
+ OpenVPN Access Server was pre-installed on the VPS template but is not needed since the VPS is now in
+ an allowed trading jurisdiction. It was consuming ~450 MB of RAM and disk space unnecessarily.
+
+
+
+
+Hostinger VPS Setup Guide — Jakarta, Indonesia                                                         Page 1
+ Step 1 — Remove OpenVPN Access Server package
+          apt-get remove --purge openvpn-as -y
+
+ Result: Removed openvpn-as (3.1.0-e22fe316-Ubuntu22), freed 60.7 MB
+
+ Step 2 — Remove leftover directory
+          rm -rf /usr/local/openvpn_as
+
+
+ Step 3 — Remove all OpenVPN dependencies
+          apt-get autoremove -y
+
+ Packages removed:
+          bridge-utils, ieee-data, libmariadb3, mariadb-common, mysql-common,
+          openvpn-as-bundled-clients, python3-arrow, python3-bs4, python3-cffi, python3-dateutil,
+          python3-defusedxml, python3-h2, python3-hpack, python3-html5lib, python3-hyperframe,
+          python3-isodate, python3-ldap3, python3-lxml, python3-netaddr, python3-ply,
+          python3-priority, python3-pycparser, python3-soupsieve, python3-tomli,
+          python3-typing-extensions, python3-webencodings, python3-xmlsec, sqlite3
+
+ Total disk space freed: ~484 MB
+
+ Step 4 — Clean apt cache
+          apt-get autoclean
+
+
+
+  Section 3 — System Update &amp; Kernel Upgrade
+ A kernel upgrade was available (from 5.15.0-173-generic to 5.15.0-176-generic).
+
+ Step 1 — Update &amp; upgrade all packages
+          apt update &amp;&amp; apt upgrade -y
+
+ During upgrade, two interactive prompts appeared:
+
+     • &quot;Pending kernel upgrade&quot; dialog: pressed Enter to acknowledge
+     • &quot;Daemons using outdated libraries&quot; dialog: accepted defaults to restart services including
+     irqbalance.service, multipathd.service, packagekit.service, rsyslog.service, ssh.service
+
+
+ Step 2 — Reboot to load the new kernel
+          reboot
+
+ After reconnecting, kernel was confirmed up-to-date with no further restarts needed.
+
+
+  Section 4 — Installing Essential Packages
+          apt install -y curl wget git unzip build-essential ufw fail2ban
+
+ All packages were already present on the system (pre-installed with the Ubuntu 22.04 template):
+
+
+
+
+Hostinger VPS Setup Guide — Jakarta, Indonesia                                                      Page 2
+ Package                                         Version
+
+ curl                                            7.81.0
+
+ wget                                            1.21.2
+
+ git                                             2.34.1
+
+ unzip                                           6.0
+
+ build-essential                                 12.9
+
+ ufw                                             0.36.1
+
+ fail2ban                                        0.11.2
+
+
+
+  Section 5 — UFW Firewall Configuration
+ UFW (Uncomplicated Firewall) was configured with a strict deny-incoming, allow-outgoing policy.
+
+
+ Commands Executed
+            ufw default deny incoming ufw default allow outgoing ufw allow 22/tcp ufw allow out
+            443/tcp ufw allow out 9443/tcp ufw enable
+
+
+ Firewall Rules Applied
+
+ Rule                          Direction               Action     Purpose
+
+ Default incoming              INBOUND                 DENY       Blocks all unsolicited inbound connections
+
+ Default outgoing              OUTBOUND                ALLOW      Bots can connect outbound freely
+
+ Port 22/tcp                   INBOUND                 ALLOW      SSH access
+
+ Port 443/tcp                  OUTBOUND                ALLOW      HTTPS + standard WSS WebSocket
+
+ Port 9443/tcp                 OUTBOUND                ALLOW      Binance WebSocket stream endpoint
+
+  NOTE: WHY PORT 9443: Binance uses port 9443 for its WebSocket market data streams
+  (wss://stream.binance.com:9443/ws/). This must be explicitly allowed outbound for trading bots.
+
+ Verification
+            ufw status verbose
+
+ Status: active, enabled on system startup
+
+
+  Section 6 — Fail2Ban Configuration
+ Fail2Ban protects SSH from brute-force attacks by banning IPs after repeated failed login attempts.
+
+
+
+
+Hostinger VPS Setup Guide — Jakarta, Indonesia                                                                 Page 3
+ Configuration File
+ File created: /etc/fail2ban/jail.d/sshd.conf
+            [sshd] enabled = true port = 22 filter = sshd logpath = /var/log/auth.log maxretry = 3
+            findtime = 600 bantime = 3600
+
+
+ Settings Explained
+
+ Setting                     Value               Meaning
+
+ maxretry                    3                   Ban after 3 failed login attempts
+
+ findtime                    600                 Count failures within a 10-minute window
+
+ bantime                     3600                Ban offending IP for 1 hour
+
+
+ Commands
+            systemctl enable fail2ban systemctl restart fail2ban
+
+ Status: active (running), enabled on system startup. Main PID confirmed running as fail2ban-server
+
+
+  Section 7 — WebSocket &amp; TCP Kernel Tuning
+ The Linux kernel was tuned for high-concurrency WebSocket connections required by trading bots that
+ maintain persistent connections to exchange APIs.
+
+ Configuration — appended to /etc/sysctl.conf
+            net.core.somaxconn = 65535 net.ipv4.tcp_max_syn_backlog = 65535
+            net.ipv4.tcp_keepalive_time = 60 net.ipv4.tcp_keepalive_intvl = 10
+            net.ipv4.tcp_keepalive_probes = 6 net.ipv4.tcp_fin_timeout = 15
+            net.ipv4.ip_local_port_range = 1024 65535
+
+
+ Settings Explained
+
+ Parameter                                        Value              Purpose
+
+ net.core.somaxconn                               65535              Maximum socket connection backlog
+
+ net.ipv4.tcp_max_syn_backlog                     65535              Maximum pending TCP connections
+
+ net.ipv4.tcp_keepalive_time                      60                 Send keepalive probe after 60s idle — prevents WebSocket drops
+
+ net.ipv4.tcp_keepalive_intvl                     10                 Retry keepalive every 10 seconds
+
+ net.ipv4.tcp_keepalive_probes                    6                  Drop connection after 6 missed keepalives (60s total)
+
+ net.ipv4.tcp_fin_timeout                         15                 Release closed connections faster (default is 60s)
+
+ net.ipv4.ip_local_port_range                     1024–65535         Maximum available outbound ports for concurrent connections
+
+
+
+
+Hostinger VPS Setup Guide — Jakarta, Indonesia                                                                     Page 4
+ Apply Settings
+            sysctl -p
+
+ All settings confirmed applied successfully.
+
+
+  Section 8 — Docker Installation
+ Docker Engine was installed using the official Docker convenience script.
+
+ Install Docker Engine
+            curl -fsSL https://get.docker.com | sh
+
+
+ Installed Versions
+
+ Component                              Version
+
+ Docker Engine                          29.4.1
+
+ containerd                             v2.2.3
+
+ runc                                   v1.3.5
+
+ Built                                  Mon Apr 20 16:32:36 2026
+
+ OS/Arch                                linux/amd64
+
+ Docker daemon was automatically enabled and started on system startup.
+
+ Docker Compose Plugin
+            apt install -y docker-compose-plugin
+
+ Version: Docker Compose v5.1.3 (already included with Docker install)
+
+ Verification
+            docker --version # Docker version 29.4.1, build 055a478 docker compose version # Docker
+            Compose version v5.1.3
+
+  NOTE: WHY DOCKER: Containerizing bots provides process isolation (one crashing bot doesn&#x27;t affect others),
+  easy deployment and updates, automatic restart on failure, and clean dependency management.
+
+
+  Section 9 — Final Server State Summary
+
+ Component                     Status                         Details
+
+ OS                            Ubuntu 22.04 LTS               Kernel 5.15.0-176-generic
+
+ Location                      Jakarta, Indonesia             IP: 72.61.209.224
+
+ UFW Firewall                  Active                         Deny in, Allow out, SSH open
+
+
+
+
+Hostinger VPS Setup Guide — Jakarta, Indonesia                                                           Page 5
+ Fail2Ban                      Active (running)                SSH protection enabled
+
+ Kernel Tuning                 Applied                         WebSocket/TCP optimized
+
+ Docker                        Running                         v29.4.1
+
+ Docker Compose                Ready                           v5.1.3
+
+ OpenVPN                       Removed                         484 MB freed
+
+
+
+  Section 10 — Next Steps
+ The VPS is now ready for bot deployment. Recommended workflow:
+
+     • Create a non-root deploy user with SSH key authentication
+     • Upload bot code via SCP or git clone from repository
+     • Create docker-compose.yml with bot services
+     • Store API keys in a .env file (never hardcode in source)
+           docker compose up -d # start all services docker compose logs -f # monitor live output
+
+
+
+ Key WebSocket Endpoints for Reference
+
+ Service                               Endpoint
+
+ Binance Spot                          wss://stream.binance.com:9443/ws/
+
+ Binance Futures                       wss://fstream.binance.com/ws/
+
+ Polymarket CLOB                       wss://ws-subscriptions-clob.polymarket.com/ws/
+
+
+
+ Test WebSocket Connectivity from VPS
+           npm install -g wscat wscat -c wss://stream.binance.com:9443/ws/btcusdt@ticker
+
+
+
+
+Hostinger VPS Setup Guide — Jakarta, Indonesia                                                Page 6
+</pre></div>

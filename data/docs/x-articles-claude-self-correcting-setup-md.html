@@ -1,0 +1,229 @@
+<h1>How to Make Claude Code Fix Its Own Mistakes Automatically (Exact Setup You Can Copy)</h1>
+<blockquote>Source: X Article by @zodchiii (darkzodchi), 2026-05-27 https://x.com/zodchiii/status/2059563487676784696</blockquote>
+<p>Claude writes code, tests fail, you explain what went wrong. Then it fixes it, but breaks something else. Every session, same loop.</p>
+<p>There&#x27;s a setup that makes Claude catch, fix, and learn from its own mistakes automatically. Here&#x27;s the full config you can just copy.</p>
+<h2>Why Claude keeps making the same mistakes</h2>
+<p>Claude has no memory of what went wrong last session. Every new session starts from zero. The same bug that took you 20 minutes to fix yesterday will happen again tomorrow.</p>
+<p>CLAUDE.md fixes this. Claude is good at writing rules for itself — the problem is most people never ask it to.</p>
+<h2>Step 1: The self-correcting CLAUDE.md</h2>
+<p>Your CLAUDE.md should grow every time Claude makes a mistake. Not with personality instructions, but with specific, actionable rules.</p>
+<p>The &quot;Learned from mistakes&quot; section is key. Every time you correct Claude, end with:</p>
+<pre class='code'><code>&quot;Anytime Claude does something incorrectly,
+add it to CLAUDE.md so it knows not to repeat the mistake.&quot;
+
+&quot;After every correction, end with:
+&#x27;Update your CLAUDE.md so you don&#x27;t make that mistake again.&#x27;&quot;</code></pre>
+<p>Example CLAUDE.md:</p>
+<pre class='code'><code>## Rules
+
+- NEVER refactor, rename, or clean unrelated code
+- All database queries through services/, never in components
+- Run `npx tsc --noEmit` after every code change
+- Run tests after every change, fix failures before moving on
+- Prefix commits: feat:, fix:, docs:, refactor:, test:, chore:
+- NEVER use enums, always prefer literal unions
+- NEVER force push. Rewrites shared history.
+- Run migrations before tests, not after
+
+## Learned from mistakes
+
+- Don&#x27;t install packages in packages/ui that belong in apps/web
+- Don&#x27;t average two existing patterns, pick one and follow it
+- When unsure about folder structure, check existing files first
+- Stop-loss function must return a number, not a boolean (broke prod on 2026-05-12)</code></pre>
+<p>After a month, your CLAUDE.md has captured every mistake Claude has made in your project. Error rate drops because Claude literally reads the list of things not to do before starting work.</p>
+<p>Research shows the sweet spot is ~12 rules under 200 lines. Past that, compliance drops sharply.</p>
+<h2>Step 2: PostToolUse hooks (catch mistakes in real-time)</h2>
+<p>Hooks fire automatically at specific points. PostToolUse runs after Claude writes or edits a file. This is where you catch problems before they compound.</p>
+<pre class='code'><code>{
+  &quot;hooks&quot;: {
+    &quot;PostToolUse&quot;: [
+      {
+        &quot;matcher&quot;: &quot;Write(*.ts)&quot;,
+        &quot;hooks&quot;: [
+          {
+            &quot;type&quot;: &quot;command&quot;,
+            &quot;command&quot;: &quot;npx prettier --write $file&quot;
+          }
+        ]
+      },
+      {
+        &quot;matcher&quot;: &quot;Write(*.ts)&quot;,
+        &quot;hooks&quot;: [
+          {
+            &quot;type&quot;: &quot;command&quot;,
+            &quot;command&quot;: &quot;npx tsc --noEmit 2&gt;&amp;1 | head -20&quot;
+          }
+        ]
+      },
+      {
+        &quot;matcher&quot;: &quot;Write(*.tsx)&quot;,
+        &quot;hooks&quot;: [
+          {
+            &quot;type&quot;: &quot;command&quot;,
+            &quot;command&quot;: &quot;npx eslint --fix $file&quot;
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+<p>Every .ts file: auto-format with Prettier, then type-check. Every .tsx file: auto-lint with ESLint. Claude sees the type errors immediately in the same turn and fixes them before moving on.</p>
+<ul>
+<li>Without hooks: Claude writes 5 files, you run type check, 12 errors across 3 files, you explain each one.</li>
+<li>With hooks: Each file is checked the moment Claude writes it. Errors fixed in real-time.</li>
+</ul>
+<h2>Step 3: Stop hooks (the quality gate)</h2>
+<p>This is the most powerful hook. Stop hooks run every time Claude says &quot;I&#x27;m done.&quot; They check if the work actually meets your standards before Claude finishes.</p>
+<pre class='code'><code>{
+  &quot;hooks&quot;: {
+    &quot;Stop&quot;: [
+      {
+        &quot;hooks&quot;: [
+          {
+            &quot;type&quot;: &quot;command&quot;,
+            &quot;command&quot;: &quot;npm test 2&gt;&amp;1 | tail -5; echo \&quot;Exit code: $?\&quot;&quot;
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+<p>If tests fail, Claude sees the failure output and automatically continues working to fix it. No manual intervention.</p>
+<p>For more complex validation, use a prompt hook that asks Claude to evaluate its own work:</p>
+<pre class='code'><code>{
+  &quot;hooks&quot;: {
+    &quot;Stop&quot;: [
+      {
+        &quot;hooks&quot;: [
+          {
+            &quot;type&quot;: &quot;prompt&quot;,
+            &quot;prompt&quot;: &quot;Check if all requested tasks are complete. Review the code changes for bugs, missing edge cases, and test coverage. If anything is incomplete or broken, continue working. If everything looks good, confirm done.&quot;
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+<p><strong>Critical rule:</strong> always check <code>stop_hook_active</code> in Stop hooks. When it&#x27;s true, Claude is already continuing because of a previous Stop hook. Exit 0 immediately. Without this check, your hook blocks Claude forever.</p>
+<h2>Step 4: PreToolUse hooks (prevent mistakes before they happen)</h2>
+<p>PreToolUse runs before Claude executes a tool. Use it to filter inputs and prevent expensive mistakes.</p>
+<pre class='code'><code>{
+  &quot;hooks&quot;: {
+    &quot;PreToolUse&quot;: [
+      {
+        &quot;matcher&quot;: &quot;Bash(cat *log*)&quot;,
+        &quot;hooks&quot;: [
+          {
+            &quot;type&quot;: &quot;command&quot;,
+            &quot;command&quot;: &quot;grep -n &#x27;ERROR\\|WARN&#x27; $file | head -50&quot;
+          }
+        ]
+      },
+      {
+        &quot;matcher&quot;: &quot;Write(**/.env*)&quot;,
+        &quot;hooks&quot;: [
+          {
+            &quot;type&quot;: &quot;command&quot;,
+            &quot;command&quot;: &quot;echo &#x27;BLOCKED: Cannot write to .env files&#x27; &amp;&amp; exit 1&quot;
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+<p>Claude tries to read a 10,000-line log? Hook filters it to 50 lines of errors first. Claude tries to write to .env? Blocked before it happens.</p>
+<h2>Step 5: The auto-retry pattern</h2>
+<p>For tasks that need multiple attempts, set up a retry loop with a token budget:</p>
+<pre class='code'><code>Prompt pattern:
+
+&quot;Fix the failing tests. You have 3 attempts maximum.
+
+After each attempt:
+1. Run the tests
+2. If they pass, you&#x27;re done
+3. If they fail, read the error, try a different approach
+4. If all 3 attempts fail, explain what you tried and what&#x27;s still broken
+
+Do NOT try the same fix twice.&quot;</code></pre>
+<p>Combined with the Stop hook from Step 3, this creates a self-correcting loop: Claude writes code → tests run → if fail → Claude reads errors → tries different approach → tests run again → repeat until pass or budget exhausted.</p>
+<p>The token budget prevents infinite loops. Without it, Claude can spiral into retry loops that burn hundreds of dollars.</p>
+<h2>Step 6: Memory for cross-session learning</h2>
+<p>Hooks catch mistakes within a session. Memory prevents them across sessions.</p>
+<pre class='code'><code># Check what Claude has learned
+/memory
+
+# Add rules manually
+/memory add &quot;this project uses pnpm, not npm&quot;
+/memory add &quot;auth module was refactored on May 15, new pattern is in src/lib/auth/v2/&quot;</code></pre>
+<p>With Dreaming enabled, Claude processes past sessions in the background and builds persistent knowledge automatically. No manual <code>/memory add</code> needed.</p>
+<p>The combination: CLAUDE.md catches project-level patterns, /memory catches session-level learnings, Dreaming consolidates everything overnight.</p>
+<p>After a correction, you can also just say:</p>
+<pre class='code'><code>&quot;Update CLAUDE.md so you don&#x27;t make that mistake again.&quot;</code></pre>
+<h2>The full self-correcting settings.json (copy-paste ready)</h2>
+<pre class='code'><code>{
+  &quot;permissions&quot;: {
+    &quot;allow&quot;: [
+      &quot;Read&quot;, &quot;Glob&quot;, &quot;Grep&quot;, &quot;LS&quot;, &quot;Edit&quot;, &quot;MultiEdit&quot;,
+      &quot;Write(src/**)&quot;, &quot;Write(tests/**)&quot;,
+      &quot;Bash(npm test *)&quot;, &quot;Bash(npx tsc *)&quot;, &quot;Bash(npx prettier *)&quot;,
+      &quot;Bash(npx eslint *)&quot;, &quot;Bash(git add *)&quot;, &quot;Bash(git commit *)&quot;
+    ],
+    &quot;deny&quot;: [
+      &quot;Read(**/.env*)&quot;, &quot;Write(**/.env*)&quot;,
+      &quot;Bash(rm -rf *)&quot;, &quot;Bash(git push *)&quot;
+    ],
+    &quot;defaultMode&quot;: &quot;acceptEdits&quot;
+  },
+  &quot;hooks&quot;: {
+    &quot;PostToolUse&quot;: [
+      {
+        &quot;matcher&quot;: &quot;Write(*.ts)&quot;,
+        &quot;hooks&quot;: [
+          { &quot;type&quot;: &quot;command&quot;, &quot;command&quot;: &quot;npx prettier --write $file&quot; },
+          { &quot;type&quot;: &quot;command&quot;, &quot;command&quot;: &quot;npx tsc --noEmit 2&gt;&amp;1 | head -20&quot; }
+        ]
+      },
+      {
+        &quot;matcher&quot;: &quot;Write(*.tsx)&quot;,
+        &quot;hooks&quot;: [
+          { &quot;type&quot;: &quot;command&quot;, &quot;command&quot;: &quot;npx prettier --write $file&quot; },
+          { &quot;type&quot;: &quot;command&quot;, &quot;command&quot;: &quot;npx eslint --fix $file&quot; }
+        ]
+      }
+    ],
+    &quot;PreToolUse&quot;: [
+      {
+        &quot;matcher&quot;: &quot;Bash(cat *log*)&quot;,
+        &quot;hooks&quot;: [
+          { &quot;type&quot;: &quot;command&quot;, &quot;command&quot;: &quot;grep -n &#x27;ERROR\\|WARN&#x27; $file | head -50&quot; }
+        ]
+      }
+    ],
+    &quot;Stop&quot;: [
+      {
+        &quot;hooks&quot;: [
+          { &quot;type&quot;: &quot;command&quot;, &quot;command&quot;: &quot;npm test 2&gt;&amp;1 | tail -10; echo \&quot;Exit: $?\&quot;&quot; }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+<h2>The before and after</h2>
+<pre class='code'><code>BEFORE:
+
+- Claude writes code, you run tests, 4 failures
+- You explain each failure manually
+- Claude fixes 3, introduces 1 new bug
+- You explain again
+- 45 minutes of back-and-forth per feature
+- Same mistake happens again tomorrow
+
+AFTER:
+
+- Claude writes code, hooks auto-format and type-check every file
+- Tests run automatically when Claude says &quot;done&quot;
+- If tests fail, Claude reads errors and keeps fixing
+- CLAUDE.md prevents yesterday&#x27;s mistakes from repeating
+- Memory prevents last week&#x27;s mistakes from repeating
+- 10 minutes per feature, most of it unattended</code></pre>

@@ -1,0 +1,60 @@
+<h1>Infrastructure Decisions</h1>
+<p>Living record of where this system runs and why. Update when decisions change — don&#x27;t re-litigate them in conversations.</p>
+<hr>
+<h2>Current state (2026-05-16)</h2>
+<table><thead><tr><th>Concern</th><th>Decision</th><th>Where</th></tr></thead><tbody><tr><td>Source of truth</td><td>GitHub, private</td><td><a href="https://github.com/tsunamicstraw420/zc-trading" target="_blank" rel="noopener">tsunamicstraw420/zc-trading</a></td></tr><tr><td>Dev loop (code, tests, backtests)</td><td>Local Mac</td><td><code>~/Desktop/AI_bots/zc_trading/</code></td></tr><tr><td>Always-on infrastructure</td><td><strong>Deferred</strong></td><td>—</td></tr><tr><td>Live execution</td><td><strong>Deferred</strong></td><td>—</td></tr></tbody></table>
+<hr>
+<h2>Decision: GitHub now, Hetzner later</h2>
+<p><strong>Decided:</strong> 2026-05-16 <strong>Status:</strong> Active</p>
+<h3>What we chose</h3>
+<ul>
+<li>Create the GitHub repo immediately and push the planning docs + Phase 1 skeleton.</li>
+<li><strong>Defer</strong> Hetzner VPS, Docker compose, Postgres, InfluxDB, Redis until Phase 4 (Weeks 10-12 in <a href="../AUTOMATED_TRADING_SYSTEM_PLAN.md" target="_blank" rel="noopener">AUTOMATED_TRADING_SYSTEM_PLAN.md</a>) — i.e. when there is something always-on to run.</li>
+</ul>
+<h3>Why</h3>
+<ol>
+<li><strong>Phase 1 doesn&#x27;t need always-on.</strong> The first ~6 weeks of work (VWAP, S/R detection, spike detection, position sizing) is pure backtesting on historical CSVs. That runs perfectly on the Mac and doesn&#x27;t care if the Mac sleeps overnight.</li>
+<li><strong>Premature infra violates our own rule.</strong> <code>CLAUDE.md</code> says &quot;start simple, validate, iterate.&quot; Spinning up a 3-database VPS before any code uses it is yak-shaving.</li>
+<li><strong>GitHub is cheap and high-value now.</strong> Every commit needs a remote home; we&#x27;d be doing this eventually regardless.</li>
+<li><strong>Decisions deferred are decisions improved.</strong> By the time we hit Phase 4 we&#x27;ll know which databases we actually need based on real workloads — not guesses from the planning doc.</li>
+</ol>
+<h3>What &quot;always-on&quot; actually requires (so we know it when we see it)</h3>
+<p>We need the VPS when <strong>any</strong> of these is true:</p>
+<ul>
+<li>We&#x27;re consuming a live WebSocket feed (TradingView / exchange) 24/7</li>
+<li>We&#x27;re running scheduled jobs (nightly backtest refresh, weekly performance report)</li>
+<li>We&#x27;re sending real-time alerts to the trader (SMS/email) that must fire when the Mac is off</li>
+<li>We&#x27;re placing real orders that need to survive client crashes</li>
+</ul>
+<p>None of those is true today. All become true around Phase 4.</p>
+<hr>
+<h2>Decision: GitHub repo settings</h2>
+<p><strong>Decided:</strong> 2026-05-16</p>
+<table><thead><tr><th>Setting</th><th>Value</th><th>Why</th></tr></thead><tbody><tr><td>Visibility</td><td>Private</td><td>Trading code + future API keys</td></tr><tr><td>Default branch</td><td><code>main</code></td><td>Standard</td></tr><tr><td><code>.gitignore</code></td><td>Custom (in repo)</td><td>We had project-specific paths already</td></tr><tr><td>License</td><td>None</td><td>Private project, no need</td></tr><tr><td>README</td><td>Custom</td><td>Written by us, not the GitHub template</td></tr></tbody></table>
+<hr>
+<h2>Open questions (decide before Phase 4)</h2>
+<h3>1. Postgres-on-Hetzner as middle ground?</h3>
+<p>If the Mac going to sleep starts losing data (e.g. partial backtest runs, journal entries), one cheap middle step is:</p>
+<table><thead><tr><th>Layer</th><th>Where</th></tr></thead><tbody><tr><td>Dev loop</td><td>Mac (unchanged)</td></tr><tr><td>GitHub</td><td>unchanged</td></tr><tr><td><strong>Postgres</strong> (trade log only)</td><td><strong>Hetzner Docker</strong> — survives Mac sleep</td></tr><tr><td>InfluxDB, Redis, live runner</td><td>Still deferred</td></tr></tbody></table>
+<p>A single small Postgres container on a Hetzner CX22 (~€5/mo, 4 GB RAM) is ~30 min of setup. Defer unless the pain shows up.</p>
+<h3>2. Secrets management</h3>
+<p>Before any exchange API keys go anywhere, decide:</p>
+<ul>
+<li><strong>Option A:</strong> <code>.env</code> file gitignored locally (fine for paper trading)</li>
+<li><strong>Option B:</strong> <code>pass</code> / <code>1Password CLI</code> integration (better for production)</li>
+<li><strong>Option C:</strong> Hetzner-side secret in env file mounted to container (production)</li>
+</ul>
+<p>Don&#x27;t ship real keys until this is settled. For now: no real keys anywhere.</p>
+<h3>3. Backups</h3>
+<p>When we have a trade log worth losing:</p>
+<ul>
+<li>Daily <code>pg_dump</code> off the VPS to local storage or a third-party (Backblaze B2, etc.)</li>
+<li>Encrypted at rest</li>
+<li>Retention: 90 days minimum</li>
+</ul>
+<p>Decide before Phase 4.</p>
+<h3>4. Hetzner region</h3>
+<p>When we get there: Falkenstein (Germany) or Helsinki (Finland) are the cheapest. For US-based exchanges, US regions or AWS would be lower latency — but the strategies in scope (1-min altcoin trades, not HFT) don&#x27;t need sub-100ms latency. Hetzner EU is fine.</p>
+<hr>
+<h2>Change log</h2>
+<table><thead><tr><th>Date</th><th>Change</th></tr></thead><tbody><tr><td>2026-05-16</td><td>Initial doc. GitHub repo created. Hetzner VPS deferred to Phase 4.</td></tr></tbody></table>

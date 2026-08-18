@@ -1,0 +1,81 @@
+<div class="pdfpages"><img class="pdfpage" loading="lazy" src="data/pdf/zc-trading-zc-fast-spike-detector-cheat-sheet-pdf/p-1.jpg" alt="page 1"></div><div class="pdftext" hidden><pre>ZCT × TRADESDONTLIE · BUILD GUIDE
+
+
+ZC Fast Spike Detector CHEAT SHEET                                                                                                                       ZCT
+Three prompts. One save. A working momentum indicator in your TradingView forever.                                                     PA S T E · V E R I F Y · S AV E
+
+
+
+
+   ⚡ W H AT I T D O E S
+
+   The ZC Fast Spike Detector helps you spot fast spikes on
+   your chart.
+
+     isLarge = (high − low) &gt; mult × SMA(high −
+     low, 60)
+
+   This guide has the prompts to build it in your TradingView step-by-
+   step. For how to apply it to your strategy:
+
+     📖 x.com/KoroushAK/status/2031718081945358497
+                                                                                      1m PIPPINUSDT · multiplier 2.0 · red/green dots mark spike bars
+
+
+      The rule: one prompt, one change. Hit ▶ in Pine Editor between each phase and verify before pasting the next.
+
+
+
+   🔍 PHASE 1 · DETECT SPIKES                                                         ⭕ PHASE 2 · ADD MARKERS
+   PA S T E 1 O F 3 → C L A U D E C O D E                                            PA S T E 2 O F 3 → C L A U D E C O D E
+
+
+     Write a Pine Script v6 indicator called &quot;ZC Fast                                   Add a small circle above each large up-candle
+     Spike Detector&quot; that overlays on the main chart.                                   and below each large down-candle, colored to
+     Calculate candle size as high − low, then take                                     match the candle.
+     the 60-period SMA of that. Flag any candle whose
+     size is more than 2x the 60-SMA as a &quot;large
+     candle.&quot; Color large up-candles green and large
+                                                                                        💡 Circles above/below every spike bar make them scannable at
+                                                                                        a glance — no more squinting at barcolor alone.
+     down-candles red using barcolor(); leave every
+     other bar its default color. Save to ~/zc-fast-
+     spike.pine and inject it into my TradingView
+     Pine Editor.
+
+
+     💡 Hit ▶ → large up-candles paint green, down-candles red.
+     Low-vol symbols show few hits — try a crypto perpetual on 1–
+     15m.
+
+
+
+
+   ⚙️ P H A S E 3 · M A K E A D J U S TA B L E                                       💾 P H A S E 4 · S AV E I T P E R M A N E N T LY
+   PA S T E 3 O F 3 → C L A U D E C O D E                                            MANUAL · 10 SECONDS
+
+                                                                                      1. Cmd+S in the Pine Editor
+     Expose three settings in the panel: the size
+     multiplier (default 2.0, min 0.1, step 0.1), the                                 2. Name the script
+     up-candle color (default green), and the down-                                   3. Save → Add to Chart
+     candle color (default red).                                                      4. Lives forever in Indicators → My Scripts
+
+
+     💡 Click the gear icon on the indicator name to tune multiplier +                   Injection is session-only. Skip this step and your work dies
+     colors live. 3.0 = only extreme spikes · 1.5 = catches more.                       when you close TradingView.
+
+
+
+
+   🔧 I F I T S TA L L S
+   CDP injection can hang on first use. If Pine Editor stays blank &gt;2 min, fall back to manual paste:
+
+     Print the full contents of ~/zc-fast-spike.pine to the terminal so I can copy it manually.
+
+
+   Copy output → open a fresh Pine Editor tab → paste → ▶ → Cmd+S. Bypasses the injection entirely.
+
+
+
+                                            ZCT   · Z C F A S T S P I K E D E T E C T O R — B U I L D C H E AT S H E E T
+</pre></div>

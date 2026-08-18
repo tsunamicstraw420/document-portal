@@ -1,0 +1,185 @@
+<h1>Custom AI Agents — A Learning Path for Eddie</h1>
+<p>A self-paced curriculum that takes you from &quot;what is an agent?&quot; to designing and building custom agents for your own projects. Built for a <strong>no-code learner</strong> who wants real conceptual depth: you&#x27;ll understand the theory, master the no-code tools you can actually build with today, get fluent in the Claude/Cowork ecosystem, and gain enough literacy in the Python frameworks to direct an AI or a developer without writing the code yourself.</p>
+<p><em>Last updated: August 2026 (resources re-checked against live sources 14 Aug 2026). The agent field moves fast — treat specific tool details as &quot;true this month&quot; and re-check with the companion <code>Agents_Research_Prompt.md</code> every couple of months.</em></p>
+<hr>
+<h2>How to use this path</h2>
+<ul>
+<li><strong>Pace:</strong> ~6 weeks at 3–5 hours/week, or compress to 3 weeks if you go full-time. Each phase has an outcome and a small hands-on &quot;build.&quot;</li>
+<li><strong>Learn by shipping.</strong> Every phase ends with something you make, not just watch. The goal is a working agent for one of your projects by the end.</li>
+<li><strong>Don&#x27;t skip Phase 1.</strong> The vocabulary makes everything after it click.</li>
+<li><strong>Use the portal&#x27;s built-in learning log</strong> — under every phase in the portal there&#x27;s a box where you write, in your own words, the answer to that phase&#x27;s &quot;you should be able to explain&quot; checkpoint. It saves as you type. Teaching it back is how it sticks.</li>
+</ul>
+<h3>The north-star mental model</h3>
+<p>An agent is just a <strong>model + instructions + tools + memory + a loop</strong>. It reads a goal, decides on a next step, uses a tool, looks at the result, and repeats until done. Everything else in this course is a variation on that one loop. Hold onto it.</p>
+<hr>
+<h2>Phase 0 — Orientation (½ week)</h2>
+<p><strong>Outcome:</strong> You know what you&#x27;re aiming at and have your toolkit ready.</p>
+<ul>
+<li>Read Anthropic&#x27;s essay <strong>&quot;Building Effective Agents&quot;</strong> (anthropic.com/engineering/building-effective-agents) once, lightly — it&#x27;s dated <strong>Dec 2024</strong>, so read it for the durable <em>concepts</em>; Anthropic itself notes the tooling has changed since. Pair it with the current <strong>&quot;Building agents with the Claude Agent SDK&quot;</strong> (2025). Don&#x27;t worry about understanding all of it — it becomes your re-read anchor later.</li>
+<li>Set up free accounts you&#x27;ll use: Claude (you have Cowork), a no-code tool (start with <strong>n8n</strong> free/self-host or <strong>Zapier</strong>), and optionally ChatGPT for a second opinion.</li>
+<li>Your <strong>learning log</strong> and <strong>project list</strong> live in the portal now: write each phase&#x27;s checkpoint answer in the log box under that phase, and add the 2–4 projects you want agents to help with on the <strong>My Projects</strong> tab (it starts with the podcast). You&#x27;ll map agents onto these in Phase 7.</li>
+</ul>
+<p><strong>You should be able to explain:</strong> why &quot;agent&quot; is different from &quot;a really good prompt.&quot;</p>
+<hr>
+<h2>Phase 1 — Foundations &amp; vocabulary (1 week)</h2>
+<p><strong>Outcome:</strong> You can define an agent, describe its loop, and understand every term you&#x27;ll hear.</p>
+<p><strong>Core concepts to nail:</strong></p>
+<ul>
+<li><strong>Agent vs. chatbot vs. workflow vs. single prompt.</strong> A chatbot answers; a workflow follows fixed steps; an agent <em>decides</em> its own steps toward a goal using tools.</li>
+<li><strong>The agent loop:</strong> perceive → reason/plan → act (use a tool) → observe → repeat. Trace it through one everyday example (e.g. &quot;research a topic and write a summary&quot;).</li>
+<li><strong>The five building blocks:</strong> the model (the brain), instructions (the system prompt/role), tools (its hands), memory (what it remembers), and the control loop (what keeps it going).</li>
+<li><strong>Key terms</strong>, one sentence each: tool use / function calling, ReAct, context window, RAG, MCP, orchestration, guardrails, evals, human-in-the-loop, token.</li>
+</ul>
+<p><strong>Do this course (the best free starting point):</strong></p>
+<ul>
+<li><strong>Hugging Face AI Agents Course</strong> — vendor-neutral, four units from &quot;what is an agent&quot; through building simple ones. Just do Unit 1 now; you&#x27;ll return for the rest. (huggingface.co/learn)</li>
+</ul>
+<p><strong>Build:</strong> Write a one-page, plain-English explainer of &quot;how an AI agent works&quot; in your learning log — as if teaching a friend. This is your comprehension test.</p>
+<p><strong>You should be able to explain:</strong> the agent loop and the five building blocks without notes.</p>
+<hr>
+<h2>Phase 2 — Build your first agent (no-code) (1 week)</h2>
+<p><strong>Outcome:</strong> You&#x27;ve shipped a real, working agent without writing code.</p>
+<p>This is where it gets tangible. You&#x27;ll build a small but genuinely useful agent on a no-code platform.</p>
+<p><strong>Pick your platform (start with one):</strong></p>
+<ul>
+<li><strong>n8n</strong> — the most capable for a serious hobbyist; visual workflow canvas with a dedicated <strong>AI Agent node</strong>. Free if self-hosted. Best if you want depth and to connect many apps. (n8n shipped a 2.0 release in early 2026 with native LangChain-based AI nodes.)</li>
+<li><strong>Zapier Agents</strong> — easiest if you already live in Zapier&#x27;s 8,000+ app world; &quot;Agents&quot; is an add-on layer that adds autonomous AI steps. Best for quick, app-to-app automation.</li>
+<li><strong>Dify</strong> — best if your agent is chat/RAG-shaped (answer questions over your documents). Drag-and-drop, fast to a working chatbot.</li>
+</ul>
+<p><strong>Concepts you&#x27;ll meet in practice:</strong> triggers, tools/actions, connecting apps (credentials), and where to insert a &quot;human approves before it acts&quot; step.</p>
+<p><strong>Build (choose the smallest useful version):</strong></p>
+<ul>
+<li>A &quot;research assistant&quot; that takes a topic, searches the web, and returns a tidy summary, <strong>or</strong></li>
+<li>An &quot;inbox triage&quot; agent that reads new items and drafts replies for your approval, <strong>or</strong></li>
+<li>A &quot;document Q&amp;A&quot; agent (Dify) over a folder of your own notes.</li>
+</ul>
+<p><strong>You should be able to explain:</strong> the difference between an <em>automation</em> (fixed steps) and an <em>agent</em> (decides steps), from having built one.</p>
+<hr>
+<h2>Phase 3 — The Claude &amp; Cowork ecosystem (1 week)</h2>
+<p><strong>Outcome:</strong> You understand Anthropic&#x27;s whole agent stack and can build custom agents inside the tools you already have.</p>
+<p>Anthropic&#x27;s stack has three layers that build on each other: <strong>MCP</strong> (how agents connect to tools/data) → <strong>Skills</strong> (reusable capability packages) → the <strong>Claude Agent SDK</strong> (the runtime developers use). As a non-coder, you&#x27;ll mostly work at the top of this stack — Cowork, Projects, Skills, and MCP connectors — which is plenty powerful.</p>
+<p><strong>Learn, in order:</strong></p>
+<ul>
+<li><strong>Claude Projects &amp; Cowork</strong> — the no-code front door. How to give Claude a persistent role, files, and instructions; how Cowork uses your files, connectors, and skills to actually <em>do</em> things on your computer.</li>
+<li><strong>Skills</strong> — reusable <code>SKILL.md</code> capability packs that Claude auto-selects when relevant. You already benefit from these (docx, pptx, etc.). Learn how to <em>ask for</em> or <em>commission</em> a custom skill for a repeated task of yours.</li>
+<li><strong>MCP (Model Context Protocol)</strong> — the &quot;USB-C for AI tools.&quot; It&#x27;s the standard that lets an agent plug into apps (Gmail, Notion, Drive, Slack, etc.). Understand what a <em>connector</em> is and how permissions work.</li>
+<li><strong>Subagents &amp; hooks (conceptual)</strong> — how a main agent delegates bounded jobs (research, review, QA) to specialist subagents with their own context. You don&#x27;t need to code this, but knowing it exists shapes how you design bigger agents.</li>
+</ul>
+<p><strong>Do this course:</strong></p>
+<ul>
+<li><strong>Anthropic Academy</strong> (anthropic.com/learn) — free, with a certificate. The MCP course (co-built with Hugging Face) and &quot;Claude in action&quot; material are the practical standouts.</li>
+</ul>
+<p><strong>Build:</strong> Set up a Claude Project (or Cowork workflow) for one recurring task of yours — with a clear role, the right files/connectors, and a repeatable instruction. Note where you&#x27;d want a custom Skill.</p>
+<p><strong>You should be able to explain:</strong> how MCP, Skills, and the Agent SDK fit together, and which layer you&#x27;d use for a given job.</p>
+<hr>
+<h2>Phase 4 — Design patterns &amp; multi-agent thinking (½ week)</h2>
+<p><strong>Outcome:</strong> You can design an agent on paper before building it, and know when to use more than one.</p>
+<p><strong>The seven patterns</strong> that are the shared vocabulary of agent design in 2026 — learn when each applies:</p>
+<ol>
+<li><strong>Reflection</strong> — the agent critiques and improves its own output.</li>
+<li><strong>Tool Use</strong> — it calls external tools to act or fetch facts.</li>
+<li><strong>ReAct</strong> — it interleaves reasoning and acting step by step.</li>
+<li><strong>Planning</strong> — it breaks a big goal into an ordered plan.</li>
+<li><strong>Multi-Agent Collaboration</strong> — an orchestrator delegates to specialists.</li>
+<li><strong>Evaluator-Optimizer</strong> — one agent produces, another scores and sends back for revision.</li>
+<li><strong>Human-in-the-Loop</strong> — a person approves risky or ambiguous steps.</li>
+</ol>
+<p><strong>Also cover:</strong> single-agent vs. multi-agent trade-offs (multi-agent adds power <em>and</em> cost/complexity — use it only when a job has genuinely separable roles), and <strong>memory</strong> (short-term context vs. long-term vector/episodic memory).</p>
+<p><strong>Build:</strong> Re-read Anthropic&#x27;s &quot;Building Effective Agents&quot; (it&#x27;ll land now) and sketch — in words/boxes — the design of an agent for one of your projects using the patterns above.</p>
+<p><strong>You should be able to explain:</strong> when a second agent is worth it, and when it&#x27;s just extra cost.</p>
+<hr>
+<h2>Phase 5 — Understanding the code frameworks (½ week, conceptual)</h2>
+<p><strong>Outcome:</strong> You can tell which framework a developer or AI assistant should use, and speak the language — without writing the code.</p>
+<p>You won&#x27;t code these, but knowing them lets you commission builds intelligently. One paragraph each:</p>
+<ul>
+<li><strong>LangGraph</strong> — models an agent as a graph of steps with branches and loops; the most battle-tested for complex, stateful, production workflows. Reach for it (or ask a builder to) when the logic is intricate.</li>
+<li><strong>CrewAI</strong> — role-based &quot;crews&quot; of agents (researcher, writer, reviewer) collaborating on a task; the lowest barrier for team-of-agents prototypes.</li>
+<li><strong>Microsoft Agent Framework</strong> — strong for multi-agent conversations and code-heavy tasks; it&#x27;s the 2026 merger of Semantic Kernel + AutoGen (Agent Framework 1.0 shipped April 2026; AutoGen itself is now in maintenance mode).</li>
+<li><strong>OpenAI Agents SDK</strong> — lightweight, good for handoff patterns where one agent passes to another; natural if you&#x27;re in the OpenAI world.</li>
+<li><strong>Claude Agent SDK</strong> — Anthropic-native runtime with first-class subagents, Skills, hooks, and the deepest MCP integration; the one behind Cowork.</li>
+</ul>
+<p><strong>Do this (optional, skim):</strong> Hugging Face Agents Course Units 2–4, which build simple agents across a couple of these frameworks. Watch to understand the shape, not to memorize syntax.</p>
+<p><strong>You should be able to explain:</strong> &quot;use LangGraph when…, CrewAI when…, Claude Agent SDK when…&quot; in a sentence each.</p>
+<hr>
+<h2>Phase 6 — Reliability, evals, safety &amp; cost (½ week)</h2>
+<p><strong>Outcome:</strong> You know how to tell if an agent actually works and how to keep it safe and affordable.</p>
+<ul>
+<li><strong>Evals</strong> — how you <em>know</em> an agent is working: test it on real examples of your own tasks and score the results, rather than trusting one lucky demo. Learn the beginner habit of keeping a small &quot;test set&quot; of real inputs.</li>
+<li><strong>Guardrails &amp; permissions</strong> — limiting what tools an agent can touch; requiring human approval for anything that sends, deletes, spends, or posts.</li>
+<li><strong>Cost</strong> — what drives spend (tokens, number of tool calls, multi-agent fan-out) and simple ways to keep it low (smaller models for simple steps, fewer agents, caching).</li>
+<li><strong>Privacy</strong> — what to consider before an agent touches your email, files, or accounts.</li>
+</ul>
+<p><strong>Build:</strong> Write a 5–10 item &quot;test set&quot; for the agent you built in Phase 2 or 3, run it, and note where it failed. Add one guardrail (e.g. a human-approval step).</p>
+<p><strong>You should be able to explain:</strong> how you&#x27;d prove to yourself that an agent is reliable enough to trust.</p>
+<hr>
+<h2>Phase 7 — Capstone: apply agents to your projects (1 week)</h2>
+<p><strong>Outcome:</strong> At least one custom agent running for a real project of yours, plus a plan for the rest.</p>
+<p>Use the <strong>Project → Agent worksheet</strong> below for each project on your list. Then pick the highest-value, lowest-effort one and build it for real, reusing what you learned in Phases 2–3.</p>
+<h3>Project → Agent worksheet (copy this per project)</h3>
+<ol>
+<li><strong>The job:</strong> In one sentence, what should this agent accomplish?</li>
+<li><strong>Trigger:</strong> What starts it? (a schedule, a new email, you asking, a file appearing)</li>
+<li><strong>Steps &amp; tools:</strong> What does it need to do, and what tools/apps does each step need?</li>
+<li><strong>Inputs &amp; memory:</strong> What information does it need up front, and what should it remember between runs?</li>
+<li><strong>Human-in-the-loop:</strong> Which steps must you approve before they happen?</li>
+<li><strong>Build lane:</strong> No-code (n8n / Zapier / Dify), Claude (Project / Cowork / Skill / MCP), or commission a coded build? Why?</li>
+<li><strong>Weekend v1:</strong> The smallest version you could get working in a weekend.</li>
+<li><strong>Grown-up version:</strong> What it becomes if it proves useful.</li>
+<li><strong>How you&#x27;ll test it:</strong> 5 real examples and what &quot;good&quot; looks like.</li>
+</ol>
+<h3>One-paragraph spec (hand this to a builder or to Claude)</h3>
+<blockquote>&quot;Build an agent that [job]. It triggers when [trigger]. It should [step 1], [step 2], [step 3], using [tools]. Before [risky step], it must ask me to approve. It remembers [memory]. Build the first version in [lane]. I&#x27;ll test it on [examples] and consider it working if [criteria].&quot;</blockquote>
+<p><strong>You should be able to explain:</strong> for each of your projects, the simplest agent that would help and how you&#x27;d build it.</p>
+<hr>
+<h2>Curated resources (ranked, mostly free)</h2>
+<p><strong>Start here:</strong></p>
+<ul>
+<li><strong>Hugging Face AI Agents Course</strong> — best free, vendor-neutral entry point; earns a certificate. (huggingface.co/learn)</li>
+<li><strong>Anthropic — &quot;Building Effective Agents&quot;</strong> — the canonical plain-ish essay on agent design; short and re-readable. (anthropic.com/engineering)</li>
+</ul>
+<p><strong>Go deeper:</strong></p>
+<ul>
+<li><strong>Anthropic Academy</strong> — free courses incl. MCP (co-built with Hugging Face) and Claude Code/agents in action; certificates. (anthropic.com/learn)</li>
+<li><strong>Hugging Face MCP Course</strong> — teaches the tool-connectivity standard every framework relies on. (huggingface.co/learn)</li>
+<li><strong>DeepLearning.AI short courses</strong> — bite-size, project-based agent courses co-built with vendors; videos free to watch. (deeplearning.ai)</li>
+</ul>
+<p><strong>Newest Anthropic guidance (2025 — post-dates the 2024 essay):</strong></p>
+<ul>
+<li><strong>&quot;Building agents with the Claude Agent SDK&quot;</strong> — the current companion to the 2024 essay; note the Claude <em>Code</em> SDK was renamed the Claude <em>Agent</em> SDK. (anthropic.com/engineering/building-agents-with-the-claude-agent-sdk)</li>
+<li><strong>&quot;Equipping agents with Agent Skills&quot;</strong> — Agent Skills became an open standard in Dec 2025; the what &amp; why. (anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills)</li>
+<li><strong>&quot;Writing effective tools for AI agents&quot;</strong> — how to design an agent&#x27;s &quot;hands&quot; so it uses them reliably. (anthropic.com/engineering/writing-tools-for-agents)</li>
+</ul>
+<p><strong>Tool docs (reference as you build):</strong></p>
+<ul>
+<li><strong>n8n docs</strong> — the AI Agent node and workflow basics.</li>
+<li><strong>Zapier Agents</strong> help center — for app-to-app autonomous steps.</li>
+<li><strong>Dify docs</strong> — for chat/RAG agents over your documents.</li>
+<li><strong>Anthropic docs (docs.claude.com)</strong> — Projects, Skills, MCP connectors, Agent SDK.</li>
+</ul>
+<p><strong>Stay current:</strong></p>
+<ul>
+<li>Re-run your <code>Agents_Research_Prompt.md</code> every 1–2 months, and skim one reputable AI newsletter. The specifics (framework versions, best no-code pick) shift quickly.</li>
+</ul>
+<hr>
+<h2>Suggested 6-week schedule</h2>
+<table><thead><tr><th>Week</th><th>Focus</th><th>You&#x27;ll finish with</th></tr></thead><tbody><tr><td>1</td><td>Phases 0–1: orientation + foundations</td><td>A one-page &quot;how agents work&quot; explainer you wrote</td></tr><tr><td>2</td><td>Phase 2: first no-code agent</td><td>A working agent on n8n / Zapier / Dify</td></tr><tr><td>3</td><td>Phase 3: Claude &amp; Cowork stack</td><td>A Claude Project / Cowork workflow for a real task</td></tr><tr><td>4</td><td>Phases 4–5: design patterns + framework literacy</td><td>A paper design for a project agent</td></tr><tr><td>5</td><td>Phase 6: evals, safety, cost</td><td>A test set + one guardrail on your agent</td></tr><tr><td>6</td><td>Phase 7: capstone</td><td>One custom agent live + a plan for the rest</td></tr></tbody></table>
+<hr>
+<h2>Glossary (quick reference)</h2>
+<ul>
+<li><strong>Agent</strong> — an AI system that pursues a goal by deciding its own steps and using tools, looping until done.</li>
+<li><strong>Tool use / function calling</strong> — the model&#x27;s ability to call external actions (search, send email, run code).</li>
+<li><strong>ReAct</strong> — a pattern of interleaving reasoning (&quot;think&quot;) and acting (&quot;do&quot;) step by step.</li>
+<li><strong>RAG</strong> — Retrieval-Augmented Generation; the agent looks up relevant documents and uses them to answer.</li>
+<li><strong>MCP</strong> — Model Context Protocol; the open standard that lets agents plug into tools and data (&quot;USB-C for AI&quot;).</li>
+<li><strong>Skill</strong> — a reusable capability package (a <code>SKILL.md</code> + assets) an agent auto-uses when relevant.</li>
+<li><strong>Subagent</strong> — a specialist agent a main agent delegates a bounded task to, with its own context.</li>
+<li><strong>Orchestration</strong> — coordinating multiple steps or agents toward one goal.</li>
+<li><strong>Memory</strong> — short-term (the current context window) or long-term (stored, retrievable facts/history).</li>
+<li><strong>Evals</strong> — tests that measure whether an agent produces good results, run on real examples.</li>
+<li><strong>Guardrails</strong> — rules/permissions that limit what an agent can do and require human approval for risky actions.</li>
+<li><strong>Human-in-the-loop</strong> — a person reviews or approves certain agent steps.</li>
+<li><strong>Context window</strong> — how much text (instructions, history, data) the model can consider at once.</li>
+<li><strong>Token</strong> — the unit of text models process and are billed on; more tokens = more cost.</li>
+</ul>
+<hr>
+<p><em>Two companion files live in this folder: <code>Agents_Research_Prompt.md</code> (a reusable deep-research prompt) and this path. Use the research prompt whenever a phase makes you want to go deeper than the curriculum, and to refresh anything that&#x27;s gone stale.</em></p>

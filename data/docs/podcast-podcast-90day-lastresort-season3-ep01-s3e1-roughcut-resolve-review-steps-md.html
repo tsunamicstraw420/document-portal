@@ -1,0 +1,42 @@
+<h1>Resolve review loop — do these steps every time I send an updated FCPXML</h1>
+<p>Repeat this each round: <strong>import → watch → mark → export markers → tell me.</strong></p>
+<hr>
+<h2>1. Import the updated timeline</h2>
+<ol>
+<li>Open your <code>EP-02</code> project in DaVinci Resolve (make sure you&#x27;re on the <strong>Edit</strong> page — bottom bar).</li>
+<li>Top menu: <strong>File → Import → Timeline…</strong></li>
+<li>Pick the file I sent (e.g. <code>roughcut/EP-02_v4_CLEAN.fcpxml</code>). Click <strong>Open</strong>, then <strong>OK</strong>.</li>
+<li>A <strong>new timeline</strong> appears in the Media Pool (top-left) — this is the latest version. Your older ones stay there too, so you can compare.</li>
+</ol>
+<p><strong>If clips show red / &quot;Media Offline&quot;:</strong> right-click any red clip → <strong>Relink Media</strong> → point to the <code>90Day_LastResort_Season3</code> folder → it finds them all. (Video lives in <code>videos/</code> and <code>kb_clean/</code>, audio in <code>audio/</code>.)</p>
+<h2>2. Watch it</h2>
+<ol>
+<li>Press <strong>Home</strong> to jump to the start. <strong>Spacebar</strong> plays/pauses.</li>
+<li>To see the whole thing at once: <strong>Shift+Z</strong> (fits the timeline to the window).</li>
+<li>Zoom in on the timeline to work: <strong>Cmd +</strong> / <strong>Cmd −</strong>.</li>
+</ol>
+<h2>3. Drop a marker wherever something&#x27;s wrong</h2>
+<ol>
+<li>Park the playhead on the spot (nudge frame-by-frame with <strong>←/→</strong>).</li>
+<li>Click an <strong>empty part of the timeline</strong> first (so the marker lands on the ruler, not one clip).</li>
+<li>Press <strong>M</strong> to drop a marker → press <strong>M</strong> again to open the note box.</li>
+<li>Type what&#x27;s wrong, and pick a <strong>color</strong>:</li>
+</ol>
+<ul>
+<li><strong>Blue</strong> = a picture/timing problem (wrong clip, wrong moment, looping, etc.)</li>
+<li><strong>Red</strong> = an audio problem (stutter, word issue)</li>
+</ul>
+<ol>
+<li>Click away to close. Jump between markers later with <strong>Shift+↑ / Shift+↓</strong>.</li>
+</ol>
+<p><em>(Tip: a pin at the start of the problem plus a short note is enough — you don&#x27;t need an exact end time.)</em></p>
+<h2>4. Export your markers for me</h2>
+<ol>
+<li>In the <strong>Media Pool</strong> (top-left), <strong>right-click the timeline</strong> you&#x27;re reviewing (the <code>EP-02…</code> item with the timeline icon).</li>
+<li><strong>Timelines → Export → Timeline Markers to EDL…</strong></li>
+<li>Save it into the <strong><code>roughcut</code></strong> folder, name it <strong><code>EP-02_MARKERS</code></strong> (overwrite the old one — that&#x27;s fine).</li>
+</ol>
+<h2>5. Tell me &quot;markers exported&quot;</h2>
+<p>I read them straight from the file (times + your notes + colors), make the changes, and send you a fresh FCPXML. Back to step 1.</p>
+<hr>
+<p><em>Keyboard quick list: Spacebar = play · Home = start · ←/→ = nudge · M = marker · Shift+↑/↓ = jump markers · Shift+Z = fit · Cmd +/− = zoom</em></p>

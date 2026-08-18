@@ -1,0 +1,33 @@
+<h1>Findings: the guru wallet&#x27;s real edge is pair-sum market-making, not latency</h1>
+<p><strong>Date:</strong> 2026-06-11 <strong>Wallet investigated:</strong> <code>0xb945945d5bcaf7b56834d4da8cdf8f8f94b2db68</code> (the @0xSurferX funnel &quot;proof&quot; wallet, profile <code>@l5zn1bwom8etsk</code>, +$20,945 all-time verified on its Polymarket P/L chart). <strong>Sources:</strong> its real fills via Polymarket data-api <code>/activity</code> (3,500 most-recent trades, June 9–11) + a 16-window June 5 slice the user pulled from the UI. Outcomes resolved from CLOB <code>prices-history</code>. Nothing here is modeled — every number is from real fills.</p>
+<h2>The one-line answer</h2>
+<p>On BTC 15-min Up/Down markets, <strong>predicting direction is dead, but providing liquidity to both sides is alive.</strong> The guru&#x27;s profit is 100% the second thing.</p>
+<h2>How we know — the decomposition</h2>
+<p>Every window&#x27;s profit splits exactly into two parts:</p>
+<ul>
+<li><strong>ARB</strong> — the shares where he holds UP <em>and</em> DOWN equally. This part pays out no matter which way Bitcoin moves, so its profit is <em>locked</em> and equals how far under $1 he bought the pair.</li>
+<li><strong>DIRECTIONAL</strong> — the leftover imbalance, a pure bet on which way BTC goes.</li>
+</ul>
+<table><thead><tr><th>Slice</th><th>Windows</th><th>ARB</th><th>DIRECTIONAL</th><th>Total</th></tr></thead><tbody><tr><td>June 9–11 (data-api)</td><td>42</td><td><strong>+$1,211</strong></td><td>−$593</td><td>+$619</td></tr><tr><td>June 5 (UI note, a losing day)</td><td>16</td><td><strong>+$344</strong></td><td>−$422</td><td>−$79</td></tr><tr><td><strong>Combined</strong></td><td><strong>58</strong></td><td><strong>+$1,555</strong></td><td><strong>−$1,015</strong></td><td><strong>+$540</strong></td></tr></tbody></table>
+<p>The arb part is <strong>positive on both days, including the day he lost money overall.</strong> The directional part is <strong>negative on both days.</strong> His losses are his direction bets; his profits are his liquidity provision.</p>
+<h2>Why this reconciles everything we measured</h2>
+<ul>
+<li>Our own 20,000-sample calibration backtest: buying across the price curve and holding to resolution nets <strong>−2.16¢ per $1</strong> <em>for a taker</em> (you pay the ask + the 1.7¢ fee). The BTC-15min market is extremely well-calibrated — a token priced at P wins ~P% of the time.</li>
+<li>Our latency probe: Polymarket reprices within <strong>0.25s</strong> of Binance — latency arb is dead.</li>
+<li>Both are true <strong>and</strong> the guru profits, because he is a <strong>maker, not a taker.</strong> Resting limit bids fill at the <em>bid</em> (you collect the spread instead of paying it) and at the reduced maker fee. That swing is the entire gap between our −2.16¢ and his win.</li>
+</ul>
+<h2>The mechanism (how he ladders)</h2>
+<ul>
+<li><strong>3,500 buys, 0 sells</strong> — pure buy-and-hold to resolution, never trades out.</li>
+<li><strong>Tiny orders:</strong> $5 median, $30 max — hundreds of small resting bids per window (~83 fills/window).</li>
+<li><strong>Both sides at once, rested slightly below the running price.</strong> As the 15-min price oscillates, his bids get hit on the dips, so each side&#x27;s average cost lands <em>below</em> the mid. Combined, <strong>his average pair costs 94¢</strong> (37 of 41 windows under $1). That ~6¢ under par, on the hedged shares, is the locked profit.</li>
+<li>Spread across the whole price curve, weighted to the cheap end (27% of shares at 0–20¢). ~83% hedged.</li>
+</ul>
+<h2>What this means for us</h2>
+<ul>
+<li><strong>Build a pair-sum maker, not a directional bot.</strong> A disciplined version could <em>beat</em> the guru: he bleeds −$1,015 letting his book drift directional; a bot that actively stays hedged captures the +$1,555 arb and skips that drag.</li>
+<li><strong>This is a different bot from the latency arb</strong> — it holds both sides and must keep inventory balanced.</li>
+</ul>
+<h2>The make-or-break unknown</h2>
+<p>The entire edge depends on our resting bids <strong>getting filled</strong> at something near his rate. Our Path-A logger measured maker fill rates at <strong>0.7–2%</strong>; he overcomes that with sheer order volume. Whether <em>our</em> infrastructure can — under Polymarket&#x27;s order rate limits, clearing the April-2026 maker fee (reduced + rebate, not zero) — is unknown and is exactly what a dry-run must measure before any capital is committed.</p>
+<p><strong>Note on the dry-run wallet:</strong> the arb wallet has been emptied. A <em>simulated</em> dry-run (watch the live book, model which of our hypothetical bids would fill) needs no funds and is the safe first measurement. A <em>true</em> live-fill test eventually needs a small USDC balance, because a real resting order needs collateral to rest and fill.</p>

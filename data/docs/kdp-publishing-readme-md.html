@@ -1,0 +1,36 @@
+<h1>kdp-publishing</h1>
+<p>Three-stage Claude pipeline for Amazon KDP self-publishing: <strong>niche research → manuscript draft → title/cover optimization</strong>. Wraps the prompts from <a href="https://x.com/leopardracer/status/2051598197881995626" target="_blank" rel="noopener">this article</a> into a runnable CLI.</p>
+<h2>Setup</h2>
+<pre class='code'><code>pip install -e .
+cp .env.example .env
+# edit .env, set ANTHROPIC_API_KEY</code></pre>
+<h2>Usage</h2>
+<p>Each book is a &quot;project&quot; — a directory under <code>projects/</code> with a <code>config.yaml</code> and generated artifacts.</p>
+<pre class='code'><code># 1. Create a project skeleton
+kdp init my-book
+
+# 2. Edit projects/my-book/config.yaml — fill in category, audience, ad_budget
+
+# 3. Stage 1: niche research → projects/my-book/01_niches.md
+kdp niche my-book
+
+# 4. Pick a niche, fill in title/problem/length/tone/angle in config.yaml
+
+# 5. Stage 2: manuscript → projects/my-book/manuscript.md + chapters/NN.md
+kdp write my-book
+# or for a smoke test:
+kdp write my-book --length 5000
+
+# 6. Fill in topic/benefit/competitors in config.yaml
+
+# 7. Stage 3: title + cover brief → projects/my-book/titles_and_cover.md
+kdp optimize my-book</code></pre>
+<p>Add <code>--dry-run</code> to any stage to print the rendered prompt without calling the API.</p>
+<h2>How stage 2 works</h2>
+<ol>
+<li>Generates a chapter outline (JSON), saved to <code>outline.json</code>.</li>
+<li>Iterates chapters, streaming each. The book brief + outline are sent as the <strong>cached</strong> system prompt, so chapters 2..N hit the cache instead of re-paying for the prefix.</li>
+<li>Per-chapter files written to <code>chapters/NN.md</code>; final concatenation to <code>manuscript.md</code>.</li>
+</ol>
+<h2>Future hook</h2>
+<p><code>portfolio.json</code> at the repo root is reserved for a future revenue tracker (royalty calculations across published books). Not implemented — see the original article for the formula.</p>

@@ -1,0 +1,18 @@
+<h1>🔒 Captions — the locked workflow (so we stop re-deciding this)</h1>
+<p><em>Locked by Eddie, re-confirmed Jul 31 2026. This is the single source of truth. If any older doc disagrees, THIS wins.</em></p>
+<p>We build our OWN captions from the word-level transcript (<code>lipsync/LastResort_03_04_CLEAN.words.json</code>), never YouTube&#x27;s. There are two caption forms across three destinations:</p>
+<table><thead><tr><th>Destination</th><th>Video file</th><th>Captions</th></tr></thead><tbody><tr><td><strong>YouTube</strong></td><td><code>EP-04_S3E4_YOUTUBE.mp4</code></td><td><strong>Karaoke BURNED IN</strong> (white Bangers, spoken word gold) <strong>AND</strong> upload <code>EP04_S3E4_CAPTIONS.srt</code> separately in the Subtitles box</td></tr><tr><td><strong>Spotify</strong></td><td><code>EP-04_S3E4_SPOTIFY.mp4</code></td><td><strong>CLEAN</strong> — nothing burned, and do <strong>not</strong> upload the SRT (Spotify auto-captions)</td></tr><tr><td><strong>Shorts</strong></td><td><code>Shorts/*.mp4</code></td><td>Their <strong>own</strong> vertical karaoke burned in (cut from the CLEAN master)</td></tr></tbody></table>
+<blockquote><strong>Both main files now carry the 10s neon-logo intro + outro</strong> (runtime ~10:00). Because content starts at 0:10, the uploaded <code>.srt</code> was shifted +10s to match. <code>EP-04_S3E4_MASTER.mp4</code> is the clean episode WITHOUT intro/outro — kept internal (it&#x27;s the source the Shorts are cut from), don&#x27;t upload it.</blockquote>
+<p><strong>Why burned + SRT on YouTube:</strong> karaoke is per-word animation, which a plain <code>.srt</code> can&#x27;t do — so it must be burned into the picture. We upload the <code>.srt</code> too only so YouTube can index the words (search + the transcript panel). Since the captions are already visible, viewers won&#x27;t toggle CC on, so there&#x27;s no double-caption problem in practice.</p>
+<p><strong>Why the Shorts are cut from the CLEAN master (not the YouTube file):</strong> if we cut them from the burned YouTube file they&#x27;d show the episode&#x27;s captions <em>and</em> the Short&#x27;s own karaoke — double captions. Always cut Shorts from the clean master.</p>
+<h2>The files that make this</h2>
+<p>All in <code>EP04_S3E4/</code>:</p>
+<ul>
+<li><code>burn_captions.py</code> → builds <code>captions/EP04_S3E4_KARAOKE.ass</code> (to burn) + <code>captions/EP04_S3E4.srt</code> (to upload) from the word JSON.</li>
+<li><code>burn_youtube_chunks.py</code> → burns the <code>.ass</code> onto the clean master → <code>EP-04_S3E4_YOUTUBE.mp4</code> (chunked + resumable).</li>
+<li><code>shorts_pipeline/make_shorts.py</code> → the 7 Shorts, each with its own karaoke.</li>
+</ul>
+<h2>Transcript fixes applied Jul 31 (auto-transcription errors)</h2>
+<p><code>servers</code>→<strong>Sarper&#x27;s</strong> · <code>Shikaina</code>→<strong>Shekinah</strong> · <code>declared award</code>→declared <strong>war</strong> · <code>bake-through</code>→<strong>breakthrough</strong>. ⚠️ <strong>One left for you:</strong> at ~5:47 the transcript has <em>&quot;Guillermo, <strong>Micho</strong>&quot;</em> — tell me what Ruby actually said (mijo? something else?) and I&#x27;ll fix it and rebuild the <code>.ass</code>/<code>.srt</code> in seconds.</p>
+<h2>Style (locked)</h2>
+<p>Bangers, size <strong>120</strong> on 1080p, white text, the spoken word turns <strong>gold (245,197,66)</strong> at 112%, baseline y=880, centered.</p>

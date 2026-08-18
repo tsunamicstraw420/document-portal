@@ -1,0 +1,573 @@
+<pre class='txtdoc'>POLYMARKET LATENCY ARBITRAGE BOT — SETTINGS &amp; LOGIC REFERENCE
+Last updated: 2026-05-15
+Bot path: /Users/rubys/Desktop/AI_bots/Polymarket-Arbitrage-Bot/
+VPS:      poly-vilnius (76.13.78.74) | SSH alias: poly-vilnius | key: ~/.ssh/hostinger_vps
+VPS deploy path: /opt/polymarket-bot/
+GitHub:   https://github.com/tsunamicstraw420/polymarket_Arb_bot
+================================================================================
+
+
+OVERVIEW
+--------
+Strategy: Latency Arbitrage (Binance → Polymarket)
+The bot monitors Binance BTC/USDT and ETH/USDT for fast price moves. When the
+30-second move exceeds a threshold, it estimates the probability the move will
+hold through the contract window using a logistic model. If that probability
+diverges from the live Polymarket price by more than the edge threshold,
+the bot places a BUY at the predicted side and exits via early-exit, stop,
+or expiry.
+
+Current strategy paths:
+  * Binance-momentum   — ACTIVE — fires across the full pre-window + first 70%
+                                  of the in-window period
+  * Chainlink-settle   — SOFT-DEMOTED (commit 8a192b5, 2026-05-15)
+                         RTDS WebSocket still subscribes and writes into the
+                         chainlink_state buffers (kept for diagnostics + future
+                         revival), but _evaluate() no longer dispatches to it.
+                         Across May 11–15, the Chainlink path produced 66 BUYs
+                         and 0 confirmed fills. Revive by uncommenting the
+                         dispatch branch in strategy._evaluate.
+
+Current mode: LIVE (docker-compose.yml always passes --live --confirm-live --real-money)
+
+
+================================================================================
+SIGNAL ENTRY — BINANCE MOMENTUM
+================================================================================
+
+LOOKBACK_SECONDS              = 30s        Binance price-change lookback
+MOMENTUM_CONFIRM_SEC          = 10s        Recent confirmation that move is still live
+                                            (renamed from MOMENTUM_LOOKBACK_SEC)
+MIN_PRICE_MOVE_PCT            = 0.07%      Pre-filter on the 30s move
+MAX_PRE_ENTRY_SEC             = 30s        Don&#x27;t enter more than 30s pre-window
+SCAN_INTERVAL_SEC             = 0.5s       Main loop scan cadence
+STATUS_PRINT_INTERVAL         = 30s        Console/log status print frequency
+TARGET_DURATIONS              = [5, 15]    Contract durations traded (minutes)
+
+Effective minimum Binance move that produces a SIGNAL (subject to true_prob ≥ 0.60):
+   5-min contracts (k=150):  ≈ 0.27% over 30s
+  15-min contracts (k=100):  ≈ 0.405% over 30s
+
+The 0.07% MIN_PRICE_MOVE_PCT is only a first-gate filter. The real signal floor
+is the conjunction of true_prob ≥ 0.60 with the per-duration edge threshold.
+NEAR-MISS log lines surface this silent band: &quot;edge=2.97% (need 3.0%)&quot;.
+
+
+================================================================================
+EDGE THRESHOLDS — per duration
+================================================================================
+
+EDGE_THRESHOLD_BY_DURATION    = {5: 0.04, 15: 0.03}
+EDGE_THRESHOLD (fallback)     = 0.05  (5%) — used for any duration not in the map
+
+5-min contracts have higher noise → require a larger edge to fire.
+15-min contracts have more statistical stability → allow a lower edge.
+
+Both are checked as strict &quot;&gt;&quot;; a signal exactly at threshold is NOT fired.
+2026-05-14 evidence: BTC DOWN 5min at edge=4.00% was blocked (need &gt;4.0%).
+
+
+================================================================================
+CHAINLINK-SETTLE STRATEGY (SOFT-DEMOTED 2026-05-15)
+================================================================================
+
+Status: dispatch is commented out in strategy._evaluate (commit 8a192b5).
+The code below documents the path AS IT EXISTS, in case of revival.
+
+CHAINLINK_LATE_ENTRY_PCT      = 0.70       Dispatch threshold (&gt;=70% = Chainlink)
+CHAINLINK_EDGE_THRESHOLD      = 0.03       3% — lower than Binance, higher conviction
+CHAINLINK_MIN_DELTA           = 0.0010     Require &gt;=0.10% Chainlink delta from window open
+CHAINLINK_SCALE_FACTOR        = 200.0      Sigmoid steepness on (|delta| × time_progress)
+CHAINLINK_MIN_SECS_LEFT       = 90         Skip when &lt;=90s left in window (added 2026-05-14)
+
+Math (in _evaluate_chainlink_settle):
+  delta       = chainlink_price_change_pct(lookback_sec = elapsed_in_window)
+  score       = |delta| × CHAINLINK_SCALE_FACTOR × time_progress
+  conviction  = 1 / (1 + e^-score)
+  edge        = conviction − market.price
+
+Why it was demoted: across May 11–15, 66 BUYs from this path produced 0 confirmed
+fills. Structural problem: by the time Chainlink screams ≥10% edge, market makers
+have pulled their asks because the outcome is near-certain. The book runs away.
+The 90s gate further compressed the effective Chainlink window for 5-min contracts
+to zero. Kept for future regime-specific revival.
+
+
+================================================================================
+SIGNAL FILTERS — order of evaluation (Binance path)
+================================================================================
+
+1. PRE-FILTER: MIN BINANCE MOVE
+   If abs(Δ30s) &lt; MIN_PRICE_MOVE_PCT (0.07%) → skip.
+
+2. MOMENTUM CONFIRM (10s)
+   If the 10-second sub-move has reversed against the 30s signal direction
+   (beyond a 0.02% tolerance) → skip. Spike is exhausted.
+
+3. PRE-WINDOW BLOCK
+   If window_start_ts is 0 (slug parse failed) → skip.
+   If window opens &gt; MAX_PRE_ENTRY_SEC (30s) from now → skip.
+
+4. STALE PRICE BLOCK
+   If Polymarket price data is older than 15s → skip.
+
+5. EXTREME PRICE BLOCK
+   If market.price &lt;= 0.02 or &gt;= 0.98 → skip (illiquid / near-resolved).
+
+6. EDGE + PROBABILITY FLOOR
+   true_prob_this_direction must be &gt;= 0.60.
+   edge = true_prob_this - market.price; must be &gt; 0 AND &gt;= EDGE_THRESHOLD_BY_DURATION.
+
+7. MINIMUM ORDER SIZE
+   Kelly-sized USDC must be &gt;= MIN_ORDER_USDC ($5).
+
+   ► If all pass → SIGNAL[BINANCE] line logged + Signal returned.
+
+
+================================================================================
+PROBABILITY MODEL (Binance)
+================================================================================
+
+  prob_up = 1 / (1 + e^(-k × Δ30s_pct))
+
+Steepness:  k = 150 (5-min)  |  k = 100 (15-min)
+
+Examples (5-min, k=150):
+  Δ30s =  0.27%  → prob_up = 60.0%   (exactly at floor)
+  Δ30s =  0.40%  → prob_up = 64.8%
+  Δ30s =  1.00%  → prob_up = 99.3%
+
+
+================================================================================
+POSITION SIZING — Kelly
+================================================================================
+
+KELLY_FRACTION       = 0.5        Half-Kelly
+MAX_POSITION_PCT     = 3.0%       Hard per-trade cap
+MIN_ORDER_USDC       = $5.00
+
+  b           = (1 - price) / price
+  raw_kelly   = (b × true_prob − (1 − true_prob)) / b
+  fractional  = raw_kelly × KELLY_FRACTION
+  capped      = min(fractional, MAX_POSITION_PCT)
+  size_usdc   = available_balance × capped
+
+NOTE: `available_balance` (= current_balance − reserved_usdc) is used since
+2026-05-14 (commit 8f36499) to prevent two concurrent in-flight BUYs from
+each passing the cap against the same pre-deduction balance.
+
+
+================================================================================
+ORDER PLACEMENT — LIVE BUY PIPELINE (current)
+================================================================================
+
+When a Signal fires, order_manager._live_execute runs:
+
+  1. price_ceiling = min(round(signal.poly_price + 0.05, 2), 0.98)
+
+  2. PARALLEL PREFLIGHT (commit 30a79fa, 2026-05-15)
+     Thread A: client.get_order_book(token_id) → _book_disagrees_with_signal()
+        ABORT if live ask side is EMPTY, OR if live_best_ask &gt; price_ceiling.
+        On abort: arm 15s per-market cooldown, return OrderResult(success=False,
+        error=&quot;preflight: book stale or empty&quot;). No record_open, no post_order.
+     Thread B (main): client.create_order(args)  [signing is local CPU]
+     Awaits Thread A via event.wait(timeout=2.0) just before post_order.
+
+  3. record_open(..., live=True)   [reserves trade in _open_trades; does NOT
+                                    deduct current_balance — on-chain sync
+                                    owns balance in live mode]
+
+  4. client.post_order(signed, OrderType.GTC)
+
+     post_order returns one of:
+       * status=&quot;matched&quot;  → SYNC-MATCHED PATH
+       * status=&quot;live&quot;     → RESTING PATH
+       * status=&quot;error&quot;    → reject + cooldown
+
+  5a. SYNC-MATCHED PATH (status=&quot;matched&quot;)
+      Spawn daemon thread _finalize_sync_gtc_fill_worker (commit 5b92e35):
+        retry get_order up to 4 times (0, 0.5, 1.0, 2.0s) waiting for
+        size_matched &gt; 0. If still 0 after retries → OPTIMISTIC: assume full
+        fill (Telegram alert sent). Refunding-on-zero is gone; that path
+        created phantom positions (2026-05-14: a &quot;refunded&quot; BUY paid out
+        +$20.75 silently because UP won).
+      Read _actual_fill_price(info, ceiling) to update trade.size_usdc and
+      _live_positions[id][&quot;entry_price&quot;] to the actual on-chain price.
+      KNOWN ISSUE: _actual_fill_price tries fields average_price / avg_price /
+      matched_price / fill_price / matched_amount-derived; if none are present
+      in get_order&#x27;s response, it FALLS BACK to the ceiling value, which the
+      bot then records as &quot;fill&quot;. This is observably wrong (2026-05-15 13:52
+      trade: bot recorded fill=$0.58, wallet showed actual fill=$0.03).
+      The real py_clob_client response field name still needs to be probed.
+
+  5b. RESTING PATH (status=&quot;live&quot;)
+      _schedule_gtc_cancel daemon thread sleeps WATCHDOG default 30s, then:
+        - get_order BEFORE cancel  (read truth — avoids cancel-clobbers-size_matched race)
+        - cancel the remainder
+        - branch on size_matched: no-fill / partial / full
+      Default delay is 30s (was 5s pre-commit dcabcb4, 2026-05-13). The bug
+      was: cancel-then-read returned size_matched=0 for already-filled orders.
+
+  6. POST-BUY DIAGNOSTIC (commit df79584)
+      Daemon thread queries the live order book again and logs an L2 BOOK line:
+        [LIVE] L2 BOOK at BUY &lt;oid&gt; | ws_ask=X | live_ask=Y sz=Z |
+          delta=±D | ceiling=C | asks=[...] | bids=[...] | FILL-EXPECTED|NO-FILL-EXPECTED
+      This lets us measure WS-vs-live divergence on every BUY without blocking.
+
+
+================================================================================
+ORDER EXIT — LIVE SELL PIPELINE
+================================================================================
+
+Evaluated in this order every scan loop, per open live position:
+
+  1. STOP_REVERSAL  — Binance reversal of 1.5× entry-direction move
+  2. STOP_POLY_FLOOR — Polymarket price drops 10¢ below entry
+  3. HIGH_CONF_EXIT  — token price reaches 0.93+
+  4. EARLY_EXIT      — token price gains 5¢ in our favour
+  5. EXPIRED         — deadline reached (window close + 30s, capped at entry + 20min)
+
+_exit_live_position pipeline:
+  - cancel_order(buy_order_id) [no-op if filled]
+  - Try SELL FAK at sell_ref − {1¢, 3¢, 6¢} where sell_ref is the current
+    best bid (falls back to exit_price reference if bid unknown)
+  - On status=&quot;matched&quot;, read size_matched + actual fill price via
+    _actual_fill_price(info, sell_price) — affected by the same known issue above.
+  - Handle partial fill: shrink _live_positions[id][&quot;shares&quot;], retry next cycle
+  - On no-fill within retry budget: 30s backoff (or hold for settlement
+    if &lt;120s to deadline)
+  - PnL bookkeeping: risk_manager.record_close(..., live=True) — does NOT
+    adjust current_balance (on-chain sync owns it).
+
+
+================================================================================
+ACCOUNTING — LIVE MODE
+================================================================================
+
+In live mode, current_balance is owned EXCLUSIVELY by the periodic on-chain
+sync (every 60s via bot._sync_live_balance → risk.update_balance).
+
+In particular:
+  - record_open(..., live=True) does NOT deduct
+  - record_close(..., live=True) does NOT credit
+  - GTC no-fill paths do NOT credit a refund
+  - GTC partial paths do NOT credit a refund
+
+Reserved-vs-available accounting:
+  reserved_usdc      = sum(t.size_usdc for t in _open_trades if not t.closed)
+  available_balance  = current_balance − reserved_usdc
+  approved_size(req) = min(req, available_balance × MAX_POSITION_PCT)
+
+This fixes the 2026-05-14 oscillation bug where balance flickered between
+−size and +size depending on which of {record_open, sync, refund} ran most
+recently. See commit 8f36499.
+
+Paper mode (record_open(live=False)) deducts normally — paper trading logic
+is unchanged.
+
+
+================================================================================
+RISK MANAGEMENT
+================================================================================
+
+MAX_OPEN_POSITIONS       = 4
+DAILY_LOSS_LIMIT_PCT     = 20%      Pauses entries 30 min if hit
+DAILY_LOSS_PAUSE_SEC     = 1800s    30 min cooldown
+DRAWDOWN_KILL_PCT        = 40%      Permanent session kill
+
+Soft-brake (bot.py): 25% drawdown → 15-min new-entry pause (auto-rearms
+when drawdown drops below 25%).
+
+Limit hierarchy (in trigger order):
+  1. 25% drawdown  → 15-min entry pause (soft, auto-recovers)
+  2. 20% daily loss → 30-min timed pause (auto-resumes)
+  3. 40% peak-to-trough drawdown → permanent kill (manual restart only)
+
+
+================================================================================
+POSITION GATES — applied in bot.py BEFORE _live_execute
+================================================================================
+
+GATE:window     same (asset, end_date_iso) blocks both UP+DOWN open simultaneously
+GATE:15min      open 15-min on asset → blocks new 5-min on the same asset
+GATE:x-asset    open 5-min on one asset blocks SAME-direction 5-min on the other
+                (cross-asset, direction-aware — May 4, 2026)
+GATE:pass       logs the (asset, dir, dur) and open-positions snapshot when entered
+GATE:cooldown   per-market 15s cooldown after CLOB reject OR preflight abort
+                OR no-fill
+
+One trade max per scan iteration (highest-edge signal wins).
+
+
+================================================================================
+PRICE FEEDS
+================================================================================
+
+Three independent WebSockets, each owning a separate state buffer:
+
+  1. BINANCE
+     URL:       wss://stream.binance.com:443/stream
+     Symbols:   btcusdt@miniTicker, ethusdt@miniTicker
+     Buffer:    _TICK_BUFFER = 3000 ticks per symbol
+     Reconnect: exponential backoff in BinanceFeed._run_loop
+
+  2. POLYMARKET CLOB (orderbook for active markets)
+     URL:       wss://ws-subscriptions-clob.polymarket.com/ws/market
+     Owner:     market_scanner
+     Events:    price_change, last_trade_price, book (initial snapshot)
+     Drives:    market.price (own best_ask), market.other_price (opposite ask),
+                _bids[token_id] (best bid)
+     Keepalive: lib-level pings disabled (V2 sends its own 5s pings);
+                app-level &quot;PING&quot; every 10s; 120s data-silence watchdog
+     REST fallback: re-polls Gamma every 30s as a gap-fill
+
+  3. POLYMARKET RTDS (Chainlink Data Stream)  [STILL SUBSCRIBED — soft-demoted strategy]
+     URL:       wss://ws-live-data.polymarket.com
+     Owner:     ChainlinkRTDSFeed
+     Subscribe: {topic: crypto_prices_chainlink, type: &quot;*&quot;, filters: &quot;&quot;}
+                The empty filters string is REQUIRED — any non-empty value
+                silently blocks all delivery (Polymarket bug).
+     Buffer:    PriceState per symbol (btc/usd, eth/usd)
+     Pings:     PING_INTERVAL = 5s (app-level &quot;PING&quot; frames)
+     Watchdog:  WATCHDOG_INTERVAL = 15s, WATCHDOG_TIMEOUT = 60s
+                Detects silent application-layer death (WS-protocol pings
+                stay alive while data frames stop). On trigger: force-close
+                socket, send Telegram alert &quot;⚠️ Chainlink RTDS silent for Ns
+                — forcing reconnect&quot;. Added 2026-05-14 after a 16-min outage.
+
+Feed-status string format (in STATUS log line):
+  Feed: BTC BN:0s CL:1s | ETH BN:1s CL:0s
+        ^ asset ^^^^^ feed:age-since-last-tick
+
+&quot;stale&quot; appears when age &gt; 10s.
+
+
+================================================================================
+LIVE-MODE OBSERVABILITY ADDITIONS (May 2026)
+================================================================================
+
+The bot log now includes several diagnostic lines beyond signals/BUYs/CLOSEs:
+
+  PREFLIGHT abort {asset} {dir} {dur}min — live ask=X &gt; ceiling=Y (ws_ask=Z, gap=+G) | cooldown=15s
+  PREFLIGHT abort {asset} {dir} {dur}min — live ask side EMPTY (ws_ask=Z ceiling=C) | cooldown=15s
+       (preflight book check rejected the signal before post_order)
+
+  [LIVE] BUY (GTC) {q} | size=X USDC | ceiling=C | ask_signal=A1 | ask_now=A2 | other_ask=A3 |
+         shares=N | order_id=0x... | token_id=N... | status={matched|live}
+       (ask_signal=market.price at signal-fire time; ask_now=market.price at log time;
+        other_ask=opposite token&#x27;s best_ask; sum(ask_now + other_ask) should be ≈ 1.0)
+
+  [LIVE] L2 BOOK at BUY 0x... | ws_ask=X | live_ask=Y sz=Z | delta=±D | ceiling=C |
+         asks=[(p,s)...] | bids=[(p,s)...] | FILL-EXPECTED|NO-FILL-EXPECTED
+       (post-BUY snapshot of authed-book vs WS view; runs in daemon thread)
+
+  [LIVE] GTC sync-matched full N shares | fill=F (ceiling=C) | order_id=0x...
+  [LIVE] GTC sync-matched partial N/M shares | fill=F (ceiling=C) | order_id=0x...
+  [LIVE] GTC sync-matched (size_matched=0 after retries, optimistic) N shares | order_id=0x...
+  [LIVE] GTC sync-matched (readback errored, optimistic) N shares | order_id=0x...
+       (different finalization outcomes — see SYNC-MATCHED PATH above)
+
+  [LIVE] GTC no fill after Ns — ghost position removed | order_id=0x... | cooldown=15s
+       (resting path timed out; position discarded)
+
+  FRESH-WINDOW {asset} {dir} {dur}min | t+S | poly=P other=O sum=PsumO |
+               BinanceΔ30s=±X% Δ10s=±Y%
+       (commit 8a192b5 — one snapshot per market within its first 10s of life;
+        used to study whether &quot;next-window pivot&quot; is an exploitable regime)
+
+  ℹ️ Clean restarts × N (deploys/SIGTERM)
+  🚨 Bot CRASHED × N
+       (digest.py — separated since commit dbd1299; deploys no longer false-alarm)
+
+
+================================================================================
+TELEGRAM ALERTS
+================================================================================
+
+Sent automatically:
+  - ⚠️ Chainlink RTDS silent for Ns — forcing reconnect          (RTDS watchdog fire)
+  - ⚠️ GTC matched but size_matched=0 after retries — assumed full fill    (optimistic path)
+  - ⚠️ GTC readback errored Nx — assumed full fill                 (readback exception)
+  - notifier.fill on every confirmed fill (sync or late)
+  - notifier.error on Order rejected
+  - 30-minute heartbeat
+
+Manual /commands (telegram_commander):
+  /status      balance, daily PnL, drawdown, open positions
+  /positions   each open position with entry / current
+  /pause       suspend new entries
+  /resume      lift pause
+  /stop        graceful shutdown
+  /restart     reload + restart
+
+
+================================================================================
+DIGEST (12-hour summary cron, runs at 00:00 and 12:00 UTC)
+================================================================================
+
+Path: /opt/polymarket-bot/digest.py (host process, NOT inside container)
+Output target: Telegram (via /opt/polymarket-bot/.env tokens)
+
+Counted events (commit dbd1299, 2026-05-14):
+  SIGNAL[BINANCE], SIGNAL[CHAINLINK], NEAR-MISS, CLOSE events (by reason)
+  GTC fills (sync_full / sync_partial / sync_optimistic / late_full / late_partial)
+  GTC no fill (no_fill / sync_zero)
+  Order errors, balance Δ12h, peak |Δ30s| per asset, feed status
+
+Header behaviour:
+  🚨 Bot CRASHED × N        only fires when actual &quot;Bot CRASHED&quot; line found
+  ℹ️ Clean restarts × N    informational; fires when &quot;Main loop exited&quot; alone
+                            and N &gt; 1 (deploys, SIGTERM)
+
+If digest&#x27;s &quot;1 fills, 1 resolved, win-rate ≈ 100%&quot; appears: do NOT assume
+the fill and the resolution are the same trade. Cross-check timestamps and
+order_ids. The counters are independent. (Burned by this 2026-05-15.)
+
+
+================================================================================
+MARKET DISCOVERY
+================================================================================
+
+Data source: Gamma API (https://gamma-api.polymarket.com/events)
+Polled every 5s by market_scanner.
+
+Slug format: {asset}-updown-{N}m-{unix_start_timestamp}
+  Example:   eth-updown-5m-1745640600
+
+Active markets during normal operation: ~36–40 direction-tokens
+  5-min:  ~6 upcoming windows × 2 assets × 2 directions = 24 tokens
+  15-min: ~2 upcoming windows × 2 assets × 2 directions = 8 tokens
+  (Count dips briefly at window boundaries.)
+
+
+================================================================================
+VPS DEPLOYMENT
+================================================================================
+
+Server:   poly-vilnius (76.13.78.74) | Hostinger KVM 1 | Vilnius, Lithuania
+OS:       Ubuntu 22.04 LTS
+SSH:      ssh poly-vilnius   (alias points at 76.13.78.74 with hostinger_vps key)
+
+CRITICAL INVARIANTS (from CLAUDE.md):
+  - ONLY ONE bot may run at a time — multiple instances share the same wallet
+  - VPS MUST be in a Polymarket-permitted region (current: Lithuania)
+  - NEVER use `docker compose up --force-recreate` (breaks Binance WS startup)
+  - NEVER push to main without explicit user confirmation
+  - .env is NOT in git — scp is the only way to update on server
+
+Containers:
+  polymarket-arb-bot   main trading bot
+  polymarket-chart     dashboard at http://76.13.78.74
+
+Deploy workflow (the only supported one):
+  # locally
+  git commit -m &quot;...&quot; &amp;&amp; git push origin main
+  # on VPS
+  ssh poly-vilnius &quot;cd /opt/polymarket-bot &amp;&amp; git pull &amp;&amp; \
+    docker compose build polymarket-bot &amp;&amp; \
+    docker compose up -d polymarket-bot&quot;
+
+Logs / state on VPS:
+  /opt/polymarket-bot/                  source clone (git working tree)
+  /opt/polymarket-bot/.env              secrets — never log this
+  /opt/polymarket-bot/data/state.json   persisted balance
+  /opt/polymarket-bot/data/positions.json   open positions for chart
+  /opt/polymarket-bot/data/trades.db    SQLite trade history
+  /opt/polymarket-bot/data/logs/bot.log persistent rolling log
+
+
+================================================================================
+SOURCES OF TRUTH (priority order)
+================================================================================
+
+When reconciling outcomes — ALWAYS use this order, never the bot log alone:
+
+  1. On-chain wallet (Polygon)         immutable, authoritative
+  2. Polymarket activity REST API      data-api.polymarket.com/activity?user=PROXY
+                                       (proxy = 0x06b4e8aa40ba9c0b76834dd14a118fd96b1ae204)
+  3. Polymarket CSV download           manual, lags
+  4. Bot&#x27;s data/logs/bot.log           bot&#x27;s INTENT, NOT proof of outcome
+
+Bot logs have been known to disagree with wallet truth on:
+  - &quot;no fill&quot; lines (sometimes the fill happened; phantom positions)
+  - fill prices (bot may record ceiling instead of actual price)
+  - PnL on CLOSE (uses last WS price, not actual sell fill)
+  - DailyPnL during the seconds-window between deduct/refund/sync
+
+If a heartbeat says PnL = ±N but no order notifications fired, the wallet
+almost certainly is unchanged. Cross-check before acting.
+
+
+================================================================================
+PARAMETER HISTORY (key changes by date)
+================================================================================
+
+2026-05-04   EDGE_THRESHOLD bumped 4%→5% (all durations)
+             BUY type FAK → GTC + 5s cancel
+             Cross-asset gate made direction-aware
+
+2026-05-10   VPS moved from Jakarta → Vilnius
+             ChainlinkRTDSFeed added (passive recording first, then dispatched)
+
+2026-05-11   Chainlink subscribe filters=&quot;&quot; fix (firehose + client-side filtering)
+
+2026-05-12   Phantom-fill mechanism observed on wallet (silent 4-fill day)
+
+2026-05-13   EDGE_THRESHOLD_BY_DURATION introduced (5min=4%, 15min=3%)
+             Cancel-race fixed: read initial_status, read size_matched BEFORE cancel,
+                                delay 5s → 30s on resting path
+
+2026-05-14   Chainlink min-secs-left gate (90s) reinstated, scoped to Chainlink
+             token_id added to BUY (GTC) log line
+             RTDS frame-watchdog (60s) added after 16-min silent outage
+             Live L2 BOOK diagnostic log added on every BUY
+             Preflight live-book check on BUY (serial, ~50-150ms)
+             ask_signal / ask_now / other_ask added to BUY log
+             Phantom-refund stopped: status=&#x27;matched&#x27; + size_matched=0 retries (no refund)
+             _actual_fill_price helper added (KNOWN: falls back to ceiling — broken)
+             Live-mode balance fix: record_open does NOT deduct; available_balance property
+             Digest fix: deploys no longer counted as crashes
+
+2026-05-15   Parallel preflight: book fetch overlaps with create_order (~50-100ms saved)
+             Chainlink soft-demoted: dispatcher always returns Binance path
+             FRESH-WINDOW probe: one-time per-market snapshot in first 10s
+
+KNOWN OPEN ISSUES (as of 2026-05-15):
+  - _actual_fill_price falls back to ceiling on every fill (no field name matches);
+    confirmed via 2026-05-15 13:52 trade where bot recorded fill=$0.58 but wallet
+    paid $0.03. Next step: probe the live py_clob_client get_order response shape.
+  - Preflight doesn&#x27;t catch the inverse &quot;ws-says-X-but-live-is-much-lower&quot; case
+    (which fired the 2026-05-15 13:52 anomaly). Could be tightened to abort when
+    |ws_ask − live_ask| &gt; some threshold (e.g., $0.10) even if live_ask &lt; ceiling.
+
+
+================================================================================
+FILE STRUCTURE
+================================================================================
+
+bot.py                   Main orchestrator, scan loop, Telegram callbacks
+config.py                All strategy parameters, credentials, clob factory
+strategy.py              _evaluate dispatcher, _evaluate_binance_momentum,
+                         _evaluate_chainlink_settle (demoted), Kelly,
+                         FRESH-WINDOW probe
+market_scanner.py        Gamma discovery, CLOB book WebSocket, PolyMarket dataclass
+price_feed.py            BinanceFeed, ChainlinkRTDSFeed, CombinedPriceFeed,
+                         PriceState ring buffers
+order_manager.py         Paper + live execution, preflight, sync-match path,
+                         scheduled cancel, exit logic, L2 BOOK diagnostic,
+                         _actual_fill_price helper, _book_disagrees_with_signal
+risk_manager.py          PnL, daily limits, drawdown kill, available_balance
+notifier.py              Telegram push notifications
+telegram_commander.py    /status /positions /pause /resume /stop /restart
+chart_server.py          WebSocket server for the dashboard
+logger_setup.py          File + console logging
+db.py                    SQLite trade journal (trades.db)
+digest.py                12-hour activity digest cron (runs on VPS HOST, not in container)
+chart.html               Browser dashboard
+
+CHANGELOG.md             Full version history since v1.0
+SESSION_HANDOFF.md       Latest session state for incoming Claude sessions
+CLAUDE.md                Project context + operating principles for AI sessions
+
+================================================================================
+</pre>

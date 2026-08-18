@@ -1,0 +1,64 @@
+<div class="pdfpages"><img class="pdfpage" loading="lazy" src="data/pdf/podcast-podcast-90day-lastresort-season3-shared-ruby-lipsync-bakeoff-guide-pdf/p-1.jpg" alt="page 1">
+<img class="pdfpage" loading="lazy" src="data/pdf/podcast-podcast-90day-lastresort-season3-shared-ruby-lipsync-bakeoff-guide-pdf/p-2.jpg" alt="page 2"></div><div class="pdftext" hidden><pre>                              Ruby Lip-Sync Bake-Off
+Pick the tool that makes Ruby’s mouth look best — then we automate the rest.
+
+Why we’re doing this
+The first time we tried lip-sync we used a tool called Wav2Lip. It only repaints a tiny 96-pixel patch over
+Ruby’s mouth, trained on real faces — so on her illustrated face it came out soft, blurry, and a little
+wobbly. That’s why we paused it. Since then the free tools have gotten much better, and a few now fix
+exactly that weakness. This is a quick taste-test: run the same Ruby clip through each one and see
+which looks best on her.
+
+
+The 3 contenders
+    Tool                      What it&amp;rsquo;s good at                         Cost            How you test it
+
+    LatentSync 1.5            Sharpest, most detailed mouth                   Free            Web demo or Colab notebook
+
+    MuseTalk 1.5              Fast, commercial-safe license                   Free            Web demo or Colab notebook
+
+    OmniSync (Kling)          Built for stylized / AI faces &amp;mdash; likely bestPaid
+                                                                                for Ruby
+                                                                                    credits   Kling AI website only
+
+OmniSync has no free/downloadable version — it’s a research model from the Kling team, and the only way to use it is
+inside the Kling AI web app. It’s worth a manual test because it’s literally designed for stylized faces like Ruby’s.
+
+
+
+Fastest way to decide (no install — ~15 min)
+Use the free hosted demos. Upload the same two files to each one: ruby_test1.mp4 (the silent clip)
+and ruby_test1.wav (Ruby’s narration), both in the bakeoff_test folder. Download each result and
+compare.
+
+   1. LatentSync — huggingface.co/spaces/fffiloni/LatentSync
+   2. MuseTalk — huggingface.co/spaces/TMElyralab/MuseTalk
+   3. OmniSync / Kling — app.klingai.com → AI Human / Lip Sync. Upload the clip + audio. (Uses Kling
+   credits; a free trial usually covers one test.)
+If a Hugging Face demo is busy or asleep, wait a minute and retry, or just use the Colab notebook below — it runs the
+same two free models on your own free GPU.
+
+
+The other way: the Colab notebook (also free)
+Ruby_LipSync_Bakeoff.ipynb runs LatentSync and MuseTalk on Google’s free GPU and stitches the
+results side-by-side into one comparison video. Open it at colab.research.google.com (File → Upload
+notebook), then follow the numbered cells — it tells you exactly what to click. This is also the file we’ll
+reuse to batch-process a whole episode once you pick a winner.
+
+
+What to look for when judging
+   • Sharpness — is the mouth crisp, or blurry like the old Wav2Lip?
+   • Style match — does the mouth still look like Ruby’s graphic-novel art, or like a real photo pasted
+   on?
+   • Timing — do the lips actually match the words?
+   • Steadiness — any jitter or flicker around the mouth between frames?
+
+
+After you pick a winner
+Tell me which one looks best and I’ll wire it into the pipeline we already built (the cues.csv + audio
+segments), so it lip-syncs all ~25 Ruby cutaways for an episode in one batch run — then those drop
+straight into DaVinci Resolve under her narration. If none of them look good enough, the fallback is the
+mouth-sprite method (Rhubarb) from your Copilot chat, which I can set up instead.
+
+Files with this guide: Ruby_LipSync_Bakeoff.ipynb (notebook) • bakeoff_test/ (ruby_test1 + ruby_test2 clips &amp; audio)
+</pre></div>

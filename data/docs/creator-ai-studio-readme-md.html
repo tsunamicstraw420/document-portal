@@ -1,0 +1,50 @@
+<h1>ShowKit (working name)</h1>
+<p>An AI-generation storefront for content creators. One credit wallet, the best image/video models under the hood, and one-click <strong>creator formats</strong> (thumbnails, Shorts, intros, audiograms, quote cards). You resell wholesale AI generation (via OpenRouter / fal.ai / Replicate) at a markup — the business model of davinci.ai / Pollo AI, but pointed at a niche you already own (podcasters + short-form creators, with your template + sound library and audience as the moat).</p>
+<h2>This folder is a handoff kit — not a finished app</h2>
+<p>It&#x27;s meant to be opened in <strong>Claude Code</strong> to do the real build. Start with <code>BUILD_PLAN.md</code>.</p>
+<pre class='code'><code>creator-ai-studio/
+├── README.md                         ← you are here
+├── BUILD_PLAN.md                     ← START HERE: phased plan + architecture + decisions
+├── CLAUDE.md                         ← working rules for building in this repo
+├── docs/
+│   ├── niche-and-competitors.md      ← market/positioning research (why this niche, competitors)
+│   ├── unit-economics.md             ← pricing + margin model (credit prices, tiers, profit)
+│   ├── unit-economics-calculator.html← interactive margin/profit calculator (open in browser)
+│   └── architecture.md               ← system design (credit ledger, model routing, data model)
+├── .env.example                      ← env vars to fill (Supabase, Stripe, provider keys)
+├── package.json                      ← starter deps
+├── db/schema.sql                     ← Postgres schema (users, wallets, ledger, generations)
+├── lib/models.ts                     ← model catalog: wholesale cost → credit cost per model
+├── lib/credits.ts                    ← credit-ledger logic (reserve → settle, transactional)
+├── lib/stripe.ts                     ← Stripe helpers (subscriptions, packs, webhooks)
+└── app/api/
+    ├── generate/route.ts             ← the metered generation endpoint (the spine)
+    └── stripe/webhook/route.ts       ← idempotent Stripe webhook → tops up the ledger</code></pre>
+<h2>Chosen stack</h2>
+<p>Next.js (App Router, TypeScript) · Supabase (Postgres + Auth + Storage) · Stripe (subscriptions + one-time credit packs) · model access via <strong>OpenRouter</strong> (unified image+text) and <strong>fal.ai / Replicate</strong> (fast image/video), all <strong>server-side</strong>. The <strong>credit ledger</strong> is the core of the product.</p>
+<h2>Get started (in Claude Code)</h2>
+<ol>
+<li>Open this folder in Claude Code and read <code>BUILD_PLAN.md</code>.</li>
+<li><code>npx create-next-app</code> on top of this scaffold (or wire these files into a fresh Next app).</li>
+<li>Copy <code>.env.example</code> → <code>.env.local</code>, create a Supabase project + Stripe (test) account +</li>
+</ol>
+<p>an OpenRouter key, and fill the values.</p>
+<ol>
+<li>Build <strong>Phase 1</strong> end-to-end first: sign in → trial credits → generate ONE model through</li>
+</ol>
+<p><code>/api/generate</code> with the ledger. That single slice proves the whole system.</p>
+<h2>Three constraints you cannot skip (details in BUILD_PLAN + CLAUDE.md)</h2>
+<ol>
+<li><strong>Provider keys are server-side only.</strong> fal.ai&#x27;s ToS forbids exposing its API to end users</li>
+</ol>
+<p>— every model call is proxied through your server. Never ship a provider key to the browser.</p>
+<ol>
+<li><strong>Moderation + NCII takedown is a launch blocker.</strong> The TAKE IT DOWN Act requires a working</li>
+</ol>
+<p>report + 48-hour removal flow (effective May 2026). Wire moderation before launch, not after.</p>
+<ol>
+<li><strong>The credit ledger must be transactional and idempotent.</strong> Never double-deduct, never lose</li>
+</ol>
+<p>a top-up. Stripe webhooks and generate requests both need idempotency keys.</p>
+<h2>Status</h2>
+<p>Scaffold + research + plan only. No application code written yet — that&#x27;s Claude Code&#x27;s job.</p>

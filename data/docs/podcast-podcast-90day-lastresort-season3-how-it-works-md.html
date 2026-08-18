@@ -1,0 +1,59 @@
+<h1>How the social system works — A to Z</h1>
+<p>Written for someone who has never touched this kind of tooling. No prior knowledge assumed.</p>
+<hr>
+<h2>The one-sentence version</h2>
+<p>It is a rubber stamp. The <strong>stamp</strong> (the layout — background, logo, lines, lettering) never changes. The <strong>ink</strong> (this week&#x27;s words) comes from one text file. Stamping takes 15 seconds.</p>
+<p>You never open a design tool. You are not making images — you are writing the words that go on them, and reviewing the result.</p>
+<hr>
+<h2>1. Where the pictures come from</h2>
+<p><strong>Nothing is bought, generated fresh, or taken from the TV network.</strong> Only two sources:</p>
+<table><thead><tr><th>Source</th><th>What it is</th></tr></thead><tbody><tr><td><strong>Frames from our own episodes</strong></td><td>I open the finished episode video and pull a still out of it at a given time — like pausing and screenshotting, but at full quality. These are our animated comic frames, so we own them outright.</td></tr><tr><td><strong>Ruby&#x27;s studio pictures</strong></td><td>The set images in <code>_SHARED/still frames/</code> — Ruby at the neon desk, the booth, the glam set.</td></tr></tbody></table>
+<p>To choose frames, I make a <strong>contact sheet</strong>: one big image of 24 evenly-spaced frames with the timecode printed under each. You point at the ones you like.</p>
+<p>Why this matters: Magnific credits are spent, so generating anything new costs real money — and since March 2026 Meta penalises a whole Page for reposting network footage. Our own frames cost nothing and carry no risk.</p>
+<h2>2. What gets drawn on top</h2>
+<p>A script paints our graphics over that picture: the purple gradient, the comic dot pattern, the <strong>2026 neon logo</strong>, the pink keylines, the Bangers lettering. There are <strong>eight layouts</strong>, and they are the same eight every week:</p>
+<table><thead><tr><th>Layout</th><th>What it is</th></tr></thead><tbody><tr><td><code>announce</code></td><td>Show-level drop card — logo, picture band, show name, pink button</td></tr><tr><td><code>quote</code></td><td>One of Ruby&#x27;s lines, big, over a picture band</td></tr><tr><td><code>poll</code></td><td>A question with a green and a red answer pill</td></tr><tr><td><code>grid</code></td><td>Six cast pictures tiled, with a question banded across the middle</td></tr><tr><td><code>cover</code> + <code>slide</code></td><td>The 6-slide carousel — a promise, then five payoffs</td></tr><tr><td><code>verdict</code></td><td>A number in a big pink circle</td></tr><tr><td><code>brand</code></td><td>Tagline card, no photograph at all</td></tr></tbody></table>
+<p>Each one renders in three shapes automatically: square (Facebook), tall 4:5 (main feed), and very tall 9:16 (Stories). Eight layouts × the shapes needed = 21 images.</p>
+<h2>3. Where the words come from</h2>
+<p><strong>One file: <code>EP04_S3E4/social/episode.json</code>.</strong> Every word on every card, and every caption, is in there. It looks like this:</p>
+<p>&quot;quote&quot;: { &quot;quote&quot;: &quot;Six couples. One castle. Zero chill.&quot;, &quot;attrib&quot;: &quot;Ruby, every single week&quot;, &quot;image&quot;: &quot;social/_src/frame_000155.png&quot; }</p>
+<p>A label on the left, your content on the right. Open it in TextEdit, change the words between the quote marks, save. <strong>Changing words never needs new artwork</strong> — it redraws in 15 seconds.</p>
+<h2>4. How it becomes a week</h2>
+<p>A second file, <code>_SHARED/social_factory/schedule.py</code>, holds the weekly grid — thirteen slots saying which day, what time, which platform, which card, and why that slot. That file does not change week to week. The builder reads it, works out the real dates from your publish Friday, and writes the posting queue.</p>
+<h2>5. What comes out</h2>
+<table><thead><tr><th>Where</th><th>What</th></tr></thead><tbody><tr><td><code>social/out/cards/</code></td><td>21 finished images</td></tr><tr><td><code>social/out/reels/</code></td><td>the vertical clips</td></tr><tr><td><code>social/out/POSTING_QUEUE.md</code></td><td>every post: time, platform, picture, caption, first-comment link</td></tr><tr><td><code>social/out/AUDIT.txt</code></td><td>every automatic check and what it found</td></tr><tr><td><code>rru-posting-desk/</code></td><td>Ruby&#x27;s website</td></tr><tr><td><code>rru-posting-desk/review/</code></td><td><strong>the Review Desk</strong></td></tr></tbody></table>
+<h2>6. Where you and Ruby have control</h2>
+<p><strong>The Review Desk</strong> — <code>rru-posting-desk/review/index.html</code>, also live on the website at <code>/review/</code>. It shows every image and every caption with a plain-English note on each saying which layout made it, which picture it used, and exactly which words were fed in. For each one you press <strong>Looks good</strong> or <strong>Change this</strong> and type what should change. At the bottom, <strong>Copy my feedback</strong> puts the whole list on your clipboard to paste back to Claude.</p>
+<p>Nothing is posted until you say so. You and Ruby can each review separately from any device.</p>
+<p><strong>Or edit directly</strong> — if it is faster to just write the line yourself, change it in <code>episode.json</code> and re-run the build.</p>
+<h2>7. The rules the build enforces on itself</h2>
+<ol>
+<li>Every image is the exact right size, or the build stops.</li>
+<li><strong>No season number, episode number or episode title in any artwork</strong> — exit code 1 if one appears.</li>
+<li>No two posts have identical text.</li>
+<li>No two posts fire at the same minute on the same platform.</li>
+<li>Every Instagram first line is measured against the 125-character cut-off.</li>
+<li>Hashtags counted against Instagram&#x27;s cap of five.</li>
+<li>Every clip measured against the 45–60 second window; every referenced file confirmed to exist.</li>
+</ol>
+<h2>8. The weekly routine</h2>
+<ol>
+<li>Edit <code>episode.json</code> — the words. (~10 min)</li>
+<li>Double-click <code>1_build_social.command</code> — draws the cards. (15 sec)</li>
+<li>Double-click <code>2_make_reels.command</code> — cuts the clips, if you want clips. (~3 min, walk away)</li>
+<li>Open the Review Desk. You and Ruby mark it up, paste feedback to Claude, changes get made.</li>
+<li>Double-click <code>3_publish.command</code> — puts it on Ruby&#x27;s website. (~30 sec)</li>
+</ol>
+<h2>9. Things worth knowing</h2>
+<ul>
+<li><strong>The logo</strong>: everything uses <code>_SHARED/RRU_logo_2026_transparent.png</code>. The old circular</li>
+</ul>
+<p>badge in <code>still frames/</code> is retired and must never be used again.</p>
+<ul>
+<li><strong>Season-only content</strong>: while we are behind on episodes, every word on every card is</li>
+</ul>
+<p>season-level — the cast, the castle, the premise — never a specific episode. The pictures can still come from any episode, because a picture of two people on a sofa gives nothing away. It is the <em>words</em> that leak an episode.</p>
+<ul>
+<li><strong>The video clips are the exception.</strong> A clip has Ruby talking about specific events, so it</li>
+</ul>
+<p>cannot be season-neutral. Until we catch up, either skip clips or cut them from an episode that is already published.</p>

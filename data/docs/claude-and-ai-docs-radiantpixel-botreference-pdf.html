@@ -1,0 +1,674 @@
+<div class="pdfpages"><img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-radiantpixel-botreference-pdf/p-01.jpg" alt="page 1">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-radiantpixel-botreference-pdf/p-02.jpg" alt="page 2">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-radiantpixel-botreference-pdf/p-03.jpg" alt="page 3">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-radiantpixel-botreference-pdf/p-04.jpg" alt="page 4">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-radiantpixel-botreference-pdf/p-05.jpg" alt="page 5">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-radiantpixel-botreference-pdf/p-06.jpg" alt="page 6">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-radiantpixel-botreference-pdf/p-07.jpg" alt="page 7">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-radiantpixel-botreference-pdf/p-08.jpg" alt="page 8">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-radiantpixel-botreference-pdf/p-09.jpg" alt="page 9">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-radiantpixel-botreference-pdf/p-10.jpg" alt="page 10">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-radiantpixel-botreference-pdf/p-11.jpg" alt="page 11">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-radiantpixel-botreference-pdf/p-12.jpg" alt="page 12">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-radiantpixel-botreference-pdf/p-13.jpg" alt="page 13">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-radiantpixel-botreference-pdf/p-14.jpg" alt="page 14"></div><div class="pdftext" hidden><pre>                                         Radiant Pixel
+                               X Signal → Phemex 10x Futures Trading Bot
+                   Reference Guide — Updated: May 07, 2026 | VPS: root@72.61.209.224 | Repo:
+                                   github.com/tsunamicstraw420/radiant-pixel
+
+
+
+
+Part 0 — What Is Radiant Pixel?
+Radiant Pixel is a fully automated crypto trading bot. It monitors the X (Twitter) account @astronomer_zero for
+buy and sell signals, uses Claude Haiku AI to parse those posts into structured trade instructions, checks them
+against 9 risk management gates, and executes 10x leveraged perpetual futures trades on Phemex
+automatically. All trade events are reported via Telegram.
+
+
+Signal flow:
+
+   #      Component                    What it does
+
+   1      Twitter Monitor tweepy       Polls @astronomer_zero every 60 seconds for new tweets. Skips tweets older
+          X API v2                     than 15 minutes.
+
+   2      Signal Parser Claude         Sends each tweet to Claude Haiku. Returns structured JSON: signal type,
+          Haiku AI                     entry price, stop loss, take profits, confidence score.
+
+   3      Risk Manager 9-gate filter   Validates confidence, price levels, staleness, daily limit, open positions,
+                                       conflicts, size, minimum order, and liquidation buffer.
+
+   4      Phemex Executor CCXT         Sets 10x leverage, places market entry order, stop-loss order, and up to 3
+          library                      take-profit orders split by configured ratios.
+
+   5      SQLite DB database.py        Logs every tweet, trade open/close, and bot state. Deduplicates tweet IDs so
+                                       nothing is processed twice.
+
+   6      Telegram Notifier            Sends HTML-formatted alerts for every trade lifecycle event and daily P&amp;L
+          notifier.py                  summaries.
+
+
+
+
+Part 1 — Project File Structure
+
+   File / Folder                       Purpose                                                          In Git?
+
+   main.py                             Main orchestrator — 60s polling loop, routes signals,            Yes
+                                       shutdown
+
+   config.yaml                         All tunable parameters — no secrets here                         Yes
+
+   .env                                API keys and secrets — NEVER commit this                         NO
+   .env.example                              Template showing all required env vars                            Yes
+
+   requirements.txt                          Python package versions                                           Yes
+
+   Dockerfile                                Python 3.11 slim container definition                             Yes
+
+   docker-compose.yml                        Runtime config: env_file, volumes, restart policy                 Yes
+
+   src/twitter_monitor.py                    tweepy X API v2 — polls user timeline every 60s                   Yes
+
+   src/signal_parser.py                      Claude Haiku — extracts structured trade signal JSON              Yes
+
+   src/risk_manager.py                       Position sizing and all 9 safety gates                            Yes
+
+   src/phemex_executor.py                    CCXT Phemex — places and manages orders                           Yes
+
+   src/notifier.py                           Telegram HTML alerts for all trade events                         Yes
+
+   src/database.py                           SQLite: tweet dedup, trade log, bot state                         Yes
+
+   data/radiant_pixel.db                     SQLite database file — persisted via Docker volume                NO
+
+   data/radiant_pixel.log                    Bot log file — persisted via Docker volume                        NO
+
+   tests/test_signal_parser.py               13 unit tests for Claude signal parsing                           Yes
+
+   tests/test_risk_manager.py                14 unit tests for risk gate edge cases                            Yes
+
+
+
+
+Part 2 — Signal Types (What Claude Haiku Detects)
+Every @astronomer_zero tweet is sent to Claude Haiku. Claude classifies it into one of 6 signal types and
+returns structured JSON. The bot acts on the type to decide what to do.
+
+   Signal Type            What it means                                Bot Action
+
+   entry_long             Buy signal — go long on BTC/ETH at           Opens long position (subject to 9 risk gates)
+                          given entry price
+
+   entry_short            Sell signal — go short on BTC/ETH            Opens short position (subject to 9 risk gates)
+                          at given entry price
+
+   close                  Close existing position now                  Cancels SL/TPs, market closes the position
+
+   adjust_sl              Move stop loss to a new price level          Cancels old SL order, places new one at new price
+
+   partial_tp             Partial take-profit hit or TP level          Logged only — Phemex TP orders handle
+                          adjustment                                   automatically
+
+   analysis_only          Market commentary, no actionable             Silently ignored — no trade, no alert
+                          trade levels
+
+
+
+Claude Haiku output schema (JSON returned for each tweet):
+  { &quot;signal_type&quot;: &quot;entry_long | entry_short | close | adjust_sl | partial_tp |
+  analysis_only&quot;, &quot;symbol&quot;: &quot;BTC | ETH&quot;, &quot;entry_price&quot;: 104000, &quot;stop_loss&quot;: 99500,
+  &quot;take_profits&quot;: [108000, 112000, 116000], &quot;confidence&quot;: 0.85, &quot;notes&quot;: &quot;Optional reasoning
+  string&quot; }
+
+  Rules baked into the system prompt: Non-whitelisted symbols (not BTC or ETH) are demoted to analysis_only.
+  Confidence below 0.70 triggers a Telegram alert for human review — no trade placed. Tweets older than 15 minutes are
+  skipped before parsing even starts.
+
+
+
+Part 3 — Risk Manager: 9 Safety Gates
+Every entry signal passes through all 9 gates in order. ALL must pass for a trade to be placed. Any rejection
+sends a Telegram alert (except POSITION_EXISTS, which is silent).
+
+        #     Code                              What it checks                                 Default
+
+        1     LOW_CONFIDENCE                    Claude&#x27;s confidence score for the signal       Min 70%
+
+        2     MISSING_LEVELS                    Signal must have both entry_price and          Required
+                                                stop_loss
+
+        3     PRICE_STALE                       Phemex mark price vs. signal&#x27;s stated          Within 2%
+                                                entry price
+
+        4     DAILY_LIMIT                       Day&#x27;s net P&amp;L vs. daily loss limit             Max −5%/day
+
+        5     MAX_POSITIONS                     Count of currently open positions              Max 1
+
+        6     CONFLICTING_POSITION              Same symbol open in opposite direction         Alert, skip
+
+        6b    POSITION_EXISTS                   Same symbol already open in same               Silent skip
+                                                direction
+
+        7     INVALID_SL                        Stop loss equals entry (zero stop distance)    Rejected
+
+        8     SIZE_TOO_SMALL                    Calculated position size vs. Phemex            Min 0.001
+                                                minimum                                        BTC
+
+        9     LIQUIDATION_TOO_CLOSE             Liquidation price distance from entry at 10x   Min 8% buffer
+
+
+
+Position sizing formula (Kelly-inspired, 1% risk per trade):
+  risk_dollars = account_equity × 0.01 # 1% of account stop_distance_pct = abs(entry −
+  stop_loss) / entry position_size_usdt = risk_dollars / stop_distance_pct position_size_btc =
+  position_size_usdt / entry_price margin_required = position_size_usdt / leverage # at 10x
+
+
+Liquidation price formula (Phemex isolated margin, 0.5% maintenance margin):
+  Long: liq = entry × (1 − 1/leverage + 0.005) → at 10x: ~9.5% below entry Short: liq = entry
+  × (1 + 1/leverage − 0.005) → at 10x: ~9.5% above entry Gate 9 requires liq to be at least 8%
+  away — all valid 10x trades pass this.
+Part 4 — Order Execution on Phemex
+Uses the CCXT library (ccxt==4.4.53) to communicate with Phemex&#x27;s REST API.
+
+4.1 Order flow for a new entry:
+
+   St       Order type               Details
+   ep
+
+   1        Set leverage             exchange.set_leverage(10, symbol) — called once per symbol
+
+   2        Market entry             Buy (long) or Sell (short) market order for position_size BTC
+
+   3        Stop-loss                stop_market, reduce_only=True — placed at signal&#x27;s stop_loss price
+
+   4        Take-profit #1           take_profit_market, reduce_only=True — 40% of position at TP1
+
+   5        Take-profit #2           take_profit_market, reduce_only=True — 35% of position at TP2
+
+   6        Take-profit #3           take_profit_market, reduce_only=True — 25% of position at TP3
+
+
+
+4.2 Supported contracts (set contract: in config.yaml):
+
+   config value              Contract type             Margin currency         Phemex symbol
+
+   BTCUSDT                   Linear perpetual          USDT                    BTC/USDT:USDT
+
+   BTCUSD                    Inverse perpetual         BTC                     BTC/USD:BTC
+
+   ETHUSDT                   Linear perpetual          USDT                    ETH/USDT:USDT
+
+
+
+4.3 Close position flow:
+       • Cancel all open SL and TP orders for the position
+       • Place a reduce_only market order for the full remaining size
+       • Estimate P&amp;L; from entry price vs. exit mark price and log to SQLite
+
+4.4 Testnet vs. live mode:
+  Currently: TESTNET. All orders go to testnet-api.phemex.com (paper money). To go live: set
+  PHEMEX_TESTNET=false in /opt/radiant-pixel/.env, then run docker compose up -d on the VPS.
+
+
+
+Part 5 — config.yaml Reference (All Tunable Parameters)
+Edit config.yaml locally, commit, push, then git pull + docker compose up -d on VPS.
+
+   Parameter                                   Value                 What it controls
+
+   twitter.target_account                      astronomer_zero       X username to monitor (no @ prefix)
+   twitter.poll_interval_seconds            60                    Seconds between X API timeline polls
+
+   twitter.signal_age_limit_minutes         15                    Skip tweets older than this — price likely moved
+
+   parsing.min_confidence                   0.70 (70%)            Minimum Claude confidence to attempt a trade
+
+   parsing.claude_model                     claude-haiku-4-5-20   Claude model used for parsing
+                                            251001
+
+   risk.risk_per_trade_pct                  0.01 (1%)             Fraction of account equity risked per trade
+
+   risk.max_daily_loss_pct                  0.05 (5%)             Daily loss before trading is paused for the day
+
+   risk.max_open_positions                  1                     Maximum simultaneous open positions
+
+   risk.liquidation_buffer_pct              0.08 (8%)             Liq price must be at least this far from entry
+
+   risk.price_staleness_pct                 0.02 (2%)             Max drift allowed from signal entry to mark price
+
+   execution.contract                       BTCUSDT               BTCUSDT (linear USDT) or BTCUSD (inverse
+                                                                  BTC)
+
+   execution.leverage                       10                    Leverage applied to all positions
+
+   execution.order_type                     market                Entry order type: market or limit
+
+   execution.tp_split                       [0.40, 0.35, 0.25]    Fraction of position closed at each TP level
+
+   execution.allowed_symbols                [BTC, ETH]            Coins outside this list are ignored by parser
+
+   fees.taker_pct                           0.0006 (0.06%)        Phemex taker fee — used in P&amp;L; estimates
+
+   notifications.daily_summary_utc_hou      0 (midnight)          UTC hour to send the daily P&amp;L; summary
+   r
+
+
+
+
+Part 6 — Required .env Variables
+Lives at /opt/radiant-pixel/.env on the VPS. Never commit to git.
+
+   Variable                        Description                      Where to get it
+
+   X_BEARER_TOKEN                  X API v2 Bearer Token            developer.x.com → Your app → Keys and
+                                                                    Tokens
+
+   ANTHROPIC_API_KEY               Anthropic API key for Claude     console.anthropic.com
+                                   Haiku
+
+   PHEMEX_API_KEY                  Phemex API key (Trade            Phemex → Account → API Management
+                                   permission only)
+
+   PHEMEX_API_SECRET               Phemex API secret                Phemex → Account → API Management
+  PHEMEX_TESTNET                 true = testnet | false = live          Set manually — change to false to go live
+                                 trading
+
+  TELEGRAM_BOT_TOKEN             Token for @radiant_pixel_bot           @BotFather on Telegram → /mybots
+
+  TELEGRAM_CHAT_ID               Your Telegram chat ID                  Send /start to bot, then use getUpdates
+                                 (7351965863)
+
+  Security: The Phemex API key has Trade-only permission and is bound to VPS IP 72.61.209.224. If testing from another
+  machine, update the IP whitelist in Phemex settings.
+
+To update .env on VPS without a full redeploy:
+  ssh -i ~/.ssh/hostinger_vps root@72.61.209.224 nano /opt/radiant-pixel/.env # Edit the
+  value, save cd /opt/radiant-pixel &amp;&amp; docker compose up -d # recreate picks up new env
+
+  docker compose restart does NOT reload .env — you must use docker compose up -d.
+
+
+
+Part 7 — Telegram Alerts Reference
+All alerts go to @radiant_pixel_bot (chat ID 7351965863). HTML parse mode.
+
+           Alert                                When it fires                                             Icon
+
+           Bot started                          Every time the Docker container starts                    ■
+
+           Bot stopped (no positions)           On SIGTERM with no open positions                         ■
+
+           Bot stopping (has positions)         On SIGTERM — lists open positions, NOT                    ■■
+                                                auto-closed
+
+           TRADE OPENED                         Entry order placed successfully on Phemex                 ■/■
+
+           TRADE CLOSED                         Position closed via manual close signal                   ■/■
+
+           STOP LOSS UPDATED                    adjust_sl signal — new SL order placed                    ■
+
+           SIGNAL SKIPPED                       Any risk gate rejection except POSITION_EXISTS            ■■
+
+           LOW CONFIDENCE SIGNAL                Claude confidence below 70% — needs human                 ■
+                                                review
+
+           CONFLICTING SIGNAL                   Opposite direction signal while already in position       ■
+
+           IMAGE-ONLY SIGNAL                    Tweet has only a chart image, no text price levels        ■
+
+           ERROR                                Any exception in main loop or API call                    ■
+
+           DAILY SUMMARY                        Sent at midnight UTC: trades/wins/losses/net P&amp;L          ■/■
+
+           Daily pause lifted                   New trading day — 5% daily loss limit reset               ■
+
+
+Sample TRADE OPENED alert:
+  ■ TRADE OPENED Symbol: BTCUSDT (LONG) Entry: $104,000 Stop Loss: $99,500 Take Profits:
+  $108,000 | $112,000 | $116,000 Size: 0.0022 BTC Leverage: 10x Liq Price: $94,120 Margin:
+  $22.88 USDT Risk: $10.00 USDT Funding Rate: 0.0100% Signal: BTC longs from $104k, SL $99.5k,
+  TPs $108k/$112k/$116k
+
+  Error deduplication: the same error type only fires ONE Telegram alert. If the same error repeats every 60s it does NOT
+  flood Telegram. A new alert fires only when the error type or message changes.
+
+
+
+Part 8 — SQLite Database (data/radiant_pixel.db)
+Three tables persist all bot state across restarts.
+
+8.1 processed_tweets — tweet deduplication
+
+   Column               Type            Description
+
+   tweet_id             TEXT PK         X tweet ID — prevents reprocessing the same tweet
+
+   text                 TEXT            Full tweet text (stored for audit trail)
+
+   signal_type          TEXT            What Claude classified this tweet as
+
+   confidence           REAL            Claude&#x27;s confidence score (0.0 to 1.0)
+
+   processed_at         TEXT            ISO timestamp when the tweet was parsed
+
+
+
+8.2 trades — full trade log
+
+   Column                  Type            Description
+
+   id                      INT PK          Auto-increment trade ID
+
+   tweet_id                TEXT            Source tweet that triggered this trade
+
+   symbol                  TEXT            Trading pair (e.g. BTCUSDT)
+
+   direction               TEXT            long or short
+
+   entry_price             REAL            Signal&#x27;s entry price
+
+   stop_loss               REAL            Stop loss price at open
+
+   take_profits            TEXT            JSON array of take-profit prices
+
+   position_size           REAL            Size in BTC (contracts)
+
+   leverage                INT             Leverage used (10)
+
+   liq_price               REAL            Calculated liquidation price
+
+   phemex_order_id         TEXT            Entry order ID returned by Phemex API
+
+   sl_order_id             TEXT            Stop-loss order ID (updated on adjust_sl signals)
+   tp_order_ids          TEXT            JSON array of take-profit order IDs
+
+   opened_at             TEXT            ISO timestamp of trade open
+
+   closed_at             TEXT            ISO timestamp of trade close (NULL if still open)
+
+   close_reason          TEXT            sl_hit, tp_hit, manual, etc.
+
+   pnl_usdt              REAL            Estimated P&amp;L in USDT at close
+
+
+
+8.3 bot_state — key/value store
+
+   Key                     What it stores
+
+   last_tweet_id           Most recent processed tweet ID — used as since_id on next poll to avoid re-fetching
+
+   paused_date             Date trading was paused (YYYY-MM-DD) for the daily loss limit check
+
+   trading_paused          1 if trading is currently paused; 0 or absent if active
+
+
+
+
+Part 9 — VPS Deployment Details
+Radiant Pixel runs on the Hostinger Jakarta VPS alongside the Polymarket bot. Both bots run in separate
+Docker containers and never interfere.
+
+  Property                    Value
+
+  VPS IP                      72.61.209.224
+
+  Hostname                    srv1514238.hstgr.cloud — Jakarta, Indonesia
+
+  OS                          Ubuntu 22.04 LTS
+
+  SSH command                 ssh -i ~/.ssh/hostinger_vps root@72.61.209.224
+
+  SSH key (Mac)               ~/.ssh/hostinger_vps
+
+  Bot directory               /opt/radiant-pixel/
+
+  Data directory              /opt/radiant-pixel/data/ (SQLite DB + log, persisted via Docker volume)
+
+  GitHub repo                 github.com/tsunamicstraw420/radiant-pixel (private)
+
+  Local path                  /Users/rubys/Desktop/AI_bots/radiant-pixel/
+
+  Docker service              bot (container name: radiant-pixel-bot-1)
+
+  Restart policy              unless-stopped — auto-restarts on crash or VPS reboot
+
+  Log rotation                10 MB max per file, 5 files kept (set in docker-compose.yml)
+9.1 Deploy workflow — code update:
+
+# Step 1 — on Mac: commit and push to GitHub
+
+   cd /Users/rubys/Desktop/AI_bots/radiant-pixel git add -p git commit -m &quot;describe your
+   change&quot; git push origin main
+
+# Step 2 — on VPS: pull new code and rebuild container
+
+   ssh -i ~/.ssh/hostinger_vps root@72.61.209.224 cd /opt/radiant-pixel git pull docker compose
+   up -d --build
+
+
+9.2 Update .env secrets on VPS:
+   ssh -i ~/.ssh/hostinger_vps root@72.61.209.224 nano /opt/radiant-pixel/.env # Edit values,
+   save (Ctrl-O, Enter, Ctrl-X) cd /opt/radiant-pixel &amp;&amp; docker compose up -d # recreate to
+   load new env
+
+
+
+
+Part 10 — Bot Management Commands
+Run docker commands from /opt/radiant-pixel/ on the VPS after SSH-ing in.
+
+10.1 Container control
+
+   Action                                 Command
+
+   Start bot                              docker compose up -d
+
+   Stop bot                               docker compose down
+
+   Restart (config change)                docker compose restart
+
+   Rebuild + restart                      docker compose up -d --build
+
+   Reload .env (new env)                  docker compose up -d
+
+   Container status                       docker compose ps
+
+
+
+10.2 Logs
+
+   Action                                 Command
+
+   Live tail                              docker compose logs -f
+
+   Last 50 lines                          docker compose logs --tail=50
+
+   Save to file                           docker compose logs &gt; /tmp/rp.log
+
+   Filter errors                          docker compose logs | grep ERROR
+
+   Filter trades                          docker compose logs | grep &#x27;Trade opened&#x27;
+10.3 Database inspection (run inside VPS)
+
+   Task                      Command
+
+   Open trades                        docker compose exec bot python -c &quot;import sqlite3;
+                                      c=sqlite3.connect(&#x27;data/radiant_pixel.db&#x27;);
+                                      print(c.execute(&#x27;SELECT id,symbol,direction,entry_price FROM
+                                      trades WHERE closed_at IS NULL&#x27;).fetchall())&quot;
+
+   Recent 5 trades                    docker compose exec bot python -c &quot;import sqlite3;
+                                      c=sqlite3.connect(&#x27;data/radiant_pixel.db&#x27;);
+                                      print(c.execute(&#x27;SELECT id,symbol,direction,pnl_usdt FROM trades
+                                      ORDER BY opened_at DESC LIMIT 5&#x27;).fetchall())&quot;
+
+   Today P&amp;L;                         docker compose exec bot python -c &quot;import sqlite3;
+                                      c=sqlite3.connect(&#x27;data/radiant_pixel.db&#x27;);
+                                      print(c.execute(\&quot;SELECT SUM(pnl_usdt) FROM trades WHERE
+                                      date(opened_at)=date(&#x27;now&#x27;)\&quot;).fetchone())&quot;
+
+   Shell in container                 docker compose exec bot bash
+
+
+
+10.4 One-liners from Mac (no SSH session needed)
+
+   Action                   Command (from Mac terminal)
+
+   Check status             ssh -i ~/.ssh/hostinger_vps root@72.61.209.224 &quot;cd /opt/radiant-pixel &amp;&amp; docker
+                            compose ps&quot;
+
+   Tail logs                ssh -i ~/.ssh/hostinger_vps root@72.61.209.224 &quot;cd /opt/radiant-pixel &amp;&amp; docker
+                            compose logs -f&quot;
+
+   Quick restart            ssh -i ~/.ssh/hostinger_vps root@72.61.209.224 &quot;cd /opt/radiant-pixel &amp;&amp; docker
+                            compose restart&quot;
+
+   Pull + rebuild           ssh -i ~/.ssh/hostinger_vps root@72.61.209.224 &quot;cd /opt/radiant-pixel &amp;&amp; git pull &amp;&amp;
+                            docker compose up -d --build&quot;
+
+
+
+
+Part 11 — Switching from Testnet to Live Trading
+Currently running in Phemex testnet mode. Follow this checklist before going live.
+
+    [ ] Run on testnet for at least 1–2 weeks — verify all signal types work correctly in logs
+    [ ] Confirm all Telegram alert types fire (trade open, close, SL update, daily summary)
+    [ ] Verify position sizes are reasonable for your account balance (min 0.001 BTC ≈ $100 notional)
+    [ ] Deposit USDT into your Phemex account (suggest $200–$500 to start)
+    [ ] SSH to VPS: edit /opt/radiant-pixel/.env — change PHEMEX_TESTNET=true to
+    PHEMEX_TESTNET=false
+    [ ] Recreate the container: cd /opt/radiant-pixel &amp;&amp; docker compose up -d
+    [ ] Watch the first live trade Telegram alert and confirm the position appears on Phemex UI
+    [ ] The bot will NOT auto-close positions on shutdown — always check Phemex before restarting
+Daily loss limit: If the bot loses 5% of your account in one day, all new entries pause until midnight UTC. You get a
+Telegram alert. Trading resumes automatically next day.
+Conflicting signals: If @astronomer_zero posts a short while you&#x27;re long, the bot will NOT auto-reverse at 10x
+leverage. You get a Telegram alert and must decide manually on Phemex.
+Part 12 — Quick Reference Card
+Everything you need 90% of the time.
+
+Key identifiers
+
+   Item                         Value
+
+   VPS IP                       72.61.209.224
+
+   SSH command                  ssh -i ~/.ssh/hostinger_vps root@72.61.209.224
+
+   Bot directory (VPS)          /opt/radiant-pixel/
+
+   Local directory (Mac)        /Users/rubys/Desktop/AI_bots/radiant-pixel/
+
+   GitHub repo                  github.com/tsunamicstraw420/radiant-pixel
+
+   Telegram bot                 @radiant_pixel_bot (Phemex_Astro_Signals)
+
+   Telegram chat ID             7351965863
+
+   Monitored account            @astronomer_zero on X.com
+
+   Exchange                     Phemex — BTCUSDT linear perpetual
+
+   Leverage                     10x isolated margin
+
+   Current mode                 TESTNET (set PHEMEX_TESTNET=false to go live)
+
+
+
+Bot control (VPS — from /opt/radiant-pixel/)
+
+   Action                         Command
+
+   Start                          docker compose up -d
+
+   Stop                           docker compose down
+
+   Restart                        docker compose restart
+
+   Rebuild + restart              docker compose up -d --build
+
+   Live logs                      docker compose logs -f
+
+   Last 50 lines                  docker compose logs --tail=50
+
+   Container status               docker compose ps
+
+   Shell inside container         docker compose exec bot bash
+
+
+
+Full deploy from Mac (after a code change):
+  Step               Command (Mac terminal)
+
+  1. Commit          cd ~/Desktop/AI_bots/radiant-pixel &amp;&amp; git add -p &amp;&amp; git commit -m &quot;msg&quot;
+
+  2. Push            git push origin main
+
+  3. Deploy          ssh -i ~/.ssh/hostinger_vps root@72.61.209.224 &quot;cd /opt/radiant-pixel &amp;&amp; git pull &amp;&amp; docker
+                     compose up -d --build&quot;
+
+  4. Verify          ssh -i ~/.ssh/hostinger_vps root@72.61.209.224 &quot;cd /opt/radiant-pixel &amp;&amp; docker compose logs
+                     --tail=20&quot;
+
+
+
+Risk settings at a glance:
+
+  Setting                                Value        Effect
+
+  Risk per trade                         1%           Max ~$10 at risk on a $1,000 account
+
+  Daily loss limit                       5%           Pauses all trading after ~$50 daily loss
+
+  Max open positions                     1            Only one position open at a time
+
+  Price staleness gate                   2%           Skip if Phemex price moved &gt;2% from signal
+
+  Min confidence                         70%          Claude must be ≥70% sure — else human review
+
+  Min position size                      0.001 BTC    ~$100 notional minimum on Phemex
+
+  TP split                               40/35/25%    Position closed in three tranches
+
+  Leverage                               10x          Isolated margin — liquidation ~9.5% from entry
+
+
+
+Signal types quick reference:
+
+  Claude returns              Bot does
+
+  entry_long                  Opens LONG — buys BTC futures at 10x leverage
+
+  entry_short                 Opens SHORT — sells BTC futures at 10x leverage
+
+  close                       Closes any open position immediately at market price
+
+  adjust_sl                   Cancels old stop-loss order, places new one at new price
+
+  partial_tp                  Logged only — Phemex TP orders handle this automatically
+
+  analysis_only               Silently ignored — no trade placed, no alert sent
+
+
+
+Troubleshooting quick guide:
+   • No Telegram for hours → bot crashed. Check: docker compose ps
+   • 401 Unauthorized (X API) → Bearer Token expired. Regenerate at developer.x.com and update .env
+• Orders not on Phemex → Check API key has Trade permission and is bound to VPS IP 72.61.209.224
+• SIGNAL SKIPPED / PRICE_STALE → BTC moved more than 2% from signal&#x27;s stated entry before bot
+could act
+• Daily pause → Bot lost 5%+ today. Resumes automatically at midnight UTC. Check Phemex for open
+positions
+• CONFLICTING SIGNAL alert → You&#x27;re long and a short signal arrived. Go to Phemex and decide
+manually
+• Position stuck open after bot restart → Close it manually on Phemex UI — bot never auto-closes on
+shutdown
+</pre></div>

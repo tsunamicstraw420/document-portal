@@ -1,0 +1,439 @@
+<div class="pdfpages"><img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-botdeploymentguide-pdf/p-1.jpg" alt="page 1">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-botdeploymentguide-pdf/p-2.jpg" alt="page 2">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-botdeploymentguide-pdf/p-3.jpg" alt="page 3">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-botdeploymentguide-pdf/p-4.jpg" alt="page 4">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-botdeploymentguide-pdf/p-5.jpg" alt="page 5">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-botdeploymentguide-pdf/p-6.jpg" alt="page 6">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-botdeploymentguide-pdf/p-7.jpg" alt="page 7">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-botdeploymentguide-pdf/p-8.jpg" alt="page 8"></div><div class="pdftext" hidden><pre>                        Python Bot Deployment Guide
+                         VPS + Docker — Reusable Framework for Any Project
+                   Last updated: April 21, 2026 | Reference deployment: Polymarket Arbitrage Bot
+
+
+
+
+Part 0 — Understanding Docker in This Stack
+Docker is a containerisation platform. Instead of installing Python, dependencies, and your bot directly on the
+server, Docker packages everything into an isolated container that runs identically on any machine.
+
+
+Key concepts:
+    • Image — A frozen snapshot of your app + all its dependencies. Built once from a Dockerfile. Think of it as
+    an installation disk.
+    • Container — A running instance of an image. Starts in seconds, restarts automatically on crash or
+    reboot, fully isolated.
+    • Dockerfile — The recipe that builds your image (base Python version, packages to install, files to copy,
+    command to run).
+    • docker-compose.yml — Orchestrates one or more containers: environment variables, volume mounts,
+    restart policy, logging.
+    • Volume — A folder that is shared between the container and the host disk. Used for persistent data
+    (databases, logs, state files) that must survive container restarts or rebuilds.
+
+
+Deployment flow for any Python bot:
+
+  Step                       What happens                                        Tool
+
+  1. Write code              Develop bot locally on your Mac                     Python / your IDE
+
+  2. Write Dockerfile        Define the image: base image, pip install, CMD      Dockerfile
+
+  3. Write compose           Define runtime: env vars, volumes, restart policy   docker-compose.yml
+
+  4. Transfer files          rsync / scp code + .env to VPS                      Terminal (Mac)
+
+  5. Build image             docker compose build — installs all dependencies    VPS terminal
+
+  6. Run container           docker compose up -d — starts bot in background     VPS terminal
+
+  7. Monitor                 docker compose logs -f — tail live output           VPS terminal
+
+  8. Update                  rsync new code → docker compose build → up -d       Mac + VPS
+
+
+
+
+Part 1 — Prerequisites (one-time setup)
+These steps are done once per machine/VPS pair. Skip any that are already complete.
+
+1.1 Generate an SSH key on your Mac
+
+# Run on your Mac — skip if ~/.ssh/hostinger_vps already exists
+
+   ssh-keygen -t ed25519 -f ~/.ssh/hostinger_vps -N &quot;&quot; -C &quot;hostinger-indonesia&quot;
+
+   The private key stays on your Mac. The public key (~/.ssh/hostinger_vps.pub) is added to the VPS.
+
+1.2 Add the public key to hPanel
+hPanel → VPS → Manage → Settings → SSH keys → + SSH key → paste contents of
+~/.ssh/hostinger_vps.pub → Save
+
+1.3 Test key-based SSH login
+   ssh -i ~/.ssh/hostinger_vps root@YOUR_VPS_IP
+
+   You should land at a root@srv… prompt with no password prompt.
+
+1.4 Verify Docker is installed on the VPS
+   # Run on VPS docker --version docker compose version
+
+   If missing: curl -fsSL https://get.docker.com | sh &amp;&amp; apt install -y docker-compose-plugin
+
+
+
+Part 2 — Required File Structure for Any Bot
+Every bot project needs these four files. The rest is your bot code.
+
+  File                                Purpose                                                   Committed to git?
+
+  Dockerfile                          Builds the Docker image                                   Yes
+
+  docker-compose.yml                  Defines runtime config (volumes, env, restart)            Yes
+
+  .dockerignore                       Excludes secrets and junk from the image                  Yes
+
+  .env                                API keys and secrets — NEVER share this                   NO — gitignore it
+
+  .env.example                        Template showing which vars are needed                    Yes
+
+  requirements.txt                    Python dependencies                                       Yes
+
+
+
+Dockerfile template (Python bot):
+
+# Replace python:3.11-slim with the version your bot needs
+
+   FROM python:3.11-slim WORKDIR /app RUN apt-get update &amp;&amp; apt-get install -y \ gcc libssl-dev
+   \ &amp;&amp; rm -rf /var/lib/apt/lists/* COPY requirements.txt . RUN pip install --no-cache-dir -r
+   requirements.txt COPY *.py . CMD [&quot;python&quot;, &quot;-u&quot;, &quot;main.py&quot;]
+
+
+docker-compose.yml template:
+
+# Adjust service name, volume paths, and CMD flags per project
+   services: my-bot: build: . container_name: my-bot restart: unless-stopped env_file: - .env
+   volumes: - ./data/trades.db:/app/trades.db - ./data/state.json:/app/state.json -
+   ./data/logs:/app/logs logging: driver: &quot;json-file&quot; options: max-size: &quot;10m&quot; max-file: &quot;5&quot;
+
+
+.dockerignore template:
+   .env venv/ __pycache__/ *.pyc *.log* *.db state.json positions.json data/ .git/
+
+
+
+
+Part 3 — Deployment Steps (repeat for each new bot)
+Run all Mac commands in a local terminal. Run VPS commands after SSH-ing in.
+
+Step 1 — Create the bot directory on the VPS
+   # Run on Mac ssh -i ~/.ssh/hostinger_vps root@YOUR_VPS_IP &quot;mkdir -p /opt/MY-BOT/data&quot;
+
+
+Step 2 — Transfer all bot files (excluding secrets and cache)
+
+# Run on Mac — adjust local path and remote path per project
+
+   rsync -av -e &quot;ssh -i ~/.ssh/hostinger_vps&quot; \ --exclude=&#x27;.env&#x27; \ --exclude=&#x27;venv/&#x27; \
+   --exclude=&#x27;__pycache__/&#x27; \ --exclude=&#x27;*.log*&#x27; \ --exclude=&#x27;*.db&#x27; \ --exclude=&#x27;state.json&#x27; \
+   --exclude=&#x27;positions.json&#x27; \ /path/to/local/bot/ \ root@YOUR_VPS_IP:/opt/MY-BOT/
+
+   The trailing slash after the local path is important — it copies the contents, not the folder itself.
+
+Step 3 — Transfer the .env secrets file separately
+   # Run on Mac scp -i ~/.ssh/hostinger_vps /path/to/local/bot/.env
+   root@YOUR_VPS_IP:/opt/MY-BOT/.env
+
+   Security: The .env file must exist on the VPS but must NEVER be inside the Docker image or committed to git.
+
+Step 4 — SSH into the VPS
+   ssh -i ~/.ssh/hostinger_vps root@YOUR_VPS_IP
+
+
+Step 5 — Navigate to the bot directory and build the image
+   # Run on VPS cd /opt/MY-BOT docker compose build
+
+   This installs all packages from requirements.txt into the image. Only re-runs when requirements.txt or the Dockerfile
+   changes.
+
+Step 6 — Start the bot
+   # Run on VPS — -d means detached (runs in background) docker compose up -d
+
+
+Step 7 — Verify it started correctly
+   docker compose ps docker compose logs --tail=50
+
+
+
+
+Part 4 — Docker Command Reference
+All commands are run from inside the bot directory on the VPS (e.g. cd /opt/MY-BOT).
+4.1 Start / Stop / Restart
+
+  Command                             What it does
+
+  docker compose up -d                Start all containers in background (detached)
+
+  docker compose down                 Stop and remove containers (data volumes preserved)
+
+  docker compose restart              Restart all containers
+
+  docker compose restart my-bot       Restart one specific service
+
+  docker compose stop                 Stop containers without removing them
+
+  docker compose start                Start previously stopped containers
+
+
+
+4.2 Logs
+
+  Command                             What it does
+
+  docker compose logs -f              Tail all logs live (Ctrl-C to exit)
+
+  docker compose logs -f my-bot       Tail logs for one service only
+
+  docker compose logs --tail=100      Show last 100 lines
+
+  docker compose logs --tail=100 -f   Show last 100 lines then follow live
+
+  docker compose logs &gt; bot.log       Dump all logs to a file
+
+
+
+4.3 Status &amp; Inspection
+
+  Command                             What it does
+
+  docker compose ps                   Show running containers and their status
+
+  docker stats                        Live CPU/memory usage for all containers
+
+  docker compose exec my-bot bash     Open a shell inside the running container
+
+  docker images                       List all built images on this server
+
+  docker system df                    Show disk usage by Docker (images, containers, volumes)
+
+
+
+4.4 Build &amp; Update
+
+  Command                             What it does
+
+  docker compose build                Build/rebuild image (uses cache where possible)
+
+  docker compose build --no-cache     Force full rebuild from scratch (slower, clean)
+
+  docker compose up -d --build        Rebuild image AND restart in one command
+  docker system prune -f                                 Remove unused images/containers to free disk
+
+  docker system prune -af                                Remove ALL unused images (aggressive cleanup)
+
+
+
+4.5 Run bot with custom flags (override CMD)
+
+  Command                                                   What it does
+
+            docker compose run --rm my-bot python           Run in live trading mode (one-off, removed after exit)
+            bot.py --live --confirm-live --real-money
+
+            docker compose run --rm my-bot python           Paper mode with custom starting balance
+            bot.py --balance 10000
+
+            docker compose run --rm my-bot python -c &quot;      Quick sanity-check of config inside container
+            import config; print(config.EDGE_THRESHOL
+            D)&quot;
+
+
+
+
+Part 5 — Updating the Bot After Code Changes
+When you change bot code on your Mac, follow this workflow to redeploy:
+
+5.1 If only .py files changed (no new dependencies):
+  # Mac — sync updated code rsync -av -e &quot;ssh -i ~/.ssh/hostinger_vps&quot; \ --exclude=&#x27;.env&#x27;
+  --exclude=&#x27;venv/&#x27; --exclude=&#x27;__pycache__/&#x27; \ /path/to/local/bot/
+  root@YOUR_VPS_IP:/opt/MY-BOT/
+
+  # VPS — rebuild and restart cd /opt/MY-BOT docker compose up -d --build
+
+
+5.2 If requirements.txt changed (new packages added):
+  # Mac — sync files including updated requirements.txt rsync ... (same as above)
+
+  # VPS — full rebuild (cache busted at requirements step) cd /opt/MY-BOT docker compose build
+  --no-cache docker compose up -d
+
+
+5.3 If .env secrets changed:
+  # Mac — re-upload .env only scp -i ~/.ssh/hostinger_vps /path/to/.env
+  root@YOUR_VPS_IP:/opt/MY-BOT/.env
+
+  # VPS — restart to pick up new env vars (no rebuild needed) cd /opt/MY-BOT docker compose
+  restart
+
+
+
+
+Part 6 — Persistent Data &amp; Volumes
+Containers are ephemeral — when rebuilt, all files inside are wiped. Data that must survive rebuilds (databases,
+state files, logs) must be stored in Docker volumes mounted from the host disk.
+
+How volumes work in docker-compose.yml:
+  volumes: - ./data/trades.db:/app/trades.db # ^host path ^container path # (on VPS disk)
+  (inside container)
+
+  The left side is a path on your VPS. The right side is the path the container reads/writes. They point to the same file.
+
+For this bot, persistent files live in:
+
+  Host path (VPS)                               Container path                    Contents
+
+  /opt/polymarket-bot/data/trades.db            /app/trades.db                    SQLite trade history
+
+  /opt/polymarket-bot/data/state.json           /app/state.json                   Paper mode balance
+
+  /opt/polymarket-bot/data/positions.json       /app/positions.json               Open positions
+
+  /opt/polymarket-bot/data/bot.log              /app/bot.log                      Active rotating log
+
+  /opt/polymarket-bot/.env                      (via env_file)                    API keys / secrets
+
+
+
+Part 7 — This Deployment: Polymarket Arbitrage Bot
+Specific details for the Polymarket BTC arbitrage bot deployed to the Hostinger Jakarta VPS.
+
+7.1 Server details
+
+  Property                              Value
+
+  VPS IP                                72.61.209.224
+
+  Location                              Jakarta, Indonesia
+
+  SSH command                           ssh -i ~/.ssh/hostinger_vps root@72.61.209.224
+
+  Bot directory                         /opt/polymarket-bot/
+
+  Data directory                        /opt/polymarket-bot/data/
+
+  SSH key (Mac)                         ~/.ssh/hostinger_vps
+
+
+
+7.2 Required .env variables
+
+        Variable                                Description                                         Required?
+
+        PRIVATE_KEY                             Polygon wallet private key (0x prefix)              Yes
+
+        POLY_BUILDER_API_KEY                    Polymarket API key                                  Yes
+
+        POLY_BUILDER_SECRET                     Polymarket API secret                               Yes
+
+        POLY_BUILDER_PASSPHRASE                 Polymarket API passphrase                           Yes
+
+        TELEGRAM_BOT_TOKEN                      Telegram bot token from @BotFather                  Optional
+
+        TELEGRAM_CHAT_ID                        Your Telegram chat ID                               Optional
+7.3 Run modes
+
+Paper mode (default — no real money, safe to test):
+  docker compose up -d
+
+Live trading mode (REAL USDC — requires all three flags):
+  docker compose run --rm polymarket-bot python bot.py --live --confirm-live --real-money
+
+  Warning: Live mode spends real USDC. Always verify paper mode is profitable before switching.
+
+7.4 Useful bot-specific commands
+
+  Task                                  Command (run on VPS in /opt/polymarket-bot)
+
+  Start bot (paper mode)                        docker compose up -d
+
+
+  Stop bot                                      docker compose down
+
+
+  View live logs                                docker compose logs -f
+
+
+  Check bot status                              docker compose ps
+
+
+  View trade history (SQL)                      docker compose exec polymarket-bot python -c &quot;import
+                                                sqlite3; conn=sqlite3.connect(&#x27;trades.db&#x27;);
+                                                print(conn.execute(&#x27;SELECT * FROM trades ORDER BY
+                                                entry_time DESC LIMIT 10&#x27;).fetchall())&quot;
+
+  Rebuild after code change                     docker compose up -d --build
+
+
+  Check VPS resources                           docker stats
+
+
+  Check disk usage                              df -h &amp;&amp; docker system df
+
+
+
+
+Part 8 — Reusing This Framework for Other Projects
+To deploy a second bot (e.g. a Binance bot), follow this checklist:
+
+    [ ] Create Dockerfile, docker-compose.yml, .dockerignore, .env.example in the new bot folder
+    [ ] Change the service name in docker-compose.yml (e.g. binance-bot instead of polymarket-bot)
+    [ ] Update the CMD in Dockerfile to point to the correct entry point (e.g. main.py)
+    [ ] Update volume paths in docker-compose.yml to use a different data directory
+    [ ] Create the bot directory on VPS: ssh -i ~/.ssh/hostinger_vps root@VPS_IP &quot;mkdir -p
+    /opt/NEW-BOT/data&quot;
+    [ ] rsync the new bot files to /opt/NEW-BOT/ (same rsync command, different paths)
+    [ ] scp the new .env to /opt/NEW-BOT/.env
+    [ ] SSH in, cd /opt/NEW-BOT, docker compose build, docker compose up -d
+    [ ] Each bot runs in its own isolated container — they never interfere with each other
+Multiple bots on the same VPS:
+Each project lives in its own /opt/BOT-NAME/ folder with its own docker-compose.yml. They share the Docker
+daemon but are completely isolated from each other. You can run 5+ bots on an 8GB VPS with no conflicts.
+  To see all running containers across all bots: docker ps
+
+
+
+
+Part 9 — Quick Reference Card
+Cut out and keep — the commands you&#x27;ll use 90% of the time:
+
+  Action                          Command
+
+  SSH to VPS                      ssh -i ~/.ssh/hostinger_vps root@72.61.209.224
+
+  Go to bot directory             cd /opt/polymarket-bot
+
+  Start bot                       docker compose up -d
+
+  Stop bot                        docker compose down
+
+  Restart bot                     docker compose restart
+
+  Live logs                       docker compose logs -f
+
+  Last 50 lines                   docker compose logs --tail=50
+
+  Container status                docker compose ps
+
+  Rebuild + restart               docker compose up -d --build
+
+  CPU/RAM usage                   docker stats
+
+  Disk usage                      df -h
+
+  Sync code from Mac              rsync -av -e &quot;ssh -i ~/.ssh/hostinger_vps&quot; --exclude=&#x27;.env&#x27; --exclude=&#x27;venv/&#x27;
+
+  Upload new .env                 scp -i ~/.ssh/hostinger_vps .env root@72.61.209.224:/opt/polymarket-bot/.env
+
+  Shell inside container          docker compose exec polymarket-bot bash
+
+  Clean up Docker                 docker system prune -f
+</pre></div>

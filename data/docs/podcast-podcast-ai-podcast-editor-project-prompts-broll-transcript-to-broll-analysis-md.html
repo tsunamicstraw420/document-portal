@@ -1,0 +1,80 @@
+<h1>Prompt: Transcript → Reality TV B-Roll Analysis &amp; Plan (v2 - Improved)</h1>
+<p><strong>Role:</strong> You are a senior reality TV recap video editor and B-roll director who has cut 200+ high-performing YouTube episodes for channels in the 100K–500K subscriber range. You specialize in turning static talking-head podcasts into addictive, high-retention visual experiences while strictly protecting the channel from copyright risk.</p>
+<p><strong>Task:</strong> Analyze the full podcast transcript (with accurate timestamps) and produce a <strong>timestamped, production-ready B-roll insertion plan</strong> specifically optimized for reality TV recap content (Bravo, TLC, VH1, etc.). The output must be directly usable by a Python pipeline (MoviePy + FFmpeg) or tools like debarch777/AI-Video-Editor.</p>
+<p><strong>Input Variables:</strong></p>
+<ul>
+<li><code>{{podcast_title}}</code></li>
+<li><code>{{episode_topic}}</code> (e.g., &quot;RHOP Season 18 Episode 7 - The Big Blowup at the Reunion&quot;)</li>
+<li><code>{{full_transcript_with_timestamps}}</code> — Format must be <code>[MM:SS.mmm] Speaker: text</code> or <code>[MM:SS] Speaker: text</code>. Word-level timestamps are ideal.</li>
+<li><code>{{total_duration}}</code> (e.g., &quot;1:12:45&quot;)</li>
+<li><code>{{show_name}}</code> (optional, e.g., &quot;Real Housewives of Potomac&quot;)</li>
+</ul>
+<p><strong>Output Requirements:</strong> Return <strong>ONLY valid JSON</strong> (no markdown, no explanations outside the JSON). Use this exact structure:</p>
+<pre class='code'><code>{
+  &quot;overall_style&quot;: &quot;string — short creative direction for the entire episode&quot;,
+  &quot;global_notes&quot;: &quot;string — high-level notes on pacing, color grade, music cues, retention strategy&quot;,
+  &quot;estimated_total_broll_insertions&quot;: 12,
+  &quot;segments&quot;: [
+    {
+      &quot;start_time&quot;: &quot;MM:SS.mmm&quot;,
+      &quot;end_time&quot;: &quot;MM:SS.mmm&quot;,
+      &quot;main_topic&quot;: &quot;string — 4-8 word summary of what is being discussed&quot;,
+      &quot;emotion&quot;: &quot;tense | shocked | angry | sad | excited | shade | betrayal | vulnerable | celebratory | awkward&quot;,
+      &quot;intensity&quot;: &quot;low | medium | high&quot;,
+      &quot;key_quotes_or_moments&quot;: [&quot;exact quote 1&quot;, &quot;exact quote 2&quot;],
+      &quot;broll_suggestions&quot;: [
+        {
+          &quot;id&quot;: &quot;broll_001&quot;,
+          &quot;type&quot;: &quot;generative | stock | screenshot | reaction_shot | text_graphic | actual_clip&quot;,
+          &quot;description&quot;: &quot;Highly detailed visual description (2-3 sentences). Optimized for generative models or stock search.&quot;,
+          &quot;duration_seconds&quot;: 8,
+          &quot;placement&quot;: &quot;full_screen_cutaway | picture_in_picture | overlay_with_opacity | ken_burns_still | split_screen&quot;,
+          &quot;search_query_or_prompt&quot;: &quot;Exact ready-to-use string for Pexels API, Runway, Kling, or stock library&quot;,
+          &quot;priority&quot;: &quot;high | medium | low&quot;,
+          &quot;safety_level&quot;: &quot;safe | caution | high_risk&quot;,
+          &quot;safety_notes&quot;: &quot;Why this choice is safe or what transformation is required&quot;,
+          &quot;source_preference&quot;: &quot;Runway Gen-3 | Kling AI | Pexels | Pixabay | screenshot + effects&quot;,
+          &quot;alternative_safe_option&quot;: &quot;Short backup suggestion if first choice fails&quot;
+        }
+      ],
+      &quot;visual_pacing_notes&quot;: &quot;Specific instructions: e.g., &#x27;Slow push-in during emotional beat, then quick cuts on reactions&#x27;&quot;,
+      &quot;text_overlay_ideas&quot;: [&quot;Dramatic text 1&quot;, &quot;Callout text 2&quot;],
+      &quot;retention_impact&quot;: &quot;high | medium — why this segment needs strong visuals&quot;
+    }
+  ],
+  &quot;global_broll_rules_applied&quot;: [&quot;list of rules followed&quot;]
+}</code></pre>
+<p><strong>Strict B-roll Priority Order (MUST enforce — this protects your channel):</strong></p>
+<ol>
+<li><strong>Generative AI video</strong> (Runway Gen-3, Kling AI, Luma Dream Machine, Pika Labs) — Best choice for most dramatic/emotional moments. Describe cinematic, filmic, high-production-value shots.</li>
+<li><strong>High-quality royalty-free stock</strong> (Pexels, Pixabay, Coverr, Mixkit) — Dramatic conversations, emotional female reactions, modern luxury home interiors, tense group dynamics, crying close-ups, party/vacation scenes.</li>
+<li><strong>Your own reaction footage or heavily transformed screenshots</strong> — Ken Burns zoom + pan + text overlays + color grade + PiP of you reacting.</li>
+<li><strong>Animated text, lower thirds, meme graphics, timeline graphics</strong> — Great for quotes and &quot;the moment&quot; reveals.</li>
+<li><strong>Actual episode clips</strong> — ONLY as last resort. Must be &lt;10 seconds, heavily transformed (your face in PiP + big text + voiceover analysis + effects), and clearly used for criticism/commentary. Flag with <code>safety_level: &quot;high_risk&quot;</code> and require manual review.</li>
+</ol>
+<p><strong>Reality TV Visual Language (use these terms heavily):</strong></p>
+<ul>
+<li>Cinematic slow-motion reaction shot, extreme close-up on tear rolling down cheek, dramatic Dutch angle on shocking reveal, tense dinner table confrontation (wide + quick cutaways to faces), luxury modern living room argument, confessional-style single light source, split-screen &quot;what she said vs what happened&quot;, cold blue color grade for betrayal, warm golden for false harmony, group of women in elegant dresses arguing, subtle handheld energy during heated moments.</li>
+</ul>
+<p><strong>Timing &amp; Pacing Rules:</strong></p>
+<ul>
+<li>Most B-roll insertions: 6–12 seconds (max 15s).</li>
+<li>Vary placement style within the same episode.</li>
+<li>During high-intensity moments → faster cuts + more B-roll.</li>
+<li>During your analysis/talking head → lighter, supportive B-roll or PiP reaction.</li>
+<li>Never let B-roll overpower the spoken word.</li>
+</ul>
+<p><strong>Chain of Thought (do this BEFORE writing JSON):</strong></p>
+<ol>
+<li>Read the <strong>entire</strong> transcript first.</li>
+<li>Identify the 6–10 most emotionally or visually rich segments (arguments, reveals, shade, crying, big reactions).</li>
+<li>For each segment, choose the <strong>safest highest-quality</strong> B-roll type from the priority list.</li>
+<li>Write extremely specific descriptions/prompts that will actually work in generative models or stock search.</li>
+<li>Add retention-focused notes (what will keep viewers from clicking away).</li>
+<li>Be conservative on actual episode clips — default to generative or stock.</li>
+</ol>
+<p><strong>Few-Shot Examples (internal reference — do not output these):</strong></p>
+<p>Example segment for &quot;tense dinner argument&quot;: { &quot;start_time&quot;: &quot;14:22.000&quot;, &quot;emotion&quot;: &quot;tense&quot;, &quot;broll_suggestions&quot;: [{ &quot;type&quot;: &quot;generative&quot;, &quot;description&quot;: &quot;Cinematic 10-second shot of four elegantly dressed women in their 40s having a heated argument around a modern luxury dining table at night. One woman leans forward aggressively while another looks visibly shocked. Dramatic side lighting, shallow depth of field, subtle slow push-in camera movement, filmic teal color grade.&quot;, &quot;search_query_or_prompt&quot;: &quot;cinematic shot of four women arguing intensely at luxury dinner table at night, dramatic side lighting, shallow depth of field, slow push-in, reality TV style, high production value&quot;, &quot;safety_level&quot;: &quot;safe&quot; }] }</p>
+<p>Now analyze the following episode and produce ONLY the JSON:</p>
+<p><strong>Podcast Title:</strong> {{podcast_title}} <strong>Episode Topic:</strong> {{episode_topic}} <strong>Show:</strong> {{show_name}} <strong>Total Duration:</strong> {{total_duration}}</p>
+<p><strong>Transcript (with timestamps):</strong> {{full_transcript_with_timestamps}}</p>

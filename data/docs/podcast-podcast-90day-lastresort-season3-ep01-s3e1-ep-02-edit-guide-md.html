@@ -1,0 +1,34 @@
+<h1>EP-02 (Last Resort S3E1) — DaVinci Resolve Edit Guide</h1>
+<p>Everything&#x27;s generated. This is how to assemble it in <strong>DaVinci Resolve (free is fine)</strong> → 1080p export. Lip-sync is <strong>skipped for this episode</strong> — Ruby&#x27;s loops play as-is under her narration.</p>
+<h2>Project settings</h2>
+<ul>
+<li>Timeline: <strong>1920×1080, 16:9, 30 fps</strong>.</li>
+<li>Import everything from this folder: <code>videos/</code>, <code>overlays/</code>, <code>audio/</code>.</li>
+</ul>
+<h2>1. Lay the spine: Ruby&#x27;s narration</h2>
+<ul>
+<li>Drop <strong><code>audio/LastResort_03_01B.m4a</code></strong> on an audio track. This is the master — everything syncs to it. (Full transcript for reference: <code>lipsync/01B_transcript.txt</code>.)</li>
+</ul>
+<h2>2. Place the video clips over the narration</h2>
+<p>Follow the shot order in <strong><code>EP-02_RUN_SHEET.md</code></strong> (S1–S8, then SC-1…SC-19), cutting to each clip on its narration beat. Two clip types:</p>
+<ul>
+<li><strong>RUBY cutaways</strong> — use the loop for that segment&#x27;s set: booth = <code>videos/RL-1_booth_loop.mp4</code> (or <code>RL-2_booth_reaction</code> for sarcasm, <code>RL-6_booth_reaction</code> for shock), glam = <code>RL-3_glam_loop</code>, cozy = <code>RL-4_cozy_loop</code>, neon = <code>RL-5_neon_loop</code>. Reuse freely; trim each to the line.</li>
+<li><strong>SCENE / B-roll</strong> — the <code>S0<em></code> and <code>SC-</em></code> clips. <code>SC-01_therapy_circle</code> is reusable B-roll you can drop under several couple mentions.</li>
+</ul>
+<p><strong>Ruby cutaway timings</strong> are pre-computed in <strong><code>lipsync/cues.csv</code></strong> (clip_id, which loop, start/end seconds in the narration, and the line). Use it to place each Ruby beat exactly; adjust by ear.</p>
+<h2>3. Composite the overlays (from <code>overlays/</code>, all transparent PNGs)</h2>
+<table><thead><tr><th>Overlay</th><th>On shot / moment</th><th>Note</th></tr></thead><tbody><tr><td><code>bubble_SC2_thais.png</code></td><td>over SC-02 (Thaís terrace)</td><td>pop-in, upper-left</td></tr><tr><td><code>bubble_SC6_violent.png</code> + <code>bubble_SC6_deport.png</code></td><td>over SC-06 (Shekinah posting)</td><td>float in around her</td></tr><tr><td><code>datecard_may20.png</code></td><td>over SC-03 (Patrick signing)</td><td>upper-left space</td></tr><tr><td><code>datecard_may22.png</code></td><td>over SC-04 (Thaís harsh light)</td><td>upper-left space</td></tr><tr><td><code>datecard_may24.png</code></td><td>over SC-05 (legal desk)</td><td>upper-left space</td></tr><tr><td><code>rating_8of10.png</code></td><td>Ruby &quot;eight out of ten&quot; beat (S72)</td><td>pop-in badge</td></tr><tr><td><code>patreon_fan/superfan/ep.png</code></td><td>Patreon segment (S76–S78)</td><td>one per tier as she names them</td></tr><tr><td><code>endcard.png</code></td><td>over SC-19 (castle night)</td><td>final card; composite the real neon logo if you want it crisper</td></tr></tbody></table>
+<h2>4. Music + SFX</h2>
+<p>Lay a music bed (drama / tension / sentimental as the segment calls for) low under the narration; add stings on the big reactions and card pop-ins.</p>
+<h2>5. Captions</h2>
+<p>Skip for now, or add after upload from YouTube&#x27;s auto-transcript.</p>
+<h2>6. Export &amp; publish</h2>
+<ul>
+<li>Deliver: <strong>H.264, 1080p</strong> (free Resolve does this natively).</li>
+<li>Upload to <strong>YouTube unlisted</strong> (Wed) → pull the transcript for show notes/chapters/Short captions → flip <strong>public</strong> (Fri), which fires the publish Zaps.</li>
+</ul>
+<h2>Later (not now)</h2>
+<ul>
+<li><strong>Lip-sync:</strong> free tool (Easy-Wav2Lip) is stale vs current Python and didn&#x27;t install on your Mac or Colab. Prep is saved (<code>lipsync/</code> transcript, cues, segments) and ready to feed a newer tool, or ~5 marquee beats can be done on Magnific (~9k credits) if you want that polish on a future pass.</li>
+<li><strong>Speech bubbles</strong> are a recurring device (<code>SPEECH_BUBBLE_CUES.md</code>) — quotes must be real.</li>
+</ul>

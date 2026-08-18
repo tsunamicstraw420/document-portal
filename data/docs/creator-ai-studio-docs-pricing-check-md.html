@@ -1,0 +1,55 @@
+<h1>Pricing Validation — assumed wholesale vs. live provider pricing</h1>
+<p><em>Checked 2026-08-11. Method: fetched each provider&#x27;s live model/pricing page (fal.ai playground cost strings, Replicate model pages + /pricing, OpenRouter model page) and corroborated with pricing aggregators. Normalization: image = one 1024×1024 (1 MP) render; video = one 5-second 720p/1080p clip. Credit rule from the economics doc: <code>credits = ceil(wholesale ÷ $0.005)</code>, sold at $0.02 (4× / 75% list).</em></p>
+<h2>Model table</h2>
+<table><thead><tr><th>Model (providerModel)</th><th>Assumed WS</th><th>Live WS (normalized)</th><th>Source (checked 2026-08-11)</th><th>Assumed cr</th><th>Recommended cr</th></tr></thead><tbody><tr><td>Flux Schnell (<code>fal-ai/flux/schnell</code>)</td><td>$0.003</td><td><strong>$0.003</strong> /MP → $0.003 @1MP</td><td>fal.ai/models/fal-ai/flux/schnell</td><td>1</td><td><strong>1 — keep</strong></td></tr><tr><td>SDXL (<code>stability-ai/sdxl</code>)</td><td>$0.004</td><td><strong>~$0.0026</strong> (time-billed, L40S)</td><td>replicate.com/stability-ai/sdxl</td><td>1</td><td><strong>1 — keep</strong></td></tr><tr><td>Flux Dev (<code>fal-ai/flux/dev</code>)</td><td>$0.025</td><td><strong>$0.025</strong> /MP</td><td>fal.ai/models/fal-ai/flux/dev</td><td>5</td><td><strong>5 — keep</strong></td></tr><tr><td>Flux 1.1 Pro (<code>fal-ai/flux-pro/v1.1</code>)</td><td>$0.04</td><td><strong>$0.04</strong> /MP</td><td>fal.ai/models/fal-ai/flux-pro/v1.1 · replicate.com/black-forest-labs/flux-1.1-pro</td><td>8</td><td><strong>8 — keep</strong></td></tr><tr><td>GPT Image (<code>openai/gpt-image-1</code>)</td><td>$0.04</td><td><strong>$0.011 low / $0.042 med / $0.167 high</strong> per 1024²</td><td>openrouter.ai/openai/gpt-image-1 · pricepertoken.com/image/model/openai-gpt-image-1</td><td>8</td><td><strong>9 (med) — change; 34 if high</strong></td></tr><tr><td>Ideogram (<code>ideogram-ai/ideogram-v2</code>)</td><td>$0.05</td><td><strong>v2 std ~$0.08; v3 Turbo $0.03 / Bal $0.06 / Qual $0.09</strong></td><td>replicate.com/ideogram-ai/ideogram-v3-turbo · /pricing</td><td>10</td><td><strong>6 (v3 Turbo) — change</strong></td></tr><tr><td>Kling 5s (<code>fal-ai/kling-video</code>)</td><td>$0.35</td><td><strong>$0.07/s → $0.35</strong> /5s</td><td>fal.ai/pricing (Kling 2.5 Turbo Pro)</td><td>70</td><td><strong>70 — keep</strong></td></tr><tr><td>Seedance 5s (<code>fal-ai/seedance</code>)</td><td>$0.50</td><td><strong>~$0.26</strong> /5s (1.5 Pro 720p)</td><td>fal.ai/models/fal-ai/bytedance/seedance/v1.5/pro · aialleyway.com/seedance-ai-pricing</td><td>100</td><td><strong>52 — change</strong></td></tr><tr><td>Veo 3.1 5s+audio (<code>fal-ai/veo</code>)</td><td>$2.00</td><td><strong>$0.40/s → $2.00</strong> /5s (Std 720p/1080p, audio)</td><td>fal.ai/models/fal-ai/veo3.1</td><td>400</td><td><strong>400 — keep</strong></td></tr></tbody></table>
+<h2>Materially-off flags (&gt;25% from live)</h2>
+<ol>
+<li><strong>GPT Image — the one that can go negative.</strong> $0.04 is right <em>only for medium quality</em> (live $0.042).</li>
+</ol>
+<p>At <strong>high quality</strong> a 1024² costs <strong>~$0.167</strong> — 4× the assumption. At 8 credits ($0.16 list) a high-quality render sells <strong>below COGS</strong>. Even medium should be <strong>9 credits</strong> (ceil(0.042/0.005)=8.4→9), not 8. This is the single biggest correction: it&#x27;s the only model that can invert margin.</p>
+<ol>
+<li><strong>Seedance — ~2× too high (safe direction).</strong> Assumed $0.50; live Seedance <strong>1.5 Pro 720p ≈ $0.26/5s</strong></li>
+</ol>
+<p>(Lite ≈ $0.18). At 100 credits we&#x27;d overcharge the user (~$2 list for ~$0.26 COGS). Drop to <strong>52 credits</strong>. Caveat: <code>fal-ai/seedance</code> is a generic route — <strong>Seedance 2.0</strong> is far pricier (~$0.30/s ≈ $1.5/5s ≈ 300 cr). Pin the SKU before trusting either number.</p>
+<ol>
+<li><strong>Ideogram — stale version + no matching SKU.</strong> <code>ideogram-v2</code> is two generations behind; the live v3</li>
+</ol>
+<p>line is Turbo $0.03 / Balanced $0.06 / Quality $0.09. $0.05 matches no current v3 SKU, and v2 <em>standard</em> is ~$0.08 (10 cr = only 60% list margin). Move to <strong>v3 Turbo $0.03 → 6 credits</strong> (matches the econ doc) or v3 Quality $0.09 → 18 credits.</p>
+<p>Everything else verified within tolerance. SDXL is actually <strong>cheaper</strong> than assumed ($0.0026 vs $0.004) — conservative, still 1 credit. Note fal&#x27;s Flux-1.1-Pro <em>meta tag</em> reads $0.055/MP while the on-page live cost calculator and Replicate both read $0.04 — treat $0.04 as current, re-verify at integration.</p>
+<h2>What to change in lib/models.ts (deltas only)</h2>
+<ul>
+<li><strong><code>gpt-image</code></strong>: keep <code>wholesaleUsd: 0.04</code> <strong>only if the adapter pins <code>quality: &quot;medium&quot;</code></strong>; bump</li>
+</ul>
+<p><code>credits: 8 → 9</code>. If high-quality output is offered, add a second entry <code>gpt-image-hi</code> (<code>wholesaleUsd: 0.167</code>, <code>credits: 34</code>) — do not serve high quality at 8 credits.</p>
+<ul>
+<li><strong><code>ideogram</code></strong>: repoint <code>providerModel: &quot;ideogram-ai/ideogram-v2&quot; → &quot;ideogram-ai/ideogram-v3-turbo&quot;</code>,</li>
+</ul>
+<p><code>wholesaleUsd: 0.05 → 0.03</code>, <code>credits: 10 → 6</code>. (Or v3-quality: <code>0.09</code> / <code>18 credits</code>.)</p>
+<ul>
+<li><strong><code>seedance-5s</code></strong>: pin the route to <code>fal-ai/bytedance/seedance/v1.5/pro</code>, <code>wholesaleUsd: 0.5 → 0.26</code>,</li>
+</ul>
+<p><code>credits: 100 → 52</code>. (Verify vs. Seedance 2.0 if that&#x27;s the intended model — it&#x27;s ~$1.5/5s.)</p>
+<ul>
+<li><strong><code>sdxl</code></strong> (optional): <code>wholesaleUsd: 0.004 → 0.003</code> to match live; credits unchanged (1).</li>
+<li><strong>Keep as-is:</strong> flux-schnell, flux-dev, flux-pro, kling-5s, veo-5s-audio — all verified on the nose.</li>
+<li>Update the header comment date and the <code>docs/unit-economics.md</code> GPT-Image row (it already carries the</li>
+</ul>
+<p>high-quality $0.19/38-cr figure — reconcile the two files so they name the same quality tier).</p>
+<h2>Verdict — does the ~75% gross thesis still hold?</h2>
+<p><strong>Yes, with two line-item fixes.</strong> Seven of nine models priced on or below the assumed wholesale (Flux Schnell, Flux Dev, Flux 1.1 Pro, Kling, and Veo 3.1 match to the cent; SDXL and Seedance came in <em>cheaper</em> than assumed). Because the credit unit is derived from COGS and most COGS held flat or fell, the <code>ceil(wholesale/$0.005)</code> → sell-at-$0.02 structure still yields ~75% list gross across the catalog, and slightly <em>better</em> on the deflated items — exactly the reseller-benefits-from-deflation dynamic the econ doc predicts. The thesis&#x27;s only real hole is <strong>GPT Image at high quality</strong>, where an unpinned quality tier turns an 8-credit charge into a loss; a distant second is <strong>Ideogram v2 standard</strong> at thinned margin. Pin GPT Image&#x27;s quality (or add a high-quality SKU at ~34 credits) and repoint Ideogram to a live v3 SKU, and the 75%-list / mid-60s-to-70s realized-margin model is intact at today&#x27;s prices.</p>
+<h2>Sources</h2>
+<ul>
+<li>fal.ai — Flux Schnell $0.003/MP: https://fal.ai/models/fal-ai/flux/schnell (2026-08-11)</li>
+<li>fal.ai — Flux Dev $0.025/MP: https://fal.ai/models/fal-ai/flux/dev (2026-08-11)</li>
+<li>fal.ai — Flux 1.1 Pro $0.04/MP: https://fal.ai/models/fal-ai/flux-pro/v1.1 (2026-08-11)</li>
+<li>fal.ai — Veo 3.1 $0.40/s w/audio (5s=$2.00): https://fal.ai/models/fal-ai/veo3.1 (2026-08-11)</li>
+<li>fal.ai — /pricing (Kling 2.5 Turbo Pro $0.07/s; Nano Banana $0.0398; Seedream V4 $0.03; Veo 3 $0.40/s): https://fal.ai/pricing (2026-08-11)</li>
+<li>fal.ai — Seedance 1.5 Pro route: https://fal.ai/models/fal-ai/bytedance/seedance/v1.5/pro/image-to-video (2026-08-11)</li>
+<li>Replicate — /pricing (flux-schnell $0.003, flux-dev $0.025, flux-1.1-pro $0.04, ideogram-v3-quality $0.09): https://replicate.com/pricing (2026-08-11)</li>
+<li>Replicate — SDXL ~$0.0026/run (time-billed, L40S): https://replicate.com/stability-ai/sdxl (2026-08-11)</li>
+<li>Replicate — Ideogram v3 Turbo $0.03 / Balanced $0.06 / Quality $0.09: https://replicate.com/ideogram-ai/ideogram-v3-turbo (2026-08-11)</li>
+<li>OpenRouter — GPT Image 1 model page: https://openrouter.ai/openai/gpt-image-1 (2026-08-11)</li>
+<li>GPT Image 1 per-image ($0.011/$0.042/$0.167 @1024² low/med/high): https://pricepertoken.com/image/model/openai-gpt-image-1 · https://langcopilot.com/gpt-image-1-pricing (2026-08-11)</li>
+<li>Seedance per-route pricing corroboration: https://aialleyway.com/seedance-ai-pricing/ (2026-08-11)</li>
+<li>Ideogram API pricing corroboration: https://developer.puter.com/tutorials/ideogram-api-pricing/ (2026-08-11)</li>
+</ul>

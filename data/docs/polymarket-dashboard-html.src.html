@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Polymarket Trading Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous"></script>
+<style>
+:root {
+  --bg: #f4f6f9;
+  --card: #ffffff;
+  --header: #0f172a;
+  --text: #1e293b;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --green: #16a34a;
+  --red: #dc2626;
+  --blue: #2563eb;
+  --orange: #ea580c;
+  --gap: 16px;
+  --r: 10px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background:var(--bg); color:var(--text); font-size:14px; }
+.wrap { max-width:1360px; margin:0 auto; padding:var(--gap); }
+
+/* Header */
+.dash-header {
+  background:var(--header);
+  color:#fff;
+  padding:18px 24px;
+  border-radius:var(--r);
+  margin-bottom:var(--gap);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:12px;
+}
+.dash-header h1 { font-size:18px; font-weight:600; letter-spacing:-0.3px; }
+.dash-header .sub { font-size:12px; color:#94a3b8; margin-top:2px; }
+.filters { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.filters label { font-size:11px; color:#94a3b8; }
+.filters select {
+  padding:5px 10px;
+  border-radius:6px;
+  border:1px solid #334155;
+  background:#1e293b;
+  color:#e2e8f0;
+  font-size:12px;
+  cursor:pointer;
+}
+
+/* KPI row */
+.kpi-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:var(--gap); margin-bottom:var(--gap); }
+.kpi {
+  background:var(--card);
+  border-radius:var(--r);
+  padding:18px 20px;
+  border:1px solid var(--border);
+}
+.kpi-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:6px; }
+.kpi-value { font-size:26px; font-weight:700; line-height:1; }
+.kpi-sub { font-size:12px; margin-top:5px; }
+.pos { color:var(--green); }
+.neg { color:var(--red); }
+.neutral { color:var(--muted); }
+
+/* Chart row */
+.chart-row { display:grid; grid-template-columns:2fr 1fr 1fr; gap:var(--gap); margin-bottom:var(--gap); }
+@media(max-width:900px) { .chart-row { grid-template-columns:1fr; } }
+.chart-card {
+  background:var(--card);
+  border-radius:var(--r);
+  padding:18px 20px;
+  border:1px solid var(--border);
+}
+.chart-card h3 { font-size:13px; font-weight:600; color:var(--text); margin-bottom:14px; }
+.chart-card canvas { max-height:240px; }
+
+/* Table */
+.table-card {
+  background:var(--card);
+  border-radius:var(--r);
+  padding:18px 20px;
+  border:1px solid var(--border);
+  overflow-x:auto;
+  margin-bottom:var(--gap);
+}
+.table-card h3 { font-size:13px; font-weight:600; margin-bottom:14px; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+thead th {
+  text-align:left;
+  padding:8px 12px;
+  border-bottom:2px solid var(--border);
+  color:var(--muted);
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  cursor:pointer;
+  white-space:nowrap;
+  user-select:none;
+}
+thead th:hover { color:var(--text); }
+tbody td { padding:10px 12px; border-bottom:1px solid #f1f5f9; }
+tbody tr:last-child td { border-bottom:none; }
+tbody tr:hover { background:#f8fafc; }
+
+.badge {
+  display:inline-block;
+  padding:2px 8px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:500;
+}
+.badge-win { background:#dcfce7; color:#15803d; }
+.badge-loss { background:#fee2e2; color:#b91c1c; }
+.badge-even { background:#f1f5f9; color:#64748b; }
+.badge-btc { background:#fff7ed; color:#c2410c; }
+.badge-eth { background:#eff6ff; color:#1d4ed8; }
+.badge-up { background:#f0fdf4; color:#15803d; }
+.badge-down { background:#fef2f2; color:#b91c1c; }
+
+.footer { text-align:center; color:var(--muted); font-size:11px; padding:8px 0 16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="dash-header">
+    <div>
+      <h1>Polymarket Trading Dashboard</h1>
+      <div class="sub">Data as of May 4, 2026 &nbsp;·&nbsp; 21 market sessions</div>
+    </div>
+    <div class="filters">
+      <label>Asset</label>
+      <select id="f-asset" onchange="applyFilters()">
+        <option value="all">All Assets</option>
+        <option value="Bitcoin">Bitcoin</option>
+        <option value="Ethereum">Ethereum</option>
+      </select>
+      <label>Result</label>
+      <select id="f-result" onchange="applyFilters()">
+        <option value="all">All Results</option>
+        <option value="win">Wins only</option>
+        <option value="loss">Losses only</option>
+      </select>
+      <label>Direction</label>
+      <select id="f-dir" onchange="applyFilters()">
+        <option value="all">All Directions</option>
+        <option value="Up">Up</option>
+        <option value="Down">Down</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="kpi-label">Total Deposited</div>
+      <div class="kpi-value">$896.47</div>
+      <div class="kpi-sub neutral">3 deposits</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Amount Traded</div>
+      <div class="kpi-value" id="kv-spent">$400.61</div>
+      <div class="kpi-sub neutral" id="ks-spent">of deposited funds</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Net P&amp;L</div>
+      <div class="kpi-value neg" id="kv-pnl">-$17.59</div>
+      <div class="kpi-sub neg" id="ks-pnl">-2.0% ROI</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Win Rate</div>
+      <div class="kpi-value" id="kv-wr">42.9%</div>
+      <div class="kpi-sub neutral" id="ks-wr">9W / 12L of 21 sessions</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Best Session</div>
+      <div class="kpi-value pos">+$86.83</div>
+      <div class="kpi-sub neutral">ETH Down · May 3</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Worst Session</div>
+      <div class="kpi-value neg">-$26.76</div>
+      <div class="kpi-sub neutral">ETH Up · Apr 29</div>
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <div class="chart-card">
+      <h3>P&amp;L by Session (chronological)</h3>
+      <canvas id="chart-pnl"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Win / Loss breakdown</h3>
+      <canvas id="chart-wl"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>P&amp;L by Asset</h3>
+      <canvas id="chart-asset"></canvas>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <h3>All Sessions <span id="table-count" style="color:var(--muted);font-weight:400;font-size:12px;"></span></h3>
+    <table>
+      <thead>
+        <tr>
+          <th onclick="sortTable('date')">Date ↕</th>
+          <th onclick="sortTable('asset')">Asset ↕</th>
+          <th onclick="sortTable('direction')">Direction ↕</th>
+          <th onclick="sortTable('spent')">Spent ↕</th>
+          <th onclick="sortTable('returned')">Returned ↕</th>
+          <th onclick="sortTable('pnl')">P&amp;L ↕</th>
+          <th>Result</th>
+          <th onclick="sortTable('numTrades')">Trades ↕</th>
+        </tr>
+      </thead>
+      <tbody id="tbl-body"></tbody>
+    </table>
+  </div>
+
+  <div class="footer">Source: Polymarket-History-2026-05-04.csv &nbsp;·&nbsp; All amounts in USDC</div>
+</div>
+
+<script>
+const ALL_DATA = [{"market":"Ethereum Up or Down - April 29, 2:00PM-2:05PM ET","asset":"Ethereum","date":"Apr 29 11:00","spent":26.76,"returned":0.0,"pnl":-26.76,"direction":"Up","numTrades":10},{"market":"Ethereum Up or Down - April 29, 2:10PM-2:15PM ET","asset":"Ethereum","date":"Apr 29 11:09","spent":24.95,"returned":0.0,"pnl":-24.95,"direction":"Down","numTrades":6},{"market":"Ethereum Up or Down - May 4, 6:05AM-6:10AM ET","asset":"Ethereum","date":"May 04 03:07","spent":14.33,"returned":0.0,"pnl":-14.33,"direction":"Up","numTrades":2},{"market":"Ethereum Up or Down - May 4, 6:00AM-6:15AM ET","asset":"Ethereum","date":"May 04 03:07","spent":13.91,"returned":0.0,"pnl":-13.91,"direction":"Up","numTrades":4},{"market":"Ethereum Up or Down - May 4, 10:50AM-10:55AM ET","asset":"Ethereum","date":"May 04 07:49","spent":13.82,"returned":0.0,"pnl":-13.82,"direction":"Down","numTrades":2},{"market":"Bitcoin Up or Down - April 29, 2:10PM-2:15PM ET","asset":"Bitcoin","date":"Apr 29 11:09","spent":13.43,"returned":0.0,"pnl":-13.43,"direction":"Down","numTrades":2},{"market":"Ethereum Up or Down - April 29, 8:00PM-8:15PM ET","asset":"Ethereum","date":"Apr 29 17:05","spent":10.81,"returned":0.0,"pnl":-10.81,"direction":"Down","numTrades":10},{"market":"Ethereum Up or Down - May 3, 6:15PM-6:20PM ET","asset":"Ethereum","date":"May 03 15:14","spent":28.81,"returned":19.87,"pnl":-8.94,"direction":"Down","numTrades":4},{"market":"Ethereum Up or Down - May 4, 11:20AM-11:25AM ET","asset":"Ethereum","date":"May 04 08:19","spent":52.95,"returned":44.77,"pnl":-8.18,"direction":"Up","numTrades":9},{"market":"Ethereum Up or Down - May 3, 9:55PM-10:00PM ET","asset":"Ethereum","date":"May 03 18:56","spent":7.63,"returned":0.0,"pnl":-7.63,"direction":"Down","numTrades":2},{"market":"Ethereum Up or Down - May 3, 10:00PM-10:05PM ET","asset":"Ethereum","date":"May 03 19:00","spent":14.14,"returned":8.37,"pnl":-5.77,"direction":"Down","numTrades":3},{"market":"Bitcoin Up or Down - May 4, 1:55PM-2:00PM ET","asset":"Bitcoin","date":"May 04 10:54","spent":13.43,"returned":10.27,"pnl":-3.16,"direction":"Down","numTrades":3},{"market":"Bitcoin Up or Down - May 3, 10:00PM-10:15PM ET","asset":"Bitcoin","date":"May 03 19:00","spent":13.7,"returned":14.08,"pnl":0.38,"direction":"Down","numTrades":3},{"market":"Ethereum Up or Down - May 4, 11:50AM-11:55AM ET","asset":"Ethereum","date":"May 04 08:52","spent":13.33,"returned":14.1,"pnl":0.77,"direction":"Up","numTrades":3},{"market":"Bitcoin Up or Down - April 29, 7:55PM-8:00PM ET","asset":"Bitcoin","date":"Apr 29 16:55","spent":2.92,"returned":5.95,"pnl":3.03,"direction":"Down","numTrades":2},{"market":"Bitcoin Up or Down - April 29, 8:00PM-8:15PM ET","asset":"Bitcoin","date":"Apr 29 17:05","spent":5.54,"returned":11.84,"pnl":6.3,"direction":"Down","numTrades":2},{"market":"Ethereum Up or Down - May 4, 9:00AM-9:05AM ET","asset":"Ethereum","date":"May 04 06:00","spent":7.64,"returned":14.1,"pnl":6.46,"direction":"Down","numTrades":2},{"market":"Ethereum Up or Down - May 4, 12:20PM-12:25PM ET","asset":"Ethereum","date":"May 04 09:19","spent":13.22,"returned":22.23,"pnl":9.01,"direction":"Up","numTrades":3},{"market":"Ethereum Up or Down - May 4, 9:05AM-9:10AM ET","asset":"Ethereum","date":"May 04 06:04","spent":13.07,"returned":22.29,"pnl":9.22,"direction":"Up","numTrades":2},{"market":"Ethereum Up or Down - May 4, 7:40AM-7:45AM ET","asset":"Ethereum","date":"May 04 04:39","spent":13.0,"returned":25.1,"pnl":12.1,"direction":"Down","numTrades":2},{"market":"Ethereum Up or Down - May 3, 5:45PM-5:50PM ET","asset":"Ethereum","date":"May 03 14:44","spent":83.2,"returned":170.03,"pnl":86.83,"direction":"Down","numTrades":9}];
+
+let filtered = [...ALL_DATA];
+let sortCol = 'date', sortDir = 1;
+let charts = {};
+
+function fmt(v, type='usdc') {
+  if (type === 'usdc') {
+    const abs = Math.abs(v);
+    const s = abs >= 1000 ? abs.toFixed(0) : abs.toFixed(2);
+    return (v < 0 ? '-$' : '$') + s;
+  }
+  return v;
+}
+
+function applyFilters() {
+  const asset = document.getElementById('f-asset').value;
+  const result = document.getElementById('f-result').value;
+  const dir = document.getElementById('f-dir').value;
+
+  filtered = ALL_DATA.filter(d => {
+    if (asset !== 'all' && d.asset !== asset) return false;
+    if (result === 'win' && d.pnl <= 0) return false;
+    if (result === 'loss' && d.pnl >= 0) return false;
+    if (dir !== 'all' && d.direction !== dir) return false;
+    return true;
+  });
+
+  renderKPIs();
+  renderTable();
+  updateCharts();
+}
+
+function renderKPIs() {
+  const spent = filtered.reduce((s,d)=>s+d.spent,0);
+  const pnl = filtered.reduce((s,d)=>s+d.pnl,0);
+  const wins = filtered.filter(d=>d.pnl>0).length;
+  const total = filtered.length;
+  const wr = total > 0 ? (wins/total*100).toFixed(1) : '0.0';
+  const roi = spent > 0 ? (pnl/spent*100).toFixed(1) : '0.0';
+
+  document.getElementById('kv-spent').textContent = fmt(spent);
+  document.getElementById('kv-pnl').textContent = fmt(pnl);
+  document.getElementById('kv-pnl').className = 'kpi-value ' + (pnl >= 0 ? 'pos' : 'neg');
+  document.getElementById('ks-pnl').textContent = roi + '% ROI';
+  document.getElementById('ks-pnl').className = 'kpi-sub ' + (pnl >= 0 ? 'pos' : 'neg');
+  document.getElementById('kv-wr').textContent = wr + '%';
+  document.getElementById('ks-wr').textContent = `${wins}W / ${total-wins}L of ${total} sessions`;
+}
+
+function renderTable() {
+  const sorted = [...filtered].sort((a,b) => {
+    const av = a[sortCol], bv = b[sortCol];
+    return typeof av === 'string' ? av.localeCompare(bv)*sortDir : (av-bv)*sortDir;
+  });
+
+  document.getElementById('table-count').textContent = `(${sorted.length} sessions)`;
+
+  const body = document.getElementById('tbl-body');
+  body.innerHTML = sorted.map(d => {
+    const pnlClass = d.pnl > 0 ? 'pos' : d.pnl < 0 ? 'neg' : '';
+    const badge = d.pnl > 0 ? '<span class="badge badge-win">Win</span>'
+                : d.pnl < 0 ? '<span class="badge badge-loss">Loss</span>'
+                : '<span class="badge badge-even">Even</span>';
+    const assetBadge = d.asset === 'Bitcoin'
+      ? '<span class="badge badge-btc">BTC</span>'
+      : '<span class="badge badge-eth">ETH</span>';
+    const dirBadge = d.direction === 'Up'
+      ? '<span class="badge badge-up">▲ Up</span>'
+      : '<span class="badge badge-down">▼ Down</span>';
+    return `<tr>
+      <td>${d.date}</td>
+      <td>${assetBadge}</td>
+      <td>${dirBadge}</td>
+      <td>$${d.spent.toFixed(2)}</td>
+      <td>$${d.returned.toFixed(2)}</td>
+      <td class="${pnlClass}" style="font-weight:600">${fmt(d.pnl)}</td>
+      <td>${badge}</td>
+      <td>${d.numTrades}</td>
+    </tr>`;
+  }).join('');
+}
+
+function sortTable(col) {
+  if (sortCol === col) sortDir *= -1;
+  else { sortCol = col; sortDir = 1; }
+  renderTable();
+}
+
+function buildCharts() {
+  // P&L bar chart (chronological order)
+  const chrono = [...ALL_DATA].sort((a,b) => a.date.localeCompare(b.date));
+  const pnlCtx = document.getElementById('chart-pnl').getContext('2d');
+  charts.pnl = new Chart(pnlCtx, {
+    type: 'bar',
+    data: {
+      labels: chrono.map(d => d.date),
+      datasets: [{
+        label: 'P&L (USDC)',
+        data: chrono.map(d => d.pnl),
+        backgroundColor: chrono.map(d => d.pnl >= 0 ? '#16a34a99' : '#dc262699'),
+        borderColor: chrono.map(d => d.pnl >= 0 ? '#16a34a' : '#dc2626'),
+        borderWidth: 1,
+        borderRadius: 3,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => `P&L: ${fmt(ctx.parsed.y)}`
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { font: { size: 9 }, maxRotation: 45 }, grid: { display: false } },
+        y: {
+          ticks: { callback: v => fmt(v), font: { size: 10 } },
+          grid: { color: '#f1f5f9' }
+        }
+      }
+    }
+  });
+
+  // Win/Loss doughnut
+  const wlCtx = document.getElementById('chart-wl').getContext('2d');
+  charts.wl = new Chart(wlCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Wins', 'Losses'],
+      datasets: [{
+        data: [9, 12],
+        backgroundColor: ['#16a34a99', '#dc262699'],
+        borderColor: ['#16a34a', '#dc2626'],
+        borderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '62%',
+      plugins: {
+        legend: { position: 'bottom', labels: { usePointStyle: true, padding: 12, font: { size: 12 } } },
+        tooltip: {
+          callbacks: {
+            label: ctx => `${ctx.label}: ${ctx.parsed} sessions (${(ctx.parsed/21*100).toFixed(0)}%)`
+          }
+        }
+      }
+    }
+  });
+
+  // Asset P&L bar
+  const aCtx = document.getElementById('chart-asset').getContext('2d');
+  charts.asset = new Chart(aCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Bitcoin', 'Ethereum'],
+      datasets: [{
+        label: 'Net P&L',
+        data: [-6.88, -10.71],
+        backgroundColor: ['#fff7ed', '#eff6ff'],
+        borderColor: ['#c2410c', '#1d4ed8'],
+        borderWidth: 2,
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `Net P&L: ${fmt(ctx.parsed.y)}` } }
+      },
+      scales: {
+        x: { grid: { display: false } },
+        y: { ticks: { callback: v => fmt(v), font: { size: 10 } }, grid: { color: '#f1f5f9' } }
+      }
+    }
+  });
+}
+
+function updateCharts() {
+  const chrono = [...filtered].sort((a,b) => a.date.localeCompare(b.date));
+  charts.pnl.data.labels = chrono.map(d => d.date);
+  charts.pnl.data.datasets[0].data = chrono.map(d => d.pnl);
+  charts.pnl.data.datasets[0].backgroundColor = chrono.map(d => d.pnl >= 0 ? '#16a34a99' : '#dc262699');
+  charts.pnl.data.datasets[0].borderColor = chrono.map(d => d.pnl >= 0 ? '#16a34a' : '#dc2626');
+  charts.pnl.update('none');
+
+  const wins = filtered.filter(d=>d.pnl>0).length;
+  const losses = filtered.filter(d=>d.pnl<=0).length;
+  charts.wl.data.datasets[0].data = [wins, losses];
+  charts.wl.update('none');
+
+  const btcPnl = filtered.filter(d=>d.asset==='Bitcoin').reduce((s,d)=>s+d.pnl,0);
+  const ethPnl = filtered.filter(d=>d.asset==='Ethereum').reduce((s,d)=>s+d.pnl,0);
+  charts.asset.data.datasets[0].data = [btcPnl, ethPnl];
+  charts.asset.update('none');
+}
+
+buildCharts();
+renderKPIs();
+renderTable();
+</script>
+</body>
+</html>

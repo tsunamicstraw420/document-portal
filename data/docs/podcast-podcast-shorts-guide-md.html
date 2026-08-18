@@ -1,0 +1,60 @@
+<h1>YouTube Shorts — how they work and how we&#x27;ll make them</h1>
+<p>Researched July 2026. Applies to every episode, not just EP-02.</p>
+<hr>
+<h2>Part 1 — The specs</h2>
+<table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td><strong>Aspect ratio</strong></td><td>9:16 vertical</td></tr><tr><td><strong>Resolution</strong></td><td>1080 × 1920</td></tr><tr><td><strong>Max length</strong></td><td>3 minutes (raised from 60s in late 2024)</td></tr><tr><td><strong>Best length</strong></td><td><strong>15–30 seconds</strong> — highest completion rate, strongest algorithm signal</td></tr><tr><td><strong>Format</strong></td><td>MP4, H.264</td></tr><tr><td><strong>Frame rate</strong></td><td>30 or 60 fps</td></tr><tr><td><strong>Thumbnail</strong></td><td>1280 × 720</td></tr></tbody></table>
+<p>Anything vertical and under 3 minutes is automatically filed as a Short — you don&#x27;t tick a box.</p>
+<p><strong>Length is the decision that matters.</strong> You <em>can</em> post 3 minutes. You shouldn&#x27;t. Completion rate is the metric Shorts lives on, and a 25-second clip watched to the end beats a 90-second clip abandoned at 40. Cut ruthlessly.</p>
+<p><strong>Keep text clear of the edges.</strong> YouTube overlays its own UI along the bottom and right — the title, channel name, like and comment buttons. Captions or graphics placed there get covered.</p>
+<hr>
+<h2>Part 2 — The problem with our episode</h2>
+<p>Our episode is <strong>1920 × 1080 horizontal</strong>. A Short is <strong>1080 × 1920 vertical</strong>. Those are opposite shapes, so something has to give. Three ways to handle it:</p>
+<p><strong>Crop to the middle.</strong> Take a tall slice out of the centre and throw away the sides. Works when Ruby is centred in her booth. Fails badly on the wide castle shots — you&#x27;d lose most of the picture. Also means blowing a 608-pixel-wide slice up to 1080, which softens the image.</p>
+<p><strong>Blurred background.</strong> Keep the whole frame, shrink it to fit the width, fill the space above and below with a blurred copy of itself. Nothing is lost, but it&#x27;s the generic look every recap channel uses and it wastes half the screen on mush.</p>
+<p><strong>Brand frame — my recommendation.</strong> Keep the whole 16:9 frame intact in the middle. Fill above and below with our deep purple, the neon logo at the top and large captions at the bottom. Nothing is cropped, nothing is soft, and it looks like <em>our</em> show rather than a repurposed clip. The comic artwork survives whole, which is the entire point of the visual style.</p>
+<hr>
+<h2>Part 3 — What makes a good Short</h2>
+<p><strong>The first second decides everything.</strong> Shorts autoplay in a feed where the thumb is already moving. Open on the most provocative sentence in the clip — never on setup, context or &quot;so as I was saying&quot;.</p>
+<p><strong>One idea per Short.</strong> A complete thought with a beginning and an end. Not a random 30 seconds lifted from the middle.</p>
+<p><strong>Captions always.</strong> Even though Shorts play with sound on, captions raise completion. We already have accurate word-level timing, so this is free.</p>
+<p><strong>End on the hook, not the resolution.</strong> Curiosity drives comments, and comments drive reach.</p>
+<hr>
+<h2>Part 4 — EP-02&#x27;s five best candidates</h2>
+<p>Pulled from the actual transcript, with real timecodes. Each is self-contained and opens strong.</p>
+<h3>1. &quot;Zero chill&quot; cold open — <code>00:00:00 → 00:00:22</code></h3>
+<blockquote><em>&quot;Six couples, one castle and zero chill… I don&#x27;t sugarcoat anything. Not the drama, not the delusion, and definitely not the part where someone gets arrested two days before the premiere.&quot;</em></blockquote>
+<p>The single best clip in the episode. It&#x27;s already written as a hook, and it sells the whole show. <strong>This is the one to post first.</strong></p>
+<h3>2. The arrest timeline — <code>00:02:16 → 00:02:43</code></h3>
+<blockquote><em>&quot;May 20th, Patrick filed for divorce… May 22nd, Thaís was arrested… May 24th, the charges are dropped.&quot;</em></blockquote>
+<p>Self-contained, factual, high-drama. And the three date cards are already on screen, so it&#x27;s visually structured with no extra work.</p>
+<h3>3. &quot;Go back to your country&quot; — <code>00:06:30 → 00:06:55</code></h3>
+<blockquote><em>&quot;Shekinah responds with, and I quote, go back to your country. On camera, on a TLC show, in episode one.&quot;</em></blockquote>
+<p>The most-discussed moment of the premiere. Highest comment potential of anything here — and the one to be most careful with. It&#x27;s a serious accusation about a real person, so let Ruby&#x27;s actual words carry it and don&#x27;t add comic sound effects or jokey overlays.</p>
+<h3>4. &quot;Deport her&quot; — <code>00:03:45 → 00:04:05</code></h3>
+<blockquote><em>&quot;…she was actually suggesting that Thaís should be deported. Let me sit with that for a second.&quot;</em></blockquote>
+<p>The two speech bubbles land here, so it&#x27;s visually strong. Same care applies as #3.</p>
+<h3>5. The 8/10 verdict — <code>00:18:05 → 00:18:30</code></h3>
+<blockquote><em>&quot;Overall premiere rating, I&#x27;m going to say it was an eight out of ten… Now, what is your group chat saying?&quot;</em></blockquote>
+<p>Ends on a direct question, which is the single most reliable way to get comments. The badge is already on screen.</p>
+<hr>
+<h2>Part 5 — How we&#x27;ll actually make them</h2>
+<p>Once the episode is exported, I can generate these automatically. Give me a start and end timecode and I&#x27;ll produce a finished 1080 × 1920 MP4 with:</p>
+<ul>
+<li>the full 16:9 frame centred, nothing cropped</li>
+<li>deep purple brand background</li>
+<li>the neon logo at the top</li>
+<li><strong>burned-in captions</strong> pulled from the existing SRT — the timing is already frame-accurate, so they&#x27;ll match her speech exactly</li>
+<li>audio taken straight from the export, music and effects intact</li>
+</ul>
+<p>Then you review, and I write the title, description and hashtags from the transcript.</p>
+<p><strong>Note:</strong> captions get burned in for Shorts, unlike the main episode. There&#x27;s no caption toggle in the Shorts player, so the text has to be part of the picture.</p>
+<hr>
+<h2>Part 6 — Publishing</h2>
+<ul>
+<li><strong>Link each Short to the full episode.</strong> YouTube has a &quot;Related video&quot; field on Shorts — always fill it in. That&#x27;s the whole point of making them.</li>
+<li><strong>Space them out.</strong> One a day beats five at once.</li>
+<li><strong>Post the cold open first</strong>, on the same day the episode goes public.</li>
+<li>Vertical thumbnails don&#x27;t show in the Shorts feed, but do appear on your channel page — worth setting for the ones you expect to do well.</li>
+</ul>
+<hr>
+<p><em>Sources: <a href="https://vidiq.com/blog/post/youtube-shorts-vertical-video/" target="_blank" rel="noopener">vidIQ — Shorts size &amp; dimensions</a> · <a href="https://virlo.ai/blog/how-long-can-youtube-shorts-be" target="_blank" rel="noopener">Virlo — Shorts length</a> · <a href="https://www.somake.ai/blog/youtube-shorts-aspect-ratio" target="_blank" rel="noopener">Somake — aspect ratio &amp; safe zones</a> · <a href="https://streamyard.com/blog/16-9-to-9-16-video-converter" target="_blank" rel="noopener">StreamYard — 16:9 to 9:16</a></em></p>

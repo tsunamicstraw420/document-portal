@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Audio-only frame preview</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Oswald:wght@500;600&display=swap');
+  body{background:#101014;color:#eee;font-family:Oswald,system-ui,sans-serif;margin:0;padding:32px;}
+  h1{font-weight:600;font-size:22px;letter-spacing:1px;}
+  p{color:#aaa;max-width:820px;line-height:1.5;}
+  .row{display:flex;flex-wrap:wrap;gap:28px;margin-top:24px;}
+  .opt{flex:1 1 440px;}
+  .cap{font-size:15px;letter-spacing:2px;color:#d7b24a;margin:0 0 8px;}
+  .note{font-size:13px;color:#888;margin-top:6px;}
+  .frame{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:6px;background:#1b0940;}
+  .bg{position:absolute;inset:0;background:url('../podcast_cover_art_v4.png') center/cover no-repeat;filter:blur(30px) brightness(.45);transform:scale(1.15);}
+  .cover{position:absolute;top:2%;left:50%;transform:translateX(-50%);height:96%;width:auto;}
+  .coverB{position:absolute;top:1%;left:50%;transform:translateX(-50%);height:76%;width:auto;}
+  .band{position:absolute;left:0;right:0;bottom:0;height:22%;background:rgba(0,0,0,.5);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2%;}
+  .s{color:#efc65b;font-family:Oswald;font-weight:600;font-size:2.6vw;letter-spacing:0.5vw;margin:0;}
+  .t{color:#fff;font-family:Bangers;font-size:6vw;letter-spacing:0.2vw;margin:0;line-height:1;}
+  @media(min-width:1100px){.s{font-size:28px}.t{font-size:64px}}
+</style>
+</head>
+<body>
+<h1>Audio-only video frame — your real cover</h1>
+<p>Each episode is this single image, held on screen for the whole recording while Ruby's audio plays. Below is your actual cover art (podcast_cover_art_v4.png): with no label (Option A) vs. with the episode label added at the bottom (Option B). Nothing here is redrawn — it's your file.</p>
+<div class="row">
+  <div class="opt">
+    <p class="cap">OPTION A — YOUR COVER, NO LABEL</p>
+    <div class="frame">
+      <div class="bg"></div>
+      <img class="cover" src="../podcast_cover_art_v4.png" alt="cover">
+    </div>
+    <p class="note">Simplest. But all 7 episodes look identical in your feed.</p>
+  </div>
+  <div class="opt">
+    <p class="cap">OPTION B — YOUR COVER + EPISODE LABEL</p>
+    <div class="frame">
+      <div class="bg"></div>
+      <img class="coverB" src="../podcast_cover_art_v4.png" alt="cover">
+      <div class="band">
+        <p class="s">SEASON 3 · EPISODE 6</p>
+        <p class="t">FALL ON YOUR SWORD</p>
+      </div>
+    </div>
+    <p class="note">Tells episodes apart in the feed. Only the bottom two lines change per episode.</p>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<h1>ShowKit — Build Plan</h1>
+<p>The single source of truth for what to build and in what order. Companion research: <code>docs/niche-and-competitors.md</code> (why/who) and <code>docs/unit-economics.md</code> (pricing/margin).</p>
+<h2>The bet (from research)</h2>
+<p>Do <strong>not</strong> sell &quot;access to AI models&quot; — that&#x27;s a commodity (Pollo AI, davinci.ai already do it and compete on price to the bottom). Sell <strong>outcomes for a niche you own</strong>:</p>
+<blockquote>&quot;Turn one podcast episode into a week of on-brand thumbnails, Shorts, intros, audiograms, and quote cards — one credit wallet, all the best models, none of the busywork.&quot;</blockquote>
+<p><strong>Moat</strong> = one-click creator <em>formats</em> + your already-licensed template/sound library wired in as intro/title/audio layers + a persistent brand kit + your existing audience as warm distribution. A thin reseller cannot copy those.</p>
+<h2>Architecture (see docs/architecture.md for detail)</h2>
+<ul>
+<li><strong>Frontend:</strong> Next.js (App Router, TS, Tailwind).</li>
+<li><strong>Auth + DB + Storage:</strong> Supabase (Postgres, Auth, Storage/R2 for outputs).</li>
+<li><strong>Payments:</strong> Stripe — subscriptions (3 tiers) + one-time credit packs + webhooks.</li>
+<li><strong>Model access (server-side):</strong> OpenRouter (unified image+text), fal.ai (fast image/video),</li>
+</ul>
+<p>Replicate (breadth). Adapters behind one internal interface.</p>
+<ul>
+<li><strong>Core:</strong> the credit ledger + the model catalog + the generation pipeline.</li>
+</ul>
+<h2>Data model (see db/schema.sql)</h2>
+<p><code>users</code> · <code>credit_wallets</code> (balance) · <code>credit_transactions</code> (append-only audit ledger: signup grant, top-up, subscription refill, reservation, settle, release, refund) · <code>generations</code> (job record: model, prompt, status, cost, output URL) · <code>subscriptions</code> (Stripe state) · model catalog lives in <code>lib/models.ts</code>.</p>
+<h2>Economics baseline (from docs/unit-economics.md — tune with the calculator)</h2>
+<ul>
+<li><strong>1 credit = $0.02</strong> list (pay-as-you-go) ≈ <strong>4× wholesale</strong> ≈ ~75% gross margin pre-Stripe.</li>
+</ul>
+<p>Subscription credits are bundled cheaper (~$0.013–0.016 effective) — margin protected by breakage + tier design.</p>
+<ul>
+<li><strong>Model credit costs:</strong> cheap image (Flux Schnell / SDXL) = <strong>1 credit</strong>; premium video</li>
+</ul>
+<p>(e.g. Veo 3.1 5s w/ audio) up to <strong>~400 credits</strong>. Full table in the doc.</p>
+<ul>
+<li><strong>Tiers:</strong> <strong>$9 Starter (550 cr) · $19 Creator (1,300 cr) · $49 Studio (3,800 cr)</strong> + top-up</li>
+</ul>
+<p>packs + a small free trial. Modeled <strong>net ≈ $11K/mo at 1,000 paying users</strong> (before salary, CAC, refunds).</p>
+<h2>Phases</h2>
+<p><strong>Phase 0 — Setup.</strong> Init Next.js + TS + Tailwind over this scaffold. Create Supabase project (auth on), Stripe test account, and an OpenRouter key. Fill <code>.env.local</code> from <code>.env.example</code>.</p>
+<p><strong>Phase 1 — Core loop (thin vertical slice).</strong> Sign in → grant free-trial credits → generate <strong>one</strong> image model (Flux via OpenRouter or fal) through <code>app/api/generate/route.ts</code> using the ledger (reserve → call → settle, in a transaction, with an audit row) → display + store the result. This proves the entire spine. Do not move on until a credit is charged correctly.</p>
+<p><strong>Phase 2 — Monetization.</strong> Stripe: 3 subscription tiers + top-up credit packs + the <strong>idempotent</strong> webhook that refills the ledger on <code>invoice.paid</code> / <code>checkout.session.completed</code>. Customer billing portal. Trial → paid upgrade path.</p>
+<p><strong>Phase 3 — Model catalog + breadth.</strong> Flesh out <code>lib/models.ts</code> with the wholesale→credit map, provider adapters (OpenRouter / fal / Replicate), more image models + basic video. Add a job queue + provider webhooks for long-running video.</p>
+<p><strong>Phase 4 — Creator formats (the moat).</strong> One-click formats: episode → thumbnail / Short / intro / audiogram / quote card. Wire in the existing template + sound library (<code>../Content_Creator_Learn/…</code>) as layers. Per-user brand kit (fonts, colors, logo).</p>
+<p><strong>Phase 5 — Compliance + launch.</strong> Prompt/output moderation, NCII report + 48-hr takedown flow, ToS / Privacy / Refund policy, rate limits + Stripe Radar, basic analytics + admin. Deploy (Vercel + Supabase). Private beta to the existing audience, then open.</p>
+<h2>Locked decisions (from research — don&#x27;t relitigate without cause)</h2>
+<ul>
+<li>Provider keys <strong>server-side only</strong> (fal ToS); build where reselling-via-your-app is permitted</li>
+</ul>
+<p>(Replicate/OpenRouter); re-check each provider&#x27;s ToS before adding it.</p>
+<ul>
+<li>Moderation + NCII takedown ships <strong>before</strong> launch.</li>
+<li>Credits are integers; ledger is append-only + transactional; webhooks idempotent.</li>
+<li>Model catalog is data-driven so a wholesale price change is a config edit, not a refactor.</li>
+</ul>
+<h2>Open decisions for Eddie (pick before/while building)</h2>
+<ul>
+<li><strong>Name:</strong> ShowKit (lead) · ReelForge · ClipSmith · ShowRunner.</li>
+<li><strong>Wedge:</strong> podcasters/short-form (lead) vs faceless UGC ad creators vs newsletter/course.</li>
+<li><strong>Tier prices / allowances:</strong> start from the calculator, then A/B.</li>
+</ul>

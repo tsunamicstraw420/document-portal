@@ -1,0 +1,481 @@
+<div class="pdfpages"><img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-twoserver-quickreference-pdf/p-01.jpg" alt="page 1">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-twoserver-quickreference-pdf/p-02.jpg" alt="page 2">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-twoserver-quickreference-pdf/p-03.jpg" alt="page 3">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-twoserver-quickreference-pdf/p-04.jpg" alt="page 4">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-twoserver-quickreference-pdf/p-05.jpg" alt="page 5">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-twoserver-quickreference-pdf/p-06.jpg" alt="page 6">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-twoserver-quickreference-pdf/p-07.jpg" alt="page 7">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-twoserver-quickreference-pdf/p-08.jpg" alt="page 8">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-twoserver-quickreference-pdf/p-09.jpg" alt="page 9">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-twoserver-quickreference-pdf/p-10.jpg" alt="page 10"></div><div class="pdftext" hidden><pre>            Two-Server Setup — Quick Reference
+               Polymarket Arbitrage Bot: London Execution + Tokyo Signal Relay
+  Updated: May 05, 2026 | SSH key: ~/.ssh/hostinger_vps | GitHub: tsunamicstraw420/polymarket_Arb_bot
+
+
+
+
+Part 1 — Architecture &amp; Latency Philosophy
+Every decision is made in service of latency. The bot&#x27;s edge is speed — detecting a Binance price move
+before the Polymarket CLOB reflects it. Any change that adds latency on the hot path (signal → decision →
+order) must be justified by a larger gain. When in doubt, don&#x27;t add it.
+
+The architecture splits work by geography: Tokyo sits ~60 ms from Binance (AWS ap-northeast-1); London sits
+~10 ms from Polymarket (AWS eu-west-2). This cuts the signal-to-order round-trip from ~220 ms (Jakarta
+single-server) to ~145 ms.
+
+
+   Server       Provider       Location                 IP                  Role
+
+   London       Hostinger      Manchester DC            72.62.212.196       Main bot — 3 WebSocket feeds in,
+                               (10ms to Polymarket                          Polymarket CLOB orders out. Docker
+                               eu-west-2)                                   Compose.
+
+   Tokyo        Vultr          Tokyo NRT (60ms to       45.63.122.65        Signal relay — Binance aggTrade WS
+                               Binance                                      → WebSocket server on :9999 →
+                               ap-northeast-1)                              London connects as client.
+
+
+
+Three WebSocket streams into London:
+    1. Binance: btcusdt/ethusdt @aggTrade — direct from Binance WS (primary)
+    2. Bybit: BTCUSDT/ETHUSDT tickers — hot standby, AWS Singapore
+    3. Tokyo relay: London connects to ws://45.63.122.65:9999 — Binance aggTrade re-broadcast ~60ms
+    faster
+    4. Polymarket WS: market price feed for CLOB order evaluation (separate from price feeds above)
+
+  All three price sources write into shared PriceState objects. any_stale() only blocks if ALL THREE are stale
+  simultaneously. Feed ages appear in every STATUS log line: Feed: BTC BN:1s BB:0s TKY:0s | ETH BN:1s BB:1s
+  TKY:0s
+  SSH is used only for deploys and debugging — never for monitoring. Use the browser dashboard (http://72.62.212.196)
+  for live data. Telegram delivers heartbeats and alerts automatically.
+
+
+
+Part 2 — Server Details
+
+2.1 London — Execution Server (Hostinger KVM 1)
+  Property                Value
+
+  Provider                Hostinger
+
+  Plan                    KVM 1 — 1 vCPU / 4 GB RAM / 50 GB SSD
+
+  IP Address              72.62.212.196
+
+  Datacenter              Manchester, UK (near AWS eu-west-2 / Polymarket CLOB)
+
+  OS                      Ubuntu 24.04 LTS x64
+
+  SSH alias               ssh poly-london    (via ~/.ssh/config)
+
+  SSH direct              ssh -i ~/.ssh/hostinger_vps root@72.62.212.196
+
+  Bot dir                 /opt/polymarket-bot/
+
+  Data dir                /opt/polymarket-bot/data/   (state.json, positions.json, trades.db, logs/)
+
+  GitHub key              /root/.ssh/github_deploy    (deploy key → repo Settings → Deploy keys)
+
+  Runtime                 Docker Compose — polymarket-arb-bot + polymarket-chart containers
+
+  Dashboard               http://72.62.212.196   (live WebSocket dashboard, always-on)
+
+  Live flags              --live --confirm-live --real-money      (set in docker-compose.yml command)
+
+  Cost                    $9.99/month
+
+
+
+2.2 Tokyo — Signal Relay Server (Vultr vc2-1c-1gb)
+
+  Property                Value
+
+  Provider                Vultr
+
+  Plan                    Shared CPU vc2-1c-1gb — 1 vCPU / 1 GB RAM / 25 GB SSD
+
+  IP Address              45.63.122.65
+
+  Region                  Tokyo NRT (near AWS ap-northeast-1 / Binance WS)
+
+  OS                      Ubuntu 24.04 LTS x64
+
+  SSH alias               ssh poly-tokyo    (via ~/.ssh/config)
+
+  SSH direct              ssh -i ~/.ssh/hostinger_vps root@45.63.122.65
+
+  Relay script            /opt/signal_relay.py
+
+  Python venv             /opt/signal_env/   (websocket-client + websockets installed)
+
+  Service                 signal-relay.service (systemd)
+
+  Binance WS              wss://stream.binance.com:9443    — btcusdt@aggTrade / ethusdt@aggTrade
+
+  Serves                  WebSocket server on 0.0.0.0:9999 — London connects as client
+   Firewall                          UFW active: 22/tcp + 9999/tcp allowed
+
+   Packet rate                       ~480 ticks/min (~8/sec, per-trade resolution)
+
+   Cost                              $5.00/month
+
+
+
+
+Part 3 — SSH Access
+~/.ssh/config is configured on your Mac with aliases for all three servers. ServerAliveInterval=60 keeps
+sessions alive during active use (deploys). Do not use SSH for ongoing monitoring — use the browser
+dashboard or Telegram.
+
+   Server              Alias                        Full command
+
+   London              ssh poly-london              ssh -i ~/.ssh/hostinger_vps root@72.62.212.196
+
+   Tokyo               ssh poly-tokyo               ssh -i ~/.ssh/hostinger_vps root@45.63.122.65
+
+   Jakarta*            ssh poly-jakarta             ssh -i ~/.ssh/hostinger_vps root@72.61.209.224
+
+
+   * Jakarta is kept as a warm standby. Never run London and Jakarta simultaneously.
+
+~/.ssh/config (on Mac — already configured):
+   Host poly-london HostName 72.62.212.196 User root IdentityFile ~/.ssh/hostinger_vps
+   ServerAliveInterval 60 ServerAliveCountMax 5 Host poly-tokyo HostName 45.63.122.65 User root
+   IdentityFile ~/.ssh/hostinger_vps ServerAliveInterval 60 ServerAliveCountMax 5 Host
+   poly-jakarta HostName 72.61.209.224 User root IdentityFile ~/.ssh/hostinger_vps
+   ServerAliveInterval 60 ServerAliveCountMax 5
+
+
+
+
+Part 4 — Monitoring (No SSH Required)
+The bot pushes all status information to you. You should never need to SSH in just to check on things.
+
+4.1 Browser dashboard (primary)
+
+Open in any browser — live WebSocket feed, always running:
+
+   http://72.62.212.196
+
+
+4.2 Telegram notifications
+
+              Event                        When                                         Silent?
+
+              ■ Heartbeat                  Every 10 minutes — balance, PnL, feed ages   Yes (no sound)
+
+              ■ Bot live                   Every startup / container restart            Yes
+
+              Bot stopped                  On graceful docker compose stop              No
+
+              ■ Bot CRASHED                On unhandled exception                       No
+             [FILL] / [BUY] / [SELL]          On every trade execution                     No
+
+             [ERROR]                          On main loop errors                          No
+
+             [PAUSE]                          Daily loss limit breached                    No
+
+             [KILL]                           Drawdown kill-switch triggered               No
+
+             ■ Binance WS reconnected On Binance WebSocket reconnect                       Yes
+
+   Heartbeat example: ■ [LIVE] Balance: $417.20 | PnL: +0.00 (0.0%) | Pos: 0 | Feed: BTC BN:1s BB:0s TKY:0s | ETH
+   BN:1s BB:1s TKY:0s
+   If you don&#x27;t see a heartbeat for 20+ minutes, the bot is likely down. OOM kills (SIGKILL) cannot be caught in Python —
+   Docker restarts the container automatically and the next &#x27;■ Bot live&#x27; message is your alert.
+
+4.3 Logs (only when debugging)
+
+# Must SSH to London first — docker is on the server, not your Mac
+
+   ssh poly-london &quot;cd /opt/polymarket-bot &amp;&amp; docker compose logs -f polymarket-bot&quot;
+
+Or SSH in first, then run docker compose commands interactively:
+
+   ssh poly-london cd /opt/polymarket-bot docker compose logs -f polymarket-bot
+
+
+
+
+Part 5 — Deploy Workflow
+All bot code is version-controlled on GitHub. London clones from the repo via deploy key. Tokyo&#x27;s relay script is
+deployed via direct scp (not in the Docker image).
+
+5.1 Standard bot deploy (London)
+
+# Step 1 — commit and push on Mac
+
+   cd /Users/rubys/Desktop/AI_bots/Polymarket-Arbitrage-Bot git add -p git commit -m &quot;describe
+   change&quot; git push origin main
+
+# Step 2 — pull, rebuild, restart on London
+
+   ssh poly-london cd /opt/polymarket-bot git pull docker compose build polymarket-bot docker
+   compose up -d polymarket-bot
+
+   NEVER use --force-recreate — it causes Binance WS to fail on startup (Docker network namespace teardown breaks the
+   initial TCP handshake). docker compose up -d without it picks up the new image automatically.
+
+5.2 Deploy relay script update (Tokyo)
+
+# Run on Mac — scp then restart
+
+   scp -i ~/.ssh/hostinger_vps \
+   /Users/rubys/Desktop/AI_bots/Polymarket-Arbitrage-Bot/signal_relay.py \
+   root@45.63.122.65:/opt/signal_relay.py ssh poly-tokyo &#x27;systemctl restart signal-relay&#x27;
+
+
+5.3 Update .env on London
+
+# .env is never in git — upload separately
+  scp -i ~/.ssh/hostinger_vps \ /Users/rubys/Desktop/AI_bots/Polymarket-Arbitrage-Bot/.env \
+  root@72.62.212.196:/opt/polymarket-bot/.env ssh poly-london &#x27;cd /opt/polymarket-bot &amp;&amp;
+  docker compose up -d polymarket-bot&#x27;
+
+
+
+
+Part 6 — Managing the Bot on London
+All docker compose commands run from /opt/polymarket-bot/ on London.
+
+6.1 Container control
+
+  Action                                    Command (run on London)
+
+  Restart bot                               docker compose restart polymarket-bot
+
+  Start bot                                 docker compose up -d polymarket-bot
+
+  Stop bot                                  docker compose stop polymarket-bot
+
+  Status                                    docker compose ps
+
+  Pull + build + restart                    git pull &amp;&amp; docker compose build polymarket-bot &amp;&amp; docker compose up -d pol
+
+
+One-liner restart from Mac:
+  ssh poly-london &quot;cd /opt/polymarket-bot &amp;&amp; docker compose restart polymarket-bot&quot;
+
+
+6.2 Logs (run on London after SSH-ing in)
+
+  Action                                    Command
+
+  Live tail                                 docker compose logs -f polymarket-bot
+
+  Last 50 lines                             docker compose logs --tail=50 polymarket-bot
+
+  Save to file                              docker compose logs polymarket-bot &gt; /tmp/bot.log
+
+
+
+6.3 Directory layout on London
+
+  Path                                             Contents
+
+  /opt/polymarket-bot/                             Git repo clone (source, Dockerfile, docker-compose.yml)
+
+  /opt/polymarket-bot/.env                         API keys and secrets — never in git, upload via scp
+
+  /opt/polymarket-bot/data/state.json              Paper mode balance — persisted across restarts
+
+  /opt/polymarket-bot/data/positions.json          Open positions — persisted across restarts
+
+  /opt/polymarket-bot/data/trades.db               SQLite trade history
+
+  /opt/polymarket-bot/data/logs/bot.log            Persistent bot log (survives restarts)
+
+  /root/.ssh/github_deploy                         Deploy key for git pull from private GitHub repo
+Part 7 — Managing the Signal Relay on Tokyo
+Tokyo runs a WebSocket SERVER on port 9999. London connects to it as a client. The relay subscribes to
+Binance aggTrade (per-trade, ~8/sec) and broadcasts each tick to all connected clients.
+
+7.1 Service control
+
+  Action                              Command (run on Tokyo)
+
+  Restart relay                       systemctl restart signal-relay
+
+  Start relay                         systemctl start signal-relay
+
+  Stop relay                          systemctl stop signal-relay
+
+  Check status                        systemctl status signal-relay
+
+  Live logs                           journalctl -u signal-relay -f
+
+  Last 10 lines                       journalctl -u signal-relay -n 10 --no-pager
+
+
+Normal relay log output (once per minute):
+  2026-05-05 22:51:32 [INFO] WebSocket relay server listening on port 9999 2026-05-05 22:51:32
+  [INFO] Binance WS connected → serving on port 9999 2026-05-05 22:52:32 [INFO] Relay alive —
+  481 ticks/min broadcast to 1 client(s)
+
+  1 client = London is connected. 0 clients = London disconnected (check London bot). TKY:0s in London STATUS log =
+  relay packets arriving. TKY:off = not yet connected.
+
+
+
+Part 8 — Required .env Variables (London only)
+Tokyo has no .env — it connects to Binance anonymously and serves WebSocket on port 9999.
+
+        Variable                            Description                                        Required?
+
+        PRIVATE_KEY                         Polygon wallet private key — 0x + 64 hex chars     Yes
+
+        POLY_PROXY_WALLET                   Derived proxy wallet — 0x06b4...e204               Yes
+
+        POLY_BUILDER_API_KEY                Polymarket CLOB API key                            Yes
+
+        POLY_BUILDER_SECRET                 Polymarket CLOB API secret                         Yes
+
+        POLY_BUILDER_PASSPHRASE             Polymarket CLOB API passphrase                     Yes
+
+        TELEGRAM_BOT_TOKEN                  Telegram bot token from @BotFather                 Optional
+
+        TELEGRAM_CHAT_ID                    Your Telegram chat ID                              Optional
+
+        TOKYO_RELAY_URL                     Override Tokyo WS URL (default: ws://45.63.122.65:9999)
+                                                                                            Optional
+
+  PRIVATE_KEY pitfall: Must start with 0 (digit zero) + x, not O (capital letter O). A capital O causes a &#x27;Non-hexadecimal
+  digit found&#x27; crash at startup.
+Part 9 — Cutover &amp; Rollback
+Jakarta (72.61.209.224) is kept as a warm standby. NEVER run London and Jakarta simultaneously — same
+Polymarket wallet = double trades.
+
+Switch to Jakarta (rollback):
+  ssh poly-london &quot;cd /opt/polymarket-bot &amp;&amp; docker compose stop polymarket-bot&quot; ssh
+  poly-jakarta &quot;cd /opt/polymarket-bot &amp;&amp; docker compose up -d polymarket-bot&quot;
+
+
+Switch back to London:
+  ssh poly-jakarta &quot;cd /opt/polymarket-bot &amp;&amp; docker compose stop polymarket-bot&quot; ssh
+  poly-london &quot;cd /opt/polymarket-bot &amp;&amp; docker compose up -d polymarket-bot&quot;
+
+
+Check which is running:
+  ssh poly-london &quot;cd /opt/polymarket-bot &amp;&amp; docker compose ps&quot; ssh poly-jakarta &quot;cd
+  /opt/polymarket-bot &amp;&amp; docker compose ps&quot;
+Part 10 — Quick Reference Card
+Everything you need 90% of the time.
+
+Monitoring (no SSH needed)
+
+  What                              Where / Command
+
+  Live dashboard                    http://72.62.212.196   (browser, WebSocket)
+
+  Heartbeat                         Telegram — silent message every 10 min
+
+  Trade alerts                      Telegram — on every fill, error, stop, crash
+
+
+
+SSH (deploys &amp; debugging only)
+
+  Target                  Command
+
+  London                  ssh poly-london
+
+  Tokyo                   ssh poly-tokyo
+
+  Jakarta                 ssh poly-jakarta
+
+
+
+Mac — Deploy Bot Update to London
+
+  Step               Command (on Mac)
+
+  1. Commit &amp;amp; push
+                   git add -p &amp;&amp; git commit -m &quot;msg&quot; &amp;&amp; git push origin main
+
+  2. SSH to London ssh poly-london
+
+  3. Deploy          cd /opt/polymarket-bot &amp;&amp; git pull &amp;&amp; docker compose build polymarket-bot &amp;&amp; docker compose
+
+  4. Verify          docker compose logs --tail=20 polymarket-bot
+
+
+
+Mac — Deploy Relay Update to Tokyo
+
+  Step           Command (on Mac)
+
+  1. Copy        scp -i ~/.ssh/hostinger_vps /Users/rubys/Desktop/AI_bots/Polymarket-Arbitrage-Bot/signal_relay.
+
+  2. Restart     ssh poly-tokyo &#x27;systemctl restart signal-relay&#x27;
+
+  3. Verify      ssh poly-tokyo &#x27;journalctl -u signal-relay -n 5 --no-pager&#x27;
+
+
+
+London — Bot Control (from /opt/polymarket-bot/ on London)
+
+  Action                               Command
+  Restart                                   docker compose restart polymarket-bot
+
+  Start                                     docker compose up -d polymarket-bot
+
+  Stop                                      docker compose stop polymarket-bot
+
+  Status                                    docker compose ps
+
+  Live logs                                 docker compose logs -f polymarket-bot
+
+  Last 50 lines                             docker compose logs --tail=50 polymarket-bot
+
+  Pull + build + restart                    git pull &amp;&amp; docker compose build polymarket-bot &amp;&amp; docker compose up -d pol
+
+
+One-liner restart from Mac:
+  ssh poly-london &quot;cd /opt/polymarket-bot &amp;&amp; docker compose restart polymarket-bot&quot;
+
+
+
+Tokyo — Relay Control (from Tokyo)
+
+  Action                                    Command
+
+  Restart                                   systemctl restart signal-relay
+
+  Status                                    systemctl status signal-relay
+
+  Live logs                                 journalctl -u signal-relay -f
+
+  Last 10 lines                             journalctl -u signal-relay -n 10 --no-pager
+
+
+
+Cutover / Rollback (from Mac)
+
+  Action                               Command
+
+  Stop London                          ssh poly-london &quot;cd /opt/polymarket-bot &amp;&amp; docker compose stop polymarket-bot&quot;
+
+  Start London                         ssh poly-london &quot;cd /opt/polymarket-bot &amp;&amp; docker compose up -d polymarket-bot&quot;
+
+  Stop Jakarta (standby)               ssh poly-jakarta &quot;cd /opt/polymarket-bot &amp;&amp; docker compose stop polymarket-bot&quot;
+
+  Start Jakarta (rollback)             ssh poly-jakarta &quot;cd /opt/polymarket-bot &amp;&amp; docker compose up -d polymarket-bot&quot;
+
+
+  Never run London and Jakarta simultaneously — same wallet, double trades.
+
+
+
+Cost Summary
+
+    Server                 Provider           IP                Plan                       Monthly
+
+    London                 Hostinger          72.62.212.196     KVM 1                      $9.99
+
+    Tokyo                  Vultr              45.63.122.65      vc2-1c-1gb                 $5.00
+ Jakarta*           Hostinger          72.61.209.224            KVM 1 (standby)   $9.99
+
+                                                                &lt;b&gt;Total&lt;/b&gt;      &lt;b&gt;$24.98&lt;/b&gt;
+
+* Cancel Jakarta once London has been stable for a few weeks.
+</pre></div>

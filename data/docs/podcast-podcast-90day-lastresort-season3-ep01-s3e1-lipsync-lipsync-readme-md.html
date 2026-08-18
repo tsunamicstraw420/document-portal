@@ -1,0 +1,17 @@
+<h1>Ruby Lip-Sync — status &amp; workflow</h1>
+<p>Goal: make each Ruby host cutaway&#x27;s mouth match her narration, layering lip-sync onto the reusable Ruby loops (<code>videos/RL-*.mp4</code>) using take <strong><code>audio/LastResort_03_01B.m4a</code></strong>. Local, free.</p>
+<p><strong>Tool:</strong> <strong>Easy-Wav2Lip</strong> — the one mature free lip-sync tool that runs on Apple-Silicon Macs, takes a <em>video</em> input, and sharpens the mouth (GFPGAN). https://github.com/anothermartz/Easy-Wav2Lip</p>
+<h2>Already done (by Claude, in-sandbox)</h2>
+<ul>
+<li>✅ <code>01B_transcript.txt</code> + <code>01B_words.json</code> + <code>01B_segments.json</code> — full word-level transcript of take 01B (reuse the transcript for show notes too).</li>
+<li>✅ <code>cues.csv</code> — 25 Ruby cutaways aligned to the episode (clip_id, ruby_loop, start/end, match confidence, line). <code>conf=chk</code> rows are short interjections (&quot;Surprise.&quot;, &quot;Deported.&quot;, &quot;Moving on.&quot;) — positions are right but worth an ear-check.</li>
+<li>✅ <code>segments/*.wav</code> — the 25 audio segments already cut (one per cutaway, mono 16k, +0.15s pad).</li>
+</ul>
+<h2>Remaining: the render (must run on the Mac&#x27;s hardware)</h2>
+<p>Lip-sync rendering (Easy-Wav2Lip + face enhancement) can&#x27;t run on the cloud sandbox — it needs the Mac. Claude will drive this on your Mac; nothing for you to do.</p>
+<p><strong>One-time install</strong> (handled by <code>3_render_lipsync.command</code>, or manually):</p>
+<pre class='code'><code>git clone https://github.com/anothermartz/Easy-Wav2Lip.git ~/Easy-Wav2Lip
+cd ~/Easy-Wav2Lip &amp;&amp; python3.10 -m venv venv &amp;&amp; source venv/bin/activate &amp;&amp; pip install -r requirements.txt</code></pre>
+<p><strong>Render:</strong> <code>3_render_lipsync.command</code> loops over <code>cues.csv</code>, feeds each <code>ruby_loop</code> + <code>segments/&lt;clip&gt;.wav</code> through Easy-Wav2Lip (quality = Enhanced), and writes <code>videos/lipsynced/&lt;clip&gt;.mp4</code>. Loops are 720p/10s — within the tool&#x27;s happy range.</p>
+<h2>Then → DaVinci Resolve</h2>
+<p>Drop <code>videos/lipsynced/<em>.mp4</code> (talking Ruby) + the silent scene clips + <code>overlays/</em>.png</code> onto the timeline under Ruby&#x27;s narration. Free Resolve does the whole edit (imports, 1080p H.264 export, OFX plugins). The Magnific in-timeline panel needs Resolve <strong>Studio</strong> — not required, since we export clips from Magnific anyway.</p>

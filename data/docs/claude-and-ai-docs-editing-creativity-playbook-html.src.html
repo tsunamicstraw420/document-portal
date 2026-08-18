@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Editor's Visual Playbook — Matching Picture to Narration</title>
+<style>
+  :root{
+    --bg:#f6f5f2; --panel:#ffffff; --ink:#1c1b19; --muted:#6b6862; --line:#e5e2db;
+    --accent:#b8442b; --accent2:#1f6f6a; --chip:#f0eee8; --code:#f2f0ea;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{ --bg:#141412; --panel:#1d1c1a; --ink:#eceae4; --muted:#a29e95; --line:#2c2a27;
+           --accent:#e07a5f; --accent2:#5bb3ac; --chip:#26241f; --code:#232019; }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:17px/1.62 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:820px;margin:0 auto;padding:44px 22px 90px;}
+  header.top{border-bottom:3px solid var(--accent);padding-bottom:20px;margin-bottom:30px;}
+  .kicker{text-transform:uppercase;letter-spacing:.14em;font-size:12px;font-weight:700;color:var(--accent);}
+  h1{font-size:clamp(28px,5vw,40px);line-height:1.1;margin:.28em 0 .2em;letter-spacing:-.01em;}
+  .sub{color:var(--muted);font-size:15px;margin:0;}
+  .lead{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent2);
+        border-radius:12px;padding:16px 20px;margin:26px 0 6px;font-size:16px;}
+  h2{font-size:22px;margin:44px 0 6px;letter-spacing:-.01em;display:flex;align-items:baseline;gap:10px;}
+  h2 .n{font-size:13px;font-weight:800;color:var(--accent);border:1.5px solid var(--accent);
+        border-radius:999px;padding:2px 9px;letter-spacing:.03em;flex:0 0 auto;}
+  h3{font-size:16px;margin:22px 0 4px;color:var(--accent2);}
+  p{margin:.5em 0}
+  ul{margin:.4em 0 .4em;padding-left:2px;list-style:none}
+  li{margin:.5em 0;padding-left:26px;position:relative}
+  li::before{content:"";position:absolute;left:6px;top:.72em;width:7px;height:7px;border-radius:2px;
+             background:var(--accent);transform:rotate(45deg)}
+  li b, p b{color:var(--ink)}
+  .rule{font-weight:600}
+  em{color:var(--muted);font-style:italic}
+  code, .kbd{background:var(--code);border:1px solid var(--line);border-radius:6px;padding:1px 6px;
+       font:13px/1.4 ui-monospace,Menlo,Consolas,monospace}
+  .callout{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:22px 0;}
+  .callout.accent{border-top:4px solid var(--accent)}
+  .callout h3{margin-top:0}
+  ol.checklist{counter-reset:step;list-style:none;padding-left:0;margin:.4em 0}
+  ol.checklist li{padding-left:44px;margin:.55em 0}
+  ol.checklist li::before{counter-increment:step;content:counter(step);background:var(--accent);color:#fff;
+    width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:700;
+    left:0;top:.05em;transform:none}
+  .six{display:grid;gap:8px;margin:10px 0}
+  .six .r{display:flex;gap:12px;align-items:baseline;background:var(--chip);border-radius:10px;padding:9px 14px}
+  .six .r .p{font-weight:800;color:var(--accent2);flex:0 0 92px;font-size:14px}
+  .tag{display:inline-block;background:var(--chip);border:1px solid var(--line);border-radius:999px;
+       padding:2px 10px;font-size:13px;font-weight:600;margin:0 4px 4px 0}
+  .sources{font-size:14px}
+  .sources a{color:var(--accent2);word-break:break-word}
+  a{color:var(--accent2)}
+  hr{border:none;border-top:1px solid var(--line);margin:40px 0}
+  footer{color:var(--muted);font-size:13px;margin-top:40px;border-top:1px solid var(--line);padding-top:16px}
+  .note{color:var(--muted);font-size:13.5px;font-style:italic}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="kicker">Reality Recaps Unfiltered · Production Playbook</div>
+  <h1>Editor's Visual Playbook</h1>
+  <p class="sub">Matching picture to narration, line by line. Compiled from documentary &amp; video-essay editing practice, Walter Murch, and retention-editing research. Every rule is written to be executed.</p>
+</header>
+
+<p class="lead"><b>Core reframe.</b> The old constraint was "we only have generic B-roll, so we reuse it." That constraint is gone. Because we can now generate a specific still for almost any line, one at a time, the default answer to "what goes here?" is now <b>generate the exact thing being said</b> — not reach for a generic clip. Treat every reuse of generic filler as a deliberate choice you have to justify, not the fallback.</p>
+
+<h2><span class="n">1</span> Deciding what goes on screen for each sentence</h2>
+<ul>
+  <li><b>The B-Roll Grid</b> — lay every visual decision on two axes. <b>Horizontal = story progression</b> (a sequential chain of shots showing a process/journey/escalation: arrival → knock → door opens → face falls). <b>Vertical = emotional alignment</b> (illustrative shots stacked directly on the exact word they reinforce). <span class="rule">Rule:</span> place sequential chains horizontally; align illustrative shots vertically, landing the cut <b>on the keyword</b>. Mark every evocative, emotional, or descriptive line as an anchor and ask one question there: <em>"What should I cut to here?"</em></li>
+  <li><b>The illustration test.</b> For any shot ask: <em>if I deleted this picture and kept only the audio, would the point still land?</em> <b>Yes</b> → the shot genuinely illustrates; keep it. <b>No</b> → the picture is carrying a logical gap; either the line or the shot is wrong. This is the test that catches "generic clip under a specific line."</li>
+  <li><b>Three registers — pick one consciously, don't default to literal:</b>
+    <span class="tag">Literal</span> narration names a thing → show that thing ("he brought the ring" → the ring).
+    <span class="tag">Conceptual</span> narration states an idea → show a concrete stand-in ("the money problems" → a declined card).
+    <span class="tag">Metaphorical</span> narration is figurative → a symbolic image whose <em>emotion</em> rings true even with no literal link.</li>
+  <li><b>Cut on the keyword</b> — break narration into emotional peaks, keywords, and tonal shifts; those are your edit points. Don't cut on a metronome — cut where the meaning turns.</li>
+  <li><b>Hide every picture change under continuous audio (J-cuts / L-cuts).</b> Let the voice run across the cut (L-cut) so the change of picture feels motivated; bring the next audio in early (J-cut) to pull the viewer into a reveal. A <b>~2-second overlap</b> is the working default. Don't split-cut every edit — use it where it serves pacing.</li>
+</ul>
+
+<h2><span class="n">2</span> Making stills + Ken Burns feel dynamic</h2>
+<ul>
+  <li><b>Motivate the move by the content — never a default preset.</b> Plan the zoom/pan path around how the eye should travel through <em>this</em> image. Identical canned moves across every still is the #1 tell of cheap Ken Burns.</li>
+  <li><b>Direction has meaning — assign it, don't randomize:</b>
+    <br><span class="tag">Push IN</span> intimacy, focus, "look closer," a detail/face, tightening tension — reserve for reaction faces and reveals.
+    <span class="tag">Pull OUT</span> context, isolation, consequence, "here's the bigger picture" — good for landing a punchline or a twist.
+    <span class="tag">Reveal move</span> open on a close detail, then pull out so a second subject enters frame — hand off from one person to the next inside a single image.</li>
+  <li><b>Vary the axis and the pairing.</b> Alternate horizontal pans, vertical moves, push-ins and pull-outs. <b>Never place two same-direction stills back to back.</b></li>
+  <li><b>Always ease.</b> Ease-in/ease-out on the start and end keyframes; a linear zoom that starts and stops abruptly reads as amateur. Match velocity to emotion — slow = contemplative, faster = urgency.</li>
+  <li><b>Upgrade stills that carry weight to 2.5D parallax.</b> Separate subject from background so they move at different rates, giving real depth. Save it for money moments — the bombshell, the confrontation reveal — not every image.</li>
+  <li><b>Match-cut between stills.</b> Cut between two stills that share shape, composition, or motion direction so the eye flows straight through. End one still's push-in on a shape that the next still opens on.</li>
+  <li><b>Hold on reaction.</b> When a beat lands emotionally, a slow push-in on a reaction face held a touch longer than comfortable does more than a fast cut. Save fast cutting for the setup.</li>
+</ul>
+
+<h2><span class="n">3</span> Avoiding repetitive / stale B-roll</h2>
+<ul>
+  <li><b>Refresh the picture every 3–5 seconds.</b> It takes ~3–5s for a viewer to absorb a shot before attention wavers — make something visually meaningful happen on that cadence.</li>
+  <li><b>Force a full visual reset every 30–50 seconds.</b> Tighten to every 10–20s in the opening to hook, then widen once the viewer is committed. 45s of unbroken talking-head is a defect regardless of how good the audio is.</li>
+  <li><b>Coverage thinking — generate the set.</b> For any recurring couple/location, make a wide establisher, a medium two-shot, and tight singles, so you can revisit a scene without repeating the identical frame.</li>
+  <li><b>Detail / insert shots are the cheapest variety and the most valuable</b> — hands, objects, textures, a phone screen, a ring, a suitcase zipper. Generate an insert for the concrete noun in the line rather than replaying a location loop.</li>
+  <li><b>Texture / tone shots for the quiet moments</b> — a slow curtain, a clock, a night sky — establish mood and bridge transitions during quieter narration.</li>
+  <li><b>Don't let one device become the crutch.</b> Rotate devices — Ken Burns still → parallax → hero clip → insert → typography — so no single look dominates a stretch.</li>
+</ul>
+
+<h2><span class="n">4</span> Visualizing abstract / figurative narration</h2>
+<p class="note">e.g. "he dropped a grenade on the relationship," "the tension was building"</p>
+<ul>
+  <li><b>Turn the abstraction into a concrete stand-in.</b> Find the physical object that embodies the idea; close-ups make abstract concepts feel real. "The tension was building" → a kettle, a tightening fist, a fuse.</li>
+  <li><b>Default move for any figurative line: symbolic insert, ~2s hold, slow push-in.</b> Generate the literal image of the metaphor ("dropped a grenade" → a grenade, a pin being pulled), cut to it on the keyword, hold, then cut back. Literalizing the metaphor is a signature reality-recap comedic beat — lean into it.</li>
+  <li><b>Juxtapose two shots to manufacture meaning.</b> Cutting between two contrasting/related images lets the viewer draw the connection — that inference <em>is</em> the metaphor (the smiling fiancé → cut to the grenade).</li>
+  <li><b>Graphic match cut as visual metaphor.</b> Match two images by shape to imply they're the same idea. "Her heart shattered" → match a face to breaking glass.</li>
+  <li><b>Kinetic typography for the un-image-able and for punchlines.</b> Animate the key word on screen — bold, punchy, on the stressed syllable — for the one or two words that carry the line, not whole sentences.</li>
+</ul>
+
+<h2><span class="n">5</span> Frameworks worth internalizing</h2>
+
+<div class="callout accent">
+  <h3>Walter Murch — the Rule of Six</h3>
+  <p>Judge every cut against six priorities, in strict order of importance. Give up the lower one first; never sacrifice the higher.</p>
+  <div class="six">
+    <div class="r"><span class="p">1 · Emotion</span><span>51% — the whole ballgame. If the cut doesn't feel right emotionally, nothing else matters.</span></div>
+    <div class="r"><span class="p">2 · Story</span><span>Does the cut advance or clarify?</span></div>
+    <div class="r"><span class="p">3 · Rhythm</span><span>Is it the right moment?</span></div>
+    <div class="r"><span class="p">4 · Eye-trace</span><span>Keep the point of interest in a consistent screen zone across the cut so the eye isn't thrown.</span></div>
+    <div class="r"><span class="p">5–6 · Plane</span><span>2D screen plane / 3D spatial continuity — lowest priority; sacrifice these before the others.</span></div>
+  </div>
+  <p class="note">Practical use: when a technically-clean cut still feels off, it almost always served eye-trace or continuity <em>over</em> emotion — recut for the emotion.</p>
+</div>
+
+<ul>
+  <li><b>Cut for logic</b> (video-essay school). Every cut serves the argument: B-roll illustrates the point, a graphic makes an abstraction concrete, a clip is evidence. Combine with the illustration test.</li>
+  <li><b>Retention-editing research.</b> The 3–5s change and 30–50s reset numbers above; the "contract renewal" model — your hook buys the first few seconds, and each new visual/rhythm shift renews the lease.</li>
+  <li><b>Match-cut &amp; creative-transition literature.</b> Graphic vs. thematic vs. audio match cuts as connective and metaphor tools.</li>
+</ul>
+
+<h2><span class="n">6</span> Build a reusable visual vocabulary</h2>
+<p>Make these standing tables so you're not re-deciding from scratch each line:</p>
+<ol class="checklist">
+  <li><b>A "verb/emotion → visual move" lookup.</b> <em>reveal/twist</em> = pull-out or J-cut reveal · <em>intimacy/reaction</em> = slow push-in on a face · <em>escalation</em> = sequential chain · <em>figurative line</em> = symbolic insert 2s + push-in · <em>quotable/stat</em> = kinetic type.</li>
+  <li><b>A generated-still coverage set per recurring subject.</b> Wide + medium + tight singles + one insert, tagged in the shared library, so revisits vary instead of repeat.</li>
+  <li><b>A symbol bank for recurring abstractions.</b> Bombshell, red flag, walking on eggshells, gold-digger, love-bombing — pre-generate the literalized image once and reuse the <em>concept</em>.</li>
+  <li><b>A "device rotation" rule of thumb.</b> No single device (Ken Burns still, parallax, hero clip, insert, typography, host loop) more than ~twice in a row; log what you last used.</li>
+  <li><b>An anchor-marking pass before building.</b> First pass over the script: mark every keyword / emotional peak / figurative line. Those marks <em>are</em> the shopping list of stills to generate.</li>
+</ol>
+
+<hr>
+
+<div class="callout accent">
+  <h3>Starter checklist — run on every line of narration</h3>
+  <ol class="checklist">
+    <li><b>Name the register</b> — literal, conceptual, or metaphorical? (Don't default to literal.)</li>
+    <li><b>Find the keyword</b> — the cut lands there, not on the sentence boundary.</li>
+    <li><b>Generate the specific image</b> for that keyword. Only reach for existing/generic B-roll if the illustration test still passes.</li>
+    <li><b>Illustration test</b> — with picture removed, does the point still land? If no, the picture is masking a gap.</li>
+    <li><b>Pick a motivated move</b> — push-in (intimacy/detail) vs pull-out (context/twist) vs pan/reveal — different from the previous shot's move. Ease both ends.</li>
+    <li><b>Figurative line?</b> → symbolic insert, ~2s hold, slow push-in (or graphic match, or kinetic type on the key word).</li>
+    <li><b>Hide the cut</b> under continuous audio (L-cut out / J-cut in, ~2s overlap).</li>
+    <li><b>Pacing check</b> — has the picture changed in the last 3–5s? A full reset in the last 30–50s? If not, add one.</li>
+    <li><b>Repetition check</b> — same device or subject-frame as the last shot? Rotate.</li>
+    <li><b>Murch check</b> — does the cut feel right <em>emotionally</em> first? If a clean cut feels off, recut for emotion over continuity.</li>
+  </ol>
+</div>
+
+<h2 style="margin-top:36px">Sources</h2>
+<ul class="sources">
+  <li>Inside The Edit — B-Roll Grid / sequential vs illustrative — <a href="https://www.insidetheedit.com/blog/b-roll-editing-structure">insidetheedit.com</a></li>
+  <li>PremiumBeat — B-roll editing guide — <a href="https://www.premiumbeat.com/blog/b-roll-video-edit-guide/">premiumbeat.com</a></li>
+  <li>Descript — video-essay method / illustration test — <a href="https://www.descript.com/blog/article/how-to-make-a-video-essay">descript.com</a></li>
+  <li>StudioBinder — Walter Murch Rule of Six — <a href="https://www.studiobinder.com/blog/walter-murch-rule-of-six/">studiobinder.com</a></li>
+  <li>Artlist — eye-trace &amp; Rule of Six — <a href="https://artlist.io/blog/eye-trace-and-rule-of-six-editing/">artlist.io</a></li>
+  <li>Cloudinary — Ken Burns complete guide — <a href="https://cloudinary.com/guides/image-effects/ken-burns-effect-complete-guide-and-how-to-apply-it">cloudinary.com</a></li>
+  <li>Motion Array — 2.5D parallax in After Effects — <a href="https://motionarray.com/learn/after-effects/animate-flat-2d-images-after-effects/">motionarray.com</a></li>
+  <li>Waxy — parallax vs Ken Burns / "The Kid Stays in the Picture" — <a href="https://waxy.org/2019/11/turning-photos-into-2-5d-parallax-animations-with-machine-learning/">waxy.org</a></li>
+  <li>StudioBinder — match cuts &amp; creative transitions — <a href="https://www.studiobinder.com/blog/match-cuts-creative-transitions-examples/">studiobinder.com</a></li>
+  <li>Backstage — match cut explained — <a href="https://www.backstage.com/magazine/article/what-is-a-match-cut-75670/">backstage.com</a></li>
+  <li>MasterClass — J-cuts and L-cuts — <a href="https://www.masterclass.com/articles/how-to-use-j-cuts-and-l-cuts-in-video-editing">masterclass.com</a></li>
+  <li>TechSmith — L/J cuts &amp; "make abstract tangible" — <a href="https://www.techsmith.com/blog/how-to-edit-videos-l-cuts-and-j-cuts/">techsmith.com</a> · <a href="https://www.techsmith.com/blog/b-roll-secret-sauce-great-video/">b-roll secret sauce</a></li>
+  <li>Desktop Documentaries — metaphorical imagery &amp; cinematic techniques — <a href="https://www.desktop-documentaries.com/cinematic-techniques.html">desktop-documentaries.com</a></li>
+  <li>Fiveable — B-roll visual metaphor / juxtaposition — <a href="https://fiveable.me/narrative-documentary-production/unit-4/b-roll-establishing-shots/study-guide/RLEcIky4l7EqGfXI">fiveable.me</a></li>
+  <li>No Film School — coverage &amp; detail shots — <a href="https://nofilmschool.com/b-roll-editor-tips">nofilmschool.com</a></li>
+  <li>Clint Till — better B-roll / coverage &amp; inserts — <a href="https://clinttill.net/blog/documentary-filmmaking-101-shooting-better-b-roll">clinttill.net</a></li>
+  <li>Visla — pacing / the 3–5s rule — <a href="https://www.visla.us/blog/guides/video-editing-pacing-what-it-is-and-how-to-control-it/">visla.us</a></li>
+  <li>AIR Media-Tech — retention editing / 30–50s reset — <a href="https://air.io/en/youtube-hacks/advanced-retention-editing-cutting-patterns-that-keep-viewers-past-minute-8">air.io</a></li>
+  <li>Know Your Meme / TodayMade — kinetic typography — <a href="https://knowyourmeme.com/memes/kinetic-typography">knowyourmeme.com</a> · <a href="https://www.todaymade.com/blog/kinetic-typography-examples">todaymade.com</a></li>
+</ul>
+
+<p class="note" style="margin-top:20px">Note on one claim: the "literal / conceptual / metaphorical" three-register terminology is assembled from documentary-editing and video-essay sources collectively, not a direct quote from a single named channel. Everything else is drawn from the cited pages.</p>
+
+<footer>
+  Editor's Visual Playbook · compiled for Reality Recaps Unfiltered · this is the reference behind the <code>episode-visual-edit</code> production step. Run the starter checklist on every line before building a timeline.
+</footer>
+
+</div>
+</body>
+</html>

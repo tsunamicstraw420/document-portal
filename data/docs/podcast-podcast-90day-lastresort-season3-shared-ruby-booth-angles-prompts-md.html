@@ -1,0 +1,31 @@
+<h1>Ruby booth — extra camera angles (multi-cam look)</h1>
+<p>Goal: 2–3 more angles of Ruby in the <strong>same booth</strong>, so the edit can cut between &quot;cameras&quot; while she talks, like a real podcast. Same room, same outfit, same lighting — only the camera moves.</p>
+<p><strong>Generate these in the Magnific app</strong> (unlimited/free on your plan). 16:9, <strong>10 seconds</strong>, <strong>no audio</strong>, 720p or better. Save into <code>videos/</code> with the names below.</p>
+<h2>Use the saved references — do NOT describe Ruby in text</h2>
+<p>Text descriptions let the model drift off-model. Connect what we already have:</p>
+<ul>
+<li><strong>Ruby character</strong> — the saved <code>ruby</code> character in your Magnific library.</li>
+<li><strong>Booth set</strong> — the saved <code>ruby_set_booth</code> location in your library.</li>
+<li><strong>NO Style Anchor.</strong> Ruby&#x27;s look stays as-is; the style anchor is only for the cast/scene shots.</li>
+</ul>
+<p>Then the only thing you type is the <strong>camera angle + motion</strong> (below). Add &quot;no text overlays, no captions, no on-screen graphics.&quot;</p>
+<h3>Easiest route: &quot;Change Camera&quot; off the existing booth frame</h3>
+<p>Magnific has a <strong>Change Camera</strong> tool. Take the existing booth keyframe (a frame from <code>RL-1_booth_loop</code>, or the booth set image) and re-angle it — that guarantees the identical set, outfit and lighting, and you&#x27;re only moving the camera. Then animate each new angle into a 10s clip. This is more reliable than re-generating the scene from scratch.</p>
+<hr>
+<h2>RL-7 — CLOSE UP  → save as <code>videos/RL-7_booth_closeup.mp4</code></h2>
+<p><strong>Type only this (with the references connected):</strong></p>
+<blockquote>Tight head-and-shoulders close-up of Ruby, camera at eye level, slightly off-center to her right. The microphone crosses the lower-left foreground, softly out of focus. The neon sign glows behind her, defocused into soft pink bokeh. Shallow depth of field, warm key light on her face. <strong>Motion:</strong> she talks naturally to camera — small head tilts, eyebrows lifting on emphasis, blinking, a slight lean in toward the mic. Subtle, continuous, alive. Camera holds with a very slow push-in.</blockquote>
+<h2>RL-8 — THREE-QUARTER SIDE → save as <code>videos/RL-8_booth_threequarter.mp4</code></h2>
+<p><strong>Type only this (with the references connected):</strong></p>
+<blockquote>Three-quarter angle from about 45 degrees to Ruby&#x27;s left, medium shot from chest up. You can see the depth of the booth — the desk running away from camera, the mic arm crossing the frame, the neon sign visible over her shoulder, foam panels receding behind. Warm rim light along her cheek and hair. <strong>Motion:</strong> she turns slightly toward the lens as she speaks, one hand rising into frame in a natural talking gesture, shoulders shifting, hair moving a little. Camera holds with a gentle drift.</blockquote>
+<h2>RL-9 — WIDER SET SHOT (optional 3rd) → save as <code>videos/RL-9_booth_wide.mp4</code></h2>
+<p><strong>Type only this (with the references connected):</strong></p>
+<blockquote>Wider shot of the whole booth from straight on — Ruby centered behind the desk, full mic and boom arm visible, the neon sign fully readable behind her, purple drape left, gold foam panels right, desk lamp in frame. Still close enough that her face reads clearly (roughly upper third of frame). <strong>Motion:</strong> she gestures with both hands while talking, leans back then forward, natural idle energy. Camera holds with an almost imperceptible push.</blockquote>
+<hr>
+<h2>Notes</h2>
+<ul>
+<li><strong>Don&#x27;t over-restrict the motion.</strong> Say &quot;talks naturally, continuous movement&quot; — if you tell it to hold still you get a frozen-looking clip.</li>
+<li><strong>Face size matters:</strong> RL-9 is the widest we should go — Kling needs to find her face to lip-sync.</li>
+<li>Once these are in <code>videos/</code>, I&#x27;ll rotate the angles across the Ruby cutaways (A→B→C→A) so consecutive on-camera beats look like camera cuts, and each becomes its own lip-sync base clip.</li>
+<li>Re-usable every episode: for EP-03 we do the same 3 angles in a <em>different</em> studio (per the one-studio-per-episode rule).</li>
+</ul>

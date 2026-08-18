@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI Studio — Stage 0</title>
+<style>
+  :root{
+    --bg:#120e14; --surface:#1b151d; --surface-2:#221b26; --ink:#f3edf1; --muted:#a99ca4;
+    --border:#322836; --accent:#ff4d8d; --accent-ink:#1a0a12; --accent-soft:#2b1622;
+    --violet:#a893ff; --good:#37c98d; --bad:#ff6b6b;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:2.4rem 1.2rem 4rem}
+  header{margin-bottom:1.6rem}
+  .eyebrow{font-family:var(--mono);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}
+  h1{margin:.3rem 0 .2rem;font-size:1.9rem;letter-spacing:-.02em}
+  header p{margin:0;color:var(--muted);font-size:.95rem}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.2rem;margin-top:1.1rem}
+  label{display:block;font-size:.72rem;font-family:var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem}
+  textarea{width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;color:var(--ink);
+    font-family:var(--sans);font-size:1rem;padding:.8rem .9rem;resize:vertical;min-height:4.6rem}
+  textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+  .btn{appearance:none;border:none;cursor:pointer;font-family:var(--sans);font-weight:700;font-size:.95rem;
+    color:var(--accent-ink);background:var(--accent);border-radius:10px;padding:.7rem 1.2rem;margin-top:.9rem;
+    display:inline-flex;align-items:center;gap:.5rem}
+  .btn:disabled{opacity:.55;cursor:not-allowed}
+  .btn.ghost{color:var(--ink);background:transparent;border:1px solid var(--border)}
+  .meta{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.9rem}
+  .pill{font-family:var(--mono);font-size:.74rem;background:var(--surface-2);border:1px solid var(--border);
+    border-radius:999px;padding:.3rem .6rem;color:var(--ink)}
+  .pill b{color:var(--accent)}
+  .out{margin-top:1rem}
+  .out img,.out video{width:100%;border-radius:12px;border:1px solid var(--border);display:block;background:#000}
+  .spinner{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.35);
+    border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .err{color:var(--bad);font-size:.9rem;margin-top:.8rem;background:rgba(255,107,107,.08);
+    border:1px solid rgba(255,107,107,.3);border-radius:9px;padding:.6rem .75rem}
+  .hint{color:var(--muted);font-size:.82rem;margin-top:.6rem}
+  .hidden{display:none}
+  footer{margin-top:2rem;color:var(--muted);font-size:.76rem;font-family:var(--mono);text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Stage 0 · proof of concept</div>
+    <h1>AI Studio</h1>
+    <p>Type a prompt → get an image → animate it into a video. Real generations, powered by fal.ai.</p>
+  </header>
+
+  <div class="card">
+    <label for="prompt">Prompt</label>
+    <textarea id="prompt" placeholder="a golden retriever astronaut floating over neon Tokyo, cinematic lighting">a golden retriever astronaut floating over neon Tokyo, cinematic lighting</textarea>
+    <button class="btn" id="genImg">✦ Generate image</button>
+    <div class="hint" id="imgHint"></div>
+    <div class="err hidden" id="imgErr"></div>
+    <div class="out hidden" id="imgOut">
+      <img id="img" alt="Generated image" />
+      <div class="meta">
+        <span class="pill">⏱ <b id="imgTime"></b></span>
+        <span class="pill">≈ <b id="imgCost"></b> cost</span>
+        <span class="pill" id="imgModel"></span>
+      </div>
+      <button class="btn ghost" id="genVid">🎬 Animate this into a video</button>
+      <div class="hint">Heads up: video costs more and takes longer than an image.</div>
+    </div>
+  </div>
+
+  <div class="card hidden" id="vidCard">
+    <label>Video</label>
+    <div class="err hidden" id="vidErr"></div>
+    <div class="hint" id="vidHint"></div>
+    <div class="out hidden" id="vidOut">
+      <video id="vid" controls autoplay loop muted playsinline></video>
+      <div class="meta">
+        <span class="pill">⏱ <b id="vidTime"></b></span>
+        <span class="pill">≈ <b id="vidCost"></b> cost</span>
+        <span class="pill" id="vidModel"></span>
+      </div>
+    </div>
+  </div>
+
+  <footer>local demo · your key stays on your Mac · no accounts, no storage</footer>
+</div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  let lastImageUrl = null;
+
+  function money(n){ return "$" + Number(n).toFixed(n < 0.1 ? 3 : 2); }
+
+  async function post(url, body){
+    const r = await fetch(url, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body) });
+    const data = await r.json().catch(() => ({ error: "Unexpected server response." }));
+    if (!r.ok) throw new Error(data.error || ("Request failed ("+r.status+")"));
+    return data;
+  }
+
+  $("genImg").addEventListener("click", async () => {
+    const prompt = $("prompt").value.trim();
+    $("imgErr").classList.add("hidden");
+    if (!prompt){ showErr("imgErr","Type a prompt first."); return; }
+    setBusy("genImg", true, "Generating…");
+    $("imgHint").textContent = "Working — usually a few seconds…";
+    try{
+      const d = await post("/api/image", { prompt });
+      lastImageUrl = d.url;
+      $("img").src = d.url;
+      $("imgTime").textContent = d.seconds + "s";
+      $("imgCost").textContent = money(d.estCost);
+      $("imgModel").textContent = d.model;
+      $("imgOut").classList.remove("hidden");
+      $("imgHint").textContent = "";
+    }catch(e){ showErr("imgErr", e.message); $("imgHint").textContent=""; }
+    finally{ setBusy("genImg", false, "✦ Generate image"); }
+  });
+
+  $("genVid").addEventListener("click", async () => {
+    if (!lastImageUrl) return;
+    $("vidErr").classList.add("hidden");
+    $("vidCard").classList.remove("hidden");
+    $("vidOut").classList.add("hidden");
+    setBusy("genVid", true, "Animating…");
+    $("vidHint").textContent = "Rendering video — this can take 30–90 seconds…";
+    try{
+      const d = await post("/api/video", { imageUrl: lastImageUrl, prompt: $("prompt").value.trim() });
+      $("vid").src = d.url;
+      $("vidTime").textContent = d.seconds + "s";
+      $("vidCost").textContent = money(d.estCost);
+      $("vidModel").textContent = d.model;
+      $("vidOut").classList.remove("hidden");
+      $("vidHint").textContent = "";
+    }catch(e){ showErr("vidErr", e.message); $("vidHint").textContent=""; }
+    finally{ setBusy("genVid", false, "🎬 Animate this into a video"); }
+  });
+
+  function setBusy(id, busy, label){
+    const b = $(id);
+    b.disabled = busy;
+    b.innerHTML = busy ? '<span class="spinner"></span> ' + label : label;
+  }
+  function showErr(id, msg){ const e=$(id); e.textContent = msg; e.classList.remove("hidden"); }
+</script>
+</body>
+</html>

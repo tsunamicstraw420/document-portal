@@ -1,0 +1,143 @@
+<h1>Spotify for Creators — upload guide + multi-platform verdict</h1>
+<p>Researched July 25 2026, for Reality Recaps Unfiltered.</p>
+<hr>
+<h2>First: the big picture (so the steps make sense)</h2>
+<p><strong>Spotify for Creators is your podcast HOST.</strong> That&#x27;s the key thing. When you upload an episode there, two things happen:</p>
+<ol>
+<li>It goes live on <strong>Spotify</strong> itself.</li>
+<li>Spotify generates your <strong>RSS feed</strong>, and that feed is what carries your show to <strong>Apple Podcasts, Amazon Music, iHeartRadio</strong> and every other podcast app. You upload once; the RSS pushes it everywhere. You do <strong>not</strong> upload separately to Apple/Amazon — you just submit your RSS link to them one time, and after that they pull each new episode automatically.</li>
+</ol>
+<p><strong>YouTube is the exception</strong> — it does <em>not</em> accept RSS feeds. YouTube is always a separate, manual upload (which you already do). So your real workflow is <strong>two uploads per episode: one to Spotify for Creators, one to YouTube.</strong> Everything else flows from the Spotify RSS.</p>
+<pre class='code'><code>                 ┌─► Spotify (plays here)
+Upload to  ─────►│
+Spotify for      └─► RSS feed ─► Apple · Amazon · iHeart · every podcast app
+Creators
+
+Upload to YouTube  ─────► YouTube (separate, manual — video + Shorts)</code></pre>
+<hr>
+<h2>One-time setup (do once, then never again)</h2>
+<ol>
+<li><strong>Verify your account.</strong> You can&#x27;t publish your first episode until you do — check for the verification email from when the account was made. (Support: <em>Not receiving verification email</em>.)</li>
+<li><strong>Cover art</strong> is already set (<code>podcast_cover_art_v4.png</code>).</li>
+<li>After <strong>Episode 1 publishes</strong>, your RSS feed goes live. <em>Then</em> do the one-time RSS submission below. After that, every new episode appears on all of them automatically.</li>
+</ol>
+<hr>
+<h2>One-time RSS submission (do this once) — UPDATED July 25 2026</h2>
+<p><strong>Spotify does NOT auto-submit you to Apple/Amazon/iHeart — you submit your RSS link to each yourself, once.</strong> New episodes then flow to all of them via RSS automatically.</p>
+<h3>⚠️ Why Apple&#x27;s verification email never came (and the real fix)</h3>
+<p>Your show is hosted on Spotify/Anchor, and Spotify <strong>hides the owner email from your public RSS feed</strong> for privacy. Apple (and Amazon) verify ownership by emailing the address <em>inside the feed</em> — but there&#x27;s no address there to reach, so no code ever arrives. Confirmed July 25: nothing landed in the podcast Gmail, spam included. <strong>This is not something you did wrong</strong> — and it turned out not to matter: <strong>clicking Publish on the Draft took the show live without any email or token.</strong> (The claim-token method below is only a fallback if Publish ever demands verification.)</p>
+<h3>Your RSS feed URL (what every platform needs)</h3>
+<p><code>https://anchor.fm/s/113c288c8/podcast/rss</code> Your Apple show is already created — <strong>ID 6794720876</strong>, URL <code>https://podcasts.apple.com/us/podcast/reality-recaps-unfiltered/id6794720876</code>. It&#x27;s just sitting <strong>unverified in Draft</strong>.</p>
+<h3>Step 1 — Apple Podcasts (what actually worked for EP-02)</h3>
+<ol>
+<li><strong>Apple Podcasts Connect</strong> (podcastsconnect.apple.com), signed in with your normal Apple ID → <strong>＋ → Add a show with an RSS feed URL</strong> → paste your <strong>RSS URL</strong> → <strong>Add</strong>. The show is created as <strong>Draft (yellow dot)</strong>.</li>
+<li>Open the show → click <strong>Publish</strong> (top-right). The status flips <strong>Draft → Available (green dot)</strong> = live on Apple Podcasts. <strong>That&#x27;s the whole thing</strong> — you did this July 25.</li>
+<li>The verification email never arrives (Spotify hides the owner email, above) — but you don&#x27;t need it. Publishing from your own account is enough.</li>
+</ol>
+<p><strong>Fallback — only if Publish is blocked demanding ownership verification:</strong></p>
+<ul>
+<li>Apple Podcasts Connect → bottom of homepage → <strong>More Options → Claim Existing Show</strong> → paste your <strong>Apple show URL</strong> (…/id6794720876) → <strong>generate Claim Token</strong> (7-day).</li>
+<li>Spotify → Settings → Availability → paste it into the <strong>&quot;Apple Podcasts claim code&quot;</strong> field → <strong>Save</strong>. Apple matches it within ~24h.</li>
+<li>If Claim returns <em>&quot;This show already exists in your account,&quot;</em> that means it&#x27;s already yours — just <strong>Publish</strong>.</li>
+</ul>
+<h3>Step 2 — Amazon Music / Audible</h3>
+<ul>
+<li>Go to <strong>music.amazon.com/podcasters</strong>, sign in with your Amazon account → <strong>Add your podcast</strong> → paste the <strong>RSS URL</strong>.</li>
+<li>Amazon also verifies by email to the feed owner, so it may hit the same hidden-email wall. If it does: in Spotify → Settings, temporarily make the owner email visible in the feed just long enough to receive Amazon&#x27;s code, then hide it again.</li>
+</ul>
+<h3>Step 3 — iHeartRadio</h3>
+<ul>
+<li>Go to <strong>iheart.com/podcast/submit</strong>, sign in / create a free account → paste the <strong>RSS URL</strong> → submit. Manual review, a few days.</li>
+</ul>
+<h3>⚠️ Note: all three need YOU signed in</h3>
+<p>Apple, Amazon, and iHeart each require logging into your account (and Apple&#x27;s token has to be pasted between two of your logged-in accounts). This part can&#x27;t be automated on your behalf — it&#x27;s a ~15-minute hands-on job. Everything above is the exact click-path so it&#x27;s fast.</p>
+<h3>What to expect</h3>
+<ul>
+<li><strong>You do this once.</strong> After the show is approved on each, every future episode appears automatically (usually within a few hours, up to 24h).</li>
+<li><strong>Video is Spotify-only.</strong> On Apple/Amazon/iHeart your episodes are <strong>audio-only</strong> — the RSS carries the audio track. That&#x27;s fine and expected.</li>
+<li>Some apps scrape public RSS and may list you without submission — normal.</li>
+<li>Keep the RSS URL somewhere handy (it&#x27;s in <code>_SHARED</code> reference or note it here): once submitted you rarely need it again.</li>
+</ul>
+<hr>
+<h2>EP-02 (S3E1 premiere) — paste-ready title + description for Spotify</h2>
+<p><strong>Title</strong></p>
+<pre class='code'><code>The Last Resort Premiere: An Arrest, a Deportation Threat &amp; 6 Couples in a Castle</code></pre>
+<p><em>(Set Season = 3, Episode = 1 under Additional details — that&#x27;s how Spotify numbers it, so the title stays clean.)</em></p>
+<p><strong>Description</strong></p>
+<pre class='code'><code>You watched it. You screamed about it in the group chat. Now let&#x27;s really get into it.
+
+The 90 Day: The Last Resort premiere went ALL the way there — six couples, one castle, and zero chill. Before the episode even ends we&#x27;ve got a divorce filing, an arrest, a dropped charge, and a cast member telling another to &quot;go back to your country.&quot; Ruby breaks down every couple, every receipt, and every moment that had your group chat on fire. Pull up.
+
+(0:00) Cold open
+(2:10) The arrest — Patrick, Thaís &amp; the full timeline
+(3:45) Shekinah vs Thaís — the &quot;deport her&quot; moment
+(7:45) Paola &amp; Russ
+(9:45) Jenny &amp; Sumit
+(11:20) Rebecca &amp; Zied
+(12:05) Kara &amp; Guillermo
+(18:05) Premiere rating &amp; final thoughts
+
+New episodes every Friday. Subscribe and pull up.</code></pre>
+<p><em>(Spotify turns <code>(0:00)</code>-style timestamps into clickable chapters — keep that format.)</em></p>
+<hr>
+<h2>Fastest path: run the prep tool first (added 2026-08-14)</h2>
+<p>Spotify has <strong>no upload API</strong>, so the file-drop is always manual — but everything up to it is automated. Double-click <strong><code>90Day_LastResort_Season3/RUN_SPOTIFY_PREP.command</code></strong>. It reads your live RSS feed (so it skips episodes already on Spotify), then for each remaining episode drops two files into that episode&#x27;s <code>_READY_TO_UPLOAD</code> folder:</p>
+<ul>
+<li><code>S3E#_SPOTIFY.m4a</code> — the clean audio, ready to upload.</li>
+<li><code>S3E#_SPOTIFY.txt</code> — the title + description to paste (chapters already in</li>
+</ul>
+<p>Spotify&#x27;s clickable <code>(0:00)</code> format), plus the Season/Episode numbers.</p>
+<p>It prints a status table of what&#x27;s on Spotify vs. what it staged. Then follow the manual dashboard steps below, using those two files per episode.</p>
+<h2>Uploading an episode — step by step</h2>
+<p><strong>On the web dashboard (creators.spotify.com):</strong></p>
+<ol>
+<li>Click <strong>New episode</strong> (top-right).</li>
+<li>Click <strong>Select a file</strong> and choose your episode file.</li>
+<li>While it uploads, fill in the <strong>Details</strong> page:</li>
+</ol>
+<ul>
+<li><strong>Title</strong> — use the same episode title as YouTube.</li>
+<li><strong>Description</strong> — paste the same show-notes/description. Spotify supports basic formatting and clickable timestamps for chapters.</li>
+<li><strong>Content checks</strong> — answer the prompts (explicit content, etc.).</li>
+</ul>
+<ol>
+<li>Under <strong>Additional details</strong>: add the <strong>season and episode number</strong> and <strong>episode artwork</strong> if you want a per-episode thumbnail.</li>
+<li><strong>Publish date:</strong></li>
+</ol>
+<ul>
+<li><strong>Now</strong> — goes live immediately.</li>
+<li><strong>Schedule</strong> — pick a future date/time (shown in your local time).</li>
+</ul>
+<ol>
+<li>Publish.</li>
+</ol>
+<p><strong>Supported files:</strong> audio = MP3, M4A, WAV. Video = MP4 or MOV, <strong>16:9</strong>. No hard size limit, but big files process slowly.</p>
+<blockquote>To change a scheduled episode later: click the episode → 3-dot menu → <strong>Revert to draft</strong>.</blockquote>
+<hr>
+<h2>DECIDED: video on Spotify → two exports from Resolve</h2>
+<p>You&#x27;re publishing <strong>video</strong> on Spotify. Because Spotify overlays its <em>own</em> toggleable subtitles on video podcasts, you must <strong>not</strong> feed it a file that already has captions burned in — that would double them (yours permanent, Spotify&#x27;s on top). So going forward, each episode exports <strong>twice from Resolve</strong>:</p>
+<table><thead><tr><th>Export</th><th>Captions</th><th>Goes to</th></tr></thead><tbody><tr><td><strong><code>EP-XX_YOUTUBE.mp4</code></strong></td><td>Karaoke captions <strong>burned in</strong></td><td>YouTube (+ the Shorts are cut from this one)</td></tr><tr><td><strong><code>EP-XX_SPOTIFY.mp4</code></strong></td><td><strong>No</strong> burned captions (clean)</td><td>Spotify — let Spotify&#x27;s own toggleable subtitles handle it</td></tr></tbody></table>
+<p>Both are the same edit; you just toggle the caption track off for the Spotify export. On YouTube you also upload the <strong>SRT</strong> separately (burned look + searchable text). On Spotify you upload nothing extra — its auto-subtitles read your audio.</p>
+<blockquote>Cut the Shorts from the <strong>YouTube</strong> export (the one with your styling), not the clean Spotify one.</blockquote>
+<hr>
+<h2>Multi-platform posting: help or hurt?</h2>
+<p><strong>It helps. There is no meaningful downside.</strong> The 2026 consensus is unanimous: list your show everywhere. Being on Spotify, Apple, Amazon, iHeart <em>and</em> YouTube doesn&#x27;t split or cannibalize you — it lets each new listener find you on whatever app they already use. There&#x27;s no &quot;duplicate content&quot; penalty for podcasts across platforms; they&#x27;re different ecosystems.</p>
+<p>What each platform is actually <em>best</em> at, so you can lean in:</p>
+<ul>
+<li><strong>YouTube</strong> — discovery. The algorithm + Shorts + search bring in brand-new viewers who&#x27;ve never heard of you. This is your growth engine.</li>
+<li><strong>Spotify</strong> — audience insight + habit. Strong follower/notification mechanics and the best creator analytics; people subscribe and come back.</li>
+<li><strong>Apple Podcasts</strong> — the loyal core. Serious podcast listeners live here; good for retention and reviews.</li>
+</ul>
+<p>The only &quot;cost&quot; of being everywhere is the one-time RSS submission and the separate YouTube upload — both of which are already in your workflow. So: <strong>post to all of them.</strong> For a channel playing catch-up, wider availability only helps.</p>
+<p>One nuance for a <em>new</em> channel: don&#x27;t spread your <em>effort</em> thin trying to game five algorithms. Put your creative energy into <strong>YouTube</strong> (where discovery happens) and let RSS quietly handle the rest. Presence everywhere, focus on one.</p>
+<hr>
+<h2>Your per-episode checklist (once you&#x27;re rolling)</h2>
+<ol>
+<li>Export the episode from Resolve <strong>twice</strong>: <code>EP-XX_YOUTUBE.mp4</code> (captions burned) and <code>EP-XX_SPOTIFY.mp4</code> (clean).</li>
+<li><strong>YouTube:</strong> upload the YOUTUBE file (unlisted → public Friday) + the SRT + thumbnail + end screen. <em>(you have guides for all of this)</em></li>
+<li><strong>Spotify for Creators:</strong> New episode → upload the SPOTIFY (clean) file → paste title + description → set Season/Episode → Publish or schedule for Friday.</li>
+<li>That&#x27;s it — Apple/Amazon/iHeart pull it from RSS automatically.</li>
+<li>Cut the Shorts from the YOUTUBE export; post them across the week. Post the social stills (Facebook groups + Instagram).</li>
+</ol>
+<hr>
+<p><em>Sources: <a href="https://support.spotify.com/us/creators/article/publishing-audio-episodes/" target="_blank" rel="noopener">Spotify — Publishing audio episodes</a> · <a href="https://creators.spotify.com/features/video" target="_blank" rel="noopener">Spotify — Upload video podcasts</a> · <a href="https://support.spotify.com/us/creators/article/distributing-your-show-to-other-platforms/" target="_blank" rel="noopener">Spotify — Distributing your show to other platforms</a> · <a href="https://johnisaacson.co.uk/spotify-vs-apple-podcasts-vs-youtube-podcast-distribution-2026/" target="_blank" rel="noopener">John Isaacson — Spotify vs Apple vs YouTube distribution 2026</a></em></p>

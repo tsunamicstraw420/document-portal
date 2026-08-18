@@ -1,0 +1,42 @@
+<h1>CLAUDE.md — building ShowKit</h1>
+<p>You are building <strong>ShowKit</strong>: an AI-generation storefront that resells wholesale image/video generation to content creators through a <strong>credit wallet</strong>. Read <code>BUILD_PLAN.md</code> for the full plan and <code>docs/architecture.md</code> for the system design. This file is the working rules.</p>
+<h2>What we&#x27;re building (one sentence)</h2>
+<p>A Next.js web app where a user signs in, buys a subscription or credit pack via Stripe, and generates images/video through a <strong>metered credit ledger</strong> that calls third-party models <strong>server-side</strong> (OpenRouter / fal.ai / Replicate) and marks up the wholesale cost.</p>
+<h2>The spine (never break this flow)</h2>
+<p><code>request → authenticate → check balance → RESERVE credits → call provider (server-side) → on success SETTLE (deduct) + store output; on failure RELEASE the reservation → return</code></p>
+<p>Every balance change writes an append-only row to <code>credit_transactions</code>. See <code>lib/credits.ts</code>.</p>
+<h2>Non-negotiables</h2>
+<ol>
+<li><strong>Keys server-side only.</strong> All provider + Stripe secret keys live in server env and never</li>
+</ol>
+<p>reach the client. Every model call goes through <code>app/api/generate/route.ts</code>. (fal.ai&#x27;s ToS forbids exposing its API to end users; Replicate permits use via your app — verify each.)</p>
+<ol>
+<li><strong>Credit-ledger integrity.</strong> Balance mutations happen inside a single Postgres transaction.</li>
+</ol>
+<p>Prefer <strong>reserve-then-settle</strong> so a failed/timed-out generation never charges the user. Idempotency keys on both <code>/api/generate</code> and the Stripe webhook. Credits are <strong>integers</strong>.</p>
+<ol>
+<li><strong>Moderation is a launch blocker.</strong> Prompt + output moderation, plus a working NCII/abuse</li>
+</ol>
+<p>report and 48-hour takedown flow (TAKE IT DOWN Act). Log prompts, outputs, and user IDs.</p>
+<ol>
+<li><strong>The model catalog is data, not code.</strong> Models live in <code>lib/models.ts</code></li>
+</ol>
+<p>(<code>id, provider, wholesale$, credits, capability</code>). Adding a model = one data entry + a provider adapter — never a rewrite. Credit costs come from <code>docs/unit-economics.md</code>.</p>
+<h2>Conventions</h2>
+<ul>
+<li>TypeScript + Next.js App Router. Anything touching secrets, credits, or providers is a</li>
+</ul>
+<p><strong>server</strong> route handler / server action — never client code.</p>
+<ul>
+<li>Store credits and prices as integers; keep the wholesale→credit mapping in one place</li>
+</ul>
+<p>(<code>lib/models.ts</code>); round only at display.</p>
+<ul>
+<li><strong>Verify before &quot;done&quot;</strong> (house style): actually run the flow, hit the endpoint, and print</li>
+</ul>
+<p>the resulting <code>credit_transactions</code> row. Don&#x27;t hand back an untested generate or webhook.</p>
+<ul>
+<li>No secrets in the repo. <code>.env.local</code> is git-ignored; <code>.env.example</code> documents the shape.</li>
+</ul>
+<h2>Build order</h2>
+<p>Follow <code>BUILD_PLAN.md</code> phases 0 → 5. Ship <strong>Phase 1</strong> (auth + ledger + one working model generate, end-to-end) before adding breadth. A thin vertical slice that actually charges a credit correctly is worth more than ten half-wired models.</p>

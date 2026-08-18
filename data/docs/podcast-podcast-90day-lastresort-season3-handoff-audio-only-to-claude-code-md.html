@@ -1,0 +1,79 @@
+<h1>Handoff prompt — finish the &quot;audio-only YouTube&quot; operation</h1>
+<blockquote>✅ <strong>STATUS (Aug 13 2026): COMPLETE.</strong> All 7 audio-only videos (S3E2, E3, E6, E7, E8, E9, E10) were rendered and verified in this session, and all 7 guides are written. E2/E9/E10 re-take flubs were trimmed and every seam verified by re-transcription. The notes below are the record of the method (and what to reuse for future episodes like E11), not open to-dos.</blockquote>
+<p>Paste everything below the line into Claude Code, launched inside <code>/Users/rubys/Desktop/AI_bots/Podcast/Podcast</code> (so its <code>.claude/</code> hooks fire and it uses the Mac&#x27;s own ffmpeg — no cloud sandbox).</p>
+<hr>
+<p>You are continuing an in-progress operation in this repo. Read <code>CLAUDE.md</code> at the repo root FIRST and follow its rules (reuse the working method, don&#x27;t redraw the logo — use the real PNG, verify every number before saying done, never use shell heredocs to write files, don&#x27;t open credential files).</p>
+<h2>The operation</h2>
+<p>Publish the un-animated <strong>90 Day: The Last Resort, Season 3</strong> episodes as <strong>audio-only YouTube videos</strong> now, so Eddie can animate them later one at a time. An &quot;audio-only video&quot; = one still title card held on screen for the whole episode while Ruby&#x27;s narration plays.</p>
+<p><strong>Episodes in scope (7):</strong> S3E2, S3E3, S3E6, S3E7, S3E8, S3E9, S3E10. Skip E1, E4, E5 (already animated / in progress) and E11 (animated version coming).</p>
+<p><strong>Approved card look (locked):</strong> an editorial 1920×1080 design produced by <code>90Day_LastResort_Season3/make_card.py</code> (Pillow). Layout: the real logo <strong><code>logoMain.JPG</code></strong> (repo root — NOT <code>podcast_cover_art_v4.png</code>) shown sharp and full at LEFT, its black background matched to the card&#x27;s black and its edges feathered so <strong>no square shows</strong>; a soft pink glow fades in from the RIGHT behind a type block: pink kicker &quot;REALITY RECAPS UNFILTERED&quot; (Jura), gold small-caps &quot;SEASON THREE · EPISODE N&quot; (Arsenal SC), a short gold rule, then the episode title in white <strong>Big Shoulders Bold</strong>; a thin gold keyline frames the whole card. Fonts live in <code>90Day_LastResort_Season3/_SHARED/fonts/</code>. Verified finished examples exist: <code>_READY_TO_UPLOAD/EP06_S3E6/S3E6_card.png</code> and the full <code>S3E6_AUDIO_ONLY.mp4</code> (11:35) — match them. Generate a card with: <code>python3 make_card.py &lt;ep#&gt; &quot;&lt;Episode Title&gt;&quot; &lt;out.png&gt;</code>.</p>
+<blockquote><strong>⚠️ LOGO NOTE (from Eddie):</strong> the correct logo is <strong><code>logoMain.JPG</code></strong> in the main podcast folder. An earlier draft of the render tool used <code>podcast_cover_art_v4.png</code> — that was the wrong image. The tool&#x27;s <code>COVER</code> variable and the recipe below have been switched to <code>logoMain.JPG</code>; use that everywhere. (<code>logoMain.JPG</code> is portrait 1152×1728, so the blurred fill on the sides is expected and looks intentional. There&#x27;s also a <code>logoMain.MP4</code> animated version in the same folder if an animated card is ever wanted — the still <code>.JPG</code> is what these audio-only cards use.)</blockquote>
+<p><strong>Audio (use the B-take where A/B exist, per the E1/E2 convention):</strong></p>
+<ul>
+<li>E2 → <code>mp3/LastResort_03_02B.m4a</code>   E3 → <code>mp3/LastResort_03_03B.m4a</code></li>
+<li>E6 → <code>mp3/LastResort_03_06.m4a</code>   E7 → <code>mp3/LastResort_03_07.m4a</code>   E8 → <code>mp3/LastResort_03_08.m4a</code></li>
+<li>E9 → <code>mp3/LastResort_03_09.m4a</code>   E10 → <code>mp3/LastResort_03_10.m4a</code></li>
+</ul>
+<h2>What&#x27;s already done (don&#x27;t redo)</h2>
+<ul>
+<li><strong>Render tool written:</strong> <code>90Day_LastResort_Season3/MAKE_AUDIO_ONLY_VIDEOS.command</code>. It</li>
+</ul>
+<p>acquires a drawtext-capable ffmpeg, builds each card, holds it over the narration, and writes <code>S3E#_AUDIO_ONLY.mp4</code> + <code>S3E#_card.png</code> into each <code>_READY_TO_UPLOAD/&lt;EP&gt;/</code>. It reads an episode table (EPNUM|FOLDER|AUDIO|TITLE|TRIM).</p>
+<ul>
+<li><strong>S3E2 auto-trim baked in:</strong> its TRIM field is <code>108.10:153.95</code>. Ruby&#x27;s raw B-take</li>
+</ul>
+<p>restarts the intro; those cut points came from <code>mp3/LastResort_03_02B.words.json</code> (her clean &quot;let&#x27;s get into it&quot; ends 107.78s; the clean re-do &quot;If you&#x27;ve been watching…&quot; starts 154.34s) and land inside pauses. Keeps 0–108.1s + 153.95s–end.</p>
+<ul>
+<li><strong>Paste-ready YouTube guides written</strong> for E2, E6, E7, E8 at</li>
+</ul>
+<p><code>_READY_TO_UPLOAD/EP0#_S3E#/S3E#_YOUTUBE_METADATA.md</code> (title options, description, chapters, tags, settings). E6&#x27;s file is the format template.</p>
+<ul>
+<li><strong>Card titles set</strong> in the tool for E2/E6/E7/E8; E3/E9/E10 use placeholder <code>RECAP</code>.</li>
+</ul>
+<h2>What remains — do these</h2>
+<ol>
+<li><strong>Render all 7 videos locally.</strong> <code>chmod +x</code> the .command and run it (or run the same</li>
+</ol>
+<p>ffmpeg steps directly — recipe below). Then VERIFY and report a table: each episode&#x27;s output runtime, file size, and that the card text is correct. Expected runtimes: E2 ≈ 14:59 (after trim), E6 11:32, E7 13:00, E8 11:40; E3/E9/E10 unknown until probed.</p>
+<ol>
+<li><strong>Spot-check the S3E2 seam.</strong> Transcribe ~1:40–1:55 of <code>EP02_S3E2/S3E2_AUDIO_ONLY.mp4</code></li>
+</ol>
+<p>and confirm it reads &quot;…let&#x27;s get into it. If you&#x27;ve been watching this season…&quot; with NO doubled &quot;let&#x27;s get into it.&quot; If wrong, fix the trim and re-render.</p>
+<ol>
+<li><strong>Transcribe E3, E9, E10</strong> with faster-whisper (<code>pip install faster-whisper</code>, model</li>
+</ol>
+<p><code>small</code>, <code>beam_size=5</code>, <code>word_timestamps=True</code>, <code>initial_prompt</code> listing the cast names: Kara, Guillermo, Thaís, Patrick, Shekinah, Sarper, Jenny, Sumit, Rebecca, Zied, Paola, Russ). Save <code>mp3/&lt;base&gt;.words.json</code> in the same shape as <code>mp3/LastResort_03_02B.words.json</code>. <strong>Check each take for retake flubs</strong> like E2 (adjacent duplicated passages); if found, derive keep/resume seconds from the word timings and add a TRIM to that episode&#x27;s row.</p>
+<ol>
+<li><strong>Write E3/E9/E10 guides</strong> matching <code>EP06_S3E6/S3E6_YOUTUBE_METADATA.md</code> exactly</li>
+</ol>
+<p>(3 title options + a pick, description with an approximate CHAPTERS list from where each couple&#x27;s segment starts, tags, settings, notes). Derive each episode&#x27;s short card title from the transcript and put it in the tool&#x27;s EP03/EP09/EP10 TITLE field, then re-render those three so the real title bakes onto the card. <strong>Cross-check all six couples</strong> (Jenny &amp; Sumit, Kara &amp; Guillermo, Paola &amp; Russ, Patrick &amp; Thaís, Rebecca &amp; Zied, Shekinah &amp; Sarper) are named in each description; if one is genuinely absent, say so.</p>
+<ol>
+<li><strong>Kill the cloud fallback:</strong> a scheduled task <code>finish-lastresort-s3-audio-guides</code> was set</li>
+</ol>
+<p>up to do step 3–4 automatically when the sandbox recovered. Since you&#x27;re doing it here, it&#x27;s redundant — tell Eddie he can delete it from the Scheduled panel (or ignore it; it self-deletes once the three guides exist).</p>
+<h2>Verified recipe (already tested end-to-end on the real logo)</h2>
+<p>Card (one still PNG) — use the Pillow designer, NOT ffmpeg text:</p>
+<pre class='code'><code>python3 90Day_LastResort_Season3/make_card.py &lt;ep#&gt; &quot;&lt;Episode Title&gt;&quot; CARD.png</code></pre>
+<p>Needs <code>pip install pillow</code>; the script resolves the logo and the fonts in <code>90Day_LastResort_Season3/_SHARED/fonts/</code> itself. (The render <code>.command</code> already calls this.)</p>
+<p>Hold card over narration:</p>
+<pre class='code'><code>ffmpeg -y -loop 1 -framerate 10 -i CARD.png -i AUDIO.m4a -map 0:v -map 1:a \
+-c:v libx264 -preset veryfast -crf 20 -pix_fmt yuv420p -r 10 -tune stillimage \
+-c:a aac -b:a 256k -shortest -movflags +faststart OUT.mp4</code></pre>
+<p>Internal trim (E2), build the trimmed audio first, then feed it in as AUDIO:</p>
+<pre class='code'><code>ffmpeg -y -i SRC.m4a -filter_complex \
+&quot;[0:a]atrim=0:108.10,asetpts=N/SR/TB[a0];[0:a]atrim=153.95,asetpts=N/SR/TB[a1];[a0][a1]concat=n=2:v=0:a=1[out]&quot; \
+-map &quot;[out]&quot; -c:a aac -b:a 256k TRIMMED.m4a</code></pre>
+<h2>Output + publishing rules (from CLAUDE.md)</h2>
+<ul>
+<li>Every uploadable file for an episode lives together in <code>_READY_TO_UPLOAD/&lt;EP&gt;/</code></li>
+</ul>
+<p>(the <code>S3E#_AUDIO_ONLY.mp4</code>, the <code>S3E#_card.png</code>, and <code>S3E#_YOUTUBE_METADATA.md</code>).</p>
+<ul>
+<li>These audio-only cuts have NO captions burned in (captions/karaoke belong to the eventual</li>
+</ul>
+<p>animated versions). No Microsoft formats.</p>
+<ul>
+<li>Publishing plan Eddie is leaning toward: keep the audio-only versions <strong>permanent</strong>, and</li>
+</ul>
+<p>post each animated version later as its own new upload (nothing lost). Confirm with him before publishing.</p>
+<p>When done: report the per-episode verification table, confirm the E2 seam, confirm six-couple coverage per guide, and list exactly what&#x27;s in each <code>_READY_TO_UPLOAD/&lt;EP&gt;/</code> folder.</p>

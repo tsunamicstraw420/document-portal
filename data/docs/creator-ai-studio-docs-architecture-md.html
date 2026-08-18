@@ -1,0 +1,61 @@
+<h1>Architecture</h1>
+<h2>Components</h2>
+<pre class='code'><code>Browser (Next.js client)
+    │  (never sees provider or Stripe secret keys)
+    ▼
+Next.js server (App Router route handlers / server actions)
+    ├── /api/generate ........ the metered spine: auth → reserve → call model → settle → store
+    ├── /api/stripe/webhook .. the only place credits are added from payments (idempotent)
+    └── auth, dashboards ..... Supabase Auth session
+    │
+    ├──► Supabase Postgres .... profiles, credit_wallets, credit_transactions (ledger),
+    │                           generations, subscriptions, abuse_reports
+    ├──► Supabase Storage ..... generated outputs (or Cloudflare R2)
+    ├──► Model providers ...... OpenRouter (image+text), fal.ai, Replicate  [server-side only]
+    └──► Stripe ............... subscriptions + one-time credit packs</code></pre>
+<h2>The generation flow (the spine)</h2>
+<ol>
+<li>Client POSTs <code>{ modelId, prompt, idempotencyKey }</code> to <code>/api/generate</code>.</li>
+<li>Server authenticates the user (Supabase session).</li>
+<li>Look up the model + its credit cost in <code>lib/models.ts</code>.</li>
+<li><strong>Moderate the prompt</strong> (Phase 5 — launch blocker). Block before spending.</li>
+<li>Insert a <code>generations</code> row (status <code>reserved</code>).</li>
+<li><strong>Reserve</strong> the credits atomically (<code>reserve_credits</code> SQL fn) — fail with 402 if short.</li>
+<li>Call the provider <strong>server-side</strong> via an adapter.</li>
+<li>On success: <strong>moderate output</strong>, then <strong>settle</strong> the reservation, save the output URL,</li>
+</ol>
+<p>set status <code>succeeded</code>. On any failure/timeout: <strong>release</strong> the reservation (user is never charged for a generation that didn&#x27;t happen), set status <code>failed</code>.</p>
+<ol>
+<li>Return the output. Long video jobs use a queue + provider webhook instead of a blocking call.</li>
+</ol>
+<h2>The credit ledger (why it&#x27;s designed this way)</h2>
+<ul>
+<li><code>credit_transactions</code> is <strong>append-only</strong> and is the source of truth; <code>credit_wallets.balance</code></li>
+</ul>
+<p>is a cached integer that must always equal <code>sum(amount)</code> for the user.</p>
+<ul>
+<li>Every mutation is one transaction. Reserve-then-settle guarantees a failed generation refunds</li>
+</ul>
+<p>automatically. <code>idempotency_key</code> (unique) makes both generate retries and Stripe webhook retries safe no-ops.</p>
+<ul>
+<li>A nightly reconciliation job should assert <code>balance == sum(transactions)</code> per wallet and alert</li>
+</ul>
+<p>on drift.</p>
+<h2>Model routing</h2>
+<p><code>lib/models.ts</code> maps a model id → provider, capability, wholesale cost, and <strong>credit cost</strong>. Provider adapters (Phase 3) share one interface <code>call(model, input) → { url }</code>. Adding a model is a data entry + (if a new provider) one adapter — never a rewrite. Because credit cost is a data field, a wholesale price change is a config edit.</p>
+<h2>Payments</h2>
+<p>Stripe is the source of truth for subscription state; the webhook mirrors it into <code>subscriptions</code> and is the <strong>only</strong> path that grants credits (keyed by Stripe event id). Tiers/packs → credit allowances live in <code>lib/stripe.ts</code>, in sync with <code>docs/unit-economics.md</code>.</p>
+<h2>Security + compliance</h2>
+<ul>
+<li>All provider/Stripe secret keys are server-side env only; every model call is proxied. (fal.ai</li>
+</ul>
+<p>ToS forbids exposing its API to end users.)</p>
+<ul>
+<li>Moderation (prompt + output) + an NCII/abuse report with a 48-hour takedown workflow</li>
+</ul>
+<p>(<code>abuse_reports</code>) are required before public launch (TAKE IT DOWN Act).</p>
+<ul>
+<li>Rate limiting + Stripe Radar to blunt abuse and chargebacks. RLS on all user tables.</li>
+</ul>
+<h2>Deployment</h2>
+<p>Vercel (Next.js) + Supabase (Postgres/Auth/Storage) + Stripe. Cloudflare R2 optional for cheaper media storage/egress. Add a queue (Inngest / QStash) when video jobs land in Phase 3.</p>

@@ -1,0 +1,55 @@
+<h1>Copyright, Fair Use &amp; Legal Guidance for B-Roll</h1>
+<p><strong>This is one of the most important documents in the project.</strong> Please read it fully before implementing any feature that pulls or uses footage from actual TV episodes.</p>
+<hr>
+<h2>Core Principle</h2>
+<p><strong>Default to safe, legal visuals.</strong> Stock footage + generative AI B-roll is almost always the better, faster, and lower-risk choice for a monetized reality TV recap podcast/YouTube channel.</p>
+<p>Using actual clips from copyrighted TV shows (even short 10–20s segments) carries <strong>real legal and platform risk</strong>, even if you believe it qualifies as fair use.</p>
+<hr>
+<h2>Why Actual Episode Clips Are Risky</h2>
+<table><thead><tr><th>Factor</th><th>Why It Weighs Against You (in most cases)</th></tr></thead><tbody><tr><td><strong>Commercial use</strong></td><td>Your podcast/YouTube is monetized</td></tr><tr><td><strong>Creative nature</strong></td><td>Reality TV footage is highly creative/protected work</td></tr><tr><td><strong>Amount used</strong></td><td>Even 10–20 seconds can be substantial if it&#x27;s the &quot;heart&quot; of a scene</td></tr><tr><td><strong>Effect on market</strong></td><td>Clips can substitute for watching the original show</td></tr><tr><td><strong>Transformative value</strong></td><td>Purely illustrative B-roll is often <em>not</em> transformative enough</td></tr></tbody></table>
+<p>YouTube’s Content ID system is automated and aggressive. Copyright holders (studios, networks) routinely issue claims. Three strikes = channel termination. Even successful fair use defenses cost time and legal fees.</p>
+<p><strong>Tools like Playphrase.me, find-scene.com, and Twelve Labs make finding clips easy — they do NOT grant you the right to use them commercially.</strong></p>
+<hr>
+<h2>Project Policy (Strictly Enforced in Code)</h2>
+<ol>
+<li><strong>Stock + Generative B-roll is the recommended and default path.</strong></li>
+<li><strong>Actual episode clip extraction is an advanced, opt-in, disabled-by-default feature.</strong></li>
+</ol>
+<ul>
+<li>Controlled by <code>ALLOW_ACTUAL_EPISODE_CLIPS=false</code> in <code>.env</code></li>
+<li>Even when enabled, the code will show prominent warnings and require explicit confirmation.</li>
+</ul>
+<ol>
+<li><strong>If you choose to use actual clips anyway</strong>:</li>
+</ol>
+<ul>
+<li>Keep them <strong>very short</strong> (&lt; 10–15 seconds ideal)</li>
+<li>Always layer substantial original value: your voiceover/analysis, text callouts, zooms/pans (Ken Burns), color grading, picture-in-picture of you reacting, memes, etc.</li>
+<li>Never use a clip that could reasonably serve as a substitute for watching the original episode</li>
+<li>Document your fair use reasoning for each clip (we can add a simple logging feature later)</li>
+<li>Consult an intellectual property attorney familiar with YouTube/content creator cases in your jurisdiction</li>
+</ul>
+<hr>
+<h2>Recommended Safe B-Roll Sources (Prioritized)</h2>
+<table><thead><tr><th>Source</th><th>Risk Level</th><th>Quality</th><th>Cost</th><th>Best For</th><th>Notes</th></tr></thead><tbody><tr><td>Pexels / Pixabay</td><td>Very Low</td><td>Good</td><td>Free</td><td>Generic dramatic scenes, reactions, environments</td><td>Commercial use OK, attribution often not required</td></tr><tr><td>Generative AI (Runway, Kling, Luma, Pika)</td><td>Low</td><td>Excellent (improving fast)</td><td>Pay-per-use / credits</td><td>Highly specific dramatic moments, stylized looks</td><td>Truly original generation = lowest copyright risk</td></tr><tr><td>Your own footage / reactions</td><td>None</td><td>High</td><td>Time</td><td>Authentic host presence</td><td>Best long-term branding play</td></tr><tr><td>Screenshots + Ken Burns</td><td>Low</td><td>Good</td><td>Free</td><td>Specific moments you want to highlight</td><td>More lenient fair use treatment than video</td></tr><tr><td>Official promo/social clips from the show</td><td>Medium</td><td>High</td><td>Free</td><td>Official short clips</td><td>Check each platform’s terms of service</td></tr><tr><td>Actual episode clips</td><td><strong>High</strong></td><td>Highest</td><td>Free (but risky)</td><td>Very specific quotes/scenes</td><td>Only with extreme caution + legal advice</td></tr></tbody></table>
+<hr>
+<h2>How This Project Will Handle It (Planned Implementation)</h2>
+<ul>
+<li>All B-roll suggestion prompts will <strong>default to stock/generative descriptions</strong></li>
+<li>The LLM prompt will include instructions like: “Prefer generic dramatic reality TV style scenes over specific show footage unless explicitly requested”</li>
+<li>Actual clip module will be in a separate file (<code>clip_extractor.py</code>) and behind the feature flag</li>
+<li>When the risky path is used, the final video metadata or a sidecar JSON will log the source and duration for your records</li>
+<li>We will include example prompts that produce excellent stylized B-roll without needing the original footage</li>
+</ul>
+<hr>
+<h2>Final Recommendation</h2>
+<p>For a sustainable, growing channel:</p>
+<ul>
+<li>Start with <strong>stock + generative B-roll only</strong></li>
+<li>Focus your energy on <strong>great commentary, personality, editing rhythm, and thumbnails</strong></li>
+<li>Many successful recap channels thrive with <strong>zero or minimal direct show footage</strong></li>
+</ul>
+<p>If your content style truly requires occasional actual clips for criticism/analysis, treat that as a small percentage of B-roll and apply heavy transformation + legal review.</p>
+<p><strong>When in doubt, leave it out.</strong></p>
+<hr>
+<p><em>This guide will be updated as the project evolves and as fair use / platform policies change.</em></p>

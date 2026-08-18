@@ -1,0 +1,77 @@
+<h1>CLAUDE.md — ZC Trading Automated System</h1>
+<p><strong>Owner:</strong> Eddie Barna · <strong>Goal:</strong> automate Koroush AK&#x27;s trading methodology <strong>Read this file, and <code>../CLAUDE.md</code> (AI_bots house rules), before the first tool call.</strong></p>
+<p>Detail lives in sibling docs — don&#x27;t duplicate it here:</p>
+<table><thead><tr><th>Doc</th><th>Holds</th></tr></thead><tbody><tr><td><code>AUTOMATED_TRADING_SYSTEM_PLAN.md</code></td><td>Full implementation roadmap, phases, deliverables</td></tr><tr><td><code>TRADING_FRAMEWORKS_SUMMARY.md</code></td><td>Trading rules reference (VWAP, S/R, entries)</td></tr><tr><td><code>PROJECT_SUMMARY.md</code></td><td>Current state narrative</td></tr><tr><td><code>README.md</code></td><td>Setup / how to run</td></tr></tbody></table>
+<hr>
+<h2>Rules</h2>
+<p><strong>1. Verify before handing back. Never hand Eddie QA.</strong> Run the check, report the number. <code>pytest -q</code> output, the coverage figure, the actual backtest result. &quot;Should work&quot; is not verification.</p>
+<p><strong>2. Name your source.</strong> &quot;The backtest shows X&quot; — not &quot;X is true.&quot;</p>
+<p><strong>3. Live state beats written claims, including this file.</strong> This file said &quot;Planning/Foundation Phase&quot; long after <code>src/</code>, <code>tests/</code>, <code>config/</code> and a <code>.venv</code> existed. Check the tree before describing the project&#x27;s state.</p>
+<p><strong>4. Never implement fully autonomous execution.</strong> Every trade requires human confirmation. The system identifies setups, sizes them, and <em>presents them for approval</em> — it does not place orders on its own. Psychological readiness cannot be automated.</p>
+<p><strong>5. No curve-fitting.</strong> Forbidden: look-ahead bias, over-fitting to one market period, rules written for specific recent trades, rule changes triggered by a single loss, rules added to explain away a weakness. Changes must improve <strong>out-of-sample</strong> performance.</p>
+<p><strong>6. Every function gets a test.</strong> <code>pytest</code>, target 85% coverage, happy path <em>and</em> error cases. Don&#x27;t integrate untested code.</p>
+<p><strong>7. Validate data before any execution path runs.</strong> OHLC current within 30s, price cross-checked across sources where possible, S/R levels consistent, position size matches the risk rules.</p>
+<p><strong>8. Don&#x27;t build what isn&#x27;t in the plan.</strong> Check <code>AUTOMATED_TRADING_SYSTEM_PLAN.md</code> before adding a feature. Start simple; add complexity only after a backtest proves it&#x27;s needed.</p>
+<p><strong>9. Scope discipline.</strong> No refactoring, renaming, or cleanup that wasn&#x27;t asked for. Don&#x27;t average two existing patterns — pick one.</p>
+<p><strong>10. Never write files with shell heredocs.</strong> Use the Write/Edit tools. A heredoc wrote a literal <code>EOF</code> and a raw <code>cat</code> command into <em>this file</em> and it went unnoticed for months.</p>
+<p><strong>11. Ask when trading intent is unclear.</strong> Momentum or reversion? Which dimension does it serve? Has it been backtested, and at what accuracy/R:R? Does it need trader confirmation?</p>
+<p><strong>12. Deliverables only.</strong> Delete generator scripts and scratch files before saying done.</p>
+<hr>
+<h2>Self-check before saying &quot;done&quot;</h2>
+<p>Cowork runs in the cloud and cannot execute <code>.claude/</code> hooks. This checklist is the gate:</p>
+<pre class='code'><code>1. Did I verify each claim, and name the source?              yes / no
+2. Did I read back every file I wrote or edited?              yes / no
+3. Did I run the tests, and report the actual output?         yes / no
+4. Did I delete every scratch file I created?                 yes / no
+5. Is there a check I skipped and am hoping is fine?          yes / no</code></pre>
+<p>If #5 is yes, go run it.</p>
+<hr>
+<h2>Learned from mistakes</h2>
+<p>Newest last. Date + what happened + the rule. When Eddie corrects a real mistake: fix it, append it here as a dated actionable rule, and quote the line you added.</p>
+<ul>
+<li><strong>2026-08-07: this file was silently corrupted.</strong> A heredoc leaked its <code>EOF</code> marker and a</li>
+</ul>
+<p>trailing <code>cat /Users/rubys/.../CLAUDE.md</code> line into the file body. It sat there undetected because nobody read the file back after writing it. <strong>Rule 10 above.</strong></p>
+<ul>
+<li><strong>2026-08-07: this file claimed &quot;Planning/Foundation Phase&quot;</strong> while <code>src/</code>, <code>tests/</code>,</li>
+</ul>
+<p><code>config/</code> and a populated <code>.venv</code> already existed. Stale self-description. <strong>Rule 3 above — check the tree, don&#x27;t trust the header.</strong></p>
+<hr>
+<h2>The framework in one screen</h2>
+<p><strong>Three dimensions — weakness in any one prevents scaling.</strong></p>
+<table><thead><tr><th>Dimension</th><th>Covers</th></tr></thead><tbody><tr><td><strong>Strategy</strong></td><td>Journal, edge development, asset selection</td></tr><tr><td><strong>Risk</strong></td><td>Sizing, stop/target placement, scaling</td></tr><tr><td><strong>Psyche</strong></td><td>Psychology, routines, discipline under pressure</td></tr></tbody></table>
+<p><strong>Two strategies, chosen by environment:</strong></p>
+<table><thead><tr><th></th><th>Momentum (breakout)</th><th>Mean reversion</th></tr></thead><tbody><tr><td>Hypothesis</td><td>Strength continues</td><td>Price reverts to average</td></tr><tr><td>Action</td><td>Buy above resistance / sell below support</td><td>Short spikes into resistance / long dumps into support</td></tr><tr><td>Environment</td><td>Strong trend, volume</td><td>Range-bound, choppy</td></tr><tr><td>VWAP signal</td><td>Price above VWAP, steep slope</td><td>Price choppy around VWAP, flat slope</td></tr></tbody></table>
+<p><strong>VWAP</strong> is the volume-weighted price anchor: position vs. VWAP = direction, slope = strength, band width = volatility.</p>
+<h3>Entry criteria</h3>
+<pre class='code'><code>MOMENTUM                            MEAN REVERSION
+✓ Price above VWAP                  ✓ Price choppy around VWAP (within 1σ)
+✓ VWAP slope &gt; 10° upward           ✓ Fast spike (&gt;2% in &lt;5 min) into level
+✓ Breaking/approaching resistance   ✓ Volume declining on spike (weakness)
+✓ Volume &gt; 20-day average           ✓ VWAP slope flat or opposite
+✓ R:R ≥ 2:1                         ✓ R:R ≥ 2:1
+→ Entry: close above resistance     → Entry: rebound from spike level
+→ Stop:  below recent swing low     → Stop:  beyond spike extreme</code></pre>
+<h3>Risk limits (hard)</h3>
+<pre class='code'><code>Max risk / trade:  1% of account   (never above 2%)
+Max risk / day:    2%              → stop trading for the day
+Max risk / week:   5%              → stop trading for the week
+
+Position Size = (account × risk%) / (stop distance × pip value)</code></pre>
+<p>Move to break-even after 1:1. Never trail a stop into a loss. Size up only after 3 consecutive profitable weeks.</p>
+<hr>
+<h2>Code standards</h2>
+<p>Python 3.9+, type hints on every function, PEP 8 via <code>black</code>, Google-style docstrings, 100-char lines, <code>pylint</code> ≥ 8.0, <code>pytest</code> with 85%+ coverage.</p>
+<p><strong>Critical errors — stop execution:</strong> market data gaps, DB connection loss, API auth failure, balance check failure. <strong>Warnings — log and continue:</strong> setup quality below threshold, sizing edge cases, signal timing delays. All errors get a timestamp and context; critical ones alert the user.</p>
+<hr>
+<h2>Validation gate (before any strategy ships)</h2>
+<ol>
+<li>Historical backtest — 6+ months</li>
+<li>Accuracy check vs. manual analysis on the same period (&gt;70% agreement)</li>
+<li>Walk-forward on unseen data</li>
+<li>Stress test across market regimes</li>
+<li>Paper trade — 2 weeks minimum</li>
+</ol>
+<p><strong>Pass bar:</strong> win rate &gt; 50%, profit factor &gt; 1.8, max drawdown &lt; 15%, R:R ≥ 2:1. <strong>6-month targets:</strong> win rate 55%+, profit factor 1.8+, monthly return 5–10%, drawdown &lt;15%, setup accuracy 75%+, execution &lt;200ms, logging 100%.</p>
+<hr>
+<p><em>Start simple. Validate. Iterate. Only add complexity that backtests prove valuable.</em></p>

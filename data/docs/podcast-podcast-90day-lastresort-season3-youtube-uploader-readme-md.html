@@ -1,0 +1,81 @@
+<h1>Automated YouTube uploader — setup &amp; use</h1>
+<p>Uploads the Season 3 <strong>audio-only</strong> episodes to YouTube unattended: video + title + description + tags + Entertainment category + <strong>made-for-kids = No</strong> + custom thumbnail + visibility, in one double-click.</p>
+<p>Files:</p>
+<ul>
+<li><code>youtube_upload.py</code> — the uploader.</li>
+<li><code>RUN_YOUTUBE_UPLOAD.command</code> — double-click to run it.</li>
+<li><code>_SHARED/client_secret.json</code> — your Google OAuth client (you create this once, below).</li>
+<li><code>_SHARED/yt_token.json</code> — cached sign-in, created automatically on first run. <strong>Never share it.</strong></li>
+<li><code>_SHARED/uploaded_state.json</code> — which episodes are already up, so re-runs don&#x27;t double-post.</li>
+</ul>
+<hr>
+<h2>One-time setup (≈10 minutes, do it once)</h2>
+<p>Sign in to Google as the <strong>podcast</strong> account <strong>realityrecapsunfiltered@gmail.com</strong> for every step below (NOT the personal gmail).</p>
+<ol>
+<li><strong>Google Cloud Console</strong> → https://console.cloud.google.com/ → create a</li>
+</ol>
+<p>project (name it e.g. <code>RRU-Uploader</code>), or pick an existing one (the podcast&#x27;s <code>rru-pipeline</code> project is fine).</p>
+<ol>
+<li><strong>Enable the API:</strong> search the top bar for <strong>&quot;YouTube Data API v3&quot;</strong> → open it</li>
+</ol>
+<p>→ <strong>Enable</strong>.</p>
+<ol>
+<li><strong>Google Auth Platform setup wizard</strong> (Google&#x27;s newer flow — this used to be</li>
+</ol>
+<p>called the &quot;OAuth consent screen&quot;). It appears as a 4-step wizard the first time: <strong>App Information</strong> (App name e.g. <code>RRU Uploader</code>; User support email) → <strong>Audience</strong> = <strong>External</strong> → <strong>Contact Information</strong> (an email) → <strong>Finish</strong> (tick the agree box, Create).</p>
+<ol>
+<li><strong>Add the test user:</strong> left nav → <strong>Audience</strong> → confirm Publishing status is</li>
+</ol>
+<p><strong>Testing</strong> → <strong>Test users</strong> → <strong>+ Add users</strong> → add <strong>realityrecapsunfiltered@gmail.com</strong> → Save. (Required — without it, sign-in is blocked. Leave the app in Testing; no need to publish it.)</p>
+<ol>
+<li><strong>Create the credential:</strong> left nav → <strong>Clients</strong> → <strong>Create client</strong> →</li>
+</ol>
+<p>Application type <strong>Desktop app</strong> → Create → <strong>Download JSON</strong>.</p>
+<ol>
+<li>Put that downloaded file here, renamed exactly:</li>
+</ol>
+<p><code>_SHARED/client_secret.json</code> (full path: <code>90Day_LastResort_Season3/_SHARED/client_secret.json</code>).</p>
+<p>That&#x27;s it. You never touch the console again for normal uploads.</p>
+<hr>
+<h2>Uploading</h2>
+<p><strong>Double-click <code>RUN_YOUTUBE_UPLOAD.command</code>.</strong></p>
+<ul>
+<li><strong>First run only:</strong> a browser opens. Sign in as <strong>realityrecapsunfiltered@gmail.com</strong></li>
+</ul>
+<p>and click <strong>Allow</strong>. Google will warn the app is &quot;unverified&quot; — click <strong>Advanced → Go to (app) (unsafe)</strong>; it&#x27;s your own app. The sign-in is then cached in <code>_SHARED/yt_token.json</code>, so later runs need no browser.</p>
+<ul>
+<li>The tool prints the channel it signed in as first — confirm it says the</li>
+</ul>
+<p>Reality Recaps channel before it uploads.</p>
+<ul>
+<li>It uploads every ready episode that isn&#x27;t already up, sets everything, and</li>
+</ul>
+<p>prints a summary table (episode → videoId → visibility → thumbnail → URL).</p>
+<p><strong>Default visibility is Unlisted</strong> (see caveat below). To go straight to Public instead, run from Terminal:</p>
+<pre class='code'><code>./RUN_YOUTUBE_UPLOAD.command --visibility public</code></pre>
+<hr>
+<h2>Adding future episodes (the reusable part)</h2>
+<p>Make a new folder <code>_READY_TO_UPLOAD/EP##_S3E#/</code> containing exactly:</p>
+<ul>
+<li><code>S3E#_AUDIO_ONLY.mp4</code></li>
+<li><code>S3E#_thumbnail.png</code></li>
+<li><code>S3E#_YOUTUBE_METADATA.md</code> (same layout as the existing ones — the tool reads</li>
+</ul>
+<p>the recommended <strong>A</strong> title, the <code>## DESCRIPTION</code> block, and the <code>## TAGS</code> block)</p>
+<p>Then double-click <code>RUN_YOUTUBE_UPLOAD.command</code> again. New episodes upload; already-uploaded ones are skipped. Nothing else to configure.</p>
+<hr>
+<h2>Two things to know up front</h2>
+<ul>
+<li><strong>Unverified-app lock → upload as Unlisted, flip to Public by hand.</strong> Until</li>
+</ul>
+<p>Google formally verifies the app, videos the API uploads are forced toward Private/Unlisted and <strong>can&#x27;t be flipped to Public through the API</strong>. So the tool uploads <strong>Unlisted</strong> (file, title, description, tags, thumbnail all done automatically); you flip each to <strong>Public</strong> in YouTube Studio with one click. (If you&#x27;d rather the API set Public directly, the app has to pass Google&#x27;s OAuth verification — a separate, slower process.) <strong>Note:</strong> flipping a video Public publishes it <strong>on YouTube only</strong>. It does NOT post to Facebook or send email — those are still manual (no Zap #2 / MailerLite yet) — and it does NOT touch the podcast RSS feed, which comes from a separate upload to Spotify for Creators. See <code>SPOTIFY_FOR_CREATORS_GUIDE.md</code>.</p>
+<ul>
+<li><strong>Daily quota ≈ 6 uploads.</strong> Each upload costs ~1600 of the default 10,000</li>
+</ul>
+<p>daily API units, so ~6 videos/day. With 7 episodes, the 7th may hit the quota and the tool <strong>stops cleanly</strong> — just double-click again the next day and it finishes the last one automatically (the state file remembers what&#x27;s done). To deliberately cap a run: <code>./RUN_YOUTUBE_UPLOAD.command --limit 6</code>.</p>
+<hr>
+<h2>Options (all optional)</h2>
+<pre class='code'><code>./RUN_YOUTUBE_UPLOAD.command --dry-run            # show what WOULD upload, no API calls
+./RUN_YOUTUBE_UPLOAD.command --visibility public  # or unlisted (default) / private
+./RUN_YOUTUBE_UPLOAD.command --limit 6            # cap uploads this run</code></pre>
+<p>The click-to-copy <code>S3_AUDIO_ONLY_UPLOAD_GUIDE.html</code> remains as the fully-manual fallback if you ever want to paste everything into Studio by hand.</p>

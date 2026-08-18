@@ -1,0 +1,200 @@
+<div class="pdfpages"><img class="pdfpage" loading="lazy" src="data/pdf/polymarket-arbitrage-bot-vps-quickreference-pdf/p-1.jpg" alt="page 1">
+<img class="pdfpage" loading="lazy" src="data/pdf/polymarket-arbitrage-bot-vps-quickreference-pdf/p-2.jpg" alt="page 2">
+<img class="pdfpage" loading="lazy" src="data/pdf/polymarket-arbitrage-bot-vps-quickreference-pdf/p-3.jpg" alt="page 3"></div><div class="pdftext" hidden><pre>  Polymarket Arbitrage Bot — VPS Quick Reference
+                                            Single-server architecture (Vilnius)
+                 Updated: May 11, 2026 | SSH key: ~/.ssh/hostinger_vps | GitHub: tsunamicstraw420/polymarket_Arb_bot
+
+
+
+Server
+    Provider                         Hostinger
+
+    Plan                               KVM 1 — 1 vCPU / 4 GB RAM / 50 GB SSD
+
+    Cost                               $9.99 / month
+
+    Location                         Vilnius, Lithuania
+
+    IP                               76.13.78.74
+
+    Hostname                         srv1644702.hstgr.cloud
+
+    OS                               Ubuntu 24.04 LTS
+
+    SSH alias                          poly-vilnius (configure in ~/.ssh/config)
+
+    SSH direct                         ssh -i ~/.ssh/hostinger_vps root@76.13.78.74
+
+    GitHub repo                        tsunamicstraw420/polymarket_Arb_bot
+
+    Bot dir on VPS                     /opt/polymarket-bot/
+
+    Data dir on VPS                    /opt/polymarket-bot/data/ (state.json, positions.json, trades.db,
+                                       logs/)
+
+    Live dashboard                     http://76.13.78.74
+
+
+
+~/.ssh/config snippet (on your Mac)
+Host poly-vilnius
+  HostName 76.13.78.74
+  User root
+  IdentityFile ~/.ssh/hostinger_vps
+  ServerAliveInterval 60
+  ServerAliveCountMax 5
+
+
+
+Daily Monitoring (no SSH normally needed)
+The bot pushes everything you need to Telegram and the browser dashboard. You should not need to SSH in just to check on
+it.
+
+Heartbeat (Telegram)
+
+Silent message every 30 minutes. Format: [LIVE] Balance: $X | PnL: +N.NN (N.N%) | Pos: N | Feed: BTC BN:Xs CL:Ys | ETH
+BN:Xs CL:Ys. If no heartbeat for 60+ minutes, the bot is likely down — SSH in and check the container.
+
+Trade alerts (Telegram)
+
+On every signal/fill/error/crash. Format: SIGNAL[SRC] | ASSET DIR Nmin | edge=N% ... where SRC is BINANCE or
+CHAINLINK.
+
+
+
+Bot Control (one-liners from your Mac)
+    Action                         Command
+
+    Status                         ssh poly-vilnius &quot;cd /opt/polymarket-bot &amp;&amp; docker compose ps&quot;
+
+    Restart                        ssh poly-vilnius &quot;cd /opt/polymarket-bot &amp;&amp; docker compose restart
+                                   polymarket-bot&quot;
+
+    Stop                           ssh poly-vilnius &quot;cd /opt/polymarket-bot &amp;&amp; docker compose stop
+                                   polymarket-bot&quot;
+
+    Start                          ssh poly-vilnius &quot;cd /opt/polymarket-bot &amp;&amp; docker compose up -d
+                                   polymarket-bot&quot;
+
+    Rebuild + restart (after git   ssh poly-vilnius &quot;cd /opt/polymarket-bot &amp;&amp; git pull &amp;&amp; docker
+    pull)                          compose build polymarket-bot &amp;&amp; docker compose up -d polymarket-bot&quot;
+
+    Live log tail (filtered)       ssh poly-vilnius &quot;tail -f /opt/polymarket-bot/data/logs/bot.log |
+                                   grep --line-buffered -E &#x27;SIGNAL|NEAR-MISS|ERROR|OPEN|CLOSE&#x27;&quot;
+
+    Last 50 log lines              ssh poly-vilnius &quot;tail -50 /opt/polymarket-bot/data/logs/bot.log&quot;
+
+    Verify code version in         ssh poly-vilnius &quot;docker compose -f
+    container                      /opt/polymarket-bot/docker-compose.yml exec -T polymarket-bot grep
+                                   _MOMENTUM_TOLERANCE /app/strategy.py&quot;
+
+    Geo-check (confirm             ssh poly-vilnius &quot;curl -s ipinfo.io | head -8&quot;
+    Lithuania)
+
+
+
+Deploy a Code Change
+Source is git-managed. NEVER scp source files directly to /opt/polymarket-bot/ — git pull overwrites them.
+
+On your Mac:
+cd /Users/rubys/Desktop/AI_bots/Polymarket-Arbitrage-Bot
+git add &lt;file&gt;
+git commit -m &quot;describe change&quot;
+git push origin main
+
+On the VPS (one-liner):
+ssh poly-vilnius &quot;cd /opt/polymarket-bot &amp;&amp; git pull &amp;&amp; docker compose build polymarket-bot &amp;&amp; docker
+compose up -d polymarket-bot&quot;
+
+Never use --force-recreate — Docker network namespace teardown breaks the Binance WS handshake. Plain docker
+compose up -d picks up the new image correctly.
+
+
+
+Telegram Commands (send to the bot chat)
+
+    Action                         Command
+
+    /status                        Balance, PnL, drawdown, open positions count
+
+    /positions                     Detail of every open position
+
+    /pause                         Stop opening new trades (existing positions keep running)
+
+    /resume                        Resume opening trades
+
+    /stop                          Graceful shutdown — Docker restarts the container automatically
+
+    /restart                       Same as /stop (Docker auto-recovers)
+
+
+
+Troubleshooting
+     No heartbeat for 60+ min        Bot likely down. Run: ssh poly-vilnius &#x27;docker compose ps&#x27; — if
+                                     Exited, check logs.
+
+     CL:stale persistent            Polymarket Chainlink RTDS broadcasts sparsely — likely normal. Binance path still
+                                    works.
+
+     403 in logs                     Geo-block returned. Run: ssh poly-vilnius &#x27;curl -s ipinfo.io&#x27; to
+                                     confirm country is LT.
+
+     Binance WS disconnect          Auto-reconnects with exponential backoff up to 60s. Persistent means network issue.
+
+     Container exited                ssh poly-vilnius &#x27;docker compose logs --tail=100 polymarket-bot&#x27; —
+                                     look for traceback.
+
+     Pre-commit hook fails          Fix the underlying issue. NEVER bypass with --no-verify.
+
+
+
+Critical Rules (so we don&#x27;t repeat 2026-05-10 mistakes)
+1. NEVER scp source files directly to /opt/polymarket-bot/ on the VPS — git is the source of truth; scp&#x27;d files get overwritten
+on next pull.
+2. NEVER use docker compose --force-recreate — breaks the Binance WS startup.
+
+3. VERIFY live state before asserting facts — check the actual running container, actual config, actual IP. Stale docs are a
+known failure mode.
+
+4. Only one bot per Polymarket wallet at any time — parallel instances on the same wallet cause double-trades.
+
+5. Don&#x27;t force push to main — this is a solo project so there&#x27;s no PR review; treat git push with the seriousness it would have
+in a team.
+
+
+
+Where Things Live on the VPS
+
+     /opt/polymarket-bot/           Git repo clone (source, Dockerfile, docker-compose.yml)
+
+     /opt/polymarket-bot/.env        Wallet + API secrets. NEVER in git. Restore from local vps_data/
+                                     backup.
+
+     /opt/polymarket-bot/data/stat Balance — persisted across restarts
+     e.json
+
+     /opt/polymarket-bot/data/pos Open positions — persisted across restarts
+     itions.json
+
+     /opt/polymarket-bot/data/tra   SQLite trade history
+     des.db
+
+     /opt/polymarket-bot/data/log   Persistent log (survives container restart)
+     s/bot.log
+
+     /root/.ssh/github_deploy       Deploy key for git pull from the private GitHub repo
+
+     /root/.ssh/authorized_keys     SSH access keys (your Mac + Hostinger-managed)
+
+
+
+Cost Summary
+
+     Vilnius VPS (KVM 1)             $9.99 / month
+
+     Tokyo signal_relay             (decommissioned 2026-05-10)
+
+     Jakarta standby                (decommissioned 2026-05-10)
+
+     Total                           $9.99 / month
+</pre></div>

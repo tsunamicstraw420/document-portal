@@ -1,0 +1,295 @@
+<div class="pdfpages"><img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-punisher-plan2-newmarketmakerbot-pdf/p-1.jpg" alt="page 1">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-punisher-plan2-newmarketmakerbot-pdf/p-2.jpg" alt="page 2">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-punisher-plan2-newmarketmakerbot-pdf/p-3.jpg" alt="page 3">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-punisher-plan2-newmarketmakerbot-pdf/p-4.jpg" alt="page 4">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-punisher-plan2-newmarketmakerbot-pdf/p-5.jpg" alt="page 5">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-punisher-plan2-newmarketmakerbot-pdf/p-6.jpg" alt="page 6">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-punisher-plan2-newmarketmakerbot-pdf/p-7.jpg" alt="page 7"></div><div class="pdftext" hidden><pre>                      Punisher Playbook — Plan 2
+                         Build a separate Polymarket market-maker / ladder bot
+                 Source: x.com/0x_punisher/status/2053055492868514213 | Generated 2026-05-13
+
+
+
+
+1. Thesis — why a brand-new bot, not an upgrade
+Our current bot is a directional Type-1 bot: predict the next move, take one side, exit at expiry. Punisher
+explicitly states: &#x27;directional strategies work but are the least profitable overall&#x27; and that &#x27;the survivors are
+usually market-maker or ladder bots, the most common and profitable big bots on the platform.&#x27; Those are
+Type-2 strategies and they require fundamentally different architecture: order-book modeling, paired bid/ask
+quoting, inventory management, and self-recorded tick data for honest backtests. Bolting them onto the existing
+bot would compromise both. A separate codebase, separate process, and (eventually) a separate wallet is the
+right shape.
+
+Three reasons not to merge:
+
+●      Different risk profile. The directional bot loses on adverse selection; the market-maker relies on a
+       bounded-inventory model that survives adverse selection. Cross-contamination of risk parameters is the
+       most common reason these get fused-then-killed.
+●      Different latency budget. Directional latency-arb wins by being first. Market making wins by being
+       patient. Tuning one in the codebase of the other will degrade both.
+●      Different wallet semantics. Market makers carry inventory across windows (carry risk). The directional
+       bot does not. Co-mingling on one wallet makes risk limits ambiguous.
+
+
+2. What the article says about market-maker and ladder bots
+He does not give a step-by-step market-maker recipe — he keeps the high-edge code to himself. But across
+the 8 steps he leaks enough to reconstruct the shape:
+
+●      Type 2 is the profitable family. Mid-window trading, GTC bids, stops, order-book modeling.
+●      Self-recorded tick data is non-negotiable. Order-book depth, fill rates, slippage. Public strike/close
+       prices are insufficient for Type-2 backtesting.
+●      Win-rate vs entry-price math. Same rule applies to market making: a maker who quotes a bid at 38c
+       on a market that resolves 50/50 needs &gt;38% win-rate to break even. Lower bids = lower required WR
+       but slower fills.
+●      Adverse selection is the dominant risk. Quoting 10c below ask at 40c gets filled disproportionately
+       on the losing side. Filter for it; do not just collect spread.
+●      Stop-loss thinking on short windows. Sometimes no-stop beats stop. For a market maker, the
+       analogue is &#x27;when do you flatten a one-sided fill before resolution?&#x27;
+●      Execution quality first. The 6-layer WebSocket system applies to any Type-2 strategy.
+3. Specification — what this bot actually does
+
+3.1 Strategy archetype
+Single-window market maker on BTC and ETH 5-min Up/Down markets. For each active market, quote one bid
+on YES and one bid on NO at a configurable distance from the mid. When one side fills, the bot is holding
+inventory; it then either places an offsetting offer on the same token at a tighter spread (capturing the
+round-trip), or it lets the market resolve if the position is small and time is short.
+
+3.2 Ladder extension (phase 2)
+Once the single-quote version is profitable, extend to a ladder: 3-5 resting bids on each side at progressively
+wider spreads. As the price walks, deeper bids fill, and the bot rolls offers to capture each step.
+
+3.3 What it does NOT do
+
+●       No directional prediction. No Binance momentum signals. No Chainlink late-window settle.
+●       No taking liquidity at ask+5c (that is the existing bot&#x27;s job).
+●       No carry across resolution boundaries. Every quote is for a specific 5-min market window only.
+●       No participation in markets above 85c or below 15c (Punisher&#x27;s stated rule, ported here).
+
+
+4. Architecture (separate Docker service)
+Component                 Role                                            Notes
+
+tick_recorder             Continuously records BTC/ETH 5/15-min           Shared with Plan 1 Phase A. Built once, used
+                          book WebSocket to disk.                         twice.
+
+book_state                In-memory L2 book per token, fed by the         Includes mid, micro-price, imbalance, recent
+                          same WS.                                        volatility.
+
+quote_engine              Decides bid/ask price and size on each          Pure function of book_state + inventory + risk
+                          token every N ms.                               caps.
+
+order_manager             Posts, cancels, repegs GTC orders. Tracks       Reuses the read-before-cancel pattern from
+                          live order_id by token.                         existing bot.
+
+inventory_manager         Tracks open shares per token. Bounds the        Hard cap per market, hard cap per asset.
+                          bot&#x27;s exposure.
+
+fill_recorder             Logs every fill with timestamped book           Schema: fill_id, token, side, size, price,
+                          snapshot for backtest replay.                   mid_at_fill, ask, bid.
+
+backtester                Offline replay over tick_recorder output.       Drives strategy tuning; runs as a separate offline
+                                                                          tool.
+
+risk_manager              Daily loss cap, position cap, drawdown          Mirrors existing bot&#x27;s risk_manager shape.
+                          kill-switch.
+
+monitor / digest          Telegram digest, dashboard.                     Separate Telegram chat (do not pollute the
+                                                                          directional bot&#x27;s chat).
+
+
+Deployment shape
+
+●       Same Vilnius VPS, separate Docker compose service in a separate folder (/opt/polymarket-mm-bot/).
+●    Separate wallet. Different funder key, different proxy address. Eliminates the &#x27;two bots on one wallet =
+     double trades&#x27; footgun called out in our CLAUDE.md.
+●    Separate Telegram bot token and chat for clarity.
+●    Shared infrastructure: the same tick_recorder process (one running instance, two consumers).
+
+
+5. Required precursors (must finish before live deploy)
+●    30+ days of self-recorded tick data. Plan 1 Phase A delivers this. Until it exists, backtests are
+     guesswork and the bot is not deployable. This is the longest pole.
+●    WebSocket 6-layer system, cheap layers at minimum. Plan 1 Phase B delivers this. Market makers
+     need cleaner tick streams than directional bots.
+●    A funded separate Polymarket wallet. Small starter ($50-100). User-side action.
+●    A replay-driven simulator. Strategy is not tunable without it. Built alongside Phase A&#x27;s recorder.
+6. Phased plan of attack
+
+Phase A — Tick recorder + replay simulator (shared with Plan 1)
+Why: Without recorded book ticks, every strategy decision is a guess. The simulator turns those ticks into a
+replayable environment so we can A/B parameters without spending real USDC.
+
+What it actually is:
+
+●        Recorder: subscribes to Polymarket CLOB book WS for all active BTC/ETH 5/15-min markets. Persists
+         every book update (bid, ask, sizes, mid, timestamp) to compressed daily files.
+●        Simulator: takes a folder of recordings + a strategy function and walks the bot through the data tick by
+         tick. Tracks would-be fills against historical bid/ask. Reports PnL, fill rate, inventory time-series,
+         adverse-selection metric.
+●        Both shared with Plan 1; no duplicate work.
+Effort                        Real-$ cost                   Success metric
+
+Recorder 2-3 days;            $0 — read-only.               30 days of tick recordings on disk. Simulator can replay any
+simulator 2-3 days. Total                                   single day in &lt;5 minutes.
+~1 engineer-week.
+    Risks / what could kill it: Schema lock-in mistakes. Spend one day on the file format before writing the recorder.
+
+
+
+Phase B — Quote engine + offline backtest
+Why: Decide the math before risking USDC. Punisher&#x27;s playbook says 99 of 100 ideas die at this stage.
+
+What it actually is:
+
+●        Implement quote_engine as a pure function: (book_state, inventory, risk_caps) -&gt; (bid_price, bid_size,
+         ask_price, ask_size, lifetime_seconds).
+●        Start with a textbook Avellaneda-Stoikov-shaped model adapted for binary outcome markets:
+         reservation price = mid - inventory_skew, half-spread tuned to volatility and time-to-resolution.
+●        Run it against 30 days of recorded ticks. Tabulate PnL by (asset, duration, time-of-day, half-spread,
+         max-inventory). Punisher&#x27;s &#x27;2-hour multivariate sweep with 3-fold CV&#x27; approach is the right shape.
+●        Hold-out validation: tune on 21 days, validate on 9.
+Effort                        Real-$ cost                   Success metric
+
+3-5 engineer-days for         $0.                           A parameter set where backtest PnL is consistently positive on
+engine + sweep harness.                                     the validation hold-out and adverse-selection rate is below ~55%.
+    Risks / what could kill it: Survivor bias: cherry-picked parameters look great on backtest, dead on arrival in live.
+    Demand ≥15% degradation tolerance before considering deploy.
+
+
+
+Phase C — Zero-balance live dry-run
+Why: Direct port of Punisher&#x27;s own advice: real wallet, zero balance, watch what would have happened.
+Catches NSF errors, signing bugs, and CLOB API edge-cases before any money is at risk.
+
+What it actually is:
+
+●        Run the full bot against the live CLOB on a separate (empty) wallet.
+●        Every quote is generated normally; every order is signed normally; the CLOB rejects with NSF.
+●        Log NSF rejects as &#x27;would-have-placed&#x27; events. Cross-reference with the simulator&#x27;s predictions.
+●        Run for 5-7 days. The bot must match the simulator&#x27;s expected-fill rate within Punisher&#x27;s stated ~3%
+         tolerance.
+Effort                         Real-$ cost                   Success metric
+
+1-2 engineer-days for the      $0 (zero-balance wallet       Live dry-run fill-rate matches simulator within 3% over &gt;500
+dry-run harness +              rejects everything).          would-have-placed orders.
+observation period of 1
+week.
+    Risks / what could kill it: API behavior may differ from the simulator (book imbalance updates we did not record
+    correctly, etc.). Discrepancies become data — re-record and re-backtest before live.
+
+
+
+Phase D — First live deploy — single market, $10 cap
+Why: Smallest possible exposure. One BTC 5-min market at a time. Inventory cap = 1 unit. Daily loss cap = $5.
+
+What it actually is:
+
+●        Wire up the funded separate wallet ($50-100 deposited).
+●        Bot quotes one market at a time, max one fill per side, lets the market resolve.
+●        Telegram digest reports every fill and every resolution.
+●        User can /pause and /resume from Telegram.
+●        Run for 5-7 days at this scale.
+Effort                         Real-$ cost                   Success metric
+
+0.5 day to wire the            $5/day daily loss cap,        Live PnL per fill matches simulator&#x27;s prediction within Punisher&#x27;s
+wallet/config switches. 1      $50 max wallet exposure.      3% tolerance. No surprise NSF, no surprise resolution.
+week of monitoring.
+    Risks / what could kill it: Adverse-selection often shows up only at this stage. If the realized fill-side win-rate is below
+    entry-price, return to Phase B and re-tune.
+
+
+
+Phase E — Scale to ladder + multi-market
+Why: Once the single-quote pattern is profitable, extend.
+
+What it actually is:
+
+●        Expand quote_engine to N-deep ladder on each side.
+●        Expand market coverage from 1 market to all active BTC/ETH 5-min, then 15-min.
+●        Inventory cap scales linearly with markets-quoted; daily loss cap scales with cap.
+●        Continue tick recording so the dataset keeps growing under live conditions.
+Effort                         Real-$ cost                   Success metric
+
+2-3 engineer-days to           Configurable.                 Sharpe-like metric (daily PnL / daily PnL std) trends up as
+expand the engine; 1-2         Recommend $200                coverage expands. Drawdown does not exceed the cap.
+weeks live ramp.               wallet, $20/day loss cap
+                               to start, double after
+                               each profitable week.
+    Risks / what could kill it: Multi-market means multi-quote, which means more cancels and more API rate-limit pressure.
+    Watch for 429s and back off accordingly.
+Phase F — Hardening and graduation
+Why: Bring the bot up to operational parity with the existing directional bot.
+
+What it actually is:
+
+●        Telegram commander (/status, /positions, /pause, /resume).
+●        12-hour digest (matching the existing bot&#x27;s pattern).
+●        Dashboard.
+●        WebSocket layers 2 and 6 (parallel replicas + jitter EMA) if Phase E shows the single-WS is the
+         bottleneck.
+●        Document everything in a /opt/polymarket-mm-bot/CLAUDE.md and SESSION_HANDOFF.md.
+Effort                       Real-$ cost                    Success metric
+
+1 engineer-week, can be      $0.                            Bot is operable from Telegram alone. Replicas/jitter only if
+parallel with Phase E.                                      measured as needed.
+    Risks / what could kill it: Skipping documentation here is the most common way these projects die. Treat it as a hard
+    gate.
+
+
+
+
+7. Coexistence with the existing bot
+Both bots run on the same Vilnius VPS but in different Docker compose stacks and on different wallets.
+
+Concern                      Existing directional bot                        New market-maker bot
+
+Wallet                       Current wallet (~$420)                          Separate wallet, $50 starter
+
+Order type                   GTC + ask+5c ceiling (taker-like)               GTC at bid below mid, ask above mid (maker)
+
+Universe                     BTC/ETH 5-min and 15-min                        Same. They will quote the same tokens.
+
+Race condition               None per-market — separate wallets,             Same.
+                             separate order_ids
+
+Shared resources             Vilnius VPS, tick_recorder service              Same.
+
+Telegram chat                Existing                                        Separate (new bot token)
+
+Kill-switch                  Telegram /pause                                 Telegram /pause (own chat)
+
+Failure mode if both run     API rate limits could be hit                    Throttle in both order_managers.
+high
+
+
+
+8. Top risks specific to this plan
+●        Adverse selection. Punisher&#x27;s most-emphasized warning. Market makers who do not filter for it lose
+         money slowly to better-informed flow. The simulator&#x27;s first job is to surface this.
+●        Fishy 1-cent resolutions. Punisher describes these as real and recurring on Polymarket. Market
+         makers carry inventory into resolution; a wrong resolution is a 100% loss on that inventory. Mitigate with
+         the same cross-check (Binance, Coinbase, on-chain) and a rule to flatten before resolution if the market
+         is close to 50/50.
+●        API rate limits. Quoting many markets means many cancels. Existing bot already lives near
+         Polymarket&#x27;s limits; running both will require throttling and likely a coordinated scheduler.
+●        Time-of-day asymmetry. Punisher mentions US vs Asian hours; market-making PnL is even more
+         sensitive than directional PnL. Allow per-hour enable/disable from day one.
+●        The &#x27;Punisher edge is gone by the time you copy it&#x27; risk. If 175k people have read the same
+         playbook, the easy edges are already crowded. Assume the playbook is a starting point, not a recipe.
+
+
+9. Decision gates (kill-switches between phases)
+●        Gate A → B: 30+ days of clean ticks on disk; simulator replays without errors. If not, fix the data layer;
+         do not write a strategy yet.
+●        Gate B → C: Backtest PnL positive on the 9-day validation hold-out, adverse-selection &lt; 55%. If not,
+         the parameters are wrong; iterate.
+●        Gate C → D: Dry-run fill rate matches simulator within 3%. If not, the simulator has a bug; fix it before
+         any real money.
+●        Gate D → E: 5-7 days of single-market live trading shows positive PnL net of fees and the live fill
+         behavior matches the simulator. If not, debug; do not scale a losing strategy.
+●        Hard kill: any week where drawdown exceeds 20% of starting wallet, regardless of phase, the bot stops
+         and we go back to the simulator.
+
+    Companion document: Punisher_Plan1_ApplyToExistingBot.pdf — applies the same article&#x27;s strategies to the current
+    Polymarket-Arbitrage-Bot rather than building a new one.
+</pre></div>

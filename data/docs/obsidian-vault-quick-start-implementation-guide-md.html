@@ -1,0 +1,361 @@
+<h1>Quick Start Implementation Guide</h1>
+<h2>Building Your AI-Powered Obsidian Vault</h2>
+<p><strong>Total Setup Time:</strong> 2-3 hours <strong>Monthly Maintenance:</strong> 20 minutes (5 min on Monday + 15 min weekly synthesis)</p>
+<hr>
+<h2>Phase 1: Obsidian Setup (30 minutes)</h2>
+<h3>Step 1.1: Install Obsidian</h3>
+<pre class='code'><code># macOS
+brew install obsidian
+
+# Or download from: https://obsidian.md/download</code></pre>
+<h3>Step 1.2: Create Vault Folder</h3>
+<pre class='code'><code>mkdir -p ~/obsidian-vault
+cd ~/obsidian-vault
+
+# Create the 5 core folders
+mkdir -p inbox notes ideas projects
+
+# Create CLAUDE.md in root
+touch CLAUDE.md</code></pre>
+<h3>Step 1.3: Initialize Obsidian</h3>
+<ol>
+<li>Open Obsidian app</li>
+<li>Click &quot;Open folder as vault&quot;</li>
+<li>Select your <code>~/obsidian-vault</code> folder</li>
+<li>Confirm to create <code>.obsidian</code> config folder</li>
+</ol>
+<h3>Step 1.4: Write Your CLAUDE.md</h3>
+<p>Open <code>CLAUDE.md</code> in Obsidian and paste this template:</p>
+<pre class='code'><code># CLAUDE.md - Your Knowledge System
+
+## Who I Am
+- **Name:** Eddie Barna
+- **Work:** Building AI automation bots for arbitrage &amp; publishing
+- **Focus:** Systems that compound over time without manual intervention
+- **Goals 2026:** 
+  - Master systematic content capture and knowledge synthesis
+  - Build 2 production bots (polymarket + KDP)
+  - Establish daily compound thinking practice
+
+## Current Projects
+- **Active:** Obsidian knowledge vault with Claude integration
+- **Stuck on:** Automating content routing without N8N complexity
+- **Next milestone:** Daily briefs running automatically by May 15
+
+## How This Vault Works
+- **Inbox:** `/inbox` — unprocessed captures, sort later
+- **Notes:** `/notes` — articles, highlights, research
+- **Ideas:** `/ideas` — my observations and thinking
+- **Projects:** `/projects` — active work (polymarket, kdp-publishing, etc)
+
+## What I Want From You (Claude)
+1. Find connections across my projects I missed
+2. Challenge assumptions when I contradict earlier notes
+3. When I ask for priorities - answer based on vault, not generic advice
+4. Flag contradictions between what I believe and what I&#x27;ve saved
+5. Help identify patterns in what I&#x27;m consuming
+
+## What I&#x27;m Reading and Thinking About
+- Knowledge systems that scale without manual friction
+- How Claude can act as a thinking partner across projects
+- Patterns in crypto/prediction markets
+- Bot automation frameworks</code></pre>
+<hr>
+<h2>Phase 2: Capture Layer Setup (30 minutes)</h2>
+<h3>Step 2.1: Readwise Integration</h3>
+<p><strong>URL:</strong> https://readwise.io</p>
+<pre class='code'><code># 1. Sign up for Readwise (free account)
+# 2. Install browser extension: 
+#    Chrome: https://readwise.io/readwise-for-chrome
+#    Safari: https://readwise.io/readwise-for-safari
+
+# 3. Open Readwise Settings
+#    → &quot;Integrations&quot; 
+#    → Find &quot;Obsidian&quot; 
+#    → Click &quot;Connect&quot;
+
+# 4. Authorize connection
+# 5. Choose sync folder: select &quot;notes&quot; folder
+
+# 6. Test it:
+#    - Read any article online
+#    - Highlight a section
+#    - Wait 30 seconds
+#    - Check your Obsidian /notes folder</code></pre>
+<p><strong>Expected result:</strong> New file appears: <code>Readwise/Highlights_2026-05-08.md</code></p>
+<h3>Step 2.2: Whisper Voice Transcription</h3>
+<pre class='code'><code># Install OpenAI&#x27;s Whisper (free, open source)
+pip install openai-whisper
+
+# Record audio (voice memo, meeting, etc)
+# Then transcribe:
+whisper your_audio.m4a --output_format txt --output_dir ~/obsidian-vault/inbox
+
+# Output: your_audio.txt (paste into Obsidian)</code></pre>
+<h3>Step 2.3: Quick Telegram Capture Bot</h3>
+<p><strong>This requires N8N setup first. See Phase 3.</strong></p>
+<hr>
+<h2>Phase 3: N8N Automation Setup (60 minutes)</h2>
+<h3>Step 3.1: Create Free N8N Account</h3>
+<pre class='code'><code># Option 1: Cloud (simplest)
+# Visit: https://n8n.cloud
+# Sign up with email
+# Create free account
+
+# Option 2: Self-hosted (advanced)
+# For now, use cloud version - we&#x27;ll migrate later if needed</code></pre>
+<h3>Step 3.2: Build the Daily Brief Automation</h3>
+<p><strong>In N8N, create new workflow:</strong></p>
+<ol>
+<li><strong>Add trigger node:</strong></li>
+</ol>
+<ul>
+<li>Type: &quot;Schedule&quot;</li>
+<li>Mode: &quot;Every weekday at 6:00 AM&quot;</li>
+</ul>
+<ol>
+<li><strong>Add Claude node:</strong></li>
+</ol>
+<ul>
+<li>Provider: Anthropic</li>
+<li>Model: Claude 3.5 Sonnet</li>
+<li>Temperature: 0.7</li>
+<li>Paste this prompt:</li>
+</ul>
+<pre class='code'><code>You are reading my Obsidian knowledge vault as my thinking partner.
+
+Read everything in /inbox from the last 24 hours.
+Read everything in /notes from the last 7 days.
+
+Generate a DAILY BRIEF with three sections:
+
+## 🔗 CONNECTIONS
+Find 3 most interesting links between recent captures and past notes
+I probably haven&#x27;t noticed. Quote both passages. Be specific.
+
+## 🎯 PATTERN  
+One pattern across this week&#x27;s reading. What is my brain working on?
+Be specific. Reference actual notes if possible.
+
+## 💭 QUESTION
+One question worth sitting with today, based on the pattern above.
+Not a task. A genuine question that challenges my thinking.
+
+Format as clean markdown for Obsidian.</code></pre>
+<ol>
+<li><strong>Add Obsidian writer node:</strong></li>
+</ol>
+<ul>
+<li>Type: &quot;Write Files&quot;</li>
+<li>Path: <code>/inbox/brief-{{now.format(&#x27;YYYY-MM-DD&#x27;)}}.md</code></li>
+<li>Content: <code>{{ $node.Claude.json.content }}</code></li>
+</ul>
+<ol>
+<li><strong>Save and test</strong></li>
+</ol>
+<h3>Step 3.3: Telegram Bot Setup (Optional but Powerful)</h3>
+<p><strong>Why:</strong> Capture ideas from anywhere (phone, car, conversation) in 2 seconds</p>
+<p><strong>In N8N:</strong></p>
+<ol>
+<li><strong>Create Telegram bot:</strong></li>
+</ol>
+<pre class='code'><code>   Open: https://t.me/BotFather
+   Send: /newbot
+   Follow prompts
+   Copy: YOUR_BOT_TOKEN</code></pre>
+<ol>
+<li><strong>In N8N create new workflow:</strong></li>
+</ol>
+<p><strong>Node 1: Telegram Trigger</strong></p>
+<ul>
+<li>Authentication: Add your bot token</li>
+<li>Event: &quot;Message&quot;</li>
+</ul>
+<p><strong>Node 2: Code block (format markdown)</strong></p>
+<pre class='code'><code>   const message = $input.all()[0].body.message.text;
+   const timestamp = new Date().toISOString().split(&#x27;T&#x27;)[0];
+
+   return {
+     filename: `inbox/${timestamp}-telegram-capture.md`,
+     content: `# Quick Capture
+Date: ${timestamp}
+Source: Telegram
+
+${message}
+
+---
+Needs processing and filing.`
+   };</code></pre>
+<p><strong>Node 3: Obsidian File Writer</strong></p>
+<ul>
+<li>Path: <code>{{ $node.Code.json.filename }}</code></li>
+<li>Content: <code>{{ $node.Code.json.content }}</code></li>
+</ul>
+<ol>
+<li><strong>In Telegram:</strong> Find your bot, send <code>/start</code></li>
+</ol>
+<ul>
+<li>Whenever you message it, captures to vault automatically</li>
+<li>Use for: ideas, tweets to think about, random questions</li>
+</ul>
+<hr>
+<h2>Phase 4: Weekly Synthesis Setup (15 minutes)</h2>
+<h3>Step 4.1: Calendar Reminder</h3>
+<pre class='code'><code># Create weekly reminder every Monday at 9 AM
+# In macOS Calendar / Google Calendar / Outlook:
+# Title: &quot;Weekly Vault Synthesis&quot;
+# Recurring: Every Monday at 9:00 AM
+# Duration: 15 minutes
+# Reminder: Don&#x27;t miss this - it&#x27;s where compounding happens</code></pre>
+<h3>Step 4.2: Your Weekly Synthesis Session</h3>
+<p><strong>Every Monday at 9 AM, sit with Claude and ask:</strong></p>
+<pre class='code'><code>You&#x27;ve been reading my Obsidian vault all week.
+Focus on everything I added in the last 7 days.
+
+Give me four things in markdown format:
+
+## 🌱 EMERGING THESIS
+What idea am I building toward without stating it explicitly?
+What belief is forming that I haven&#x27;t yet articulated?
+
+## ⚡ CONTRADICTIONS  
+What have I saved recently that contradicts what I believed before?
+Show me both sides from my actual notes.
+
+## ❓ KNOWLEDGE GAPS
+Based on what I&#x27;m reading, what am I clearly NOT reading that I should?
+What perspective is missing from my vault?
+
+## 💪 ONE ACTION
+What&#x27;s the single highest-leverage thing I could do this week?
+Not ten things. One. Based on vault patterns.
+
+Be direct. Challenge me. Don&#x27;t summarize what I already know.</code></pre>
+<p><strong>Save output to:</strong> <code>/inbox/synthesis-{{date}}.md</code></p>
+<hr>
+<h2>Phase 5: Add Your First Captures (30 minutes)</h2>
+<h3>Step 5.1: Add 5 Starting Notes</h3>
+<p>In Obsidian, create 5 new files in <code>/notes</code>:</p>
+<p><strong>Note 1: Current Problem</strong></p>
+<pre class='code'><code># Current Challenge: Knowledge Capture Friction
+
+I keep losing good ideas because my capture process is too complex.
+Need something that takes &lt;10 seconds or I don&#x27;t use it.
+
+Related projects:
+- Polymarket arbitrage research
+- KDP publishing research</code></pre>
+<p><strong>Note 2: Interesting Pattern</strong></p>
+<pre class='code'><code># Pattern: Compound Systems
+
+Everything that works compounds:
+- Polymarket: Small bets → portfolio → statistical edge
+- Publishing: One book → audience → leverage for next book  
+- Knowledge: One note → connections → thesis → action
+
+The theme: automation + feedback loops.</code></pre>
+<p><strong>Note 3: Question Worth Sitting With</strong></p>
+<pre class='code'><code># Question: What does my ideal day look like?
+
+Not &quot;busy&quot; — what actual work would I do if everything was automated?
+
+Clues:
+- Think deeply about patterns
+- Build things (bots, systems, content)
+- Speak/write clearly about findings</code></pre>
+<p><strong>Note 4: Project Reference</strong></p>
+<pre class='code'><code># Polymarket Arbitrage Bot
+
+Current state: Tracking price differences across exchanges
+Next: Automated execution when spread &gt; 2%
+
+Key metrics:
+- Capture speed: Must be &lt;100ms
+- Accuracy: 99.5%
+- Daily volume: Target $10K
+
+Stuck on: Reliable order execution during volatility</code></pre>
+<p><strong>Note 5: Technical Discovery</strong></p>
+<pre class='code'><code># How Claude Reads Obsidian
+
+Claude can:
+- Read entire vault structure
+- Find connections across 100+ notes
+- Generate synthesis based on patterns
+- Write back to vault
+
+Cannot:
+- Access without explicit file sharing
+- Learn from vault across sessions (needs CLAUDE.md)
+- Update notes in real-time (batch processing only)</code></pre>
+<hr>
+<h2>Phase 6: Running Your System (Week 1)</h2>
+<h3>Monday 9:00 AM</h3>
+<ul>
+<li>[ ] Open Obsidian</li>
+<li>[ ] Read this week&#x27;s captures (if any)</li>
+<li>[ ] Update CLAUDE.md with current focus/goals (5 min)</li>
+<li>[ ] Run weekly synthesis with Claude (15 min)</li>
+</ul>
+<h3>Every Weekday 6:00 AM (Automatic)</h3>
+<ul>
+<li>[ ] N8N runs daily brief automatically</li>
+<li>[ ] Brief appears in <code>/inbox/brief-{{date}}.md</code></li>
+<li>[ ] Read with coffee before opening other apps</li>
+</ul>
+<h3>Anytime (Capture)</h3>
+<ul>
+<li>[ ] Read article → highlight in Readwise (automatic to vault)</li>
+<li>[ ] Idea strikes → message Telegram bot (automatic to vault)</li>
+<li>[ ] Podcast moment → clip in Airr (manual add to vault, or automate)</li>
+<li>[ ] Voice note → Whisper transcription → paste into vault</li>
+</ul>
+<hr>
+<h2>Phase 7: Verification Checklist</h2>
+<p>By end of Week 1, verify you have:</p>
+<ul>
+<li>[ ] Obsidian vault with 5 folders created</li>
+<li>[ ] CLAUDE.md written and in root folder</li>
+<li>[ ] Readwise installed and syncing to <code>/notes</code></li>
+<li>[ ] N8N account created</li>
+<li>[ ] Daily brief scheduled (6 AM weekdays)</li>
+<li>[ ] Telegram bot optional but ideally configured</li>
+<li>[ ] 5+ starting notes in vault</li>
+<li>[ ] Monday weekly synthesis on calendar</li>
+<li>[ ] First daily brief received and read</li>
+<li>[ ] First week&#x27;s captures (10-20 items minimum)</li>
+</ul>
+<hr>
+<h2>Troubleshooting</h2>
+<h3>Readwise not syncing?</h3>
+<pre class='code'><code>Settings → Integrations → Obsidian
+→ Check &quot;Enable sync&quot;
+→ Verify folder path: /notes
+→ Click &quot;Sync now&quot;</code></pre>
+<h3>N8N daily brief not running?</h3>
+<pre class='code'><code>Check:
+1. Workflow is &quot;Active&quot; (toggle in top right)
+2. Trigger time is set to &quot;Every day at 06:00&quot;
+3. Claude API key is valid (test connection)
+4. File path exists: ~/obsidian-vault/inbox/</code></pre>
+<h3>CLAUDE.md not being read by Claude?</h3>
+<pre class='code'><code>When asking Claude to read your vault:
+1. Explicitly mention &quot;Read my CLAUDE.md first&quot;
+2. Share the vault folder path
+3. Or paste CLAUDE.md content in the prompt
+4. Once you use folder sharing in N8N, it reads automatically</code></pre>
+<hr>
+<h2>Month 1 Goals</h2>
+<p>By end of May:</p>
+<ul>
+<li><strong>Captures:</strong> 50-100 items (articles, notes, ideas)</li>
+<li><strong>Connections:</strong> Claude surfaces non-obvious links weekly</li>
+<li><strong>Habit:</strong> Read daily brief before opening email/Slack</li>
+<li><strong>Updates:</strong> CLAUDE.md updated every Monday</li>
+<li><strong>Syntheses:</strong> 4 weekly synthesis sessions completed</li>
+</ul>
+<hr>
+<h2>Important: Start Simple, Expand Later</h2>
+<p><strong>Week 1:</strong> Just Obsidian + Readwise + daily brief <strong>Week 2:</strong> Add Telegram bot <strong>Week 3:</strong> Add weekly synthesis <strong>Week 4+:</strong> Optimize and expand as needed</p>
+<p>Don&#x27;t try to build the perfect system. Build the minimum system and let it compound.</p>
+<p><strong>Start today. Start with 5 notes. The vault does the rest.</strong></p>

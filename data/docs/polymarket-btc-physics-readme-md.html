@@ -1,0 +1,50 @@
+<h1>Bitcoin Market Physics — Polymarket data &amp; analysis (v1)</h1>
+<p>A small tool that treats Bitcoin as a <strong>physics problem</strong> instead of a charting problem, following the approach in <a href="https://x.com/Gustafssonkotte/status/2061335947619295758" target="_blank" rel="noopener">@Gustafssonkotte&#x27;s article</a> <em>&quot;How I Learned to Read Bitcoin Through Thirty Thousand Data Points.&quot;</em></p>
+<p><strong>This version only watches and measures. It does not trade, and it cannot move money</strong> — every data source is public and read-only. The point is to first prove, on today&#x27;s market, the same &quot;physics&quot; the author measured, before any strategy or real funds are involved (his own warning: <em>small samples deceive, simulations overstate</em>).</p>
+<h2>What it measures</h2>
+<p>Every ~2 seconds it records one snapshot:</p>
+<table><thead><tr><th>Thing</th><th>Plain meaning</th></tr></thead><tbody><tr><td><strong>speed</strong> ($/min)</td><td>How fast Bitcoin is moving right now — dollars per minute.</td></tr><tr><td><strong>band</strong></td><td>The &quot;weather&quot;: quiet / normal / active / storm / hurricane.</td></tr><tr><td><strong>distance</strong> ($)</td><td>How far Bitcoin is above/below the price the market window opened at (the <em>strike</em>).</td></tr><tr><td><strong>time to close</strong></td><td>Seconds left in the current Polymarket window.</td></tr><tr><td><strong>Up / Down price</strong></td><td>What Polymarket is charging for the &quot;Up&quot; and &quot;Down&quot; outcomes.</td></tr></tbody></table>
+<p>It follows Polymarket&#x27;s <strong>Bitcoin Up or Down</strong> market (15-minute window by default; 5-minute is a config switch). Bitcoin price comes from Coinbase spot.</p>
+<blockquote>Accuracy note: Polymarket settles these markets on the <em>Chainlink</em> BTC/USD feed; we read <em>Coinbase</em> spot. They track closely but not to the cent, so &quot;distance from strike&quot; is a faithful proxy, not the exact settlement figure.</blockquote>
+<h2>Setup</h2>
+<pre class='code'><code>pip install -r requirements.txt</code></pre>
+<h2>Use</h2>
+<p><strong>1. Collect data</strong> (leave it running — minutes for a taste, days to match the article):</p>
+<pre class='code'><code>python collector.py</code></pre>
+<p>Stop any time with Ctrl-C. Data accumulates in <code>data/snapshots.db</code>.</p>
+<p><strong>2. See the results</strong> — reproduces the article&#x27;s tables and saves two charts:</p>
+<pre class='code'><code>python analyze.py</code></pre>
+<p>Prints speed median/mean, the weather-band breakdown (% of time), average speed by UTC hour (look for the volatility jump around the 14:00 UTC US open), and distance-from-strike stats. Charts land in <code>data/</code>.</p>
+<h2>Tuning</h2>
+<p>All knobs live in <a href="config.py" target="_blank" rel="noopener"><code>config.py</code></a>: snapshot cadence, the speed-measuring window, 5- vs 15-minute market, and the speed-band edges.</p>
+<h2>Running on a VPS with Docker</h2>
+<p>The collector is built to run continuously on a server. Files: <code>Dockerfile</code>, <code>docker-compose.yml</code>. Collected data is stored on the host (<code>./data</code>), so it survives rebuilds and restarts. The container auto-restarts (<code>unless-stopped</code>).</p>
+<p>First-time deploy (Docker + Compose already installed):</p>
+<pre class='code'><code>git clone &lt;repo&gt;           # private repo: uses a read-only deploy key
+cd polymarket-btc-physics
+docker compose up -d --build</code></pre>
+<p>Day-to-day (run these against the server, e.g. <code>ssh poly-vilnius &#x27;...&#x27;</code>):</p>
+<pre class='code'><code>docker compose logs -f                      # watch live snapshots
+docker compose exec collector python analyze.py   # print tables + write charts to data/
+docker compose down                         # stop the collector
+git pull &amp;&amp; docker compose up -d --build    # update after a code change</code></pre>
+<p>Charts land in the server&#x27;s <code>data/</code>; copy them to your laptop with <code>scp &lt;host&gt;:~/polymarket-btc-physics/data/*.png .</code></p>
+<h2>What&#x27;s intentionally <em>not</em> here yet</h2>
+<ul>
+<li>A <strong>paper-trading engine</strong> (simulated fills on the recorded token prices).</li>
+<li>The <strong>decision logic</strong>: the physics-vs-token-price gap and the <code>WEAK_COMBO</code></li>
+</ul>
+<p>filter (skip a trade when <em>both</em> signals are weak). The article deliberately withholds its thresholds — those get tuned on <em>our</em> data later.</p>
+<ul>
+<li>Any <strong>live trading</strong>. That stays off until paper results justify it.</li>
+</ul>
+<h2>Companion reading</h2>
+<p>@Gustafssonkotte&#x27;s pinned post, <em>&quot;47 Versions of the Same Bot,&quot;</em> is the honest build history of this same Polymarket bot — useful context for where this is heading.</p>
+<h2>Layout</h2>
+<pre class='code'><code>collector.py   the 2-second snapshot loop
+analyze.py     reproduce the article&#x27;s tables + charts
+feeds.py       Coinbase price + Polymarket market lookup (read-only)
+metrics.py     pure math: speed, distance, time-to-close, band
+storage.py     SQLite read/write
+config.py      all the knobs
+tests/         unit tests for the math</code></pre>

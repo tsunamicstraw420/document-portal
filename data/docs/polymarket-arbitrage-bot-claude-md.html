@@ -1,0 +1,156 @@
+<h1>Polymarket Arbitrage Bot — Project Context</h1>
+<p>This file is project-specific context. Read it before doing anything on this codebase.</p>
+<h2>Operating principle: stop guessing, always double-check</h2>
+<p><strong>Before asserting any fact, check it.</strong> Before claiming a tool or capability isn&#x27;t available, list what&#x27;s actually loaded. Before claiming a server is production, check what&#x27;s running on it.</p>
+<p><strong>Why:</strong> This rule comes from two close-spaced failures on 2026-05-10:</p>
+<ol>
+<li>Deployed v1.7 to Jakarta because DEBUG_REPORT.md said Jakarta was production. The real production server (London at the time) had been running for 4 days; the assertion in the doc was stale. Should have run <code>docker compose ps</code> on both servers before touching anything.</li>
+<li>Told the user I &quot;couldn&#x27;t&quot; change a Hostinger VPS location via SSH and that they had to do it in hPanel — without checking that Chrome MCP tools were loaded and could in fact drive hPanel.</li>
+</ol>
+<p><strong>How to apply:</strong></p>
+<ul>
+<li>&quot;Where is X running?&quot; → <code>ssh &amp;&amp; docker ps</code>, not &quot;the docs say…&quot;</li>
+<li>&quot;Can I do X?&quot; → list available tools / try a no-op first, not &quot;I don&#x27;t have access to that&quot;</li>
+<li>&quot;What version of Y is in production?&quot; → <code>docker compose exec ... grep ...</code>, not &quot;the latest commit&quot;</li>
+<li>&quot;Is this safe?&quot; → cross-check the actual on-disk / on-server state, not the most recent thing said in chat</li>
+<li>Stale docs are a known failure mode in this codebase. Live state always wins over written claims, including this file.</li>
+</ul>
+<h2>Operating principle: the bot log is intent, not outcome</h2>
+<p><strong>Trading-bot ground-truth rule:</strong> Before any claim about whether trades did or didn&#x27;t happen, fills landed, PnL is real, or balance moved — cross-check the wallet or Polymarket&#x27;s REST API. The bot&#x27;s log records what the bot THINKS happened. It is not evidence of what actually executed on-chain.</p>
+<p><strong>Why:</strong> On 2026-05-13 I claimed &quot;47 GTC orders, all no-fills, zero trades&quot; based solely on the bot&#x27;s log. The wallet&#x27;s actual Polymarket activity history showed 4 successful BUYs filling for ~$23 USDC that day, two of which resolved profitably for ~$41 in payouts — net +$18.23. The bot mis-reported because there&#x27;s a race condition between its 5-second <code>cancel</code> + <code>get_order</code> query and Polymarket&#x27;s matching engine: orders that match late are recorded as <code>size_matched=0</code> at query time, then actually fill seconds later. The bot&#x27;s <code>_live_positions</code> and <code>trades.db</code> have been chronically out of sync with the wallet for weeks.</p>
+<p><strong>Sources of truth for THIS bot, in order of authority:</strong></p>
+<ol>
+<li>Wallet balance and on-chain Polygon transactions (immutable)</li>
+<li>Polymarket&#x27;s activity / positions / trades REST endpoints</li>
+<li>The user&#x27;s downloaded Polymarket CSV</li>
+<li>The bot&#x27;s <code>data/logs/bot.log</code> — <strong>only as a hint about intent</strong>, never as proof of outcome</li>
+</ol>
+<p><strong>Mandatory checks before stating outcomes:</strong></p>
+<ul>
+<li>&quot;The bot made X trades&quot; → fetch from Polymarket activity API</li>
+<li>&quot;Fills aren&#x27;t landing&quot; → cross-check wallet balance change and Polymarket positions</li>
+<li>&quot;PnL is N&quot; → derive from wallet, not from STATUS log lines</li>
+<li>&quot;Position closed&quot; → confirm via Polymarket&#x27;s <code>/positions</code> (current) or <code>/trades</code> (history)</li>
+</ul>
+<h2>Operating principle: name your source</h2>
+<p>When making a state claim, <strong>explicitly name the source you checked.</strong> &quot;The bot log shows X&quot; is fine. &quot;X is happening&quot; without naming a source is forbidden when X is empirically verifiable. The phrasing forces the discipline.</p>
+<h2>Operating principle: when an answer depends on two sources, check both before recommending</h2>
+<p>If the right answer requires data from sources A and B, do not produce a recommendation from A alone. The correct shape is: &quot;A says X; B says Y; therefore Z&quot; — OR — &quot;A says X but I haven&#x27;t checked B yet; let me verify before recommending.&quot;</p>
+<p>This rule exists because confident wrong recommendations have cost real money and real time on this codebase. The CLAUDE.md &quot;stop guessing&quot; rule alone was not enough. This is its operational form: a checklist that fires per recommendation.</p>
+<h2>Operating principle: empirical testing trumps documentation reading every time</h2>
+<p>When an API or upstream service&#x27;s behavior is in question, <strong>write a 50-line probe and run it.</strong> Don&#x27;t rely on docs, README summaries, or what a WebFetch told you the source code says. Production behavior is the only source of truth.</p>
+<p><strong>Why:</strong> This rule comes from the 2026-05-11 Chainlink RTDS investigation. I&#x27;d repeatedly claimed (and shipped) Chainlink subscribe code based on:</p>
+<ol>
+<li>A WebFetch summary of Polymarket&#x27;s README (correct topic name, wrong filter shape)</li>
+<li>Historical git commits&#x27; assertions (&quot;Chainlink ticks are sparse&quot; — wrong, my filter was rejecting them)</li>
+<li>My own pattern-matching from the SELL FAK code (right shape, wrong field semantics)</li>
+</ol>
+<p>Each of those felt like &quot;double-checking.&quot; None of them were. The real test took ~2 minutes: a standalone probe script that tried 4 subscribe variants for 30 seconds each and counted frames. It immediately revealed (a) the bot&#x27;s current config received 0 Chainlink frames, (b) empty-filter received 189 frames in 30s, and (c) the supposed-correct filter format silently delivered nothing.</p>
+<p><strong>How to apply:</strong></p>
+<ul>
+<li>&quot;Does this API do X?&quot; → write a probe and call it. Don&#x27;t ask another LLM to summarize the docs.</li>
+<li>&quot;Are messages flowing on this WebSocket?&quot; → connect and count frames. Don&#x27;t trust counts from logs that were generated by code you suspect is broken.</li>
+<li>&quot;Will this order type fill?&quot; → place ONE tiny order with a 30-second cooldown. The CSV of real fills is the only evidence that counts.</li>
+<li>A 50-line probe script that proves the actual behavior is worth more than a 1000-line analysis based on documentation.</li>
+<li>&quot;Documentation reading&quot; includes: WebFetch results, README summaries from search engines, GitHub issue summaries, and even your own prior conclusions. None of them are the live API.</li>
+</ul>
+<h2>What this bot does</h2>
+<p>Latency arbitrage between Binance BTC/ETH price moves and Polymarket &quot;Up or Down&quot; 5-min / 15-min binary markets. The edge is <strong>speed</strong> — detecting a Binance move before the Polymarket CLOB reprices. Every decision is in service of latency. Don&#x27;t add anything to the hot path (signal → decision → order) without a clear latency win.</p>
+<p>Two strategy paths, dispatched per-market by how far through the window we are:</p>
+<ul>
+<li><strong>Binance-momentum</strong> (0–70% through window): Predict direction from a recent Binance move. Uses logistic <code>true_prob</code> + Kelly sizing + 5% edge threshold.</li>
+<li><strong>Chainlink-settle</strong> (70–100% through window): Observe where Polymarket&#x27;s Chainlink Data Stream currently sits vs. the window-open price. Bet the side already winning — Polymarket settles on the Chainlink price at window close. 3% edge threshold (higher conviction = lower bar).</li>
+</ul>
+<h2>Infrastructure — single Vilnius VPS</h2>
+<p><strong>Single-server architecture as of 2026-05-10.</strong> The previous London+Tokyo+Jakarta setup was decommissioned: Polymarket geo-blocked the UK so London had to move, and CLOB v2 (April 2026) made the 75ms Tokyo-relay edge less important than the geographic permissibility.</p>
+<table><thead><tr><th>Server</th><th>Role</th><th>IP</th><th>SSH alias</th></tr></thead><tbody><tr><td><strong>Vilnius</strong> (Hostinger KVM 1)</td><td>Production bot — Docker Compose</td><td><code>76.13.78.74</code></td><td><code>ssh poly-vilnius</code></td></tr></tbody></table>
+<p>SSH key: <code>~/.ssh/hostinger_vps</code>. Update <code>~/.ssh/config</code> to point <code>poly-vilnius</code> at the new IP (the old <code>poly-london</code> alias is dead).</p>
+<p>The canonical command reference for daily ops is in <a href="VPS_QuickReference.pdf" target="_blank" rel="noopener">VPS_QuickReference.pdf</a>. Regenerator: <code>gen_vps_quickref_pdf.py</code>.</p>
+<h3>Critical invariants</h3>
+<ul>
+<li><strong>Only ONE bot may run at a time</strong> — all instances share the same Polymarket wallet, so running two = double trades. The whole point of decommissioning Jakarta was to remove this footgun. If a future server is ever added (Amsterdam standby, etc.), this rule applies.</li>
+<li><strong>VPS must be in a Polymarket-permitted region.</strong> UK, France, Germany, US, etc. are blocked. Lithuania is currently permitted; verify against https://docs.polymarket.com/developers/CLOB/geoblock before any future move.</li>
+</ul>
+<h3>Where things live on Vilnius</h3>
+<table><thead><tr><th>Path</th><th>Contents</th></tr></thead><tbody><tr><td><code>/opt/polymarket-bot/</code></td><td>Git clone (source, Dockerfile, docker-compose.yml)</td></tr><tr><td><code>/opt/polymarket-bot/.env</code></td><td>Secrets — NEVER in git, never log it</td></tr><tr><td><code>/opt/polymarket-bot/data/state.json</code></td><td>Balance (persisted)</td></tr><tr><td><code>/opt/polymarket-bot/data/positions.json</code></td><td>Open positions (persisted)</td></tr><tr><td><code>/opt/polymarket-bot/data/trades.db</code></td><td>SQLite trade history</td></tr><tr><td><code>/opt/polymarket-bot/data/logs/bot.log</code></td><td>Persistent log (survives restarts)</td></tr><tr><td><code>/root/.ssh/github_deploy</code></td><td>Deploy key for <code>git pull</code> from the private repo</td></tr></tbody></table>
+<p>Container names: <code>polymarket-arb-bot</code> (the bot), <code>polymarket-chart</code> (dashboard at http://76.13.78.74).</p>
+<h2>Deploy workflow — git only, NEVER scp</h2>
+<p><strong>The bot source is git-managed. NEVER scp source files directly to <code>/opt/polymarket-bot/</code></strong> — they&#x27;ll be overwritten on the next <code>git pull</code>. This mistake was made on 2026-05-10; don&#x27;t repeat it.</p>
+<pre class='code'><code># On Mac
+cd /Users/rubys/Desktop/AI_bots/Polymarket-Arbitrage-Bot
+git add &lt;files&gt;
+git commit -m &quot;describe change&quot;
+git push origin main
+
+# On Vilnius (one-liner)
+ssh poly-vilnius &quot;cd /opt/polymarket-bot &amp;&amp; git pull &amp;&amp; docker compose build polymarket-bot &amp;&amp; docker compose up -d polymarket-bot&quot;</code></pre>
+<h3>Hard rules</h3>
+<ul>
+<li><strong>NEVER <code>docker compose up --force-recreate</code></strong> — Docker network namespace teardown breaks Binance WS startup. Plain <code>docker compose up -d</code> picks up the new image correctly.</li>
+<li><strong>NEVER push to <code>main</code> without explicit user confirmation</strong> (the harness blocks it by default; ask first).</li>
+<li><strong><code>.env</code> is not in git</strong> — <code>scp</code> is the only way to update it on a server.</li>
+<li><strong><code>.git/</code> is rebuildable from origin</strong>; data dir (<code>.env</code>, state, positions, trades.db, logs) is not — back it up before any server-destructive operation. Local backups live in <code>vps_data/</code>, gitignored.</li>
+</ul>
+<h2>Monitoring — no SSH for normal observation</h2>
+<ul>
+<li><strong>Telegram heartbeat</strong> every 30 min. If you don&#x27;t see one for 60+ min, something&#x27;s wrong.</li>
+<li><strong>Dashboard:</strong> http://76.13.78.74 (always-on WebSocket).</li>
+<li><strong>SSH is for deploys and debugging only.</strong> Don&#x27;t sit on <code>tail -f</code> for monitoring.</li>
+</ul>
+<h2>Price feeds</h2>
+<p>The bot subscribes to two WebSockets:</p>
+<ol>
+<li><strong>Binance</strong> (<code>wss://stream.binance.com:443/stream</code>) — <code>btcusdt@miniTicker</code>, <code>ethusdt@miniTicker</code>. Drives the Binance-momentum strategy. Auto-reconnects with backoff.</li>
+<li><strong>Polymarket RTDS</strong> (<code>wss://ws-live-data.polymarket.com</code>) — same Chainlink Data Stream Polymarket uses to settle crypto markets. Drives the Chainlink-settle strategy. Sends app-level <code>PING</code> every 5s to maintain connection.</li>
+</ol>
+<p>RTDS subscribe message format (matches the official <code>Polymarket/real-time-data-client</code> TS library):</p>
+<pre class='code'><code>{
+  &quot;action&quot;: &quot;subscribe&quot;,
+  &quot;subscriptions&quot;: [
+    {&quot;topic&quot;: &quot;crypto_prices_chainlink&quot;, &quot;type&quot;: &quot;update&quot;, &quot;filters&quot;: &quot;{\&quot;symbol\&quot;:\&quot;BTCUSDT\&quot;}&quot;},
+    {&quot;topic&quot;: &quot;crypto_prices_chainlink&quot;, &quot;type&quot;: &quot;update&quot;, &quot;filters&quot;: &quot;{\&quot;symbol\&quot;:\&quot;ETHUSDT\&quot;}&quot;}
+  ]
+}</code></pre>
+<p>Chainlink live updates are observed to be sparse (likely on-chain heartbeat cadence). <code>CL:stale</code> in feed_status is normal; the Chainlink-settle strategy is a graceful no-op when no recent data. Investigation of <code>gamma_auth</code> for denser delivery is a future task.</p>
+<h2>Code layout</h2>
+<table><thead><tr><th>File</th><th>Purpose</th></tr></thead><tbody><tr><td><code>bot.py</code></td><td>Main orchestrator, main loop, Telegram callbacks</td></tr><tr><td><code>config.py</code></td><td>All strategy parameters, credentials loading</td></tr><tr><td><code>strategy.py</code></td><td><code>_evaluate()</code> dispatcher → <code>_evaluate_binance_momentum()</code> (early-window) or <code>_evaluate_chainlink_settle()</code> (late-window). Logistic <code>true_prob</code>, Kelly sizing.</td></tr><tr><td><code>market_scanner.py</code></td><td>Discovers active 5/15-min BTC/ETH markets + Polymarket CLOB WS feed (separate from RTDS)</td></tr><tr><td><code>price_feed.py</code></td><td>Binance WS + Chainlink RTDS WS, per-symbol PriceState ring buffers</td></tr><tr><td><code>order_manager.py</code></td><td>Paper + live order execution, position tracking, exits</td></tr><tr><td><code>risk_manager.py</code></td><td>Daily loss limit, drawdown kill-switch, Kelly guard</td></tr><tr><td><code>notifier.py</code></td><td>Telegram notifications</td></tr><tr><td><code>telegram_commander.py</code></td><td><code>/status</code> <code>/positions</code> <code>/pause</code> <code>/resume</code> <code>/stop</code> <code>/restart</code></td></tr><tr><td><code>chart_server.py</code></td><td>Dashboard WebSocket server</td></tr><tr><td><code>gen_vps_quickref_pdf.py</code></td><td>Regenerator for VPS_QuickReference.pdf</td></tr></tbody></table>
+<h2>Strategy parameters worth remembering</h2>
+<h3>Binance-momentum</h3>
+<table><thead><tr><th>Param</th><th>Value</th><th>Why</th></tr></thead><tbody><tr><td><code>EDGE_THRESHOLD_BY_DURATION</code></td><td><code>{5: 0.04, 15: 0.03}</code></td><td>Per-duration edge floor: 5-min markets need 4% edge, 15-min need 3% (15-min is statistically less noisy)</td></tr><tr><td><code>EDGE_THRESHOLD</code></td><td>0.05 (5%)</td><td>Fallback for any duration not in the map above</td></tr><tr><td><code>MIN_PRICE_MOVE_PCT</code></td><td>0.0007 (0.07%)</td><td>First-gate filter — but <strong>real signal bar is ~0.27%</strong> because of <code>true_prob &gt;= 0.60</code> with k=150</td></tr><tr><td><code>MAX_PRE_ENTRY_SEC</code></td><td>30</td><td>Don&#x27;t enter more than 30s before window opens</td></tr><tr><td><code>MOMENTUM_CONFIRM_SEC</code></td><td>10</td><td>Short-window confirmation of the 30s signal (renamed from <code>MOMENTUM_LOOKBACK_SEC</code> — it&#x27;s a check, not a time gate)</td></tr><tr><td><code>_MOMENTUM_TOLERANCE</code></td><td>0.0002 (v1.7)</td><td>Allow 0.02% drift against signal before blocking — strict <code>&gt;0</code> was killing post-spike signals</td></tr><tr><td><code>_TICK_BUFFER</code></td><td>3000 (v1.7)</td><td>Was 400 — too small for the previous relay&#x27;s tick rate</td></tr></tbody></table>
+<h3>Chainlink-settle</h3>
+<table><thead><tr><th>Param</th><th>Value</th><th>Why</th></tr></thead><tbody><tr><td><code>CHAINLINK_LATE_ENTRY_PCT</code></td><td>0.70</td><td>Switch from Binance to Chainlink at 70% through window</td></tr><tr><td><code>CHAINLINK_EDGE_THRESHOLD</code></td><td>0.03 (3%)</td><td>Lower than Binance&#x27;s 5% — conviction is higher when observing current direction vs. predicting future</td></tr><tr><td><code>CHAINLINK_MIN_DELTA</code></td><td>0.0010 (0.10%)</td><td>Require ≥0.10% Chainlink delta from window-open to avoid flip-prone resolutions</td></tr><tr><td><code>CHAINLINK_SCALE_FACTOR</code></td><td>200.0</td><td>Sigmoid steepness on (delta × time_progress)</td></tr></tbody></table>
+<p>The true 5-min Binance signal floor is <strong>0.27% over 30s</strong> (where <code>true_prob</code> crosses 0.60), not the 0.07% the config suggests. NEAR-MISS logs (v1.7+) make the 0.07%-0.27% silent zone visible: <code>NEAR-MISS BTC DOWN 5min | move=-0.086% true_prob=0.532 edge=1.21% (need 5%)</code>.</p>
+<h2>Useful one-liners</h2>
+<pre class='code'><code># Check what&#x27;s running on Vilnius right now
+ssh poly-vilnius &quot;cd /opt/polymarket-bot &amp;&amp; docker compose ps&quot;
+
+# Watch live signal/near-miss activity (line-buffered so output streams)
+ssh poly-vilnius &quot;tail -f /opt/polymarket-bot/data/logs/bot.log | grep --line-buffered -E &#x27;SIGNAL|NEAR-MISS|ERROR|OPEN&#x27;&quot;
+
+# Last 50 log lines
+ssh poly-vilnius &quot;tail -50 /opt/polymarket-bot/data/logs/bot.log&quot;
+
+# Verify v1.7+ code is actually running inside the container
+ssh poly-vilnius &quot;docker compose -f /opt/polymarket-bot/docker-compose.yml exec -T polymarket-bot grep _MOMENTUM_TOLERANCE /app/strategy.py&quot;
+
+# Geo-check (sanity)
+ssh poly-vilnius &quot;curl -s ipinfo.io | head -8&quot;</code></pre>
+<h2>Self-correcting workflow (hooks in .claude/)</h2>
+<p>Automatic guardrails defined in <code>.claude/settings.json</code>:</p>
+<ul>
+<li><strong>After every <code>.py</code> write/edit:</strong> syntax-checked with <code>py_compile</code>; any error is fed straight back to fix in the same turn.</li>
+<li><strong>Before any write to <code>.env</code>:</strong> blocked (it holds live keys/wallet secrets); <code>.env.example</code> is allowed.</li>
+<li><strong>When Claude says it&#x27;s done:</strong> every top-level <code>.py</code> must still compile or work continues. (Swap to <code>pytest</code> here once tests exist.)</li>
+</ul>
+<p><strong>Keep this file self-correcting:</strong> whenever the user corrects a real mistake, append it to the numbered list below and end with &quot;Update CLAUDE.md so you don&#x27;t make that mistake again.&quot;</p>
+<h2>Things that have gone wrong (so we don&#x27;t repeat them)</h2>
+<ol>
+<li><strong>2026-05-10: deployed v1.7 fixes to Jakarta instead of London</strong> because <code>DEBUG_REPORT.md</code> referenced Jakarta as production. Started a duplicate bot on the same wallet for ~18 min. No actual trades fired during the overlap. Fixed by stopping Jakarta and redeploying via the git workflow.</li>
+<li><strong>2026-05-10: claimed Hostinger VPS location change was &quot;no downtime / no data loss&quot;</strong> based on a 2023 third-party article. The actual in-place change WIPES the VPS. Caught before clicking confirm — but only because the hPanel dialog itself warned. Verify Hostinger-specific behavior with Hostinger sources, not blog posts.</li>
+<li><strong>2026-05-10: my first Polymarket RTDS subscribe format was wrong</strong> (&quot;Invalid request body&quot; from the server). The correct shape (<code>subscriptions: [{topic, type, filters}]</code>) came from the official Polymarket TS client repo, not from the docs page. When subscribing to AWS API Gateway WebSockets, find a working client and copy its format — don&#x27;t guess.</li>
+<li><strong>2026-05-10: a single <code>echo &gt;&gt; authorized_keys</code> on a fresh VPS concatenated my key onto the previous line</strong> because the file didn&#x27;t end with a newline. Future fix: use <code>cat &gt;&gt; ... &lt;&lt;EOF</code> with a literal trailing newline, or <code>printf &#x27;\n%s\n&#x27;</code>.</li>
+<li><strong>2026-05-30: read and edited the codebase from a local checkout that was 28 commits behind <code>origin/main</code>.</strong> Spent a whole session designing a multi-asset change against stale versions of <code>config.py</code>, <code>market_scanner.py</code>, <code>bot.py</code>, <code>strategy.py</code> — the gate logic I edited had already been rewritten on the remote (and on the live VPS). Only caught it when <code>git push</code> was rejected as non-fast-forward. <strong>Always <code>git fetch origin &amp;&amp; git log --oneline origin/main..HEAD HEAD..origin/main</code> at the START of any code work on this repo</strong> — the live bot tracks <code>origin/main</code>, not whatever the Mac last had. Live state wins over local, same as the top-of-file rule. Recovery: stash protected uncommitted files (<code>CLAUDE.md</code>, <code>BotSettings.txt</code> — confirmed not changed on remote first), <code>git reset --hard origin/main</code>, re-apply edits against current code.</li>
+<li><strong>2026-05-30: deploy &quot;succeeded&quot; but silently saw only ~20 of ~50 markets.</strong> Polymarket&#x27;s Gamma <code>/events</code> endpoint defaults to a 20-event page. BTC/ETH (≈20 slugs) fit under the cap by luck; adding SOL/XRP/BNB (≈50 slugs) truncated the response to an arbitrary 20. Would have run a half-blind bot if I&#x27;d trusted the green &quot;deployed&quot; signal. <strong>After any change that grows the number of scanned markets, verify the live active-market count, don&#x27;t assume.</strong> Fixed by passing <code>limit=max(len(slugs),100)</code> on the fetch (commit <code>9d46fc7</code>).</li>
+</ol>
+<h2>Repo</h2>
+<p>GitHub: <code>tsunamicstraw420/polymarket_Arb_bot</code> (private). Main branch deploys to Vilnius via <code>git pull</code> over a deploy key at <code>/root/.ssh/github_deploy</code> on the server.</p>

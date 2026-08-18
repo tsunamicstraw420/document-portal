@@ -1,0 +1,34 @@
+<h1>EP-02 (Last Resort S3E1) — Resolve Edit Checklist</h1>
+<p><em>Asset audit run July 15 2026. Everything is generated, named correctly, and present. Read the ⚠️ flags before you start — they&#x27;ll save you a re-do.</em></p>
+<h2>Asset audit — ALL PRESENT ✅</h2>
+<ul>
+<li><strong>Narration master:</strong> <code>audio/LastResort_03_01B.m4a</code> — 21:01 runtime (episode will run ~21 min).</li>
+<li><strong>Ruby loops (6):</strong> RL-1 booth, RL-2 booth reaction, RL-3 glam, RL-4 cozy, RL-5 neon, RL-6 booth shock. (<code>ruby_loop_booth_2.mp4</code> is a spare.)</li>
+<li><strong>Cold open (8):</strong> S01–S08 all present.</li>
+<li><strong>Scene track (19):</strong> SC-01 … SC-19 — complete, no gaps. SC-16 &amp; SC-19 are the fixed versions.</li>
+<li><strong>Overlays (11):</strong> all transparent PNGs named in the edit guide; <code>endcard.png</code> is full 1920×1080.</li>
+<li><strong>Logo:</strong> <code>still frames/RRU_logo_neon_transparent.png</code> for compositing on Ruby walls + end card.</li>
+<li><strong>Cue sheet:</strong> <code>lipsync/cues.csv</code> — 25 Ruby cutaway timings.</li>
+</ul>
+<h2>⚠️ Before you build the timeline</h2>
+<p><strong>1. Source clips are 24 fps, not 30.</strong> Every clip is 24 fps at ~1268×724 (Ruby/booth) or ~1284×716 (scenes) — Kling&#x27;s native output. The old edit guide said &quot;30 fps&quot;; <strong>ignore that.</strong> Set the timeline to <strong>1920×1080 @ 24 fps</strong> so the push-ins and pans stay smooth (a 30 fps timeline would conform the 24 fps clips and can add judder on slow moves).</p>
+<p><strong>2. Clips need scaling up to fill 1080.</strong> They&#x27;re slightly under 1080p and a hair off exact 16:9 (~1.75–1.79 vs 1.778). In Resolve, set clip <strong>Zoom to fill</strong> (or Timeline &gt; &quot;Scale entire image to fit&quot;). Minor softening from the upscale — unavoidable, not a defect.</p>
+<p><strong>3. Use the 12-cast version of S06.</strong> There are two: <code>S06_couples_arriving.mp4</code> and <code>S06_couples_arriving_12cast.mp4</code>. <strong>Use <code>_12cast</code></strong> — it&#x27;s the one that shows all six couples (the cast-coverage rule; matching keyframe is <code>still frames/S06_keyframe_12cast.png</code>). Ignore the other.</p>
+<p><strong>4. Six cue timings need adjusting by ear.</strong> In <code>cues.csv</code> these rows are low-confidence (<code>chk</code>) — the auto-match wasn&#x27;t sure, so place them manually: <strong>S16</strong> (&quot;Thaís was arrested&quot;), <strong>S24</strong> (&quot;Surprise.&quot;), <strong>S28</strong> (&quot;Deported.&quot;), <strong>S50</strong> (&quot;Next. Jenny and Sumit.&quot;), <strong>S70</strong> (&quot;Moving on.&quot;), <strong>S83</strong> (sign-off). The other 19 are solid.</p>
+<p><strong>5. All clips are silent</strong> (no audio track) — correct. Ruby&#x27;s narration is the only audio.</p>
+<h2>Build order</h2>
+<ol>
+<li>New project → timeline <strong>1920×1080, 24 fps</strong>. Import <code>videos/</code>, <code>overlays/</code>, <code>audio/</code>.</li>
+<li>Drop <code>LastResort_03_01B.m4a</code> on A1 — this is the spine; everything syncs to it.</li>
+<li>Lay video per <code>EP-02_RUN_SHEET.md</code> shot order (S1–S8, then SC-1…SC-19). Ruby beats to the loop for each segment&#x27;s set; place them at the <code>cues.csv</code> timestamps, adjust the 6 <code>chk</code> rows by ear. <code>SC-01_therapy_circle</code> is reusable B-roll under couple mentions.</li>
+<li>Composite overlays (see table in <code>EP-02_EDIT_GUIDE.md</code> §3): Thaís/Shekinah bubbles, May 20/22/24 date cards, 8/10 rating on S72, Patreon tiers on S76–S78, endcard on SC-19.</li>
+<li>Composite <code>RRU_logo_neon_transparent.png</code> onto Ruby-set walls + end card.</li>
+<li>Music bed low under narration (dramatic / playful / tense / sentimental per segment); stings on hot takes, &quot;Deported.&quot;, date cards, gavel, 8/10 pop.</li>
+<li>Captions: skip now — add from YouTube auto-transcript after upload.</li>
+<li>Export <strong>H.264, 1080p</strong> → YouTube <strong>unlisted</strong> (today, Wed) → pull transcript for show notes → flip <strong>public</strong> Fri (fires publish Zaps).</li>
+</ol>
+<h2>Not in this pass</h2>
+<ul>
+<li><strong>Lip-sync</strong> — deferred. Ruby loops play as-is. Prep saved in <code>lipsync/</code> if you want ~5 marquee beats on Magnific later.</li>
+<li><strong>Speech-bubble text</strong> — composited from <code>overlays/</code> PNGs (already made); don&#x27;t regenerate.</li>
+</ul>

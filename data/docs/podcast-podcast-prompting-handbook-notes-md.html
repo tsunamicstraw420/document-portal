@@ -1,0 +1,74 @@
+<h1>Prompting Handbook — working notes</h1>
+<p>Source: <em>The Prompting Handbook</em> v1.2, Magnific Studios, July 2026 (<code>prompt-guide-v1-2.pdf</code>). Digested Aug 5 2026. The full playbook is saved as the <strong><code>visual-prompting</code></strong> skill and loads automatically in any session — this file is the podcast-specific reading of it.</p>
+<hr>
+<h2>The core idea</h2>
+<p>Describe a <strong>coherent scene in plain language</strong>. Not a pile of keywords. The model builds what you describe and fills every gap you leave open with its most average answer.</p>
+<hr>
+<h2>What changes for Reality Recaps Unfiltered</h2>
+<h3>1. &quot;Slop&quot; has a name now — and it&#x27;s exactly our failure mode</h3>
+<p>Every model drifts to the same default: subject centred, staring at the lens, posed, evenly lit, everything in focus, plastic gloss. Audiences clock it in half a second. Our fix is two habits — <strong>direct the shot</strong> (off-centre framing, a caught moment, foreground depth) and <strong>finish the grade</strong> (gentle contrast, creamy focus roll-off, fine uniform grain).</p>
+<p><strong>Banned words. Never write these:</strong> ultra sharp · hyper detailed · crisp · razor sharp · 8K clarity · HDR · ultra-realistic detail.</p>
+<p><strong>Skin-realism block</strong> — paste whenever skin is visible (i.e. every Ruby plate and every cast shot):</p>
+<blockquote>Natural skin texture: realistic pores, fine hairs, subtle veining, a faint highlight. Tactile and real, not retouched plastic.</blockquote>
+<h3>2. Character sheets = what we already do with Ruby, formalised</h3>
+<p>The handbook&#x27;s rule matches our multi-angle character refs exactly: build a <strong>three-panel sheet</strong> (straight-on, side profile, full body) before a character appears twice, and every later generation carries it as a reference.</p>
+<p>Its extra rule we should adopt: <strong>when the character changes, the sheet changes first.</strong> New wardrobe, new set, new hair → regenerate the <em>sheet</em>, then prompt from the new sheet. A character has exactly one current sheet at any time. That&#x27;s the discipline that stops Ruby drifting between episodes.</p>
+<h3>3. &quot;Rewrite the first frame&quot; — a pipeline we should be using</h3>
+<p>The strongest video edits aren&#x27;t made in a video model:</p>
+<ol>
+<li>Take the clip.</li>
+<li>Extract frame one as a still.</li>
+<li>Edit that still in <strong>Nano Banana Pro</strong> (image-grade instruction-following — name the change, pin everything else).</li>
+<li>Re-render with the edited frame as <strong>start frame</strong> + the original clip attached as a <strong>motion reference</strong>: <em>&quot;Repeat the exact same move as @video1, now around the new subject. Same pacing, same framing, one continuous take. No cuts.&quot;</em></li>
+</ol>
+<p>Start frame pins <em>what it opens on</em>; the video reference pins <em>how it moves</em>. This is how we change one detail in an approved shot without regenerating and losing likeness.</p>
+<h3>4. Location coverage from a single still</h3>
+<p>Drop one set still in as a start frame and prompt a slow fly-through that <strong>rotates and stops for a beat facing each angle</strong>. Every held beat is an extractable frame with matching light and set. That&#x27;s a whole episode&#x27;s worth of Ruby-set angles from one approved plate, all consistent — which generating each angle separately can never guarantee.</p>
+<p>Name each rotation <em>and give it a stop</em>. Never ask for &quot;multiple angles.&quot;</p>
+<h3>5. Rules that map straight onto our shot lists</h3>
+<ul>
+<li><strong>One action, one camera move per clip.</strong> Stacking either produces warping. (Confirms our existing rule.)</li>
+<li><strong>Add &quot;slow&quot; to almost everything</strong> — slow moves hide what the model can&#x27;t render; fast moves expose every flaw.</li>
+<li><strong>Arcs around people stay under ~30°</strong>; products on a pedestal can take a full turn.</li>
+<li><strong>Handheld needs &quot;subtle&quot;</strong> or the model goes full earthquake.</li>
+<li><strong>Three tracked characters max</strong> across cuts — beyond that faces migrate between bodies. (This is exactly the &quot;3+ characters loses likeness&quot; note we already learned the hard way.)</li>
+<li><strong>Exit-frame means gone.</strong> Never exit and re-enter within one continuous take.</li>
+<li><strong>Compose around mirrors, never into them.</strong></li>
+<li><strong>Re-establish after every cut</strong> — restate positions and facing, keep the camera on one side of the action line.</li>
+<li><strong>Emotions are physics, not labels:</strong> &quot;jaw clenches, nostrils flare,&quot; not &quot;looks angry.&quot;</li>
+<li><strong>Action is intent plus a named move,</strong> never joint-by-joint biomechanics.</li>
+<li><strong>Only what can be seen or heard.</strong> Smells, thoughts and backstory render as nothing.</li>
+</ul>
+<h3>6. Audio discipline — end every video prompt with &quot;No music. No subtitles.&quot;</h3>
+<p>Generated music locks you in and burned-in captions can&#x27;t be removed. We score and caption in the edit, where we control it. If a clip carries dialogue, keep &quot;no subtitles&quot; and let the line live in quotes.</p>
+<h3>7. Text in the image</h3>
+<p>Quote every word exactly and say where it goes. Few text elements, one or two sizes. When a word keeps mangling, spell it letter by letter (<code>spelled F, O, C, U, S</code>) <strong>in an edit pass</strong> — don&#x27;t re-roll the whole design. Free-form on-screen text in <em>video</em> is unreliable: declare a text-safe zone (&quot;the right third falls to clean darkness&quot;) and set type in post.</p>
+<h3>8. Gear numbers are a weak lever</h3>
+<p>Focal lengths and apertures barely register across nearly every model. Say the <strong>effect</strong> instead: &quot;background melts into soft blur,&quot; &quot;only the label in focus,&quot; &quot;creamy focus roll-off.&quot;</p>
+<hr>
+<h2>Vocabulary shortlist</h2>
+<p>Stack <strong>two or three</strong> per prompt, never all — stacked look words dilute each other.</p>
+<ul>
+<li><strong>Light:</strong> shadowplay (most reliable keyword in testing) · single soft key from upper left · hard shaft of light · practical light only · low-key · rim light · golden hour</li>
+<li><strong>Grade &amp; mood:</strong> muted palette · faded blacks · gentle contrast · cinematic · editorial · quiet-luxury · understated</li>
+<li><strong>Texture:</strong> fine uniform film grain · visible pores · tactile fabric weave · atmospheric haze · soft highlight bloom</li>
+<li><strong>Composition:</strong> generous negative space · centered, deadpan framing · chest-up crop · slight three-quarter angle · leading lines</li>
+<li><strong>Blur/focus:</strong> background melts into soft blur · creamy focus roll-off · subject razor sharp against a soft distance</li>
+<li><strong>Tested stacks:</strong> shadowplay + cinematic + fine film grain · muted palette + faded blacks + negative space · practical light only + atmospheric haze</li>
+</ul>
+<hr>
+<h2>Model routing (as of July 2026)</h2>
+<p><strong>Image:</strong> Nano Banana 2 = default (editing, product, volume, best multi-ref consistency) · Nano Banana Pro = cinematic/hero and the hardest prompts (same cost, route by behaviour) · Seedream 5.0 = posters, packaging, merging up to 10 refs · GPT Image 2 = layout-heavy design · Recraft V4.1 = logos, vectors/SVG, typographic posters · Flux.2 = exact hex colours and structured briefs · Krea 2 = moodboard-driven looks.</p>
+<p><strong>Video:</strong> Seedance 2.5 = default (30s, 4K, up to 50 refs, native audio) · Kling 3.0 Omni = character continuity, physics, dialogue, <strong>on-product text</strong>, faithful video-to-video · Happy Horse 1.1 = fast/cheap · Gemini Omni Flash = conversational direction and physics-aware edits, lower quality.</p>
+<blockquote>Our Magnific setup uses <strong>Nano Banana 2 Flash</strong> as the image model, and <strong>Kling</strong> for lip-sync via its own API — that stays as-is. This table is for deciding <em>which model to reach for</em>, not for changing what&#x27;s already locked.</blockquote>
+<hr>
+<h2>Where this handbook does NOT override us</h2>
+<p>The handbook is general best practice; our project rules are tested on this show. <strong>Project rules win.</strong></p>
+<p>Two live conflicts to be aware of:</p>
+<ol>
+<li><strong>Keyframe prompt tails.</strong> Our rule is <em>drop the style/negative boilerplate tail entirely</em> on keyframe prompts. The handbook wants a film-look line and a standard negative set in every prompt. Ours was tested on our comic-book style — keep dropping the tail. The handbook&#x27;s line is for photoreal work.</li>
+<li><strong>Photoreal grade language.</strong> The film-look line (&quot;soft cinematic lens… fine uniform film grain… no digital look&quot;) is aimed at photorealism. Our show is <strong>comic book / graphic novel</strong> style. Use the handbook&#x27;s <em>structural</em> advice (framing, camera moves, scene rules, character sheets, the first-frame pipeline) freely; use its <em>grade</em> language only where we&#x27;re actually going photoreal.</li>
+</ol>
+<p>Also unchanged: the approved Ruby host plates are never regenerated, the logo is baked not composited, and the camera-movement prompt library is still the source for motion wording.</p>
+<hr>
+<p><em>Companion: the <code>visual-prompting</code> skill holds the full playbook including the cheat sheet, dialogue/audition workflow, and the five clip-chaining seams.</em></p>

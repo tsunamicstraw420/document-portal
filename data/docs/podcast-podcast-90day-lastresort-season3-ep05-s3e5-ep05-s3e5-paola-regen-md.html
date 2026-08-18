@@ -1,0 +1,35 @@
+<h1>EP05 — Paola Regen Prep  (Aug 9 2026)</h1>
+<h2>Problem</h2>
+<p>Paola&#x27;s design was updated ~Aug 5 (<code>paola_v3</code>). Two EP05 clips on the current timeline were generated BEFORE that, with the old face (<code>paola_OLD_do_not_use_pre_aug5</code>): paler skin, slimmer face. Outfit/tattoo are close; the FACE + skin tone are wrong.</p>
+<h2>Root cause (why it happened)</h2>
+<p>There are TWO cast folders and the OLD Paola refs are the easy-to-grab ones:</p>
+<ul>
+<li>CURRENT  → <code>90_Day_The_Last_Resort_S3_Cast/individuals/PaolaNew.png</code>  = <strong>paola_v3</strong>  (Aug 5)</li>
+<li>OLD      → <code>_SHARED/90_Day_The_Last_Resort_S3_Cast/individuals/Paola_2a…2e</code>  (pre-Aug5)</li>
+</ul>
+<h2>Correct references to attach</h2>
+<ul>
+<li><strong>paola_v3</strong> = <code>90_Day_The_Last_Resort_S3_Cast/individuals/PaolaNew.png</code>   ← use this</li>
+<li>russ        = <code>_SHARED/90_Day_The_Last_Resort_S3_Cast/individuals/Russ_2.png</code></li>
+<li>style (always) = <code>graphic_novel</code></li>
+<li>❌ never attach <code>Paola_2a…2e</code> for Paola again</li>
+</ul>
+<h2>Clips to regenerate (current timeline = roughcut/EP05_S3E5_REVIEW.xml)</h2>
+<table><thead><tr><th>Clip</th><th>What it is</th><th>Timeline uses</th><th>Fix</th></tr></thead><tbody><tr><td><code>videos/EP05_E_zoomin_woman_at_bar_v2.mp4</code></td><td>Paola hero — seated alone at castle bar, drink, zoom-in</td><td>8:16 and 8:59</td><td>regen base still (paola_v3) → Kling img-to-video, slow push-in, 10s</td></tr><tr><td><code>videos/EP05_couple_paola_russ.mp4</code></td><td>Paola+Russ roll-call / couple card</td><td>1:10, 8:11, 8:27</td><td>regen still (paola_v3 + russ) → held + Ken Burns</td></tr></tbody></table>
+<h2>Recipe (your Magnific/Kling run — I don&#x27;t spend, I prep)</h2>
+<ol>
+<li>EP05 Magnific space → base still, <code>graphic_novel</code> + <code>paola_v3</code>.</li>
+</ol>
+<p>Prompt gist: &quot;Graphic-novel semi-real comic illustration, inked linework + cel shading. Paola — blonde, tan, arm tattoo, pink ring-cutout top — seated alone at a candlelit castle bar, whisky glass in hand, drained/tired expression. Warm amber stone interior. 16:9. No text or watermark.&quot; → Kling image-to-video, slow push-in, 10s.</p>
+<ol>
+<li>Couple card: <code>graphic_novel</code> + <code>paola_v3</code> + <code>russ</code>, &quot;Paola and Russ two-shot,</li>
+</ol>
+<p>castle lounge, seated close, modern eveningwear.&quot; Still (we hold + Ken Burns).</p>
+<ol>
+<li>NAME THE OUTPUTS NEW (so Resolve relinks clean, no offline):</li>
+</ol>
+<p><code>EP05_E_zoomin_woman_at_bar_v3.mp4</code>, <code>EP05_couple_paola_russ_v2.mp4</code>. Give me the names → I repoint the timeline XML, you re-import.</p>
+<h2>Also inconsistent — optional but recommended</h2>
+<p>The SC-11 Ken Burns clips (<code>videos/kb2/v6_kb_44–47_21_SC11</code>, from plate <code>videos/kenburns/21_SC11.mp4</code>) use a THIRD Paola (tan, red lips, pearls) — also not paola_v3. For full consistency, regen the <code>21_SC11</code> plate with <code>paola_v3</code> + <code>russ</code> and I&#x27;ll re-cut those 4 Ken Burns clips from the new plate.</p>
+<h2>Stop-it-recurring fix (say the word)</h2>
+<p>Rename the old <code>_SHARED/.../Paola_2a…2e</code> to <code>paola_OLD_do_not_use_pre_aug5/</code> so nothing grabs them again. I can also do a one-pass likeness audit of every cast member across EP05 (same method) to catch any other pre-Aug5 faces before lip-sync spend.</p>

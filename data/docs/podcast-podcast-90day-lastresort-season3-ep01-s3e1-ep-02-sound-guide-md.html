@@ -1,0 +1,67 @@
+<h1>Sound for EP-02 — what goes where, and why</h1>
+<blockquote>## ✅ Both stems are built — just drop them in  In <code>roughcut/</code>: - <strong><code>EP-02_MUSIC_STEM.wav</code></strong> - <strong><code>EP-02_SFX_STEM.wav</code></strong>  Each is one full-length file with everything already in position. <strong>Drop each on its own audio track, snapped to 00:00:00:00.</strong> Don&#x27;t trim or slide them — they&#x27;re exactly the length of the timeline.  No timeline re-import, so your captions stay put.  <strong>Then two things in Resolve:</strong> 1. <strong>Turn on ducking for the music track</strong> so it dips under Ruby automatically. Fairlight page → select the music track → add a <strong>Compressor</strong> with sidechain from the narration track. This does most of the work of a good mix. 2. <strong>Set starting levels.</strong> Music around −20 dB and effects around −13 dB are baked in, so start both faders at 0 and adjust by ear from there.  The whole 02:24–03:20 arrest sequence is genuinely silent in the music stem — that&#x27;s deliberate, not a fault.  Everything below is the reasoning, if you want it. You don&#x27;t need it to place the stems.</blockquote>
+<hr>
+<p>Written for someone doing this for the first time. Two halves: <strong>music</strong> (long, underneath) and <strong>sound effects</strong> (short, on top). They do completely different jobs.</p>
+<hr>
+<h2>Part 1 — The mental model</h2>
+<h3>Music is furniture. Sound effects are punctuation.</h3>
+<p><strong>Music</strong> sits under everything and tells the viewer how to feel. They shouldn&#x27;t consciously notice it. If they do, it&#x27;s too loud.</p>
+<p><strong>Sound effects</strong> mark specific moments — a card slams on, a bubble pops, you move to a new topic. Each one is a full stop or an exclamation mark. Punctuation you can hear.</p>
+<p>The single biggest beginner mistake is treating sound effects like decoration and sprinkling them everywhere. Every professional guide says the same thing: <strong>fewer, placed deliberately, beats more.</strong> A whoosh on every cut becomes wallpaper in ninety seconds. A whoosh on the eight moments that actually matter tells the viewer <em>this is a new chapter.</em></p>
+<h3>The four kinds of sound you&#x27;ll use</h3>
+<table><thead><tr><th>Kind</th><th>What it is</th><th>Where in EP-02</th></tr></thead><tbody><tr><td><strong>Stinger</strong></td><td>A short hit — impact, slam, thud</td><td>When a date card or the 8/10 badge appears</td></tr><tr><td><strong>Whoosh</strong></td><td>A swish that carries you from A to B</td><td>Moving from one couple&#x27;s story to the next</td></tr><tr><td><strong>Pop / UI</strong></td><td>Small, light, quick</td><td>Speech bubbles appearing</td></tr><tr><td><strong>Ambience</strong></td><td>Quiet room tone under a scene</td><td>Castle at night, therapy room</td></tr></tbody></table>
+<p>That&#x27;s it. Four categories covers this whole show. Using the <em>same</em> whoosh every time is a feature, not laziness — it&#x27;s how a viewer learns your show&#x27;s grammar.</p>
+<h3>The rule that overrides all the others</h3>
+<p><strong>Never put a sound effect on a serious moment.</strong> EP-02 has an arrest, a domestic battery charge, and someone being told to leave the country. A comic <em>boing</em> over any of that reads as making light of it. The date cards work because they&#x27;re factual — a timeline, not a punchline. But when Ruby is sitting with something heavy, let it be quiet. Silence is a sound design choice.</p>
+<hr>
+<h2>Part 2 — How loud</h2>
+<p>Numbers you can just use:</p>
+<ul>
+<li><strong>Ruby&#x27;s voice: −6 to −12 dB.</strong> She&#x27;s the star. Everything else works around her.</li>
+<li><strong>Music under Ruby: −18 to −25 dB.</strong> Roughly 20 below her. It should feel like it&#x27;s in another room.</li>
+<li><strong>Music with nobody talking: −12 to −14 dB.</strong> Intro, outro, the beat after a punchline — let it breathe.</li>
+<li><strong>Sound effects: −12 to −18 dB.</strong> Audible, never startling.</li>
+<li><strong>Whole episode, exported: −14 LUFS</strong> — that&#x27;s YouTube&#x27;s target. Resolve has a loudness meter under the Fairlight tab.</li>
+</ul>
+<p><strong>Use ducking rather than doing this by hand.</strong> Resolve can automatically dip the music whenever Ruby speaks and lift it when she stops. That one feature does 80% of a good mix. Search &quot;ducking&quot; in Resolve&#x27;s Fairlight page.</p>
+<hr>
+<h2>Part 3 — The EP-02 cue sheet</h2>
+<p>Timecodes are from <code>EP-02_v13</code>. Start with the <strong>Tier 1</strong> list — that&#x27;s 12 sounds and it&#x27;ll already feel produced. Add Tier 2 later if you want.</p>
+<h3>Tier 1 — do these first</h3>
+<p><strong>Overlay hits.</strong> These are the easy wins: a graphic appears, you hear it. Perfectly synced already because you know exactly when each card lands.</p>
+<table><thead><tr><th>Time</th><th>What happens</th><th>Sound</th></tr></thead><tbody><tr><td>00:02:16</td><td>MAY 20 card</td><td>Stamp / paper slam</td></tr><tr><td>00:02:24</td><td>MAY 22 card</td><td>Same stamp</td></tr><tr><td>00:02:37</td><td>MAY 24 card</td><td>Same stamp</td></tr><tr><td>00:02:33</td><td>Thaís bubble &quot;I&#x27;M NOT DOING THIS.&quot;</td><td>Soft pop</td></tr><tr><td>00:03:51</td><td>&quot;VIOLENT&quot; bubble</td><td>Soft pop</td></tr><tr><td>00:03:53</td><td>&quot;DEPORT HER&quot; bubble</td><td>Same pop, slightly higher</td></tr><tr><td>00:18:08</td><td>8/10 badge</td><td>Big impact + short shimmer</td></tr><tr><td>00:19:05</td><td>Endcard</td><td>Whoosh into the outro music</td></tr></tbody></table>
+<blockquote>Use <strong>one</strong> stamp sound for all three date cards and <strong>one</strong> pop for all three bubbles. Repetition is what makes it read as a system.</blockquote>
+<p><strong>Segment transitions.</strong> Whoosh where the episode changes subject — moving from one couple to another:</p>
+<table><thead><tr><th>Time</th><th>Moving to</th></tr></thead><tbody><tr><td>00:03:51</td><td>Shekinah&#x27;s social media posts</td></tr><tr><td>00:07:45</td><td>Paola &amp; Russ</td></tr><tr><td>00:09:45</td><td>Jenny &amp; Sumit</td></tr><tr><td>00:11:20</td><td>Rebecca</td></tr><tr><td>00:12:07</td><td>Kara &amp; Guillermo</td></tr><tr><td>00:14:40</td><td>Shekinah &amp; Sarper</td></tr></tbody></table>
+<p>Six whooshes across 19 minutes. Feels like chapters. Six <em>dozen</em> would feel like a slot machine.</p>
+<h3>Tier 2 — once Tier 1 feels right</h3>
+<p><strong>The roll call, 00:01:03 → 00:01:10.</strong> Five couples in seven seconds, one shot each. A tiny tick or soft whoosh on each name gives it rhythm. Keep them <em>small</em> — this is fast and busy already.</p>
+<p><strong>Ambience beds.</strong> Very low, under the scene, barely conscious:</p>
+<ul>
+<li>00:02:24 castle exterior at night — distant wind</li>
+<li>00:01:41 and 00:16:13 therapy circle — quiet room tone</li>
+<li>00:02:33 and 00:03:18 terrace — light outdoor air</li>
+</ul>
+<p><strong>Deliberate silence at 00:02:24–00:03:20.</strong> The arrest sequence. Consider pulling the music <em>out</em> here and letting Ruby carry it dry, then bringing it back at 00:03:20. Absence of sound is the strongest tool you have, and it costs nothing.</p>
+<hr>
+<h2>Part 4 — Working order</h2>
+<ol>
+<li><strong>Music first.</strong> Lay the beds, set levels, turn ducking on. Watch it through.</li>
+<li><strong>Then the overlay hits.</strong> Eight sounds, exact timecodes above.</li>
+<li><strong>Then the six transitions.</strong></li>
+<li><strong>Watch it start to finish without touching anything.</strong> Note where your ear snags.</li>
+<li><strong>Ambience last</strong>, if at all. It&#x27;s the least important and the easiest to overdo.</li>
+</ol>
+<p>Don&#x27;t start sound effects until you&#x27;re sure the cut is locked. If a clip moves later, every effect after it slides out of sync.</p>
+<hr>
+<h2>Part 5 — Where the sounds come from</h2>
+<p><strong>Music:</strong> Magnific, using <strong>Lyria 3 Pro</strong>. 160 credits flat for anything up to 3 minutes, so always ask for the full 180 seconds even if you only need 20 — same price, and you can trim.</p>
+<p><strong>Sound effects:</strong> Magnific&#x27;s Sound Effects generator also costs credits and is excluded from your unlimited plan. Free alternatives worth checking first, because SFX are generic and there&#x27;s no reason to pay:</p>
+<ul>
+<li><strong>freesound.org</strong> — huge, free, check each licence</li>
+<li><strong>Pixabay Sound Effects</strong> — free, no attribution required</li>
+<li><strong>YouTube Audio Library</strong> — free, built for exactly this</li>
+</ul>
+<p>You need about <strong>six unique sounds</strong> total for Tier 1: one stamp, one pop, one whoosh, one impact, one shimmer, one transition whoosh. Everything else is reuse.</p>
+<hr>
+<p><em>Sources: <a href="https://daily.dev/blog/podcast-sound-design-essential-elements-effects-and-music/" target="_blank" rel="noopener">daily.dev — Podcast Sound Design</a> · <a href="https://podcast.adobe.com/en/guides/podcast-sound-design" target="_blank" rel="noopener">Adobe — Podcast Sound Design</a> · <a href="https://www.descript.com/blog/article/how-to-add-sound-effects-to-a-podcast" target="_blank" rel="noopener">Descript — How to add sound effects</a> · <a href="https://soundcy.com/article/how-to-describe-a-projectile-sound-for-comic-book" target="_blank" rel="noopener">SoundCy — comic panel sound placement</a> · <a href="https://pureaudioinsight.com/blogs/content-production/background-music-volume-how-loud-should-it-be" target="_blank" rel="noopener">Pure Audio Insight — background music levels</a> · <a href="https://youlean.co/loudness-standards-full-comparison-table/" target="_blank" rel="noopener">Youlean — loudness standards</a></em></p>

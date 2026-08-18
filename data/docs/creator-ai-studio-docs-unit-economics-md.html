@@ -1,0 +1,83 @@
+<h1>ShowKit — Unit Economics &amp; Pricing Model</h1>
+<p><em>Credit-based reseller of third-party image/video generation (fal.ai / Replicate / OpenRouter), marked up on a subscription. Compiled August 2026. Every wholesale price below traces to a dated search result listed in Sources, not memory. All figures are pre-tax, pre-salary, pre-marketing operating economics unless stated.</em></p>
+<hr>
+<h2>1. The credit unit and markup strategy</h2>
+<p><strong>Recommended credit price: $0.02 per credit (list / pay-as-you-go rate).</strong></p>
+<p>The design rule is simple and auditable: <strong>each generation is priced at <code>credits = round_up(wholesale ÷ $0.005)</code></strong> — one credit is backed by at most half a cent of wholesale COGS. Selling that credit at $0.02 is a <strong>4× markup = 75% gross margin</strong> on the list rate, before Stripe. Cheap models round up slightly, so they land a touch higher (85% on a 1-credit Flux Schnell image).</p>
+<p>Two prices for the same credit:</p>
+<ul>
+<li><strong>Top-up packs (pay-as-you-go): $0.02/credit</strong> — full list rate, 75% gross.</li>
+<li><strong>Subscription credits: ~$0.013–$0.016/credit effective</strong> — a &quot;member&quot; discount (you get more credits per dollar for committing), which is ~3× COGS, so ~62–67% gross <em>if fully consumed</em>. In practice <strong>breakage</strong> (subscribers rarely burn 100% of an allowance) lifts realized subscription margin back to ~72–76%.</li>
+</ul>
+<p>Why 75% list / mid-60s subscription: after Stripe (2.9% + $0.30) the net contribution margin needs to survive refunds, churn, and infra and still fund CAC. Stripe is a bigger drag than it looks on small charges — on a $9 charge, 2.9% + $0.30 = <strong>6.2% effective</strong>; on $49 it&#x27;s 3.5%. That alone argues for nudging annual billing and larger top-up packs.</p>
+<hr>
+<h2>2. Model table (wholesale → credits → user price → margin)</h2>
+<p>Wholesale = our cost per generation via the cheapest compliant aggregator. Image = one ~1024×1024 (~1 MP) render; video = one <strong>5-second clip</strong>. Effective $ and margin are shown at the <strong>$0.02 list rate</strong>; subscribers pay less per credit (see §3) but the credit <em>counts</em> are identical.</p>
+<h3>Image models</h3>
+<table><thead><tr><th>Model</th><th>Wholesale / gen</th><th>Credits</th><th>Effective $ (list)</th><th>Gross margin</th></tr></thead><tbody><tr><td>Flux Schnell (fal/Replicate)</td><td>$0.003</td><td>1</td><td>$0.02</td><td>85%</td></tr><tr><td>SDXL (Replicate)</td><td>$0.005</td><td>1</td><td>$0.02</td><td>75%</td></tr><tr><td>Google Imagen 4 Fast</td><td>$0.02</td><td>4</td><td>$0.08</td><td>75%</td></tr><tr><td>Flux Dev</td><td>$0.025</td><td>5</td><td>$0.10</td><td>75%</td></tr><tr><td>Ideogram 3.0 Turbo</td><td>$0.03</td><td>6</td><td>$0.12</td><td>75%</td></tr><tr><td>Nano Banana (Gemini 2.5 Flash Image)</td><td>$0.039</td><td>8</td><td>$0.16</td><td>76%</td></tr><tr><td>Seedream 4.5 (OpenRouter)</td><td>$0.04</td><td>8</td><td>$0.16</td><td>75%</td></tr><tr><td>FLUX.2 Pro (1 MP @ $0.03/MP+)</td><td>$0.04</td><td>8</td><td>$0.16</td><td>75%</td></tr><tr><td>Nano Banana 2 (Gemini 3.1 Flash Image)</td><td>$0.06</td><td>12</td><td>$0.24</td><td>75%</td></tr><tr><td>GPT Image (high quality, 1024²)</td><td>$0.19</td><td>38</td><td>$0.76</td><td>75%</td></tr></tbody></table>
+<h3>Video models (per 5-second clip)</h3>
+<table><thead><tr><th>Model</th><th>Wholesale / clip</th><th>Credits</th><th>Effective $ (list)</th><th>Gross margin</th></tr></thead><tbody><tr><td>Wan 2.6 (budget, ~$0.05/s)</td><td>$0.25</td><td>50</td><td>$1.00</td><td>75%</td></tr><tr><td>Seedance 1.5 Pro (720p)</td><td>$0.26</td><td>52</td><td>$1.04</td><td>75%</td></tr><tr><td>Luma Ray 3 (720p)</td><td>$0.30</td><td>60</td><td>$1.20</td><td>75%</td></tr><tr><td>Kling 3.0 (standard, ~$0.07/s)</td><td>$0.35</td><td>70</td><td>$1.40</td><td>75%</td></tr><tr><td>Runway Gen-4.5 ($0.12/s)</td><td>$0.60</td><td>120</td><td>$2.40</td><td>75%</td></tr><tr><td>Veo 3.1 (with native audio, ~$0.40/s)</td><td>$2.00</td><td>400</td><td>$8.00</td><td>75%</td></tr></tbody></table>
+<p><strong>Cheapest generation: Flux Schnell = 1 credit. Most expensive: Veo 3.1 (5s, audio) = 400 credits.</strong> That 400× spread is why a flat &quot;unlimited&quot; tier is dangerous and a metered credit is safe — every generation is priced to its own COGS.</p>
+<hr>
+<h2>3. Subscription tiers, top-ups, and free trial</h2>
+<p>Three tiers, priced to anchor at the middle. Subscription credits carry an 18–35% bonus over the $0.02 list rate (bigger bonus at higher tiers), which is the reward for committing.</p>
+<table><thead><tr><th>Plan</th><th>Price/mo</th><th>Monthly credits</th><th>Effective $/credit</th><th>Rough usage</th></tr></thead><tbody><tr><td><strong>Starter</strong></td><td>$9</td><td>550</td><td>$0.0164</td><td>~65 mid images, or ~8 std clips</td></tr><tr><td><strong>Creator</strong></td><td>$19</td><td>1,300</td><td>$0.0146</td><td>~160 mid images, or ~18 clips</td></tr><tr><td><strong>Studio</strong></td><td>$49</td><td>3,800</td><td>$0.0129</td><td>~475 mid images, or ~54 clips</td></tr></tbody></table>
+<p><strong>Rollover rule:</strong> unused credits roll over for <strong>one billing cycle only</strong>, capped at <strong>1× the monthly allowance</strong> (a Creator can bank at most 1,300 rolled credits). This kills two problems at once — it removes &quot;use-it-or-lose-it&quot; anxiety (a top churn driver at incumbents) while preventing a user from hoarding six months of credits into a single COGS-spike month of Veo clips.</p>
+<p><strong>Top-up packs (pay-as-you-go, no bonus, never expire while subscribed):</strong></p>
+<ul>
+<li>500 credits — <strong>$10</strong></li>
+<li>1,500 credits — <strong>$28</strong> (small pack discount)</li>
+<li>5,000 credits — <strong>$90</strong></li>
+</ul>
+<p>Top-ups are the pressure-release valve: when a power user drains the allowance, they buy more at the full $0.02 list rate (75% margin), which is <em>better</em> for us than the discounted subscription credit. Over-consumption converts into our highest-margin revenue.</p>
+<p><strong>Free trial:</strong> <strong>100 credits, no card, expires in 14 days</strong>, restricted to image models + budget/standard video (Veo/Runway locked). Max possible trial COGS ≈ 100 × $0.005 = <strong>$0.50</strong> — a tightly capped CAC. Enough to produce a full set of thumbnails and a couple of clips, i.e., a real &quot;aha,&quot; without funding a free video farm.</p>
+<hr>
+<h2>4. Profit scenarios (100 / 1,000 / 10,000 paying users)</h2>
+<p><strong>Assumptions (blended across all paying users, steady-state active payers):</strong></p>
+<ul>
+<li><strong>Tier mix:</strong> 55% Starter / 35% Creator / 10% Studio → subscription ARPU ≈ <strong>$16.50</strong>.</li>
+<li><strong>Top-ups:</strong> ~12% of users buy a $10 pack/mo → +~$1.00/user. <strong>Blended ARPU ≈ $17.50.</strong></li>
+<li><strong>Credits granted:</strong> ~1,137/user/mo; <strong>utilization ~75%</strong> (breakage) → ~<strong>850 credits consumed</strong>.</li>
+<li><strong>Usage mix:</strong> image-heavy — roughly 50 images + 7 clips per active user/mo; blended <strong>COGS ≈ $4.25/user/mo</strong> (effective ~$0.0047/credit consumed).</li>
+<li><strong>Stripe:</strong> 2.9% + $0.30 per charge; ~1.1 charges/user/mo → <strong>≈ $0.85/user/mo</strong>.</li>
+<li><strong>Churn:</strong> ~8–10%/mo (AI apps churn fast; niche + rollover aims to beat the ~12% category norm). Scenarios are snapshots of <em>active</em> payers, so churn shows up as a growth/CAC problem, not in these margins.</li>
+</ul>
+<table><thead><tr><th></th><th>100 users</th><th>1,000 users</th><th>10,000 users</th></tr></thead><tbody><tr><td>Revenue</td><td>$1,750</td><td>$17,500</td><td>$175,000</td></tr><tr><td>Wholesale COGS</td><td>−$425</td><td>−$4,250</td><td>−$42,500</td></tr><tr><td>Stripe fees</td><td>−$85</td><td>−$850</td><td>−$8,500</td></tr><tr><td>Infra (hosting, storage, CDN, moderation API, logging)</td><td>−$250</td><td>−$1,300</td><td>−$9,000</td></tr><tr><td><strong>Net monthly operating profit</strong></td><td><strong>≈ $990</strong></td><td><strong>≈ $11,100</strong></td><td><strong>≈ $115,000</strong></td></tr><tr><td>Operating margin</td><td>~57%</td><td>~63%</td><td>~66%</td></tr></tbody></table>
+<p><strong>At 1,000 paying users, net ≈ $11,100/mo (~$133K/yr).</strong> Read these honestly: they are <em>before</em> founder salary, marketing/CAC, refunds/chargebacks (budget ~2% of revenue), and support. At 100 users the fixed infra floor eats most of the contribution — the business is real only past low four-digit user counts. At 10,000 users, headcount (support, moderation review, on-call) becomes the real cost line, not COGS.</p>
+<hr>
+<h2>5. Sensitivity — the two things that move margin</h2>
+<p><strong>(a) Wholesale prices fall ~30% (they will).</strong> Aggregator prices have only fallen; the companion brief already flags this. If COGS drops 30%, per-user COGS falls ~$4.25 → ~$3.00, and <em>if we hold credit prices</em>, gross margin rises from ~76% to ~83% and net at 1,000 users climbs to ~$12,300/mo. The reseller <strong>benefits</strong> from deflation — as long as we don&#x27;t cut prices faster than costs. The disciplined play is to keep credit prices flat and instead <em>add credits</em> to tiers (Starter 550 → 650) as a retention lever, banking part of the saving and passing part along. Danger only appears if a competitor forces a price war before we&#x27;ve built the workflow moat.</p>
+<p><strong>(b) Power users over-consume the allowance.</strong> This is the real threat, and it lives entirely on premium video. A Studio user ($49, 3,800 credits) who spends the <em>whole</em> allowance on Veo 3.1 clips gets 3,800 ÷ 400 = 9.5 clips = <strong>$19 COGS</strong> → margin still 61%. But push utilization to 100% across the base and blended gross margin drops from ~76% to ~65%; a cohort that consistently over-burns premium video can push an individual account underwater for a month.</p>
+<p><strong>How the design protects margin:</strong></p>
+<ol>
+<li><strong>Metered credits, no &quot;unlimited.&quot;</strong> Every generation is priced to its own COGS — the opposite of Freepik/Magnific&#x27;s 2,600-credit-video-on-an-unlimited-plan trap.</li>
+<li><strong>Premium models cost proportionally more</strong> (Veo = 400 credits), so heavy premium use drains the allowance fast and pushes the user to <strong>top-ups at full 75% margin</strong> — over-consumption becomes our best revenue, not a loss.</li>
+<li><strong>Rollover capped at 1× allowance</strong> prevents a banked-credit COGS spike.</li>
+<li><strong>Trial excludes premium video</strong> and is capped at $0.50 COGS, so acquisition can&#x27;t be gamed into free Veo.</li>
+<li><strong>Per-model fair-use rate limits</strong> as a backstop for abuse.</li>
+</ol>
+<p><strong>Bottom line:</strong> the credit unit is a margin governor, not just a billing gimmick. Sticker margin is 75%; realized subscription margin lands mid-60s to mid-70s depending on breakage; the metering plus capped rollover plus full-price top-ups keep the tail of power users from inverting the economics — the failure mode that &quot;unlimited&quot; resellers walk into.</p>
+<hr>
+<h2>Sources</h2>
+<p><strong>Image model wholesale pricing</strong></p>
+<ul>
+<li>fal.ai / FLUX pricing (Schnell $0.003/MP, FLUX.2 Pro $0.03/MP, per-image) — https://pricepertoken.com/image ; https://pricepertoken.com/fal-ai-pricing ; https://flowith.io/blog/flux-2-pro-pricing-2026-dev-vs-pro-vs-schnell-api/ ; https://www.teamday.ai/blog/ai-api-pricing-comparison-2026</li>
+<li>Replicate (Flux Schnell ~$0.003/image, SDXL ~$0.005) — https://checkthat.ai/brands/replicate/pricing ; https://runaihome.com/blog/flux-vs-sdxl-vs-sd15-cost-per-image-2026/ ; https://www.siliconflow.com/articles/en/the-cheapest-image-gen-models</li>
+<li>Ideogram 3.0 ($0.03/$0.06/$0.09), Imagen 4 ($0.02/$0.04/$0.06), GPT Image ($0.005–$0.211) — https://www.cometapi.com/ai-image-api-pricing/ ; https://www.buildmvpfast.com/api-costs/ai-image ; https://www.digitalapplied.com/blog/ai-image-generation-api-pricing-comparison-2026</li>
+<li>OpenRouter image API (Seedream 4.5 $0.04, FLUX.2 Pro $0.03/MP, GPT-5.4 Image token pricing) — https://openrouter.ai/blog/announcements/image-api/ ; https://openrouter.ai/collections/image-models ; https://openrouter.ai/openai/gpt-image-2</li>
+<li>Nano Banana / Nano Banana 2 ($0.039–$0.151/image; batch −50%) — https://openrouter.ai/google/gemini-2.5-flash-image ; https://openrouter.ai/google/gemini-3.1-flash-image ; https://pricepertoken.com/pricing-page/model/google-gemini-2.5-flash-image ; https://www.aifreeapi.com/en/posts/nano-banana-2-pricing</li>
+</ul>
+<p><strong>Video model wholesale pricing</strong></p>
+<ul>
+<li>fal.ai video (Kling, Seedance, Veo 3.1, Wan 2.6; $0.05–$0.40/sec) — https://www.teamday.ai/blog/ai-image-video-api-providers-comparison-2026 ; https://fal.ai/learn/tools/ai-video-generators</li>
+<li>Per-second/per-clip (Kling $0.07/s, Veo $0.03–$0.50/s, Seedance 1.5 Pro ~$0.26/5s 720p) — https://fluxnote.io/guides/ai-video-model-pricing-comparison-2026 ; https://www.buildmvpfast.com/api-costs/ai-video ; https://devtk.ai/en/blog/ai-video-generation-pricing-2026/</li>
+<li>Runway Gen-4.5 ($0.12/s), Luma Ray 3 ($0.15–$1.20/5s by res) — https://www.versely.studio/blog/runway-gen-4-pricing-vs-alternatives-2026 ; https://www.freeaivideohub.com/ai-video-cost-calculator ; https://rangy.ai/blog/ai-video-pricing-explained/</li>
+</ul>
+<p><strong>Payments / fees</strong></p>
+<ul>
+<li>Stripe standard 2.9% + $0.30 online; Billing add-on ~0.7%; disputes $15 — https://flexprice.io/blog/stripe-pricing-breakdown-2026 ; https://dodopayments.com/blogs/stripe-fees-calculator ; https://checkoutpage.com/blog/stripe-processing-fees</li>
+</ul>
+<p><strong>Context (from companion brief <code>niche-and-competitors.md</code>)</strong></p>
+<ul>
+<li>Aggregator/reseller landscape, provider ToS on reselling, AI-app churn (~30% faster; annual retention ~21%) — see <code>docs/niche-and-competitors.md</code> Sources section.</li>
+</ul>

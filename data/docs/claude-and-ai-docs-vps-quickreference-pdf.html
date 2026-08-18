@@ -1,0 +1,178 @@
+<div class="pdfpages"><img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-vps-quickreference-pdf/p-1.jpg" alt="page 1">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-vps-quickreference-pdf/p-2.jpg" alt="page 2">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-vps-quickreference-pdf/p-3.jpg" alt="page 3">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-vps-quickreference-pdf/p-4.jpg" alt="page 4"></div><div class="pdftext" hidden><pre>                                      VPS Quick Reference
+                              Jakarta, Indonesia · IP: 72.61.209.224 · /opt/polymarket-bot
+                               April 21, 2026 · GitHub: tsunamicstraw420/polymarket_Arb_bot
+
+
+
+Daily Session — SSH to Bot Commands
+
+Every session starts with SSH + cd. All docker commands require the cd first.
+
+ #    Where    Command                                                              Purpose
+
+ 1    Mac                ssh -i ~/.ssh/hostinger_vps root@72.61.209.224             SSH into VPS
+
+                                                                                    ■ Required before ANY docker compose
+ 2    VPS                cd /opt/polymarket-bot
+                                                                                    command
+
+ 3    VPS                docker compose ps                                          Check container status
+
+4a    VPS                docker compose up -d                                       Start bot + chart server in background
+
+4b    VPS                docker compose down                                        Stop all containers
+
+4c    VPS                docker compose restart                                     Restart without rebuilding
+
+ 5    VPS                docker compose logs polymarket-bot -f                      Watch live bot output (Ctrl-C to exit)
+
+ 6    VPS                docker compose up -d --build                               After git pull — rebuild image + restart
+
+
+
+Logs &amp; Status
+
+Command (run from /opt/polymarket-bot)                                  What it does
+
+         docker compose logs polymarket-bot -f                          Tail bot logs live
+
+         docker compose logs chart-server -f                            Tail chart server logs
+
+         docker compose logs --tail=50                                  Last 50 lines, all containers
+
+         docker stats                                                   Live CPU / RAM per container
+
+         df -h &amp;&amp; docker system df                                      Disk usage — VPS + Docker
+
+         ufw status verbose                                             Firewall rules
+
+
+
+Updating the Bot After Code Changes
+
+Where       Command                                                                              When
+
+Mac                 git add -A &amp;&amp; git commit -m &quot;description&quot; &amp;&amp; git push                        After editing any .py file or config
+
+VPS                 cd /opt/polymarket-bot &amp;&amp; git pull &amp;&amp; docker compose up -d                   After every git push from Mac
+                    --build
+
+VPS                 docker compose restart                                                       .env changed only — no rebuild
+                                                                                                 needed
+Dashboard: http://72.61.209.224 · SSH tunnel (secure): ssh -i ~/.ssh/hostinger_vps -L 8080:localhost:80 root@72.61.209.224 -N → open
+                                                        http://localhost:8080
+     Full Lifecycle — New Bot from Scratch to VPS
+             Complete step-by-step: Mac development → GitHub → VPS first-time deployment
+                 Replace BOT-NAME, REPO-NAME, and SERVICE-NAME with your project values
+
+
+
+Phase 1 — Mac: Create the Bot Project
+
+#   Where   Command / Action                                          Notes
+
+                     mkdir -p ~/Desktop/BOT-NAME &amp;&amp; cd
+1   Mac                                                               Create project folder
+                     ~/Desktop/BOT-NAME
+
+                     touch Dockerfile docker-compose.yml .
+2   Mac              dockerignore .env .env.example                   Create required files
+                     requirements.txt
+
+3   Mac     Edit Dockerfile — set base image, pip install, CMD        Use python:3.11-slim as base
+
+            Edit docker-compose.yml — volumes, env_file, restart
+4   Mac                                                               Mount data/ as directory, not individual files
+            policy, ports
+
+            Edit .dockerignore — exclude .env, venv/, __pycache__,
+5   Mac                                                               Keeps secrets + data out of image
+            *.log*, data/
+
+6   Mac     Edit .env — add all API keys and secrets                  NEVER commit this file — gitignore it
+
+7   Mac     Edit .env.example — copy .env with values blanked out     Safe to commit — shows required vars
+
+
+
+Phase 2 — Mac: Push to GitHub
+
+#   Where   Command                                                   Notes
+
+1   Mac              git init &amp;&amp; git add -A                           Initialize repo, stage all files
+
+2   Mac              git commit -m &quot;Initial commit&quot;                   First commit
+
+3   Mac     Create new repo on github.com (do NOT init with README)   Copy the repo URL
+
+                     git remote add origin https://github.com/U
+4   Mac                                                               Link local to GitHub
+                     SER/REPO-NAME.git
+
+                     git branch -M main &amp;&amp; git push -u origin
+5   Mac                                                               Push — use GitHub token as password
+                     main
+
+
+
+Phase 3 — VPS: First-Time Deployment (git-based)
+
+#   Where   Command                                                   Notes
+
+                     ssh -i ~/.ssh/hostinger_vps
+1   Mac                                                               SSH into VPS
+                     root@72.61.209.224
+
+2   VPS              mkdir -p /opt/BOT-NAME &amp;&amp; cd /opt/BOT-NAME       Create bot directory
+
+                     git config --global credential.helper
+3   VPS                                                               Save token so you only enter it once
+                     store
+
+                     git clone https://github.com/USER/REPO-NAM
+4   VPS                                                               Clone into current dir — enter token as password
+                     E.git .
+                            git config --global --add safe.directory
+ 5     VPS                                                                               Fix ownership warning if it appears
+                            /opt/BOT-NAME
+
+ 6     VPS                  nano .env                                                    Paste all API keys — Ctrl-X to save
+
+                            mkdir -p data/logs &amp;&amp; touch
+ 7     VPS                                                                               Pre-create data files as files not directories
+                            data/positions.json data/state.json
+
+ 8     VPS                  docker compose build                                         Build image — installs all pip dependencies
+
+ 9     VPS                  docker compose up -d                                         Start all containers in background
+
+10     VPS                  docker compose ps                                            Confirm status = Up for all containers
+
+11     VPS                  docker compose logs SERVICE-NAME -f                          Watch live output — confirm no startup errors
+
+
+
+Phase 4 — Ongoing: Code Change → Live on VPS
+
+ #     Where      Command                                                                Notes
+
+                            git add -A &amp;&amp; git commit -m &quot;what
+ 1     Mac                                                                               Push changes to GitHub
+                            changed&quot; &amp;&amp; git push
+
+ 2     VPS                  cd /opt/BOT-NAME &amp;&amp; git pull                                 Pull latest code onto VPS
+
+ 3     VPS                  docker compose up -d --build                                 Rebuild image + restart containers
+
+ 4     VPS                  docker compose logs SERVICE-NAME -f                          Confirm changes took effect
+
+
+Key rules: (1) docker-compose.yml volumes — always mount data/ as a directory, never individual log files. (2) .env is NEVER committed to git. (3)
+All docker compose commands require cd /opt/BOT-NAME first. (4) GitHub password = Personal Access Token (ghp_…), not account password.
+
+
+                Polymarket bot dashboard: http://72.61.209.224 · SSH key: ~/.ssh/hostinger_vps · All running containers: docker ps
+</pre></div>

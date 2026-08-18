@@ -1,0 +1,69 @@
+<h1>Session Handoff — 2026-05-15 ~22:00 UTC</h1>
+<p>Read this FIRST in a new session, alongside CLAUDE.md and BotSettings.txt.</p>
+<h2>Where things stand</h2>
+<p>Commit running on Vilnius: <strong><code>745955f</code></strong>. Bot is LIVE, balance <strong>~$398.20 USDC</strong> (per on-chain sync). Strategy: Binance-momentum only. Chainlink is SOFT-DEMOTED.</p>
+<h2>What shipped in this session (in order, all live)</h2>
+<table><thead><tr><th>Commit</th><th>What</th></tr></thead><tbody><tr><td><code>dcabcb4</code></td><td>Cancel-race fix: read <code>initial_status</code>, read <code>size_matched</code> BEFORE cancel, delay 5s → 30s</td></tr><tr><td><code>6adcb4e</code></td><td>Chainlink 90s min-secs-left gate</td></tr><tr><td><code>c0fc711</code></td><td><code>token_id</code> added to BUY (GTC) log</td></tr><tr><td><code>dd81516</code></td><td>SESSION_HANDOFF update</td></tr><tr><td><code>5ad4796</code></td><td>Diagnostic: live L2 BOOK log on every BUY</td></tr><tr><td><code>5b92e35</code></td><td>Phantom-refund fix (retry get_order then optimistic) + <code>_actual_fill_price</code> v1</td></tr><tr><td><code>3fe3350</code></td><td>Preflight live-book check (serial)</td></tr><tr><td><code>30a79fa</code></td><td>Parallel preflight — book fetch overlaps with create_order</td></tr><tr><td><code>8f36499</code></td><td>Accounting fix: live mode trusts on-chain sync; <code>available_balance</code> property</td></tr><tr><td><code>8a192b5</code></td><td>Chainlink dispatch SOFT-DEMOTED; FRESH-WINDOW probe</td></tr><tr><td><code>bf07ab6</code></td><td><code>_actual_fill_price</code> rewritten to use <code>get_trades</code> (real fill price); preflight aborts on ws-vs-live ask gap &gt;$0.10</td></tr><tr><td><code>32a4bb0</code></td><td>Phase C wallet-truth audit in digest (FIFO matching by conditionId)</td></tr><tr><td><code>745955f</code></td><td>Cosmetic: drop CL leg from feed_status display</td></tr></tbody></table>
+<p>13 production commits, all empirically motivated. No scratch files left behind (verified clean on VPS + local).</p>
+<h2>Empirical findings from today</h2>
+<ol>
+<li><strong>Bot&#x27;s BUY log price field was lying.</strong> Recorded &quot;fill=$0.58&quot; when actual on-chain fill was $0.03. Root cause: <code>_actual_fill_price</code> fell back to <code>ceiling</code> because <code>get_order</code> doesn&#x27;t expose a fill-price field. <strong>Fixed by switching to <code>get_trades(asset_id=...)</code> keyed by <code>taker_order_id</code>. The <code>price</code> field there is the actual avg fill.</strong></li>
+<li><strong>WS view can diverge from live book by ~$0.50.</strong> The 5/15 13:52 trade: bot&#x27;s WS said ask=$0.525, live book had ask=$0.03 (market already priced UP near zero). The bot fired and lost $0.66. <strong>Fixed by tightening preflight to abort when |ws_ask − live_ask| &gt; $0.10.</strong></li>
+<li><strong>Live-mode balance was oscillating.</strong> <code>record_open</code> deducted immediately, on-chain sync overwrote 60s later, no-fill refund credited back — heartbeat reported false +N then -N then 0. <strong>Fixed by making record_open not deduct in live mode; <code>available_balance</code> (= current − reserved_usdc) is used for sizing instead.</strong></li>
+<li><strong>Phantom fills were a real phenomenon.</strong> <code>status=&#x27;matched&#x27;</code> + <code>size_matched=0</code> on immediate readback was the bot&#x27;s race-condition signature. The old &quot;refund and remove position&quot; path created untracked on-chain positions. <strong>Fixed by retrying <code>get_order</code> 4× with backoff before going OPTIMISTIC (assume fill, Telegram alert).</strong></li>
+<li><strong>Chainlink-settle hasn&#x27;t filled once.</strong> 83 BUYs across May 11-15: 66 from Chainlink path, 16 from Binance. Every confirmed fill was Binance. The dispatch is now commented out; RTDS WS stays subscribed but doesn&#x27;t influence trades.</li>
+<li><strong>Wallet truth ≠ bot truth.</strong> The Phase C audit in the digest now reads <code>data-api.polymarket.com/activity?user=PROXY</code> directly. 48h window currently shows: 3 resolved trades (W:2 L:1), avg entry 35¢, win-rate 67%, realized PnL +$12.02.</li>
+</ol>
+<h2>What to watch for in the next session</h2>
+<ol>
+<li><strong>First sync-matched fill on <code>bf07ab6</code> code.</strong> Watch <code>[LIVE] GTC sync-matched full N shares | fill=X (ceiling=Y)</code> — <code>fill</code> should now show the actual <code>get_trades</code> price (e.g., $0.51), not the ceiling (e.g., $0.56). If <code>fill</code> still equals ceiling on every fill, <code>_actual_fill_price</code> is still broken in some way.</li>
+<li><strong>Tightened preflight aborts.</strong> New log line: <code>PREFLIGHT abort ASSET DIR DURmin — ws_ask=X diverges from live_ask=Y by Z (&gt; 0.10) — bot&#x27;s model is running on a stale price</code>. If these fire ≥1/day, the gate is paying off.</li>
+<li><strong>FRESH-WINDOW probe data.</strong> ~24 lines/hour, format: <code>FRESH-WINDOW ETH UP 5min | t+S | poly=P other=O sum=S | BinanceΔ30s=±X% Δ10s=±Y%</code>. Tells us whether newly-opened markets have meaningful Binance state at open (re: user&#x27;s next-window-pivot hypothesis).</li>
+<li><strong>No Chainlink signals fired.</strong> <code>grep SIGNAL\[CHAINLINK\]</code> should be empty in post-<code>8a192b5</code> logs. If non-zero, the demote didn&#x27;t take.</li>
+<li><strong>Heartbeat shape.</strong> STATUS lines should now read <code>Feed: BTC BN:Ns | ETH BN:Ns</code> — no CL field.</li>
+</ol>
+<h2>Open questions / not-yet-investigated</h2>
+<ol>
+<li><strong>Should Chainlink WS be hard-demoted?</strong> Currently subscribing + writing buffers + running 60s watchdog. Cost: one daemon thread, occasional Telegram alert on RTDS reconnect. Benefit: option value if we want to revive Chainlink-settle, plus watchdog confirms upstream RTDS is healthy. Decision: deferred.</li>
+<li><strong>The 13:52 trade was massively +EV on paper.</strong> Model said UP=60%, market said UP=3%. Trade lost. The new preflight catches this case, but did the bot&#x27;s model miss a regime shift that the market saw? Worth a longer-horizon study (50+ trades).</li>
+<li><strong><code>MAX_PRE_ENTRY_SEC = 30</code> — should it be smaller for next-window pivots?</strong> Hypothesis: if a signal fires near the end of window A, the bot could pre-position into window B. Probe (FRESH-WINDOW logs) will tell us if there&#x27;s an opportunity to act on.</li>
+<li><strong>Phase B (6-layer WebSocket hardening)</strong> — analysed and deferred. Layers 1 &amp; preflight overlap conceptually. Layer 3 targets wrong failure mode (we have silent-no-update, not bad-tick-value). Layers 2/6 over-scoled. Layers 4 &amp; 5 deferred as low-priority hygiene.</li>
+</ol>
+<h2>Quick reference</h2>
+<pre class='code'><code># bot status
+ssh poly-vilnius &quot;docker compose -f /opt/polymarket-bot/docker-compose.yml ps&quot;
+
+# tail recent activity
+ssh poly-vilnius &quot;tail -50 /opt/polymarket-bot/data/logs/bot.log&quot;
+
+# watch for new BUYs / fills / preflight aborts
+ssh poly-vilnius &quot;tail -f /opt/polymarket-bot/data/logs/bot.log | grep --line-buffered -E &#x27;BUY \\(GTC\\)|sync-matched|fully filled|partial fill|no fill after|PREFLIGHT|FRESH-WINDOW|CLOSE&#x27;&quot;
+
+# preview a digest right now
+ssh poly-vilnius &quot;python3 /opt/polymarket-bot/digest.py --print --hours 12 2&gt;&amp;1 | grep -v DeprecationWarning&quot;
+
+# wallet truth (last few trades)
+curl -s -H &#x27;User-Agent: x&#x27; &#x27;https://data-api.polymarket.com/activity?user=0x06b4e8aa40ba9c0b76834dd14a118fd96b1ae204&amp;limit=10&#x27;</code></pre>
+<h2>Sources of truth (priority order)</h2>
+<ol>
+<li><strong>On-chain wallet</strong> (Polygon) — immutable</li>
+<li><strong>Polymarket activity API</strong> — <code>data-api.polymarket.com/activity?user=PROXY</code> (now used by the digest audit)</li>
+<li><strong>Polymarket CSV download</strong> — manual, lags</li>
+<li><strong>Bot&#x27;s <code>bot.log</code></strong> — INTENT, not proof. Cross-check before acting.</li>
+</ol>
+<p>Proxy address: <code>0x06b4e8aa40ba9c0b76834dd14a118fd96b1ae204</code></p>
+<h2>How to resume</h2>
+<ol>
+<li>Read this file + CLAUDE.md + BotSettings.txt (BotSettings was thoroughly updated this session).</li>
+<li><code>ssh poly-vilnius &quot;docker ps --filter name=polymarket-arb-bot --format &#x27;{{.Names}} {{.Status}}&#x27;&quot;</code> — confirm container is up.</li>
+<li>Check the next 12h digest output for any of the diagnostic lines listed in &quot;What to watch for&quot;.</li>
+<li>If a sync-matched fill has happened, verify the new <code>fill=X (ceiling=Y)</code> shows actual <code>get_trades</code> price.</li>
+<li>Update this file at end of next session.</li>
+</ol>
+<h2>What NOT to do without empirical evidence</h2>
+<ul>
+<li>DON&#x27;T revert the preflight gap check before seeing whether it fires too aggressively in production</li>
+<li>DON&#x27;T re-enable Chainlink dispatch without first verifying the fill rate it produces</li>
+<li>DON&#x27;T claim &quot;the bot did X trades&quot; from bot.log alone — query the wallet activity API</li>
+<li>DON&#x27;T push to main without explicit user permission</li>
+</ul>

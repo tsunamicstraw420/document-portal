@@ -1,0 +1,98 @@
+<h1>Plan: KDP Prompt Library + Workflow Automation</h1>
+<h2>TL;DR (read this first when resuming)</h2>
+<p><strong>What:</strong> A CLI (<code>kdp</code>) that runs a 3-stage Claude pipeline for self-publishing on Amazon KDP — niche research → manuscript draft → title/cover optimization. Wraps three prompts from a Twitter article into <code>kdp niche|write|optimize</code>.</p>
+<p><strong>Why this project (vs. your other AI_bots work):</strong></p>
+<ul>
+<li>Polymarket bots = trading/arbitrage. Different domain, different repo.</li>
+<li>Patent-discovery, radiant-pixel = separate experiments.</li>
+<li><strong>kdp-publishing = content generation pipeline.</strong> No external market data, no live trading risk. Pure prompt orchestration + file I/O. Spend cap is just API tokens.</li>
+</ul>
+<p><strong>Status (2026-05-06):</strong></p>
+<ul>
+<li>✅ Repo scaffolded, package installs as <code>kdp</code> CLI</li>
+<li>✅ All three stages implemented in <a href="kdp/pipeline.py" target="_blank" rel="noopener">pipeline.py</a></li>
+<li>✅ Prompt caching wired for stage-2 chapter loop</li>
+<li>✅ Streaming on stage-2 chapter writes</li>
+<li>✅ <code>--dry-run</code> smoke test passed on stage 1</li>
+<li>⏳ Live API verification (PLAN steps 2–5 below) — <strong>not yet run</strong></li>
+<li>⏳ No real book project created yet (<code>projects/</code> is empty)</li>
+</ul>
+<p><strong>Resume here next session:</strong> run a live stage-2 smoke test with <code>--length 5000</code> against a throwaway project. That&#x27;s the riskiest path (outline parsing + caching + streaming + chapter assembly) and proves the design end-to-end. See &quot;Verification&quot; section below.</p>
+<p><strong>Open questions / unbuilt:</strong></p>
+<ul>
+<li>Resume support — if chapter 7 of 12 fails, currently restarts from scratch. Not in original plan; worth adding before any real-length run.</li>
+<li>Token/cost reporting — no visibility into whether prompt cache is actually hitting.</li>
+<li><code>portfolio.json</code> royalty tracker — explicit stub, deferred per article scope.</li>
+</ul>
+<hr>
+<h2>Context</h2>
+<p>The article (https://x.com/leopardracer/status/2051598197881995626) describes a 3-step Claude-driven Amazon KDP self-publishing workflow: <strong>niche research → manuscript draft → title/cover optimization</strong>. The article ships these as three free-form prompts plus a Python royalty tracker.</p>
+<p>You want a small standalone project that turns those three prompts into a runnable pipeline — paste-and-pray becomes <code>kdp run &lt;stage&gt;</code>. Out of scope per your answers: the royalty tracker, real KDP sales API integration. The portfolio/sales side gets a stubbed file location only, so the tracker can be added later without restructuring.</p>
+<p>This lives in its own repo, separate from the Polymarket bot.</p>
+<h2>Proposed location</h2>
+<p><code>~/Desktop/AI_bots/kdp-publishing/</code> (parallel to the existing Polymarket directory). Override at approval time if you&#x27;d prefer elsewhere.</p>
+<h2>Project layout</h2>
+<pre class='code'><code>kdp-publishing/
+├── README.md                  ← how to install + run each stage
+├── pyproject.toml             ← deps: anthropic, pyyaml, click, rich
+├── .env.example               ← ANTHROPIC_API_KEY=
+├── .gitignore                 ← .env, projects/, __pycache__
+├── prompts/
+│   ├── 01_niche_analyzer.md   ← article prompt 1, with {{placeholders}}
+│   ├── 02_book_writer.md      ← article prompt 2
+│   └── 03_cover_title.md      ← article prompt 3
+├── kdp/
+│   ├── __init__.py
+│   ├── cli.py                 ← click entrypoint: `kdp niche|write|optimize`
+│   ├── client.py              ← Anthropic SDK wrapper + prompt caching
+│   ├── pipeline.py            ← orchestrates each stage
+│   └── projects.py            ← per-project config + artifact I/O
+└── projects/
+    └── .gitkeep               ← per-book working dirs land here (gitignored)</code></pre>
+<p>A &quot;project&quot; = one book in progress. Each gets <code>projects/&lt;slug&gt;/config.yaml</code> (inputs) plus generated artifacts (<code>01_niches.md</code>, <code>manuscript.md</code>, <code>chapters/</code>, <code>titles_and_cover.md</code>).</p>
+<h2>Pipeline design</h2>
+<p>Three CLI subcommands map 1:1 to the article&#x27;s three prompts. Each stage reads <code>config.yaml</code>, renders the prompt template, calls the API, writes outputs. The user reviews between stages — no auto-chaining, since the article is explicit that you pick the niche manually after stage 1.</p>
+<table><thead><tr><th>Stage</th><th>Command</th><th>Inputs (from config.yaml)</th><th>Output artifact</th></tr></thead><tbody><tr><td>1. Niche research</td><td><code>kdp niche &lt;project&gt;</code></td><td>category, audience, ad_budget</td><td><code>01_niches.md</code></td></tr><tr><td>2. Manuscript</td><td><code>kdp write &lt;project&gt;</code></td><td>title, audience, problem, length, tone, angle</td><td><code>manuscript.md</code> + <code>chapters/NN.md</code></td></tr><tr><td>3. Title &amp; cover</td><td><code>kdp optimize &lt;project&gt;</code></td><td>topic, audience, benefit, competitors[]</td><td><code>titles_and_cover.md</code></td></tr></tbody></table>
+<p>Stage 2 detail: the article notes &quot;30,000–40,000 words across multiple sessions.&quot; Implementation: one call gets the outline + chapter list, then one call per chapter with the <strong>outline cached as a prompt prefix</strong> so each chapter call is cheap. Concatenate to <code>manuscript.md</code> at the end. Per-chapter files preserved so the user can edit selectively without regenerating the whole book.</p>
+<p><code>--dry-run</code> flag on every stage: render the filled prompt to stdout, skip the API call. Lets you sanity-check templates without burning tokens.</p>
+<h2>Prompt templates</h2>
+<p>Lift the three prompts verbatim from the article. Replace bracketed placeholders (<code>[NON-FICTION / FICTION / specify]</code>, <code>[TITLE]</code>, etc.) with <code>{{snake_case}}</code> tokens. The runner substitutes from <code>config.yaml</code>. No prompt rewriting — the article&#x27;s wording is the spec.</p>
+<h2>Anthropic SDK details</h2>
+<ul>
+<li>Model: <code>claude-opus-4-7</code> (latest, best for long-form writing).</li>
+<li>Prompt caching enabled on the system prompt + outline for stage 2. The outline gets reused across N chapter calls, so caching turns N full re-reads into N cache hits.</li>
+<li>Streaming on stage 2 chapter calls (long output, user wants progress feedback).</li>
+<li>API key from <code>.env</code> via <code>ANTHROPIC_API_KEY</code>.</li>
+</ul>
+<h2>Future hook (out of scope now)</h2>
+<p>Stub a <code>portfolio.json</code> location at the repo root. Empty for now. When the tracker comes back into scope, it reads from there. No code yet — just the convention documented in README so it doesn&#x27;t conflict with future work.</p>
+<h2>Verification</h2>
+<p>End-to-end smoke test on a throwaway project after implementation:</p>
+<ol>
+<li><code>kdp niche test-project --dry-run</code> → confirm prompt 1 renders with config substitutions.</li>
+<li><code>kdp niche test-project</code> → real API call, inspect <code>01_niches.md</code> for sensible niche analysis.</li>
+<li>Manually pick a niche, fill in stage-2 inputs in <code>config.yaml</code>.</li>
+<li><code>kdp write test-project --length 5000</code> → short manuscript (1–2 chapters) to verify caching + streaming + chapter file output without spending opus tokens on a full 40k draft.</li>
+<li><code>kdp optimize test-project</code> → inspect <code>titles_and_cover.md</code> for 10 titles + cover brief.</li>
+<li>Verify <code>.env</code> is gitignored, <code>projects/</code> is gitignored.</li>
+</ol>
+<h2>Verification status</h2>
+<table><thead><tr><th>Step</th><th>Description</th><th>Status</th></tr></thead><tbody><tr><td>1</td><td><code>kdp niche test-project --dry-run</code> — prompt renders</td><td>✅ done</td></tr><tr><td>2</td><td><code>kdp niche test-project</code> — real API, inspect <code>01_niches.md</code></td><td>⏳ not run</td></tr><tr><td>3</td><td>Pick a niche, fill stage-2 inputs in <code>config.yaml</code></td><td>⏳ blocked on step 2</td></tr><tr><td>4</td><td><code>kdp write test-project --length 5000</code> — short manuscript</td><td>⏳</td></tr><tr><td>5</td><td><code>kdp optimize test-project</code> — inspect <code>titles_and_cover.md</code></td><td>⏳</td></tr><tr><td>6</td><td><code>.env</code> and <code>projects/</code> gitignored</td><td>✅ done</td></tr></tbody></table>
+<h2>Files to create (all new)</h2>
+<p>All paths under <code>~/Desktop/AI_bots/kdp-publishing/</code>:</p>
+<ul>
+<li><code>README.md</code></li>
+<li><code>pyproject.toml</code></li>
+<li><code>.env.example</code></li>
+<li><code>.gitignore</code></li>
+<li><code>prompts/01_niche_analyzer.md</code></li>
+<li><code>prompts/02_book_writer.md</code></li>
+<li><code>prompts/03_cover_title.md</code></li>
+<li><code>kdp/<strong>init</strong>.py</code></li>
+<li><code>kdp/cli.py</code></li>
+<li><code>kdp/client.py</code></li>
+<li><code>kdp/pipeline.py</code></li>
+<li><code>kdp/projects.py</code></li>
+<li><code>projects/.gitkeep</code></li>
+</ul>
+<p>No existing files modified — separate repo.</p>

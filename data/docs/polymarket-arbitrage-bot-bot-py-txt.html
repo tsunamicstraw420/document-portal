@@ -1,0 +1,214 @@
+<pre class='txtdoc'>&quot;&quot;&quot;
+bot.py — Polymarket Latency Arbitrage Bot (Paper Mode Optimized)
+&quot;&quot;&quot;
+import argparse
+import signal
+import sys
+import time
+import threading
+
+# ── Local imports ─────────────────────
+import config
+from logger_setup import log
+from notifier import notifier
+from price_feed import price_feed
+from market_scanner import MarketScanner
+from strategy import Strategy
+from risk_manager import RiskManager
+from order_manager import OrderManager
+
+# ── Paper-mode virtual portfolio ──────────────────────────────────────────────
+PAPER_STARTING_BALANCE = 1000.0
+
+class ArbBot:
+    def __init__(self, paper_mode: bool = True, scan_interval: float = config.SCAN_INTERVAL_SEC):
+        self.paper_mode = paper_mode
+        self.scan_interval = scan_interval
+        self._running = False
+        self._shutdown_event = threading.Event()
+
+        # Load credentials and client
+        creds_env = config.Credentials.from_env()
+        self._creds_env = creds_env
+
+        # Use fixed client from config.py
+        self._clob = config.get_clob_client()
+
+        # Determine starting balance
+        starting_balance = self._resolve_starting_balance()
+
+        # Compose subsystems
+        self._risk = RiskManager(starting_balance=starting_balance)
+        self._scanner = MarketScanner(clob_client=self._clob)
+        self._strategy = Strategy(price_feed=price_feed, market_scanner=self._scanner)
+        self._orders = OrderManager(
+            clob_client=self._clob,
+            risk_manager=self._risk,
+            paper_mode=paper_mode,
+        )
+
+        # Cooldown tracking
+        self._last_trade_time: dict[str, float] = {}
+        self._trade_cooldown_sec = 30.0
+
+        # Status timing
+        self._last_status_time = 0.0
+
+        mode = &quot;PAPER&quot; if paper_mode else &quot;LIVE&quot;
+        log.info(&quot;=&quot; * 60)
+        log.info(&quot;Polymarket Latency Arbitrage Bot — %s MODE&quot;, mode)
+        log.info(&quot;Starting balance: %.2f USDC&quot;, starting_balance)
+        log.info(&quot;Edge threshold: %.1f%% (testing)&quot;, config.EDGE_THRESHOLD * 100)
+        log.info(&quot;Scan interval: %.1fs&quot;, scan_interval)
+        log.info(&quot;=&quot; * 60)
+
+    # ── Startup ───────────────────────────────────────────────────────────────
+    def start(self) -&gt; None:
+        self._running = True
+        price_feed.start()
+
+        log.info(&quot;Waiting for Binance price feed to warm up...&quot;)
+        deadline = time.monotonic() + 15.0
+        while not price_feed.all_ready():
+            if time.monotonic() &gt; deadline:
+                log.warning(&quot;Price feed warm-up timed out — continuing anyway&quot;)
+                break
+            time.sleep(0.5)
+        log.info(&quot;Price feed ready.&quot;)
+
+        self._scanner.start()
+
+        signal.signal(signal.SIGINT, self._handle_signal)
+        signal.signal(signal.SIGTERM, self._handle_signal)
+
+        notifier.send(
+            f&quot;Bot started in {&#x27;PAPER&#x27; if self.paper_mode else &#x27;LIVE&#x27;} mode. &quot;
+            f&quot;Balance: {self._risk.current_balance:.2f} USDC&quot;
+        )
+
+        self._run()
+
+    def stop(self) -&gt; None:
+        log.info(&quot;Shutting down...&quot;)
+        self._running = False
+        price_feed.stop()
+        self._scanner.stop()
+        self._shutdown_event.set()
+        log.info(&quot;Final state: %s&quot;, self._risk.summary())
+        notifier.send(f&quot;Bot stopped. Final state: {self._risk.summary()}&quot;)
+
+    # ── Main loop ─────────────────────────────────────────────────────────────
+    def _run(self) -&gt; None:
+        log.info(&quot;Main loop started (scan interval=%.1fs)&quot;, self.scan_interval)
+        while self._running:
+            loop_start = time.monotonic()
+            try:
+                self._iteration()
+            except Exception as exc:
+                log.error(&quot;Unhandled exception in main loop: %s&quot;, exc, exc_info=True)
+                notifier.error(f&quot;Main loop error: {exc}&quot;)
+
+            elapsed = time.monotonic() - loop_start
+            sleep_time = max(0.0, self.scan_interval - elapsed)
+            self._shutdown_event.wait(timeout=sleep_time)
+        log.info(&quot;Main loop exited.&quot;)
+
+    def _iteration(self) -&gt; None:
+        &quot;&quot;&quot;One scan cycle&quot;&quot;&quot;
+        if self._risk.is_killed:
+            log.critical(&quot;Kill switch active — shutting down.&quot;)
+            self.stop()
+            return
+
+        if price_feed.any_stale():
+            log.warning(&quot;Price feed is stale — skipping iteration&quot;)
+            return
+
+        # Print status every 15 seconds
+        now = time.monotonic()
+        if now - self._last_status_time &gt; config.STATUS_PRINT_INTERVAL:
+            self._log_status()
+            self._last_status_time = now
+
+        # Skip if risk limits prevent trading
+        if not self._risk.trading_allowed:
+            return
+
+        # Evaluate signals
+        signals = self._strategy.scan(bankroll=self._risk.current_balance)
+        if not signals:
+            return
+
+        # Execute best signal
+        for signal in signals:
+            token_id = signal.token_id
+            last = self._last_trade_time.get(token_id, 0)
+            if time.time() - last &lt; self._trade_cooldown_sec:
+                continue
+
+            result = self._orders.execute_signal(signal)
+            if result and getattr(result, &#x27;success&#x27;, False):
+                self._last_trade_time[token_id] = time.time()
+                break
+
+    # ── Helpers ───────────────────────────────────────────────────────────────
+    def _resolve_starting_balance(self) -&gt; float:
+        if self.paper_mode:
+            return PAPER_STARTING_BALANCE
+        # Live balance logic can be added later
+        return PAPER_STARTING_BALANCE
+
+    def _log_status(self) -&gt; None:
+        &quot;&quot;&quot;Clean status log every 15 seconds&quot;&quot;&quot;
+        active_markets = len(self._scanner.get_markets())
+        log.info(
+            &quot;STATUS | Balance=%.2f USDC | Active Markets=%d | Edge=%.1f%% | OpenPos=0&quot;,
+            self._risk.current_balance,
+            active_markets,
+            config.EDGE_THRESHOLD * 100
+        )
+
+        # Price feed info using the global price_feed
+        for sym in config.BINANCE_SYMBOLS:
+            price = price_feed.latest_price(sym) if hasattr(price_feed, &#x27;latest_price&#x27;) else None
+            change = price_feed.price_change_pct(sym, lookback_sec=config.LOOKBACK_SECONDS) * 100 if hasattr(price_feed, &#x27;price_change_pct&#x27;) else 0
+            log.info(&quot;  %s price=%.2f  Δ%ds=%+.3f%%&quot;, sym.upper(), price or 0, config.LOOKBACK_SECONDS, change)
+
+    def _handle_signal(self, signum, frame) -&gt; None:
+        log.info(&quot;Signal %s received — shutting down&quot;, signum)
+        self.stop()
+
+
+# ── Entry point ───────────────────────────────────────────────────────────────
+def parse_args() -&gt; argparse.Namespace:
+    parser = argparse.ArgumentParser(description=&quot;Polymarket Latency Arbitrage Bot&quot;)
+    parser.add_argument(&quot;--live&quot;, action=&quot;store_true&quot;, default=False)
+    parser.add_argument(&quot;--interval&quot;, type=float, default=config.SCAN_INTERVAL_SEC)
+    parser.add_argument(&quot;--balance&quot;, type=float, default=None)
+    return parser.parse_args()
+
+
+def main() -&gt; None:
+    args = parse_args()
+    if args.balance is not None:
+        global PAPER_STARTING_BALANCE
+        PAPER_STARTING_BALANCE = args.balance
+
+    paper_mode = not args.live
+
+    if not paper_mode:
+        print(&quot;\n&quot; + &quot;!&quot; * 60)
+        print(&quot;! LIVE TRADING MODE — REAL USDC WILL BE SPENT&quot;)
+        print(&quot;! Press Ctrl-C within 5 seconds to abort...&quot;)
+        print(&quot;!&quot; * 60 + &quot;\n&quot;)
+        try:
+            time.sleep(5)
+        except KeyboardInterrupt:
+            sys.exit(0)
+
+    bot = ArbBot(paper_mode=paper_mode, scan_interval=args.interval)
+    bot.start()
+
+
+if __name__ == &quot;__main__&quot;:
+    main()</pre>

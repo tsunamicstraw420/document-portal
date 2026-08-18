@@ -1,0 +1,140 @@
+<h1>The Agents Research Prompt</h1>
+<p>A reusable, copy-paste prompt for deeply researching AI agents and custom agents. Paste it into any research-capable AI (Claude, ChatGPT, Perplexity, Gemini) that can search the web. Fill in the bracketed <code>[...]</code> variables first, or leave them and the AI will ask.</p>
+<hr>
+<h2>How to use this</h2>
+<ol>
+<li>Copy everything inside the <strong>PROMPT</strong> block below.</li>
+<li>Replace the <code>[VARIABLES]</code> at the top with your own details (or delete a line to accept the default).</li>
+<li>Paste it into your AI tool and send.</li>
+<li>Use the <strong>follow-up prompts</strong> at the bottom to go deeper on any section.</li>
+</ol>
+<p>Tip: run it once with defaults to get the lay of the land, then re-run focused versions (e.g. only &quot;no-code platforms&quot; or only &quot;Claude Agent SDK&quot;) for depth.</p>
+<hr>
+<h2>PROMPT</h2>
+<pre class='code'><code>You are my senior AI-agents research analyst and teacher. Your job is to research the
+current state of AI agents and custom agents thoroughly, then hand me a decision-ready,
+well-cited briefing that a smart non-coder can act on.
+
+# MY CONTEXT (edit these)
+- My skill level: [non-coder who builds with no-code tools and AI assistants; can follow guided steps but does not write production code]
+- What I want to build: [describe your ongoing projects and any new ideas — e.g. &quot;an assistant that organizes my files,&quot; &quot;a research agent for my podcast,&quot; &quot;a customer-support bot&quot;]
+- Tools I already use or have access to: [e.g. Claude / Cowork, ChatGPT, Zapier, n8n, Notion, Google Workspace]
+- My goal: [understand agents well enough to design and commission/build custom agents for my projects]
+- Budget sensitivity: [free-first, willing to pay for a couple of key tools]
+- Depth: [comprehensive — I want the full landscape, not a quick summary]
+
+# WHAT COUNTS AS &quot;DONE&quot;
+Deliver a briefing that lets me (a) explain how agents work in plain language, (b) choose
+the right approach for each of my projects, and (c) know exactly what to learn or build next.
+
+# RULES
+- Search the web and cite every non-obvious claim with a source link and its date.
+- Prioritize primary sources (official docs, framework repos, vendor pages) over blog roundups.
+- Flag anything that changed in the last 6 months, and note when something is likely to
+  keep changing fast.
+- When tools compete, give me a plain-English &quot;use this when…&quot; verdict, not a spec dump.
+- Define jargon the first time you use it. Assume I&#x27;m smart but new to the terminology.
+- Where you&#x27;re uncertain or sources disagree, say so instead of guessing.
+- No code unless I ask. When you must reference code, explain what it does in words.
+
+# RESEARCH SCOPE — cover all of these
+
+## 1. Foundations (plain-language)
+- What an &quot;AI agent&quot; actually is, and how it differs from a chatbot, a workflow/automation,
+  and a single LLM prompt. Give a crisp definition and a spectrum (assistant → workflow →
+  autonomous agent).
+- The core loop: perceive → reason/plan → act (tool use) → observe → repeat. Explain with a
+  concrete everyday example.
+- The building blocks every agent has: model, instructions/system prompt, tools, memory,
+  and a control loop. Define each.
+- Key terms I&#x27;ll keep hearing, each in one sentence: tool use / function calling, ReAct,
+  RAG (retrieval-augmented generation), context window, MCP (Model Context Protocol),
+  orchestration, guardrails, evals, human-in-the-loop.
+
+## 2. How agents are designed (patterns)
+- The canonical agentic design patterns and when each is used: Reflection, Tool Use, ReAct,
+  Planning, Multi-Agent Collaboration, Evaluator-Optimizer, and Human-in-the-Loop.
+- Single-agent vs. multi-agent (orchestrator + subagents): trade-offs, and when multi-agent
+  is worth the added complexity and cost.
+- Memory: short-term (context) vs. long-term (vector/episodic memory). Why it matters and
+  how it&#x27;s usually implemented at a high level.
+- Agentic RAG: what it is and when an agent should retrieve documents as a tool.
+- The most common failure modes (loops, hallucinated tool calls, runaway cost) and how
+  people mitigate them.
+
+## 3. Ways to BUILD a custom agent — full landscape, four lanes
+For each lane: what it is, who it&#x27;s for, learning curve, cost, strengths, limits, and a
+&quot;pick this if…&quot; line. Then a comparison table across all lanes.
+  a. No-code / low-code platforms — e.g. n8n, Zapier Agents, Make, Dify, Lindy, Botpress,
+     Flowise, plus custom GPTs / Claude Projects. Best current option(s) for a non-coder.
+  b. Anthropic / Claude ecosystem — Claude Agent SDK (subagents, Skills, hooks, sessions),
+     MCP, Claude Projects, and Cowork. What each is for and how they fit together.
+  c. Code frameworks (conceptual, so I understand what developers/AI assistants use) —
+     LangGraph, CrewAI, AutoGen / Microsoft Agent Framework, OpenAI Agents SDK. One
+     paragraph each: what it&#x27;s known for and its ideal use case.
+  d. Managed / hosted agent products and API-native building. When to just use a hosted
+     product vs. build your own.
+
+## 4. MCP and tools (the connectivity layer)
+- What MCP is, in plain terms, and why it&#x27;s become the standard way agents connect to tools
+  and data.
+- How an agent gets &quot;hands&quot; — the kinds of tools agents use (search, files, apps, code,
+  browsers) and how tool permissions/guardrails work.
+
+## 5. Reliability, safety, and cost
+- Evals: how do you know an agent is actually working? Beginner-friendly ways to test.
+- Guardrails and permissions; keeping a human in the loop for risky actions.
+- Cost drivers (tokens, tool calls, multi-agent fan-out) and how to keep spend sane.
+- Privacy/data considerations when an agent touches my files, email, or accounts.
+
+## 6. Best learning resources (ranked, mostly free)
+- The single best free course to start with, and why.
+- 5–8 more high-quality resources (official courses, docs, canonical essays, one or two
+  YouTube/newsletter picks), each with a one-line &quot;what you&#x27;ll get.&quot;
+- Note which are vendor-neutral vs. tied to one platform.
+
+## 7. Apply it to MY projects
+For each project I listed in MY CONTEXT:
+- The simplest approach that would work, and the &quot;grown-up&quot; version if it takes off.
+- Which build lane and specific tool(s) to use.
+- The first concrete milestone I could reach in a weekend.
+
+# OUTPUT FORMAT
+1. Executive summary (about 10 bullet-equivalent sentences in prose): the 8–10 things I
+   most need to understand right now.
+2. A glossary of the key terms (term → one-sentence definition).
+3. The full briefing, following the scope sections above, using clear headers.
+4. A single comparison table of the build lanes/tools.
+5. A &quot;start here&quot; section: my recommended first course, first tool, and first project.
+6. Open questions / things to watch (what&#x27;s still changing fast).
+7. Sources: numbered list of every link used, each with its publication date.
+
+Before you begin, if any of MY CONTEXT is blank or unclear, ask me up to 3 quick
+questions. Otherwise, proceed.</code></pre>
+<hr>
+<h2>Follow-up prompts (paste after the main briefing)</h2>
+<p>Use these to drill into any lane once you have the overview:</p>
+<ul>
+<li><strong>Go deep on no-code:</strong> &quot;Focus only on no-code/low-code agent platforms for a non-coder. Compare n8n, Zapier Agents, Make, Dify, and Lindy on: ease for a beginner, cost, what kinds of agents each is best at, and how each handles connecting to my apps. End with a single recommendation for my projects and a first-build walkthrough in plain steps.&quot;</li>
+</ul>
+<ul>
+<li><strong>Go deep on the Claude/Anthropic stack:</strong> &quot;Explain the Claude ecosystem for building custom agents as one coherent stack: Claude Projects, Cowork, Skills, MCP connectors, subagents, and the Claude Agent SDK. For each, tell me what it is, when I&#x27;d reach for it as a non-coder, and how they build on each other. Include the official docs links.&quot;</li>
+</ul>
+<ul>
+<li><strong>Understand the code frameworks without coding:</strong> &quot;I won&#x27;t write the code myself, but I want to understand LangGraph, CrewAI, AutoGen, and the OpenAI Agents SDK well enough to know which one to ask an AI assistant or developer to use. Give me a plain-English profile of each, a &#x27;best for&#x27; verdict, and one real example of what each is commonly used to build.&quot;</li>
+</ul>
+<ul>
+<li><strong>Design a specific agent:</strong> &quot;Help me design an agent for [PROJECT]. Walk through: the job it does, the trigger, the steps/tools it needs, where a human should approve, the memory it needs, how I&#x27;d test it, and the cheapest way to build a first version. Then give me a one-paragraph &#x27;spec&#x27; I could hand to a builder or an AI.&quot;</li>
+</ul>
+<ul>
+<li><strong>Stay current:</strong> &quot;What has changed in the AI agents world in the last 60 days? New framework releases, notable model/agent capabilities, and shifts in best practice. Cite dates and sources, and tell me what (if anything) changes my recommended approach.&quot;</li>
+</ul>
+<hr>
+<h2>Why this prompt is built the way it is</h2>
+<ul>
+<li><strong>It assigns a role and a done-condition</strong> so the AI optimizes for a usable briefing, not a wall of text.</li>
+<li><strong>It forces citations and dates</strong> because the agent field changes monthly — undated claims age badly.</li>
+<li><strong>It separates &quot;understand&quot; from &quot;build&quot;</strong> so you get concepts <em>and</em> an action path.</li>
+<li><strong>It&#x27;s parameterized</strong> — the <code>MY CONTEXT</code> block is the only thing you edit to re-aim it.</li>
+<li><strong>It ends by tying research back to your projects</strong>, which is where most research prompts stop short.</li>
+</ul>

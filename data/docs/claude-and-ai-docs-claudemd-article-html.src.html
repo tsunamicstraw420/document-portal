@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How to Build a CLAUDE.md File — cyrilXBT</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: #fff;
+    color: #1a1a1a;
+    font-size: 11pt;
+    line-height: 1.65;
+    padding: 0;
+  }
+  .page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 52px;
+  }
+  .meta {
+    font-size: 9.5pt;
+    color: #888;
+    margin-bottom: 6px;
+    letter-spacing: 0.02em;
+  }
+  .meta span { color: #e85d04; font-weight: 600; }
+  h1 {
+    font-size: 22pt;
+    font-weight: 800;
+    line-height: 1.2;
+    color: #0a0a0a;
+    margin-bottom: 4px;
+  }
+  .tagline {
+    font-size: 12pt;
+    font-weight: 700;
+    color: #e85d04;
+    letter-spacing: 0.05em;
+    margin-bottom: 20px;
+  }
+  hr.accent {
+    border: none;
+    border-top: 2.5px solid #e85d04;
+    margin-bottom: 24px;
+  }
+  hr.divider {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 20px 0;
+  }
+  p {
+    margin-bottom: 12px;
+    color: #2a2a2a;
+    text-align: justify;
+  }
+  h2 {
+    font-size: 15pt;
+    font-weight: 800;
+    color: #0a0a0a;
+    margin: 28px 0 8px;
+    border-left: 4px solid #e85d04;
+    padding-left: 10px;
+  }
+  h3 {
+    font-size: 11.5pt;
+    font-weight: 700;
+    color: #e85d04;
+    margin: 18px 0 5px;
+  }
+  ul, ol {
+    margin: 8px 0 12px 20px;
+    color: #2a2a2a;
+  }
+  li { margin-bottom: 4px; }
+  pre {
+    background: #1a1a1a;
+    color: #e8e8e8;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 8.5pt;
+    line-height: 1.5;
+    padding: 14px 16px;
+    border-radius: 6px;
+    margin: 10px 0 14px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    border-left: 3px solid #e85d04;
+  }
+  code {
+    background: #f0f0f0;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 8.5pt;
+    padding: 1px 4px;
+    border-radius: 3px;
+    color: #c0392b;
+  }
+  .callout {
+    background: #fff8f0;
+    border-left: 4px solid #e85d04;
+    padding: 12px 16px;
+    margin: 14px 0;
+    font-weight: 600;
+    color: #333;
+    font-size: 11pt;
+    font-style: italic;
+  }
+  .footer {
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid #ddd;
+    font-size: 9pt;
+    color: #888;
+  }
+  .footer .handle { color: #e85d04; font-weight: 600; }
+  .stats { font-size: 8.5pt; color: #aaa; margin-top: 4px; }
+  @media print {
+    body { background: #fff; }
+    .page { padding: 36px 40px; }
+    pre { page-break-inside: avoid; }
+    h2, h3 { page-break-after: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="meta"><span>CyrilXBT</span> &nbsp;·&nbsp; @cyrilXBT &nbsp;·&nbsp; Apr 21, 2026</div>
+  <h1>How to Build a CLAUDE.md File That Makes Claude Code Actually Listen to You</h1>
+  <div class="tagline">FULL GUIDE</div>
+  <hr class="accent">
+
+  <p>Most people using Claude Code are doing it wrong. They open a new project, start typing prompts, and wonder why Claude keeps forgetting the rules, ignoring their stack, or writing code that looks nothing like what they asked for.</p>
+  <p>The problem is not Claude. The problem is you never told Claude who you are, what you are building, or how you want it to behave.</p>
+  <div class="callout">That is what a CLAUDE.md file is for.</div>
+  <p>This is the single most underrated feature in Claude Code. Once you understand it, you will never go back to raw prompting. This guide covers everything: what a CLAUDE.md file is, why it matters, how to structure it, and the exact templates I use for my own projects.</p>
+
+  <h2>What Is a CLAUDE.md File?</h2>
+  <p>When you run Claude Code inside a project folder, it automatically looks for a file called <code>CLAUDE.md</code> in the root of that directory. If it finds one, it reads the entire file before doing anything else.</p>
+  <p>Think of it as a persistent system prompt that travels with your project. Every time you start a session, Claude already knows:</p>
+  <ul>
+    <li>What the project is</li>
+    <li>What stack you are using</li>
+    <li>What coding conventions you follow</li>
+    <li>What it should never do</li>
+    <li>What your goals are</li>
+  </ul>
+  <p>This is the difference between a junior dev who needs constant hand-holding and a senior dev who gets it from day one. One file. Permanent context. Zero repeated instructions.</p>
+
+  <h2>Why Most People Skip This (And Why That Is Expensive)</h2>
+  <p>Here is what happens when you do not use a CLAUDE.md file:</p>
+  <ul>
+    <li>You spend the first 5 minutes of every session re-explaining your project</li>
+    <li>Claude writes code using the wrong framework</li>
+    <li>It uses naming conventions you hate</li>
+    <li>It adds comments you never asked for</li>
+    <li>It suggests packages you already decided against three weeks ago</li>
+  </ul>
+  <p>You correct it. It forgets. You correct it again. That is not a productivity tool. That is a very fast typist who needs babysitting.</p>
+  <p>A CLAUDE.md file eliminates almost all of this. It is the difference between Claude acting like a first-day hire and Claude acting like someone who has been on your team for months.</p>
+  <div class="callout">The time investment to write a good CLAUDE.md is 20 to 30 minutes. The time you get back is EVERY session after that.</div>
+
+  <h2>Where to Put the File</h2>
+  <p>Claude Code checks for <code>CLAUDE.md</code> in three places:</p>
+  <ul>
+    <li><strong>Project root</strong> — The main one. Claude reads this at the start of every session inside that folder.</li>
+    <li><strong>Subdirectories</strong> — If you have a monorepo, you can have a CLAUDE.md in each subfolder. Claude reads the relevant one based on where you are working.</li>
+    <li><strong>Your home directory</strong> — A global <code>~/.claude/CLAUDE.md</code> that applies to ALL your projects. Great for personal preferences that never change.</li>
+  </ul>
+  <p>For most people, start with the project root. Add a global one once you know your permanent preferences.</p>
+
+  <h2>The Anatomy of a High-Performance CLAUDE.md</h2>
+  <p>Here is the structure I use. Each section serves a specific purpose. Do not skip sections. Every missing piece is a gap where Claude will default to its own judgment.</p>
+
+  <h3>1. Project Overview</h3>
+  <p>Start with a plain-English description of what the project is. One or two paragraphs. No fluff.</p>
+<pre>## Project Overview
+This is a crypto signal bot dashboard built with Next.js and Tailwind.
+It scans 98 trading pairs every 58 seconds using RSI, MACD, and Bollinger
+Bands and displays live signals in a dark-mode UI. The target user is a
+retail crypto trader who wants clean, fast signals without noise.
+Speed and clarity are the two non-negotiable priorities.</pre>
+  <p>Claude now knows the domain, the user, and the priorities. Every decision it makes will be filtered through this context.</p>
+
+  <h3>2. Tech Stack</h3>
+  <p>Be explicit. List everything.</p>
+<pre>## Tech Stack
+- Framework: Next.js 14 (App Router)
+- Styling: Tailwind CSS only — no CSS modules, no styled-components
+- Language: TypeScript strict mode
+- Database: Supabase (Postgres)
+- Auth: Supabase Auth
+- Deployment: Vercel
+- Package manager: pnpm
+- State: Zustand
+- Charts: Recharts</pre>
+  <p>If you leave this out, Claude will make assumptions. Sometimes right. Often wrong.</p>
+
+  <h3>3. Coding Conventions</h3>
+  <p>This is where most CLAUDE.md files fall short. You need to be specific about how you write code, not just what you use.</p>
+<pre>## Coding Conventions
+- Use named exports for all components — no default exports
+- File names use kebab-case: signal-card.tsx, not SignalCard.tsx
+- Component names use PascalCase
+- All functions use arrow function syntax
+- No var — only const and let
+- Prefer early returns over nested conditionals
+- Add JSDoc comments only for exported utility functions
+- Never use any — always type explicitly
+- Keep components under 150 lines — extract if larger
+- Co-locate types with the file that uses them unless shared across 3+ files</pre>
+  <p>This is the stuff Claude gets wrong constantly without guidance. Write it once. Never correct it again.</p>
+
+  <h3>4. What Claude Should NEVER Do</h3>
+  <p>This section is underused and it is one of the most powerful.</p>
+<pre>## Never Do This
+- Never install a new package without asking me first
+- Never rewrite a component I did not ask you to touch
+- Never use useEffect for data fetching — use React Query
+- Never add console.log statements to production code
+- Never use inline styles
+- Never suggest switching the framework or database
+- Never add placeholder comments like "// TODO: implement this"
+- Never use emojis in code comments
+- Never wrap everything in a try/catch without telling me</pre>
+  <p>Claude is helpful by nature. Sometimes TOO helpful. It will refactor things you did not ask it to refactor. The NEVER section puts hard stops on this behavior.</p>
+
+  <h3>5. File Structure</h3>
+  <p>Show Claude how your project is organized.</p>
+<pre>## File Structure
+src/
+  app/          # Next.js App Router pages
+  components/   # Shared UI components
+    ui/         # Primitive components (buttons, inputs)
+    features/   # Feature-specific components
+  lib/          # Utility functions and helpers
+  hooks/        # Custom React hooks
+  stores/       # Zustand stores
+  types/        # Shared TypeScript types
+  styles/       # Global styles only</pre>
+  <p>Do not create new top-level folders without asking. Do not put components in <code>/app</code> — only pages and layouts go there.</p>
+
+  <h3>6. Current Goals</h3>
+  <p>This is the section most people forget. Tell Claude what you are actively working on RIGHT NOW.</p>
+<pre>## Current Sprint Goals
+- Build the signal card component with RSI, MACD, and BB indicators
+- Connect to Supabase real-time for live updates
+- Add a filter bar to sort signals by strength and timeframe
+- Optimize for mobile — the dashboard must be fully usable on phone
+
+Not working on authentication this sprint.
+Do not suggest auth-related changes.</pre>
+  <p>This keeps Claude focused. Without it, Claude will happily solve problems you are not trying to solve right now.</p>
+
+  <h3>7. Context and Background</h3>
+  <p>Add anything else Claude needs to know about the project history, decisions already made, or constraints.</p>
+<pre>## Important Context
+- We already tried using Socket.io for real-time — it caused memory leaks
+  on Vercel. We switched to Supabase real-time. Do not suggest Socket.io.
+- The Binance API rate limit is 1200 requests per minute per IP.
+  Always account for this when writing fetch logic.
+- The bot currently runs on a $6/month VPS. Keep dependencies lean.
+- This project started as a personal tool and is now a paid product on
+  Gumroad. Code quality matters — this is not a throwaway script.</pre>
+  <p>This section prevents Claude from suggesting things you already ruled out. It saves you from repeating yourself across sessions.</p>
+
+  <h2>A Full CLAUDE.md Template You Can Copy</h2>
+  <p>Here is a complete template ready to customize for your own projects.</p>
+<pre># CLAUDE.md
+
+## Project Overview
+[Describe what the project does in 2 to 3 sentences. Who is it for? What problem does it solve?]
+
+## Tech Stack
+- Framework: [e.g. Next.js 14 App Router]
+- Styling: [e.g. Tailwind CSS]
+- Language: [e.g. TypeScript]
+- Database: [e.g. Supabase]
+- Auth: [e.g. Supabase Auth]
+- Deployment: [e.g. Vercel]
+- Package manager: [e.g. pnpm]
+- State management: [e.g. Zustand]
+
+## Coding Conventions
+- [List your naming conventions]
+- [List your syntax preferences]
+- [List your component structure rules]
+- [List your commenting rules]
+- [List your typing rules]
+
+## Never Do This
+- Never install packages without asking
+- Never rewrite files I did not ask you to touch
+- [Add your specific restrictions]
+
+## File Structure
+[Paste your directory tree here and annotate each folder]
+
+## Current Goals
+[List what you are actively building this week or this sprint]
+[List what is explicitly OUT OF SCOPE right now]
+
+## Important Context
+[Anything Claude needs to know about past decisions, constraints, or gotchas]
+
+## Communication Style
+- Be direct. Skip the preamble.
+- If you are unsure about something, ask before writing code.
+- When you make a change, tell me what you changed and why in one sentence.
+- Flag anything that looks like a potential bug or architectural issue.</pre>
+
+  <h2>The Global CLAUDE.md: Your Personal Preferences Layer</h2>
+  <p>Once you have used project-level CLAUDE.md files for a while, you will notice patterns. Conventions you want in EVERY project. That is what the global CLAUDE.md is for.</p>
+  <p>Create it here:</p>
+<pre>mkdir -p ~/.claude
+touch ~/.claude/CLAUDE.md</pre>
+  <p>Then fill it with your universal preferences:</p>
+<pre># Global CLAUDE.md — Cyril's Defaults
+
+## My Defaults Across All Projects
+- I prefer TypeScript over JavaScript always
+- I use pnpm as my package manager
+- I write arrow functions not function declarations
+- I prefer explicit types over inferred ones in function signatures
+- Keep responses concise — I do not need lengthy explanations unless I ask
+- If something is technically possible but a bad idea, tell me first
+
+## Communication Rules
+- Do not start responses with "Great question" or "Certainly"
+- Be direct and skip filler sentences
+- When writing code, write the code first and explain after if needed
+- Do not suggest I read documentation unless you cannot answer the question
+
+## Things I Never Want
+- Placeholder comments in code
+- Console.log in any code I will deploy
+- Unsolicited refactors of things I did not ask about
+- Default exports in React components</pre>
+  <p>This runs in the background for every project. Combined with a project-level CLAUDE.md, Claude operates with two layers of context at all times.</p>
+
+  <h2>Advanced: Using CLAUDE.md for Non-Code Projects</h2>
+  <p>CLAUDE.md is not just for code. If you are using Claude Code for writing, research, or content workflows, you can use the same file to set behavioral rules for those contexts.</p>
+<pre># CLAUDE.md — Content Operations
+
+## Project Overview
+This folder contains my article pipeline for cyrilXBT. I write about AI tools,
+crypto trading, and productivity for solo builders. My audience is intermediate
+to advanced. They do not need hand-holding.
+
+## Writing Style Rules
+- Write in first person
+- Use short punchy sentences
+- Avoid the word "utilize" — use "use"
+- Avoid "leverage" as a verb
+- No em dashes
+- No bullet points in articles unless it is a genuine list
+
+## What I Never Want in My Articles
+- Phrases like "in today's fast-paced world"
+- Passive voice where active voice works
+- Filler intros that take more than 2 sentences to get to the point
+- Conclusions that just summarize what I already said
+
+## Tone
+Direct. Opinionated. Personal. Written like someone who has actually done
+the thing. Not a tutorial robot. Not a corporate blog.</pre>
+  <p>Now Claude writes in your voice from the first sentence. Every time.</p>
+
+  <h2>Common Mistakes People Make With CLAUDE.md</h2>
+
+  <h3>Mistake 1: Being too vague</h3>
+  <p><strong>Bad:</strong> "Write clean code."<br>
+  <strong>Good:</strong> "Use named exports, kebab-case file names, and no default exports."<br>
+  Vague instructions are better than nothing but they still leave too much to interpretation. Be specific.</p>
+
+  <h3>Mistake 2: Writing it once and never updating it</h3>
+  <p>Your project evolves. Your CLAUDE.md should evolve with it. Any time you make a major architectural decision or rule out an approach, add it to the file. Update yours at the end of every sprint.</p>
+
+  <h3>Mistake 3: Putting goals in instead of context</h3>
+  <p>Your CLAUDE.md is not a to-do list. It is a briefing document. Goals are fine in the Current Sprint section but the rest of the file should be stable context that does not change week to week.</p>
+
+  <h3>Mistake 4: Forgetting the NEVER section</h3>
+  <p>This is the most valuable section for experienced developers. You already know what you hate. Write it down. Claude will stop doing it.</p>
+
+  <h3>Mistake 5: Not having a global one</h3>
+  <p>If you are only using project-level files, you are re-writing the same preferences across every project. Spend 20 minutes on your global CLAUDE.md and you never have to write those preferences again.</p>
+
+  <h2>The Real Unlock: CLAUDE.md + Custom Commands</h2>
+  <p>Once your CLAUDE.md is solid, the next level is combining it with Claude Code slash commands. Claude Code lets you create custom commands in <code>.claude/commands/</code> as markdown files. Each file becomes a reusable command you can call with <code>/command-name</code>.</p>
+  <p>For example, create <code>.claude/commands/new-component.md</code>:</p>
+<pre>Create a new React component with the following requirements:
+- TypeScript functional component
+- Named export only
+- Tailwind for styling
+- Props interface defined above the component
+- Place in src/components/features/ unless I specify otherwise
+- File name in kebab-case
+Ask me for the component name and purpose before writing anything.</pre>
+  <p>Now type <code>/new-component</code> and Claude already knows the full spec.</p>
+  <p>Your CLAUDE.md handles the project-wide context. Your slash commands handle the task-specific workflows. Together they turn Claude Code into something that actually feels like a senior dev on your team.</p>
+
+  <h2>Final Thoughts</h2>
+  <p>The developers getting the most out of Claude Code are not the ones with the cleverest prompts. They are the ones who invested 30 minutes up front to write a CLAUDE.md that does the prompting for them.</p>
+  <div class="callout">Stop explaining yourself every session. Write the file. Lock in the context. Let Claude work.</div>
+
+  <hr class="divider">
+  <div class="footer">
+    Follow <span class="handle">@cyrilXBT</span> on X for more on building with AI, crypto, and how to ship faster.
+    <div class="stats">7:00 AM · Apr 21, 2026 &nbsp;·&nbsp; 73.5K Views &nbsp;·&nbsp; 1,122 Reposts &nbsp;·&nbsp; 2,141 Likes</div>
+  </div>
+
+</div>
+</body>
+</html>

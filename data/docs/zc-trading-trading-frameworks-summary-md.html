@@ -1,0 +1,86 @@
+<h1>Trading Frameworks Summary</h1>
+<p>Distilled trading rules used by this system. Sourced from Koroush AK&#x27;s reference PDFs in this repo and the standards in <a href="CLAUDE.md" target="_blank" rel="noopener">CLAUDE.md</a>. This document is the single-page reference; the PDFs are the long form.</p>
+<hr>
+<h2>Primary Timeframe: 4-Hour Swing</h2>
+<p><strong>Decided 2026-05-16.</strong> This system targets <strong>swing trading on 4H bars</strong>, not intraday scalping.</p>
+<table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>Primary chart</td><td>4H</td></tr><tr><td>Setup hierarchy (S/R cascade)</td><td>Weekly → Daily → 4H</td></tr><tr><td>Typical hold time</td><td>Hours to days</td></tr><tr><td>Expected setups</td><td>2-5 per week per instrument</td></tr><tr><td>VWAP session anchor</td><td><strong>Weekly</strong> (~42 bars/session — sufficient sample)</td></tr></tbody></table>
+<h3>Why not 1-min</h3>
+<p>Koroush AK&#x27;s exit-strategies article uses 1-min as a <em>teaching</em> timeframe because it gives beginners fast feedback. But 1-min is for full-time scalpers — high noise, decaying edge against HFT, hours of screen time per day. 4H gives cleaner signal, fewer false setups, and is compatible with checking charts twice a day.</p>
+<h3>VWAP anchor mapping (auto-selected by <code>scripts/plot_indicators.py</code>)</h3>
+<table><thead><tr><th>Interval</th><th>Session anchor</th><th>Bars/session</th></tr></thead><tbody><tr><td>1m – 30m</td><td>Daily (<code>D</code>)</td><td>48 – 1440</td></tr><tr><td>1h – 12h</td><td><strong>Weekly (<code>W</code>)</strong></td><td>14 – 168</td></tr><tr><td>1d – 3d</td><td>Monthly (<code>M</code>)</td><td>10 – 30</td></tr><tr><td>1w</td><td>Yearly (<code>Y</code>)</td><td>52</td></tr></tbody></table>
+<p>VWAP needs ~30+ bars per session to be meaningful. Daily-anchored VWAP on a 4H chart shows only 6 bars per session — useless. Weekly fixes this.</p>
+<h3>Caveat: exit-rule numbers need re-validation</h3>
+<p>Koroush&#x27;s 0.5R FTA cut, 2× time stop, and 0.9R-→-breakeven rule were EV-tested on <strong>1-min</strong> data (10,000+ trades). The <em>concepts</em> port to 4H (they&#x27;re about R-multiple psychology, not bar size), but the <em>exact thresholds</em> may differ. Our journal will re-validate each rule on 4H data before we treat the published numbers as authoritative. See <a href="Trade_Exit_Strategies.pdf" target="_blank" rel="noopener"><code>Trade_Exit_Strategies.pdf</code></a>.</p>
+<h3>Universe</h3>
+<table><thead><tr><th>Stage</th><th>Universe</th></tr></thead><tbody><tr><td>Pipeline validation (now)</td><td>BTC + ETH + SOL on 4H</td></tr><tr><td>End of Phase 1</td><td>Top ~10-20 by Binance USDT volume, non-stable, non-wrapped</td></tr><tr><td>Phase 2+</td><td>Top ~50 with liquidity filter, snapshotted per backtest</td></tr></tbody></table>
+<hr>
+<h2>The Three Dimensions of Trading Performance</h2>
+<p>Every trade — and every module in this system — must respect three interdependent dimensions. Weakness in any one prevents scaling.</p>
+<table><thead><tr><th>Dimension</th><th>What it means</th><th>System module</th></tr></thead><tbody><tr><td><strong>Strategy</strong></td><td>Edge identification, setup rules, asset selection, journal</td><td><code>src/indicators/</code>, <code>src/signals/</code></td></tr><tr><td><strong>Risk</strong></td><td>Position sizing, stop/TP placement, daily/weekly limits, scaling</td><td><code>src/risk/</code></td></tr><tr><td><strong>Psyche</strong></td><td>Discipline, routines, emotional management, behavioral tracking</td><td><code>src/logging/</code>, pre-trade checklist</td></tr></tbody></table>
+<p>Automation handles Strategy and Risk well. Psyche is handled through forced human confirmation (Phases 1-3) and behavioral metrics, not automation.</p>
+<hr>
+<h2>Two Core Strategies</h2>
+<h3>Momentum (Breakout)</h3>
+<table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td><strong>Hypothesis</strong></td><td>Strength continues</td></tr><tr><td><strong>Action</strong></td><td>Buy above resistance / sell below support</td></tr><tr><td><strong>Environment</strong></td><td>Strong trends with volume</td></tr><tr><td><strong>VWAP signature</strong></td><td>Price above VWAP, steep upward slope</td></tr><tr><td><strong>Entry triggers</strong></td><td>Price closes through level; volume ≥ 20-bar average; R:R ≥ 2:1</td></tr><tr><td><strong>Stop</strong></td><td>Below recent swing low (or above swing high for shorts)</td></tr></tbody></table>
+<h3>Mean Reversion (Reversal)</h3>
+<table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td><strong>Hypothesis</strong></td><td>Price reverts to average</td></tr><tr><td><strong>Action</strong></td><td>Short fast spikes into resistance / long fast dumps into support</td></tr><tr><td><strong>Environment</strong></td><td>Range-bound, choppy</td></tr><tr><td><strong>VWAP signature</strong></td><td>Price oscillating within ±1σ of VWAP, flat slope</td></tr><tr><td><strong>Entry triggers</strong></td><td>Fast spike (&gt;2% in &lt;5 min) into level with weakening volume; R:R ≥ 2:1</td></tr><tr><td><strong>Stop</strong></td><td>Above/below spike extreme</td></tr></tbody></table>
+<p>Regime drives which strategy is active. Don&#x27;t run breakouts in a chop tape; don&#x27;t run reversals in a steep trend.</p>
+<hr>
+<h2>VWAP — the regime anchor</h2>
+<p>VWAP (volume-weighted average price) is the primary regime classifier. Implementation: <a href="src/indicators/vwap.py" target="_blank" rel="noopener">src/indicators/vwap.py</a>.</p>
+<table><thead><tr><th>Signal</th><th>Reading</th></tr></thead><tbody><tr><td><strong>Position vs VWAP</strong></td><td>Above = bullish bias. Below = bearish bias. Crossing = regime in transition.</td></tr><tr><td><strong>Slope of VWAP</strong></td><td>Steep (&gt;10° equivalent) = momentum. Flat = reversion. Reversing = caution.</td></tr><tr><td><strong>Band width (±1σ)</strong></td><td>Wide = volatile. Narrow = compression — expect expansion.</td></tr></tbody></table>
+<p>Session-anchored (resets each UTC day by default) so the band reflects today&#x27;s participation, not a rolling window.</p>
+<hr>
+<h2>Support &amp; Resistance (ZCT Framework)</h2>
+<p>Levels by timeframe, in order of weight:</p>
+<ol>
+<li><strong>Daily</strong> — primary structure; respected by most participants</li>
+<li><strong>4-hour</strong> — secondary structure</li>
+<li><strong>1-hour</strong> — intraday tradeable</li>
+<li><strong>15-minute</strong> — entry timing only</li>
+</ol>
+<p>Classification:</p>
+<ul>
+<li><strong>Fresh</strong> (untested since formation) → higher probability, less noise</li>
+<li><strong>Recycled</strong> (retested ≥1 time) → more tests = stronger confirmation, but more participants watching</li>
+</ul>
+<p>A trade taken against fresh daily resistance is qualitatively different from one against recycled 15-minute resistance.</p>
+<hr>
+<h2>Spike vs Grind</h2>
+<table><thead><tr><th>Pattern</th><th>Definition</th><th>Implication</th></tr></thead><tbody><tr><td><strong>Fast spike</strong></td><td>&gt;2% move in &lt;5 minutes</td><td>Reversion candidate — fade into S/R</td></tr><tr><td><strong>Slow grind</strong></td><td>Steady directional move over ≥15 minutes with rising volume</td><td>Momentum candidate — buy/short the breakout</td></tr></tbody></table>
+<p>The same level, hit by a spike vs a grind, gives opposite trades.</p>
+<hr>
+<h2>Risk Rules (Fixed-Risk Model)</h2>
+<p>From <a href="CLAUDE.md" target="_blank" rel="noopener">CLAUDE.md</a> and the position-sizing cheat sheet:</p>
+<table><thead><tr><th>Limit</th><th>Value</th></tr></thead><tbody><tr><td>Max risk per trade</td><td><strong>1%</strong> of account</td></tr><tr><td>Max risk per day</td><td><strong>2%</strong> of account</td></tr><tr><td>Max risk per week</td><td><strong>5%</strong> of account</td></tr><tr><td>Position size formula</td><td><code>(account × risk%) ÷ (stop distance × pip value)</code></td></tr><tr><td>Stop trading day if</td><td>daily loss ≥ 2%</td></tr><tr><td>Stop trading week if</td><td>weekly loss ≥ 5%</td></tr><tr><td>Increase position size only after</td><td>3 consecutive profitable weeks</td></tr></tbody></table>
+<hr>
+<h2>Trade Exits (Koroush AK&#x27;s 6 rules)</h2>
+<p>Full detail: <a href="Trade_Exit_Strategies.pdf" target="_blank" rel="noopener">Trade_Exit_Strategies.pdf</a>. Quick reference:</p>
+<table><thead><tr><th>#</th><th>Rule</th><th>Type</th><th>Targets trap</th></tr></thead><tbody><tr><td>1</td><td>Cut at FTA — close beyond −0.5R → exit for −0.5R</td><td>Mechanical</td><td>Full hit on losers</td></tr><tr><td>2</td><td>Time-based stop — cut at 2× avg-winner duration</td><td>Mechanical</td><td>Full hit on losers</td></tr><tr><td>3</td><td>Volume taper after entry → cut early</td><td>Discretionary</td><td>Money on table / full hit</td></tr><tr><td>4</td><td>At +0.9R, move stop to +0.1R</td><td>Mechanical</td><td>Winner → loser</td></tr><tr><td>5</td><td>Orderbook signals (thin book, trailing limits) → extend TP</td><td>Discretionary</td><td>Money on table</td></tr><tr><td>6</td><td>3-pattern alignment (onside / grind / quality) → extend TP</td><td>Discretionary</td><td>Money on table</td></tr></tbody></table>
+<p>The &quot;3 traps&quot; being avoided: (1) winner reverses to full stop, (2) leaving money on table, (3) full hit on losing trade despite warning signs.</p>
+<hr>
+<h2>Trade Management Defaults</h2>
+<table><thead><tr><th>Decision</th><th>Default rule</th></tr></thead><tbody><tr><td>Stop placement</td><td>Structure-based: below swing low (momentum) or spike extreme (reversion)</td></tr><tr><td>Take-profit placement</td><td>Next S/R level, or 2:1 R:R from entry, whichever comes first</td></tr><tr><td>Breakeven move</td><td>Optional: at +1R, move stop to break-even (or apply Rule 4 above for partials)</td></tr><tr><td>Trailing</td><td>Only in strong trends with confirming orderflow</td></tr><tr><td>Never</td><td>Trail a stop into loss</td></tr></tbody></table>
+<hr>
+<h2>Pre-Trade Checklist (every trade)</h2>
+<p>A trade is only valid if every box is checked:</p>
+<ul>
+<li>[ ] Strategy matches current regime (momentum strat in trending tape, reversion strat in chop)</li>
+<li>[ ] Setup type is one of the documented patterns</li>
+<li>[ ] S/R level identified with timeframe (daily / 4H / 1H / 15m)</li>
+<li>[ ] R:R ≥ 2:1 from intended entry to intended TP</li>
+<li>[ ] Position size matches risk-% rule for current account balance</li>
+<li>[ ] Daily loss limit not breached</li>
+<li>[ ] Weekly loss limit not breached</li>
+<li>[ ] Trade context logged before entry (not after)</li>
+</ul>
+<p>This checklist is the Psyche-dimension enforcement mechanism — it&#x27;s the system saying &quot;no&quot; when discipline would otherwise slip.</p>
+<hr>
+<h2>Backtest Acceptance Criteria</h2>
+<p>Any new signal rule must clear all of these on out-of-sample data before going live:</p>
+<table><thead><tr><th>Metric</th><th>Threshold</th></tr></thead><tbody><tr><td>Win rate</td><td>≥ 50%</td></tr><tr><td>Profit factor</td><td>≥ 1.8</td></tr><tr><td>Max drawdown</td><td>&lt; 15%</td></tr><tr><td>R:R realized</td><td>≥ 2:1 average</td></tr><tr><td>Sample size</td><td>≥ 6 months of bars</td></tr></tbody></table>
+<p>Forbidden during optimization (curve-fitting indicators): look-ahead bias, fitting to a single market regime, adding rules to explain individual losing trades, changing rules mid-test.</p>
+<hr>
+<h2>Where this maps in the codebase</h2>
+<table><thead><tr><th>Framework concept</th><th>Code location (planned)</th></tr></thead><tbody><tr><td>VWAP, slope, bands</td><td><code>src/indicators/vwap.py</code> ✓</td></tr><tr><td>S/R level detection</td><td><code>src/indicators/support_resistance.py</code></td></tr><tr><td>Spike vs grind</td><td><code>src/indicators/spike_detector.py</code></td></tr><tr><td>Momentum entry signals</td><td><code>src/signals/momentum_signals.py</code></td></tr><tr><td>Reversion entry signals</td><td><code>src/signals/reversion_signals.py</code></td></tr><tr><td>Position sizing</td><td><code>src/risk/position_sizing.py</code></td></tr><tr><td>Stop / TP rules + the 6 exit rules</td><td><code>src/risk/trade_management.py</code></td></tr><tr><td>Daily/weekly limits</td><td><code>src/risk/risk_limits.py</code></td></tr><tr><td>Pre-trade checklist</td><td><code>src/signals/signal_validator.py</code></td></tr><tr><td>Trade log + analytics</td><td><code>src/logging/</code></td></tr></tbody></table>
+<p>✓ = implemented. Everything else is planned per <a href="AUTOMATED_TRADING_SYSTEM_PLAN.md" target="_blank" rel="noopener">AUTOMATED_TRADING_SYSTEM_PLAN.md</a>.</p>

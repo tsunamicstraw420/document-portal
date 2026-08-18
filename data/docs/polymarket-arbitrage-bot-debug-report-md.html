@@ -1,0 +1,144 @@
+<h1>Debug Report — 5-min Signal Not Firing (13:10–13:45 PT)</h1>
+<p>Generated: 2026-05-10 by Cowork session analysis</p>
+<hr>
+<h2>Context</h2>
+<p>User reported: from 13:10–13:45 PT, the 5-min PA should have triggered a signal but nothing happened.</p>
+<p>Live bot is running on <strong>London</strong> VPS at <code>root@72.62.212.196</code> (Hostinger, Manchester DC). Local <code>bot.log</code> ends April 21 — today&#x27;s incident logs are on the VPS at <code>/opt/polymarket-bot/data/logs/bot.log</code>. This analysis is based on full static code review + all historical logs.</p>
+<blockquote><strong>Note (added 2026-05-10):</strong> Earlier drafts of this report referenced Jakarta (<code>72.61.209.224</code>) as production. That was incorrect — Jakarta has only ever been a warm standby. Production runs on London with the Tokyo signal relay (<code>45.63.122.65</code>) feeding it. See <code>TwoServer_QuickReference.pdf</code> for the full topology.</blockquote>
+<p>Current running config (confirmed from last log entries April 21):</p>
+<ul>
+<li><code>EDGE_THRESHOLD = 0.05</code> (5% flat, all durations)</li>
+<li><code>MIN_PRICE_MOVE_PCT = 0.0007</code> (0.07%)</li>
+<li><code>MIN_ENTRY_SECS_REMAINING_5MIN = 90</code></li>
+<li><code>MAX_PRE_ENTRY_SEC = 30</code></li>
+<li><code>MOMENTUM_LOOKBACK_SEC = 10</code></li>
+</ul>
+<hr>
+<h2>Root Cause Summary</h2>
+<p>Four issues identified, in priority order:</p>
+<h3>Bug #1 — Momentum check is over-blocking (PRIMARY CULPRIT)</h3>
+<p><strong>File:</strong> <code>strategy.py</code> line 183–185</p>
+<pre class='code'><code># CURRENT (broken):
+signal_is_up = price_change &gt; 0
+still_moving = move_10s &gt; 0 if signal_is_up else move_10s &lt; 0
+if not still_moving:
+    return None</code></pre>
+<p><strong>Problem:</strong> The strict <code>&gt; 0</code> / <code>&lt; 0</code> means the signal is killed the instant BTC stops accelerating — even at 0.000%, even for a single 0.5s scan. In practice: BTC spikes → price plateaus at new level → <code>move_10s = 0.000%</code> → <code>0.000 &gt; 0</code> is <code>False</code> → signal blocked. This kills signals for the <strong>entire duration of a consolidation</strong> (which is often most of the 5-min window after a spike). The log says &quot;Momentum block&quot; at DEBUG level — totally invisible in INFO logs.</p>
+<p><strong>Fix:</strong></p>
+<pre class='code'><code># FIXED — allow up to 0.02% drift against trend before blocking
+_MOMENTUM_TOLERANCE = 0.0002
+still_moving = move_10s &gt; -_MOMENTUM_TOLERANCE if signal_is_up else move_10s &lt; _MOMENTUM_TOLERANCE</code></pre>
+<hr>
+<h3>Bug #2 — Tokyo relay overflows the tick buffer</h3>
+<p><strong>File:</strong> <code>price_feed.py</code> line 24</p>
+<pre class='code'><code># CURRENT (broken for relay use):
+_TICK_BUFFER = 400  # ~6-7 min at ~1 tick/s</code></pre>
+<p><strong>Problem:</strong> The buffer was sized for Binance miniTicker (1 tick/s). The Tokyo relay (<code>signal_relay.py</code>) streams Binance <code>aggTrade</code> events at 10–50 ticks/second for BTC. At 20 aggTrades/s, the 400-tick buffer only covers <strong>~20 seconds</strong> of history. When <code>price_change_pct(lookback_sec=30)</code> is called, it can only look back 20s because that&#x27;s all that&#x27;s in the buffer. A sustained +0.30% drift over 30s only shows as +0.15% over the effective 20s window — <strong>below the 0.27% threshold needed to clear the 60% true_prob floor</strong>. This specifically hurts gradual sustained moves (as opposed to flash spikes), which is exactly the pattern that should be the easiest to trade.</p>
+<p><strong>Fix:</strong></p>
+<pre class='code'><code># FIXED — supports relay at 50+ aggTrades/s with full 30s coverage
+_TICK_BUFFER = 3000  # ~60s at 50 ticks/s, ~50 min at 1 tick/s</code></pre>
+<hr>
+<h3>Design Issue #3 — 60-second dead zone every 5 minutes (silent)</h3>
+<p><strong>Files:</strong> <code>strategy.py</code>, <code>config.py</code></p>
+<p><strong>Problem:</strong> The combination of:</p>
+<ul>
+<li><code>MAX_PRE_ENTRY_SEC = 30</code> (don&#x27;t enter more than 30s before window opens)</li>
+<li><code>MIN_ENTRY_SECS_REMAINING_5MIN = 90</code> (block if &lt;90s remain = block after T+210s)</li>
+</ul>
+<p>...creates a <strong>60-second gap every 5 minutes</strong> (from T+210s to T+270s) where no 5-min entry can fire. In a 35-minute window: 7 gaps × 60s = <strong>7 minutes of total dead time</strong>. All of this is silent — no log output at INFO level.</p>
+<p><strong>Timeline per window:</strong></p>
+<pre class='code'><code>T-30s  → pre-entry opens (MAX_PRE_ENTRY_SEC)
+T+0s   → window opens
+T+210s → entry closes (MIN_ENTRY_SECS_REMAINING_5MIN = 90s before T+300)
+         ← 60-second gap — NO ENTRY POSSIBLE →
+T+270s → next window&#x27;s pre-entry opens (30s before T+300)
+T+300s → next window opens</code></pre>
+<p><strong>Fix (optional):</strong> Reduce <code>MIN_ENTRY_SECS_REMAINING_5MIN</code> from 90 to 60, which shortens the dead zone from 60s to 30s. Alternatively, add a INFO-level log when a signal is blocked by the time gate so you can see it happening.</p>
+<hr>
+<h3>Design Issue #4 — True signal bar is 0.27%, not 0.07% (misleading config)</h3>
+<p><strong>Files:</strong> <code>config.py</code>, <code>strategy.py</code></p>
+<p><strong>Problem:</strong> <code>MIN_PRICE_MOVE_PCT = 0.0007</code> (0.07%) looks like the entry bar, but the actual effective minimum is <strong>0.27%</strong> — the move needed for <code>true_prob ≥ 60%</code> with k=150 (5-min steepness). Any Binance move between 0.07% and 0.27% passes the first gate, looks like it&#x27;s being evaluated, and then fails silently at the edge/probability check. There are zero INFO-level logs for this failure mode.</p>
+<p><strong>Math:</strong></p>
+<pre class='code'><code>prob_up = 1 / (1 + exp(-150 × price_change_pct))
+For prob_up ≥ 0.60: price_change_pct ≥ ln(0.60/0.40) / 150 = 0.270%
+For prob_up ≥ 0.70: price_change_pct ≥ 0.438%
+For prob_up ≥ 0.80: price_change_pct ≥ 0.693%</code></pre>
+<p>Moves in the April 18 13:10–13:45 PT window peaked at 0.076% for BTC — legitimately below the effective threshold. The bot was correct to not fire. But if the user saw a move they expected to qualify, they may have been looking at a 5-minute candle move rather than a 30-second rolling Δ.</p>
+<hr>
+<h2>All Required Code Changes</h2>
+<h3>1. <code>strategy.py</code> — Fix momentum check</h3>
+<p>Find this block (around line 180–190):</p>
+<pre class='code'><code>move_10s = self._pf.price_change_pct(
+    asset_sym, lookback_sec=config.MOMENTUM_LOOKBACK_SEC
+)
+signal_is_up = price_change &gt; 0
+still_moving = move_10s &gt; 0 if signal_is_up else move_10s &lt; 0
+if not still_moving:
+    log.debug(
+        &quot;Momentum block %s %s: 30s=%+.3f%% but 10s=%+.3f%% — spike exhausted&quot;,
+        market.asset, market.direction,
+        price_change * 100, move_10s * 100,
+    )
+    return None</code></pre>
+<p>Replace with:</p>
+<pre class='code'><code>move_10s = self._pf.price_change_pct(
+    asset_sym, lookback_sec=config.MOMENTUM_LOOKBACK_SEC
+)
+signal_is_up = price_change &gt; 0
+# Allow up to 0.02% drift against the signal direction before blocking.
+# Strict &gt; 0 was killing signals the instant price paused/consolidated.
+_MOMENTUM_TOLERANCE = 0.0002
+still_moving = move_10s &gt; -_MOMENTUM_TOLERANCE if signal_is_up else move_10s &lt; _MOMENTUM_TOLERANCE
+if not still_moving:
+    log.debug(
+        &quot;Momentum block %s %s: 30s=%+.3f%% but 10s=%+.3f%% — spike exhausted&quot;,
+        market.asset, market.direction,
+        price_change * 100, move_10s * 100,
+    )
+    return None</code></pre>
+<h3>2. <code>price_feed.py</code> — Fix tick buffer size</h3>
+<p>Find line 24:</p>
+<pre class='code'><code>_TICK_BUFFER = 400  # ~6-7 min at ~1 tick/s</code></pre>
+<p>Replace with:</p>
+<pre class='code'><code>_TICK_BUFFER = 3000  # handles relay aggTrade at 50+ ticks/s while keeping 30s+ lookback</code></pre>
+<h3>3. <code>strategy.py</code> — Add near-miss INFO logging (diagnostic, optional but recommended)</h3>
+<p>In <code>_evaluate()</code>, just before <code>return None</code> on the edge threshold check (around line 265–266):</p>
+<pre class='code'><code>if edge &lt; config.EDGE_THRESHOLD:
+    return None</code></pre>
+<p>Replace with:</p>
+<pre class='code'><code>if edge &lt; config.EDGE_THRESHOLD:
+    if abs(price_change) &gt;= config.MIN_PRICE_MOVE_PCT:  # only log if it passed pre-filter
+        log.info(
+            &quot;NEAR-MISS %s %s %dmin | move=%+.3f%% true_prob=%.3f edge=%.2f%% (need %.0f%%)&quot;,
+            market.asset, market.direction, market.duration_min,
+            price_change * 100, true_prob_this, edge * 100,
+            config.EDGE_THRESHOLD * 100,
+        )
+    return None</code></pre>
+<p>This makes the 0.07%–0.27% &quot;false hope&quot; zone visible in the logs.</p>
+<hr>
+<h2>How to Deploy to VPS</h2>
+<p>Follow the standard London deploy workflow from <code>TwoServer_QuickReference.pdf</code> §5.1 — do NOT scp directly to <code>/opt/polymarket-bot/</code> (London&#x27;s source is git-managed and direct scp gets overwritten on next <code>git pull</code>):</p>
+<pre class='code'><code># From Mac:
+cd /Users/rubys/Desktop/AI_bots/Polymarket-Arbitrage-Bot
+git add strategy.py price_feed.py
+git commit -m &quot;Fix momentum gate + tick buffer (see DEBUG_REPORT.md)&quot;
+git push origin main
+
+# On London:
+ssh poly-london &quot;cd /opt/polymarket-bot &amp;&amp; git pull &amp;&amp; docker compose build polymarket-bot &amp;&amp; docker compose up -d polymarket-bot&quot;</code></pre>
+<p><strong>Do NOT use <code>--force-recreate</code></strong> — Docker network namespace teardown breaks Binance WS startup. Plain <code>docker compose up -d</code> picks up the new image correctly.</p>
+<hr>
+<h2>How to Confirm the Bug Before Fixing</h2>
+<p>To see exactly which gate was blocking signals during the incident, temporarily add debug logging on the VPS:</p>
+<pre class='code'><code>ssh poly-london \
+  &quot;tail -f /opt/polymarket-bot/data/logs/bot.log | grep -E &#x27;SIGNAL|NEAR-MISS|Momentum|Pre-window|Time gate|GATE&#x27;&quot;</code></pre>
+<p>Then watch for activity during the next qualifying Binance move (≥0.27% over 30s). If you see &quot;Momentum block&quot; repeatedly for a move that should qualify, Bug #1 is confirmed.</p>
+<hr>
+<h2>What a Healthy Signal Sequence Looks Like</h2>
+<p>In the logs, a working signal + trade looks like this:</p>
+<pre class='code'><code>SIGNAL | ETH DOWN 5min | edge=22.77% price=0.475 true_prob=0.703 move=-0.573% size=35.25 USDC
+[PAPER] OPEN  Ethereum Up or Down - ... | dir=DOWN | size=35.25 USDC | price=0.4750 | edge=22.77%</code></pre>
+<p>If you see SIGNAL but no OPEN, a GATE is blocking it (check for GATE:window, GATE:15min, GATE:x-asset logs). If you see nothing at all during a qualifying move, Bug #1 or Bug #2 is the cause.</p>
+<hr>
+<p><em>End of debug report. Apply changes in strategy.py and price_feed.py, deploy, confirm with live log tail.</em></p>

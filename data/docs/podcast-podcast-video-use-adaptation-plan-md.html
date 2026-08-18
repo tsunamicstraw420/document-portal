@@ -1,0 +1,175 @@
+<h1>video-use → Reality Recaps: Implementation Plan</h1>
+<p><strong>Repo:</strong> https://github.com/browser-use/video-use (MIT, 17.1k stars, 18 commits, Aug 2026) <strong>Written:</strong> August 3, 2026 <strong>Scope agreed with Eddie:</strong> auto-tighten Ruby&#x27;s narration + adopt the self-eval loop. Free Whisper, not paid ElevenLabs. Runs on the Mac via <code>.command</code> launchers.</p>
+<hr>
+<h2>1. What the repo actually is</h2>
+<p>A Claude Code <em>skill</em> — a SKILL.md of instructions plus six Python helpers that wrap ffmpeg. There is no application, no server, no model. The whole idea is one sentence:</p>
+<blockquote><strong>The LLM never watches the video. It reads a word-level transcript, decides the cuts as text, and ffmpeg executes them.</strong></blockquote>
+<p>That is precisely what we already do. Which is the headline finding of this research: <strong>we independently built about 70% of this repo.</strong> The plan below is therefore not &quot;adopt video-use&quot; — it&#x27;s &quot;take the three things they have that we don&#x27;t, and skip the rest.&quot;</p>
+<h3>The six helpers</h3>
+<table><thead><tr><th>Helper</th><th>Lines</th><th>What it does</th><th>Do we have this?</th></tr></thead><tbody><tr><td><code>transcribe.py</code></td><td>175</td><td>ElevenLabs Scribe → word-level JSON, cached</td><td>Yes — <code>vps-pipeline/chunk_transcribe.py</code> (faster-whisper, free)</td></tr><tr><td><code>transcribe_batch.py</code></td><td>118</td><td>4-worker parallel wrapper</td><td>Yes — our chunked runner does the same</td></tr><tr><td><code>pack_transcripts.py</code></td><td>206</td><td>word JSON → <code>takes_packed.md</code>, phrase-level, breaks on ≥0.5s silence</td><td><strong>No — this is new and useful</strong></td></tr><tr><td><code>timeline_view.py</code></td><td>392</td><td>filmstrip + waveform + word-label PNG for any time range</td><td><strong>No — this is the piece we&#x27;re actually missing</strong></td></tr><tr><td><code>render.py</code></td><td>659</td><td>per-segment extract → lossless concat → overlays → subtitles</td><td>Partially — split across <code>trim_audio.py</code>, <code>burn_captions.py</code>, <code>build_timeline.py</code></td></tr><tr><td><code>grade.py</code></td><td>375</td><td>ASC CDL–style ffmpeg color grade chains</td><td>N/A — see §4</td></tr></tbody></table>
+<h3>Their 12 &quot;Hard Rules&quot; vs. ours</h3>
+<p>We arrived at most of these the hard way. Worth noting how closely they match, because it&#x27;s evidence the remaining ones are worth taking seriously:</p>
+<table><thead><tr><th>#</th><th>Their rule</th><th>Our status</th></tr></thead><tbody><tr><td>1</td><td>Subtitles applied LAST</td><td>✅ <code>burn_youtube_chunks.py</code> burns onto the finished master</td></tr><tr><td>2</td><td>Per-segment extract → <code>-c copy</code> concat, <strong>never</strong> single-pass filtergraph</td><td>⚠️ <strong>Half-met.</strong> <code>burn_youtube_chunks.py</code> is compliant (chunk → concat demuxer → <code>-c:v copy</code>). But <code>trim_audio.py</code> is <em>exactly</em> the prohibited pattern — one <code>-filter_complex_script</code> holding all 8 <code>atrim</code> legs plus <code>concat</code>, re-encoded to <code>pcm_s24le</code> then AAC. Audio-only, so the practical harm is small, but it does violate the rule.</td></tr><tr><td>3</td><td>30ms audio fades at every boundary</td><td>⚠️ We use <strong>12ms</strong> — see §6</td></tr><tr><td>4</td><td>Overlays <code>setpts=PTS-STARTPTS+T/TB</code></td><td>N/A — Resolve owns overlay placement</td></tr><tr><td>5</td><td>SRT uses output-timeline offsets</td><td>✅ <code>trim_audio.py</code> remaps word timings after every cut</td></tr><tr><td>6</td><td>Never cut inside a word</td><td>✅</td></tr><tr><td>7</td><td>Pad every cut edge, 30–200ms window</td><td>⚠️ <strong>Convention, not code.</strong> Our 0.15s sits inside their window (upper quartile — centre is 115ms), and we found it through the exact failure they describe: <em>&quot;Whisper&#x27;s word boundaries run slightly early… clips the tail off the word (&#x27;missionary&#x27; → &#x27;missionate&#x27;).&quot;</em> But it&#x27;s a docstring rule a human applies while hand-typing timestamps — there is no padding constant or padding logic in <code>trim_audio.py</code>, and it&#x27;s documented for the <strong>leading</strong> edge only.</td></tr><tr><td>8</td><td>Word-level verbatim ASR, never SRT/phrase mode</td><td>✅</td></tr><tr><td>9</td><td>Cache transcripts per source</td><td>✅ <code>chunk_transcribe.py</code> is idempotent</td></tr><tr><td>10</td><td>Parallel sub-agents for animations</td><td>~ Practice, no artifact in the repo to point at</td></tr><tr><td>11</td><td>Strategy confirmation before execution</td><td>✅</td></tr><tr><td>12</td><td>All outputs in a dedicated edit dir</td><td>✅ <code>_READY_TO_UPLOAD</code> / <code>_SHARED</code> / <code>EPxx</code> structure</td></tr></tbody></table>
+<p><strong>Defensible score: 9–10 of 12 met, 1 genuinely N/A.</strong> Not the &quot;11 of 12, one-character fix&quot; it looks like at first glance. Two of the three gaps are real work rather than a constant change:</p>
+<ul>
+<li><strong>Rule 7 is the one worth acting on.</strong> Codifying the padding into <code>propose_cuts.py</code> — applied to <em>both</em> edges, as a named constant — is a genuine improvement over a human remembering a docstring. Phase 3 does this.</li>
+<li><strong>Rule 2&#x27;s violation in <code>trim_audio.py</code> is knowingly acceptable.</strong> Per-segment extract + <code>-c copy</code> concat exists to avoid double-encoding <em>video</em>. <code>trim_audio.py</code> touches audio only and encodes once to lossless PCM. Not worth refactoring; worth knowing it&#x27;s there so nobody cites it as compliant later.</li>
+</ul>
+<hr>
+<h2>2. Where the two pipelines genuinely differ</h2>
+<p>This is what makes a straight install wrong for us.</p>
+<table><thead><tr><th></th><th>video-use</th><th>Reality Recaps</th></tr></thead><tbody><tr><td>Source material</td><td>Many raw camera takes of a person talking</td><td>One teleprompter read + AI-generated comic visuals</td></tr><tr><td>The editing problem</td><td><em>Which take of each beat is best?</em></td><td><em>Where did Ruby flub, and what visual goes here?</em></td></tr><tr><td>Final composite</td><td>ffmpeg <code>render.py</code></td><td><strong>DaVinci Resolve</strong>, from our XMEML timeline</td></tr><tr><td>Visuals</td><td>Filmed footage that gets cut and graded</td><td>Generated per-shot from a worklist; nothing to &quot;choose between&quot;</td></tr><tr><td>Captions</td><td>2-word UPPERCASE Helvetica, <code>MarginV=90</code></td><td><strong>Locked</strong>: Bangers 120, gold spoken-word karaoke</td></tr><tr><td>Color grade</td><td>Core feature (<code>grade.py</code>, ASC CDL model)</td><td>Irrelevant — Magnific output is already stylized</td></tr></tbody></table>
+<p><strong>Consequence:</strong> their multi-take selection engine — the editor sub-agent brief, the &quot;pick the best HOOK across 8 clips&quot; logic — has no job here. Ruby does one read. <code>grade.py</code> has no job either. <code>render.py</code>&#x27;s overlay compositing has no job, because Resolve owns the composite.</p>
+<p>What <em>does</em> transfer is everything upstream of the composite: transcript → phrase view → cut decisions → clean audio spine → verification.</p>
+<hr>
+<h2>3. The three things we&#x27;re taking</h2>
+<h3>3.1 Automatic cut proposal (the actual win)</h3>
+<p>We already tighten Ruby&#x27;s narration. Here is the current EP-04 code, verbatim:</p>
+<pre class='code'><code># (start, end, why) — ORIGINAL timeline seconds
+CUTS = [
+    ( 92.82,  94.15, &quot;M2  false start: &#x27;because it&#x27;s the position&#x27; before ...&quot;),
+    (187.15, 188.60, &quot;M5  repeated &#x27;one small ...&#x27; before &#x27;one small door back in&#x27;&quot;),
+    (210.50, 212.10, &quot;M7  &#x27;turned the room,&#x27; before &#x27;turned to the room&#x27;&quot;),
+    ...
+]</code></pre>
+<p>Seven cuts, hand-found by reading the raw transcript, hand-typed with hand-measured timestamps. That list is the manual labour video-use eliminates.</p>
+<p>The architecture around it is already right and stays: source of truth is the original take, cuts are expressed on the original timeline, re-running rebuilds CLEAN from scratch with no compounding or generation loss. <strong>We are not replacing <code>trim_audio.py</code>. We are auto-generating its <code>CUTS</code> list.</strong></p>
+<p>New tool: <strong><code>propose_cuts.py</code></strong></p>
+<pre class='code'><code>narration.m4a
+  → chunk_transcribe.py            (already exists, free, cached)
+  → pack_transcripts.py            (ported from video-use)
+  → narration_packed.md            (phrase-level, ~12KB for a 15-min read)
+  → I read it and propose cuts     (retakes, false starts, &quot;sorry&quot;, dead air)
+  → cuts_proposed.json             (start, end, reason, confidence)
+  → you approve/reject each one
+  → written into trim_audio.py&#x27;s CUTS list
+  → existing trim_audio.py runs unchanged</code></pre>
+<p>The step that video-use gets right and we should copy exactly: <strong>phrase-level packing with silence-gap breaks.</strong> Their format —</p>
+<pre class='code'><code>[092.40-094.15] Because it&#x27;s the position. Sorry.
+[094.30-098.72] It&#x27;s because in any other position...</code></pre>
+<p>— makes a retake visually obvious in a way raw word JSON does not. A 15-minute read packs to roughly 12KB, which I can hold entirely in context and reason over in one pass. That&#x27;s what turns hand-hunting into a single review.</p>
+<p><strong>Detection heuristics I&#x27;ll use on the packed view</strong> (all derived at read time, not precomputed — their design principle, and it&#x27;s the right one):</p>
+<ul>
+<li>Consecutive phrases with high word overlap → retake</li>
+<li>Phrase ending in &quot;sorry&quot;, &quot;let me&quot;, &quot;again&quot;, &quot;one more time&quot; → abandoned take</li>
+<li>Silence gaps ≥ 1.2s mid-paragraph → dead air</li>
+<li>Repeated sentence openers → false start</li>
+</ul>
+<p>Every proposal comes with the reason string, and the reason lands in <code>trim_audio.py</code> as a comment, exactly as the hand-written ones do now. Nothing gets cut without you seeing it first.</p>
+<p><strong>Honest expectation:</strong> this won&#x27;t be perfect. It will over-propose. The value isn&#x27;t autonomous cutting — it&#x27;s turning &quot;read 15 minutes of transcript hunting for flubs&quot; into &quot;review 10 flagged candidates.&quot; I&#x27;d guess it catches most real flubs and flags 2–4 false positives per episode.</p>
+<h3>3.2 <code>timeline_view.py</code> — the visual drill-down</h3>
+<p>This is the single best piece of code in the repo and we have no equivalent.</p>
+<p>Given a video and a time range, it produces one PNG: a filmstrip of N frames across the top, an audio waveform ribbon below, word labels from the transcript overlaid on the waveform, and silence gaps shaded. Roughly 390 lines of PIL + numpy + ffmpeg. No API, no cost, no dependencies we don&#x27;t have.</p>
+<p>Why it matters for us specifically: <strong>I currently cannot see our episodes.</strong> When you say a cut looks wrong, I&#x27;m reasoning from filenames and JSON. This gives me an actual look at any moment of any file — a cut boundary, a shot that might be miscast, a caption that might be colliding with an overlay.</p>
+<p>Direct application to problems we&#x27;ve already hit:</p>
+<ul>
+<li><strong>The miscast clip.</strong> <code>SC-25_paola_russ_years</code> is actually Guillermo — caught by you, by eye, after it shipped into a worklist. A filmstrip of every generated clip is how that gets caught before assembly.</li>
+<li><strong>Sliver shots.</strong> The ≥4s minimum is currently enforced by arithmetic. A filmstrip makes a flash cut visible.</li>
+<li><strong>Caption collisions.</strong> Whether the karaoke line is sitting under an overlay is a thing you look at, not a thing you compute.</li>
+</ul>
+<p>Port it near-verbatim. Only change: our word JSON key names (§5).</p>
+<h3>3.3 The self-eval loop</h3>
+<p>Their step 7, and it directly implements the rule you already gave me — <em>verify before handing back, never make Eddie do QA.</em></p>
+<p>After any render, before you see it:</p>
+<ol>
+<li><code>timeline_view</code> at <strong>every cut boundary</strong>, ±1.5s window</li>
+<li>Check each image for: visual jump/flash, waveform spike at the seam (a pop that slipped past the fade), caption hidden behind an overlay, overlay showing the wrong frames</li>
+<li>Sample first 2s, last 2s, 2–3 midpoints — grade consistency, caption readability</li>
+<li><code>ffprobe</code> the output, confirm duration matches what the timeline predicted</li>
+<li>Fail → fix → re-render → re-check. <strong>Hard cap 3 passes</strong>, then surface what&#x27;s left rather than looping</li>
+</ol>
+<p>The 3-pass cap matters. Without it an agent will grind indefinitely on something it can&#x27;t fix.</p>
+<p>For us this runs on the <strong>Resolve export</strong>, not on an ffmpeg render — the check is identical either way, it just reads whatever MP4 came out.</p>
+<p>This also catches a specific class of bug we&#x27;ve been bitten by: the sample-rate mislabel that produced the deep/slow &quot;drunk&quot; audio on EP-04 (48k body stream-copied onto a 44.1k logo clip). A duration check plus a decoded-length comparison would have caught it automatically instead of you hearing it. <em>Note: that incident is recorded in my working notes, not in any file in this repo — so it&#x27;s not something a reader can verify here.</em></p>
+<hr>
+<h2>4. What we&#x27;re skipping, and why</h2>
+<table><thead><tr><th>Skipped</th><th>Reason</th></tr></thead><tbody><tr><td><code>grade.py</code> + the whole color pipeline</td><td>Our visuals are stylized Magnific output. Grading generated comic art is meaningless.</td></tr><tr><td>Editor sub-agent / multi-take selection</td><td>Ruby does one teleprompter read. There is no &quot;best take&quot; to pick.</td></tr><tr><td><code>render.py</code> overlay compositing</td><td>Resolve owns the composite. Replacing that means rebuilding the whole visual pipeline for no gain.</td></tr><tr><td>Their subtitle style + <code>SUB_FORCE_STYLE</code></td><td>Our karaoke style is <strong>locked</strong> (Bangers 120, gold spoken word). Take the timeline-offset <em>math</em>, not the styling.</td></tr><tr><td>ElevenLabs Scribe</td><td>Costs money. Our Whisper is free, cached, and emits equivalent data. See §5.</td></tr><tr><td>HyperFrames / Remotion / Manim animation slots</td><td>We generate visuals in Magnific. Different problem entirely.</td></tr><tr><td><code>yt-dlp</code> downloader</td><td>We already have <code>2_download_and_assemble.command</code>.</td></tr><tr><td>Installing as a registered skill</td><td>Would create a second, competing workflow. We want three files inside the pipeline we have.</td></tr></tbody></table>
+<hr>
+<h2>5. The Whisper swap (and a schema bug we should fix while we&#x27;re here)</h2>
+<p>video-use expects ElevenLabs Scribe JSON. We produce faster-whisper JSON. The gap is small:</p>
+<table><thead><tr><th>Scribe</th><th>Ours (<code>chunk_transcribe.py</code>)</th></tr></thead><tbody><tr><td><code>words[].text</code></td><td><code>words[].word</code></td></tr><tr><td><code>words[].type</code> = <code>&quot;word&quot;</code> / <code>&quot;spacing&quot;</code> / <code>&quot;audio_event&quot;</code></td><td><em>(absent)</em></td></tr><tr><td><code>words[].speaker_id</code></td><td><em>(absent)</em></td></tr><tr><td>silence carried by <code>&quot;spacing&quot;</code> entries</td><td><em>(absent — but see below)</em></td></tr></tbody></table>
+<p><strong>The adapter is ~15 lines:</strong> map <code>word</code>→<code>text</code> and inject <code>type: &quot;word&quot;</code>.</p>
+<p>Two things I checked rather than assumed:</p>
+<ul>
+<li><code>pack_transcripts.py</code> reads gaps from <code>spacing</code> entries, which we don&#x27;t have — <strong>but it has a <code>prev_end</code> fallback path</strong> that computes the gap from the previous word&#x27;s end time. Our data works through that path unmodified. I verified against <code>LastResort_03_08.words.json</code>: word timings are contiguous during speech (<code>2.21→2.21</code>, <code>2.67→2.67</code>) and only open up during real silence. Gap detection works correctly.</li>
+<li><code>render.py</code>&#x27;s <code>_words_in_range()</code> filters on <code>w.get(&quot;type&quot;) != &quot;word&quot;</code> and would silently drop <strong>every</strong> word from our JSON. The <code>type</code> injection is not optional.</li>
+</ul>
+<p><strong>What we lose:</strong> speaker diarization and <code>(laughter)</code> / <code>(applause)</code> audio-event tags. Neither applies to a solo teleprompter read. If fan call-ins or guest interviews arrive as planned, diarization becomes worth paying for — revisit then, not now.</p>
+<h3>The schema bug worth fixing</h3>
+<p>While auditing I found <strong>two incompatible word-JSON schemas already in the repo</strong>. Full census:</p>
+<table><thead><tr><th>Schema</th><th>Count</th><th>Where</th></tr></thead><tbody><tr><td><code>{i, word, start, end}</code></td><td><strong>9</strong></td><td>EP05, EP06, EP07, EP08 <code>lipsync/</code>; <code>mp3/</code> ×5 (02B, 05, 06, 07, 08); <code>vps-pipeline/examples/</code></td></tr><tr><td><code>{w, s, e}</code></td><td><strong>2</strong></td><td>EP04 only — <code>LastResort_03_04.words.json</code> + its <code>_CLEAN</code></td></tr></tbody></table>
+<p>The wrappers differ too: <code>{duration, n_words, words, segments}</code> vs <code>{audio, duration_sec, model, language, text, words, segments}</code>. So a normalizer that only rewrites word keys leaves a second incompatibility in place — fix both.</p>
+<p><code>chunk_transcribe.py</code> writes the majority schema. <strong>EP04 is the outlier</strong>, and it&#x27;s self-consistent: <code>trim_audio.py</code> reads <em>and writes</em> <code>{w,s,e}</code>, and <code>burn_captions.py</code> reads <code>{w,s,e}</code> too. Nothing is broken today — the risk is that any new script pointed at EP04 fails, or silently reads nothing.</p>
+<p><strong>Recommendation:</strong> standardize on <code>{i, word, start, end}</code> (9:2 majority, and what our transcriber emits).</p>
+<p>⚠️ <strong>This is a code change, not a data migration.</strong> Both EP04 consumers are hard-coded to <code>{w,s,e}</code>:</p>
+<ul>
+<li><code>trim_audio.py</code> — reads <code>d[&quot;words&quot;][i][&quot;w&quot;/&quot;s&quot;/&quot;e&quot;]</code>, writes the same shape</li>
+<li><code>burn_captions.py</code> — reads <code>w[&quot;w&quot;]</code>, <code>wd[&quot;s&quot;]</code>, <code>ln[-1][&quot;e&quot;]</code> (lines 80, 86, 103–111, 126–127)</li>
+</ul>
+<p>Converting the JSON without editing both scripts produces a <code>KeyError</code>. Phase 0 is therefore 2 script edits + 2 JSON conversions, and the gate has to be <em>&quot;EP-04&#x27;s caption build still produces identical output&quot;</em> — reached by changing all four files together, not by hoping the scripts don&#x27;t notice.</p>
+<hr>
+<h2>6. The 12ms vs 30ms fade question</h2>
+<p><code>trim_audio.py</code> uses <code>FADE = 0.012</code>. video-use mandates 30ms and calls it non-negotiable.</p>
+<p>They&#x27;re probably right, and here&#x27;s the reasoning rather than deference: at 48kHz, 12ms is ~576 samples. That&#x27;s enough to kill a hard discontinuity but leaves audible transient energy if the waveform is mid-cycle at a high amplitude — which is exactly what happens cutting between two takes of the same voice at similar loudness. 30ms (~1440 samples) covers a full cycle of anything above ~33Hz.</p>
+<p><strong>But</strong> it costs ramp time. <code>trim_audio.py</code> builds 8 keep-segments and fades both edges of each, so EP-04 actually carries <strong>16 fades</strong>: 480ms of ramped audio at 30ms versus 192ms at 12ms. On a voice track with tight cuts that&#x27;s a real, if small, softening.</p>
+<p><strong>Recommendation:</strong> bump to 30ms and A/B it on EP-04, which already has 7 known cuts. It&#x27;s a one-line change and a five-minute listen. If the pops were never audible at 12ms, keep 12ms — I&#x27;d rather have the evidence than the rule. This is a taste call you should make with your ears, not one I should make from a README.</p>
+<hr>
+<h2>7. Build order</h2>
+<p>Each phase ships something usable. Nothing after Phase 0 blocks the current pipeline.</p>
+<h3>Phase 0 — Normalize (do first, ~1 hr)</h3>
+<p>Four files change together, or nothing works:</p>
+<ul>
+<li><code>normalize_words.py</code> — convert EP04&#x27;s 2 JSONs to <code>{i,word,start,end}</code> + the standard wrapper, keep <code>.bak</code></li>
+<li>Edit <code>trim_audio.py</code> — read <em>and write</em> the new keys</li>
+<li>Edit <code>burn_captions.py</code> — read the new keys (lines 80, 86, 103–111, 126–127)</li>
+<li><strong>Gate:</strong> rebuild EP-04&#x27;s <code>.ass</code> and <code>.srt</code> and diff against the current ones. Must be identical. If they differ, revert from <code>.bak</code> and stop.</li>
+</ul>
+<h3>Phase 1 — Sight (highest value, lowest risk, ~2 hrs)</h3>
+<ul>
+<li>Port <code>timeline_view.py</code> to <code>vps-pipeline/timeline_view.py</code></li>
+<li>Swap Scribe key names for ours</li>
+<li>Add <code>make_timeline_view.command</code> (prompts for file + time range)</li>
+<li><strong>Gate:</strong> produces a readable filmstrip+waveform PNG for a known EP-04 cut boundary</li>
+</ul>
+<p>Nothing else depends on this, and it immediately gives me eyes on the material. Ship it first.</p>
+<h3>Phase 2 — Packed transcript (~1 hr)</h3>
+<ul>
+<li>Port <code>pack_transcripts.py</code>, single-file mode</li>
+<li>Wire to <code>chunk_transcribe.py</code> output</li>
+<li><strong>Gate:</strong> EP-04&#x27;s narration packs to a phrase-level MD under ~15KB, and all 7 known hand-found flubs are visible in it by eye</li>
+</ul>
+<p>That gate is the honest test of the whole idea. If the flubs aren&#x27;t obvious in the packed view, auto-proposal won&#x27;t work either and we should stop there.</p>
+<h3>Phase 3 — Cut proposal (~3 hrs)</h3>
+<ul>
+<li><code>propose_cuts.py</code>: read packed MD → <code>cuts_proposed.json</code></li>
+<li>Approval step — nothing auto-applies</li>
+<li>Emit the approved list in <code>trim_audio.py</code> <code>CUTS</code> format, comments and all</li>
+<li><strong>Gate:</strong> run blind against EP-04&#x27;s original narration. Score against the 7 known cuts: how many found, how many missed, how many false positives. Report the numbers before we trust it.</li>
+</ul>
+<h3>Phase 4 — Self-eval (~2 hrs)</h3>
+<ul>
+<li><code>self_eval.py</code>: read a rendered MP4 + the cut list → filmstrips at every boundary + ffprobe duration check + decoded-length audio check</li>
+<li>3-pass cap</li>
+<li><strong>Gate:</strong> run against a known-good export (clean report) and a deliberately broken one (caught)</li>
+</ul>
+<h3>Phase 5 — Launchers (~1 hr)</h3>
+<ul>
+<li><code>3_tighten_narration.command</code></li>
+<li><code>4_self_eval.command</code></li>
+<li>Both <code>chmod +x</code>, both strip <code>com.apple.quarantine</code> on output</li>
+</ul>
+<p><strong>Total: roughly 10 hours of build.</strong> Phases 1 and 2 alone (3 hrs) deliver most of the value — and neither depends on Phase 0, so if the normalization turns out messier than expected we can ship sight and packing first and come back to it.</p>
+<hr>
+<h2>8. Risks</h2>
+<table><thead><tr><th>Risk</th><th>Severity</th><th>Mitigation</th></tr></thead><tbody><tr><td>Auto-proposal cuts a real line</td><td><strong>High</strong></td><td>Nothing auto-applies. You approve every cut. Original take never modified.</td></tr><tr><td>Whisper word timings drift and cuts clip word tails</td><td>Medium</td><td>Already solved — the 0.15s post-word padding rule from <code>trim_audio.py</code> carries over verbatim</td></tr><tr><td>Schema normalization breaks EP-04</td><td><strong>Medium-High</strong></td><td>Both EP-04 consumers are hard-coded to <code>{w,s,e}</code> — the JSONs and the two scripts must change together. Gate is an identical <code>.ass</code>/<code>.srt</code> diff; <code>.bak</code> files kept; revert if it differs.</td></tr><tr><td><code>timeline_view</code> is slow on long files</td><td>Low</td><td>It&#x27;s range-scoped, ~10 frames per call. Seconds, not minutes.</td></tr><tr><td>Sandbox 45s cap</td><td>Low</td><td>Everything runs on the Mac per your decision. Phase 2/3 are text-only and <em>can</em> run in the sandbox.</td></tr><tr><td>Repo is 18 commits old and may churn</td><td>Low</td><td>We&#x27;re vendoring two files, not tracking upstream. Pinned by copy.</td></tr></tbody></table>
+<hr>
+<h2>9. The honest summary</h2>
+<p>video-use is a well-built confirmation that our approach was right. We already follow 9–10 of their 12 production rules, and we found the cut-padding rule independently through the exact failure they describe. Where we fall short it&#x27;s mostly that a rule lives in a docstring rather than in code — which the new tools fix as a side effect.</p>
+<p>The genuinely new things are <strong>three</strong>:</p>
+<ol>
+<li><strong><code>timeline_view.py</code></strong> — gives me eyes. Biggest single upgrade, ~2 hours, no dependencies, immediately useful. Would have caught the miscast Guillermo clip.</li>
+<li><strong>Phrase-level packed transcript</strong> — turns flub-hunting from manual reading into a reviewable list.</li>
+<li><strong>The self-eval loop with a 3-pass cap</strong> — formalizes &quot;verify before handing back&quot; into something that runs automatically.</li>
+</ol>
+<p>Everything else in the repo is solving a problem we don&#x27;t have — picking between camera takes, and color grading real footage.</p>
+<p><strong>If we only do one thing: Phase 1.</strong> It&#x27;s the cheapest and it&#x27;s the one that changes what I can do for you.</p>

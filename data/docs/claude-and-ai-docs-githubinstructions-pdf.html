@@ -1,0 +1,152 @@
+<div class="pdfpages"><img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-githubinstructions-pdf/p-1.jpg" alt="page 1">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-githubinstructions-pdf/p-2.jpg" alt="page 2">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-githubinstructions-pdf/p-3.jpg" alt="page 3"></div><div class="pdftext" hidden><pre>                        GitHub Setup Instructions
+                                    Polymarket Latency Arbitrage Bot
+
+
+
+
+1 · Prerequisites
+Before starting, make sure you have the following:
+
+•   Git installed — check by running git --version in Terminal. If not installed:
+    https://git-scm.com/download/mac
+
+•   GitHub account — free at https://github.com
+
+•   GitHub CLI (optional but recommended) — https://cli.github.com — lets you create repos from the
+    terminal
+
+
+
+2 · Create a New Repository on GitHub
+Go to GitHub and create the remote repo before connecting your local files:
+
+•   Sign in at https://github.com
+
+•   Click the ■ icon (top-right) → New repository
+
+•   Fill in the form:
+
+
+    Field                              Recommended value
+
+    Repository name                    Polymarket-Arbitrage-Bot
+
+    Description                        Latency arb bot for Polymarket BTC/ETH contracts
+
+    Visibility                         Private — keeps your strategy confidential
+
+    Initialize with README             Leave UNCHECKED (you already have local files)
+
+    .gitignore                         Leave as None (repo already has one)
+
+Click Create repository. GitHub will show a page with setup commands — copy your repo URL (looks like:
+https://github.com/YOUR_NAME/Polymarket-Arbitrage-Bot.git)
+
+
+3 · Initialise Your Local Repository
+Open Terminal, navigate to the bot folder, and run these commands one at a time:
+cd /Users/rubys/Desktop/py-clob-client-main/Polymarket-Arbitrage-Bot
+
+git init
+
+git add bot.py config.py strategy.py market_scanner.py order_manager.py
+
+git add risk_manager.py price_feed.py chart_server.py logger_setup.py
+
+git add notifier.py telegram_commander.py .gitignore BotSettings.txt
+
+  Important: Never add .env, positions.json, state.json, or trades.db — these contain secrets or
+  live state.
+
+git commit -m &quot;Initial commit — Polymarket latency arb bot&quot;
+
+
+
+4 · Connect to GitHub and Push
+Replace YOUR_USERNAME with your actual GitHub username:
+
+git remote add origin https://github.com/YOUR_USERNAME/Polymarket-Arbitrage-Bot.git
+
+git branch -M main
+
+git push -u origin main
+
+  GitHub will prompt for your username and password. For the password, use a Personal Access Token (not
+  your account password). Create one at: https://github.com/settings/tokens → Generate new token (classic) →
+  check repo scope → copy the token.
+
+
+5 · Pushing Future Updates
+Every time you make changes and want to save them to GitHub:
+
+cd /Users/rubys/Desktop/py-clob-client-main/Polymarket-Arbitrage-Bot
+
+git add bot.py config.py strategy.py
+
+git commit -m &quot;Brief description of what changed&quot;
+
+git push
+
+  Only add the specific files you changed. Avoid git add . or git add -A as these can accidentally
+  include secrets.
+
+
+6 · Useful Git Commands
+
+   Command                                  What it does
+
+   git status                               Shows which files have changed
+
+   git log --oneline                        Shows recent commit history
+     git diff                                    Shows exact line-by-line changes not yet committed
+
+     git pull                                    Downloads latest changes from GitHub
+
+     git stash                                   Temporarily shelves uncommitted changes
+
+     git checkout -- filename                    Discards local changes to a specific file
+
+
+
+7 · What the .gitignore Protects
+The bot&#x27;s .gitignore is already configured to exclude:
+
+•    .env — your private keys and API credentials
+
+•    positions.json / state.json — live trading state
+
+•    trades.db — trade history database
+
+•    bot.log — runtime logs
+
+•    venv/ — Python virtual environment (large, machine-specific)
+
+•    __pycache__/ — compiled Python bytecode
+
+•    .DS_Store — macOS folder metadata
+
+    These files are automatically excluded — you never need to worry about accidentally committing your private
+    key.
+
+
+8 · Quick Links
+
+     GitHub Homepage                             https://github.com
+
+     Create New Repository                       https://github.com/new
+
+     Generate Personal Access Token              https://github.com/settings/tokens
+
+     GitHub CLI Download                         https://cli.github.com
+
+     Git Download (Mac)                          https://git-scm.com/download/mac
+
+     GitHub Docs — Getting Started               https://docs.github.com/en/get-started
+
+
+
+
+                          Generated for the Polymarket Latency Arbitrage Bot project · 2026-04-20
+</pre></div>

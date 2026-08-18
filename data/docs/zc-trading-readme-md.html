@@ -1,0 +1,37 @@
+<h1>ZC Trading — Automated Trading System</h1>
+<p>Python-based automated trading system implementing Koroush AK&#x27;s momentum and mean-reversion frameworks, with mandatory human confirmation in early phases.</p>
+<h2>Status</h2>
+<p><strong>Phase 1 (Foundation) — in progress.</strong> Documentation and project skeleton complete. First indicator (VWAP) and unit tests in progress.</p>
+<h2>Architecture</h2>
+<p>Three modules aligned to the &quot;Three Dimensions of Trading Performance&quot;:</p>
+<ol>
+<li><strong>Strategy</strong> — signal generation, S/R detection, regime classification</li>
+<li><strong>Risk</strong> — position sizing, trade management, daily/weekly loss limits</li>
+<li><strong>Psyche</strong> — trade logging, journal analytics, behavioral monitoring</li>
+</ol>
+<p>All trades require human confirmation through Phase 3. Autonomous execution is deferred to Phase 5.</p>
+<h2>Layout</h2>
+<pre class='code'><code>.
+├── src/
+│   └── indicators/        # VWAP, S/R, spike detection (Phase 1)
+├── tests/unit/            # pytest suite
+├── config/                # trading_rules.yaml, risk_limits.yaml (TBD)
+├── data/                  # historical OHLCV (gitignored)
+├── *.pdf                  # reference strategies (Koroush AK)
+└── CLAUDE.md              # AI assistant instructions + standards</code></pre>
+<h2>Key documents</h2>
+<table><thead><tr><th>File</th><th>What it covers</th></tr></thead><tbody><tr><td><code>CLAUDE.md</code></td><td>Code standards, the Three Dimensions framework, AI guidelines</td></tr><tr><td><code>AUTOMATED_TRADING_SYSTEM_PLAN.md</code></td><td>12-week, 5-phase implementation roadmap</td></tr><tr><td><code>PROJECT_SUMMARY.md</code></td><td>Executive summary, success metrics, next steps</td></tr><tr><td><code>Trade_Exit_Strategies.pdf</code></td><td>Koroush AK&#x27;s 6 trade-exit rules</td></tr><tr><td><code>Breakout_Trading_Strategy.pdf</code></td><td>Momentum entry framework</td></tr><tr><td><code>Reversal_Trading_Strategy.pdf</code></td><td>Mean-reversion entry framework</td></tr><tr><td><code>VWAP_Masterclass*.pdf</code></td><td>VWAP theory and application</td></tr></tbody></table>
+<h2>Development</h2>
+<pre class='code'><code>pip install -r requirements.txt
+pytest tests/</code></pre>
+<p>Python 3.9+. Code style: <code>black</code> (line length 100). Target: 85%+ test coverage, pylint ≥ 8.0.</p>
+<h2>Roadmap</h2>
+<ul>
+<li><strong>Phase 1 (Weeks 1-3):</strong> Indicators, signals, trade logger</li>
+<li><strong>Phase 2 (Weeks 4-6):</strong> Position sizing, stop/TP automation, risk limits</li>
+<li><strong>Phase 3 (Weeks 7-9):</strong> Analytics, weekly reports</li>
+<li><strong>Phase 4 (Weeks 10-12):</strong> TradingView + exchange API integration</li>
+<li><strong>Phase 5 (Weeks 13+):</strong> Auto-execution with human override, deployment to VPS</li>
+</ul>
+<h2>Success targets (6 months)</h2>
+<p>Win rate ≥55%, profit factor ≥1.8, max drawdown &lt;15%, monthly return 5-10%.</p>

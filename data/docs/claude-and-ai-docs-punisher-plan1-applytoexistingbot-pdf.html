@@ -1,0 +1,276 @@
+<div class="pdfpages"><img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-punisher-plan1-applytoexistingbot-pdf/p-1.jpg" alt="page 1">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-punisher-plan1-applytoexistingbot-pdf/p-2.jpg" alt="page 2">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-punisher-plan1-applytoexistingbot-pdf/p-3.jpg" alt="page 3">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-punisher-plan1-applytoexistingbot-pdf/p-4.jpg" alt="page 4">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-punisher-plan1-applytoexistingbot-pdf/p-5.jpg" alt="page 5">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-punisher-plan1-applytoexistingbot-pdf/p-6.jpg" alt="page 6"></div><div class="pdftext" hidden><pre>                          Punisher Playbook — Plan 1
+                    Apply 0x_Punisher&#x27;s strategies to our existing Polymarket-Arbitrage-Bot
+                     Source: x.com/0x_punisher/status/2053055492868514213 | Generated 2026-05-13
+
+
+
+
+1. Source recap — what the article actually claims
+Punisher (@0x_Punisher) publishes a Polymarket bot at polymarket.com/@pbot-6 claimed at $100k PnL on
+May 9 2026. He frames the playbook as 8 steps. The dense, useful chunks are: (a) a 6-layer WebSocket
+hardening system, (b) the win-rate-versus-entry-price math, (c) the Type 1 / Type 2 strategy split, (d)
+adverse-selection filtering, and (e) the recurring claim that market-maker and ladder bots earn more than
+directional bots.
+
+Verbatim claims worth banking
+
+●       Type 1 (90% of working bots): bet at window open from external signals (Binance direction, mean
+        reversion, candles). AI-backtestable on strike + close + signal.
+●       Type 2 (more profitable): mid-window trading, GTC bids, stops, order-book modeling. Requires
+        self-recorded tick data.
+●       Entry-price math: enter at 57c → need &gt;57% win-rate to break even. Enter at 40c → need &gt;40%. Rule
+        of thumb: +5c break even, +10c profit.
+●       Test both entries: window open AND 60s in. Segment by US vs Asian hours, weekday vs weekend.
+●       Adverse selection: bidding 10c below ask at 40c often fills on the losing side. Filter for it.
+●       Stop losses: no native stops on Polymarket; sometimes no-stop beats stop on short windows. Best on
+        BTC with strict filters; avoid betting blindly above 85c.
+●       Survivor strategies: 99 of 100 ideas die. The survivors are usually market-maker / ladder bots.
+        Directional strategies work but are least profitable overall.
+
+
+2. Where our bot stands today (post commit dcabcb4)
+We run a Type-1-and-a-half directional bot: Binance-momentum early in the window plus Chainlink-settle late.
+After today&#x27;s cancel-race fix the GTC fill path reads initial_status from post_order and finalizes synchronous
+matches without cancelling. Single Vilnius VPS, single WebSocket per source, ~36-40 active 5/15-min markets.
+
+Punisher concept            Our state today                             Gap to close
+
+6-layer WebSocket           Single WS per source. Auto-reconnect, but   Large. Layers 1, 3, 4 are cheap; layers 2, 6 are
+hardening                   no warmup gate, no stale-tick guard, no     infra-heavy.
+                            replica spawning, no jitter EMA.
+
+Self-recorded tick data     None. We have trades.db for our own         Have to build a recorder. Without it Type 2
+                            orders only. No order-book recordings.      strategies are blind.
+
+Type 1 strategies           Yes — Binance-momentum at window            Mostly done. Missing: time-of-day
+                            open is exactly this.                       segmentation, US vs Asian hours.
+
+Type 2 strategies           Partial — Chainlink-settle reads            Order-book depth is unused.
+                            mid-window state but doesn&#x27;t model the
+                            book.
+Punisher concept           Our state today                                 Gap to close
+
+Win-rate vs entry-price    Edge thresholds (5min=4%, 15min=3%)             Audit live trades; produce a WR x entry-price
+math                       implicitly encode this, but it has never been   grid.
+                           audited against actual win-rate vs
+                           entry-price.
+
+Adverse-selection filter   None. We bid at ask+5c; he warns that           Add a filter or at least a logger to see the rate.
+                           bids 10c below ask fill on the losing side.
+                           Direction is similar but worth checking.
+
+Stop losses                Coded (STOP_POLY_FLOOR,                         Run a 1-week A/B: stops on vs stops off on
+                           STOP_REVERSAL). Never A/B&#x27;d against             5-min windows.
+                           no-stop.
+
+Dry-run on real wallet,    We dry-ran in paper mode; never a               Useful before any major strategy change.
+zero balance               zero-balance live dry-run.
+
+
+
+3. What to skip or de-prioritize from his playbook
+●       &quot;Pick any decent cloud provider&quot; — done. Vilnius VPS is permitted-region and low-jitter.
+●       &quot;Python + NumPy&quot; — done.
+●       &quot;Polymarket CLOB and Gamma WS plus external sources&quot; — done (Binance + Polymarket CLOB +
+        Polymarket RTDS Chainlink stream).
+●       His advice to refund 1c flips — already known operationally. Out of scope for code.
+●       His advice to ignore 0c/100% NegRisk wallets — irrelevant to our flow.
+4. Phased plan of attack
+Six phases, sequenced so each one validates before we spend on the next. Effort is engineer-days for one
+person; cost is real-money exposure on the wallet. Phases A and B are blocking precursors; phases C-F can be
+reordered once the data is flowing.
+
+Phase A — Tick recorder (precursor for everything Type-2)
+Why: He says 18+ months of self-recorded tick data is the biggest single edge. Without it, Type-2 strategies
+(market making, ladder, mid-window) cannot be backtested honestly.
+
+What it actually is:
+
+●        Standalone Python service running on the same Vilnius VPS, separate Docker compose service.
+●        Subscribes to Polymarket CLOB book WebSocket for every active BTC/ETH 5-min and 15-min market.
+●        Persists every tick (bid, ask, sizes, mid, timestamp) to compressed daily files. Rotate at 00:00 UTC.
+●        Parallel Binance WS recorder for the same window so we can replay both feeds aligned.
+●        Goal: 30 days of recordings before any Type-2 strategy is considered production-worthy. We start
+         banking data NOW even before any strategy work begins.
+Effort                       Real-$ cost                  Success metric
+
+2-3 engineer-days for the    $0 — read-only               When we have 30+ days of clean tick data on disk, with a 1-line
+recorder + 1 day for         WebSockets, no orders.       replay loader.
+replay tooling. Then it
+just runs.
+    Risks / what could kill it: Disk usage: ~50-300 MB/day depending on activity. Plan rotation and S3 offload up front.
+
+
+
+Phase B — WebSocket hardening (his 6-layer system, applied to our 3 feeds)
+Why: Our bot has been dropping ticks and misreading status fields. His 6 layers describe how serious
+operators handle exactly this. We do not need 100-300 replicas, but we do need the cheap layers.
+
+What it actually is:
+
+●        Layer 1 (warmup &amp; quality gate). Subscribe 15s before each new 5-min market opens; in the final 5s
+         require ≥3 ticks and no &gt;5c jump; otherwise skip the window. Direct port from his text; no infrastructure
+         cost.
+●        Layer 3 (stale-tick guard). Reject any tick with &gt;15c delta from the warmup midpoint; log &#x27;STALE TICK
+         REJECTED&#x27;. One conditional in the tick handler.
+●        Layer 4 (first-tick skip). Drop the first tick after any reconnect — almost always a cached snapshot.
+         Trivial.
+●        Layer 5 (staggered startup). Spread reconnects evenly over 1s rather than reconnecting all
+         subscriptions on the same millisecond. One sleep schedule.
+●        Layer 2 (parallel replicas) and Layer 6 (jitter EMA + reaper). Defer. They assume 100-300 WS
+         connections per market. Only worth it after we measure that our single-connection per market is the
+         bottleneck.
+Effort                       Real-$ cost                  Success metric
+2 engineer-days for           $0 directly. Indirect:        Per-day tick counts and rejection counts show up in the digest.
+layers 1, 3, 4, 5. Layer      skipped windows =             Stale-tick rejection rate &gt;0 confirms the guard fired.
+2/6 deferred (3-5 days of     forgone trades, but the
+work if/when needed).         article frames this as a
+                              feature not a bug.
+    Risks / what could kill it: We risk skipping too many windows if the gate is tuned wrong. Tune on Phase A&#x27;s recorded
+    data before deploy.
+
+
+
+Phase C — Entry-price discipline (audit + retune)
+Why: He insists that win-rate must beat entry-price-in-cents. Our edge thresholds were tuned to theoretical
+probability, not to achieved win-rate. We have never audited this.
+
+What it actually is:
+
+●        Backfill the last 30 days of bot trades from the wallet CSV (already locally for May 4, 11, 13).
+●        Group by (asset, duration, entry-price-bucket) and compute realized win-rate.
+●        Produce a grid: rows = entry-price 35c/40c/45c/50c/55c/60c, cols = duration 5/15min, cells = win-rate
+         count and edge.
+●        If any bucket sits below entry-price-in-cents, raise the edge threshold for that bucket. If a bucket is well
+         above, we are leaving size on the table.
+●        Add a permanent diagnostic line to the digest: &#x27;today&#x27;s fills: avg entry 47c, win-rate so far 51%, edge
+         ratio +4c&#x27;.
+Effort                        Real-$ cost                   Success metric
+
+1 engineer-day for the        $0 — uses existing data.      Per-bucket WR/entry-price grid published; at least one threshold
+analysis script. Ongoing:                                   updated based on it.
+a 10-line digest addition.
+    Risks / what could kill it: Sample size is small (today&#x27;s bot fires ~5-20 signals/day at best). Plan to widen the window to
+    weeks not days.
+
+
+
+Phase D — Adverse-selection filter
+Why: He claims bids 10c below ask at 40c fill disproportionately on the losing side. Our bot bids ASK+5c
+(above the ask, not below), so the literal pattern does not apply, but the mechanism (we get filled when
+better-informed makers think the price is wrong) does.
+
+What it actually is:
+
+●        Define a logged metric: for each fill, was the side that filled us the one that ultimately won? Compute %
+         of fills where the maker would have wanted out.
+●        If &gt;55% of fills are adverse-selected, we are being picked off. Add a filter: skip BUYs when ask &gt; mid +
+         N c (book is moving away too fast).
+●        Skip BUYs when the ∆30s Binance signal has weakened in the last 2-3 ticks (common cause of
+         adverse-selected entry).
+Effort                        Real-$ cost                   Success metric
+1-2 engineer-days. Filter      $0 directly. Filter may       Adverse-selection rate drops from baseline. Daily PnL holds or
+is cheap; the metric           reduce fill count by          improves despite fewer fills.
+requires a join between        10-30%; net PnL should
+our fills log and the          improve.
+recorded book ticks (so
+Phase A is a precursor
+for the strict version).
+    Risks / what could kill it: Filter could over-reject in fast markets. Start logging only, switch to enforcing only when the
+    signal is clear.
+
+
+
+Phase E — Time-of-day and weekday segmentation
+Why: He explicitly calls out &#x27;US vs Asian hours, weekdays vs weekends, and work-hour effects.&#x27; Our edge
+thresholds are global. Likely a free win.
+
+What it actually is:
+
+●        Same analysis script as Phase C but grouped by hour-of-day-UTC and day-of-week.
+●        Identify hours where realized WR is below break-even and tag them as &#x27;do not trade&#x27;.
+●        Add a config flag TRADING_HOURS_UTC with permitted windows; bot consults it in the signal path.
+●        Keep the override toggle in the Telegram commander.
+Effort                         Real-$ cost                   Success metric
+
+0.5 engineer-day if            $0.                           Hour-of-day grid published; bot config has at least one excluded
+Phase C is done.                                             hour-range based on data.
+    Risks / what could kill it: Beware of overfitting on small samples. Require ≥20 trades per hour bucket before excluding.
+
+
+
+Phase F — Stop-loss A/B test (his claim: short-window markets sometimes do better with no
+stop at all)
+Why: Our STOP_POLY_FLOOR and STOP_REVERSAL fire fairly often on 5-min markets. He says short
+windows often do better without stops. The only way to know is to A/B it.
+
+What it actually is:
+
+●        Split signal generation deterministically by (asset, duration, minute-of-hour even/odd): even minutes use
+         stops, odd minutes do not. Same signal logic on both paths.
+●        Run for 5-7 days, then compare PnL/fill on each arm.
+●        If &#x27;no-stop&#x27; wins on 5-min, disable stops for 5-min only (keep them on 15-min).
+●        Keep an override kill-switch on the Telegram commander.
+Effort                         Real-$ cost                   Success metric
+
+0.5 engineer-day to            Real exposure:                Statistical significance test on PnL diff. If &gt;90% confident one
+implement the bucket           ~$50-$200/day during          arm wins, ship it.
+switch. 1 week to gather       the A/B period (whatever
+statistics.                    our normal turnover is).
+    Risks / what could kill it: 5-7 days is a small sample. Treat result as directional, not gospel. Roll out gradually.
+5. Sequencing and dependencies
+Week          Phase                             Concurrent ops
+
+1             A starts (recorder)               Bot keeps running on dcabcb4. Watch first live sync-matched fills.
+
+1-2           B (cheap layers 1/3/4/5)          A keeps recording.
+
+2-3           C (entry-price audit)             A ≥ 7 days. Use partial data for first pass.
+
+3-4           D (adverse selection logging      Phase C audit running in the digest.
+              only)
+
+3-4           E (time-of-day audit)             Same scripts as C.
+
+4-5           D (adverse selection enforcing)   Only after the metric has settled.
+
+5-6           F (stop-loss A/B)                 All other phases stable.
+
+6+            Optional: revisit B layer 2/6     Only if measured a bottleneck.
+
+
+
+6. Sanity rails — what NOT to copy
+Not every claim in the article should be accepted at face value. The post is partly a marketing piece for his
+Telegram channel; we keep skepticism on the bigger claims.
+
+●         $100k PnL profile — cited without time-frame, drawdown, or fees. Treat as &#x27;this is possible&#x27; not &#x27;this is
+          the median.&#x27;
+●         &#x27;100-300 parallel websockets per market&#x27; — almost certainly only useful if you are competing for the
+          same fills as he is. We are an order of magnitude smaller. Layers 1, 3, 4, 5 first; revisit 2/6 when we
+          have evidence of a bottleneck.
+●         &#x27;Market makers and ladder bots dominate&#x27; — true but they are also Type-2-only and require the tick
+          data and a sophisticated execution engine. That is the basis for Plan 2, not this plan.
+●         &#x27;1-7 days per idea&#x27; — sound principle, but for OUR scale 2-4 weeks per idea is more realistic given
+          sample-size constraints.
+●         &#x27;Never deploy unproven logic&#x27; — keep. Our cancel-race fix is itself an example of an
+          empirically-verified change. Maintain that bar.
+
+
+7. Success criteria for Plan 1 as a whole
+●         Tick recorder produces clean, replay-able daily files for at least 30 consecutive days.
+●         WebSocket layers 1/3/4/5 are live; STALE TICK REJECTED counter is visible in the digest.
+●         An entry-price × win-rate grid is published in the repo; at least one edge threshold tuned from it.
+●         Adverse-selection metric is logged on every fill; a filter is enforced once data justifies it.
+●         Time-of-day exclusion config exists and is informed by ≥20 trades per bucket.
+●         Stop-loss A/B has a written conclusion for 5-min markets.
+●         Daily PnL trend over the period is flat or up; drawdown does not exceed the existing 5% risk limit.
+
+     Companion document: Punisher_Plan2_NewMarketMakerBot.pdf — separate plan to build a market-maker/ladder bot
+     based on the same article.
+</pre></div>

@@ -1,0 +1,121 @@
+<pre class='txtdoc'>&quot;&quot;&quot;
+strategy.py — Edge calculation (Aggressive Testing Mode)
+&quot;&quot;&quot;
+import math
+from dataclasses import dataclass
+from typing import Dict, List
+import config
+from market_scanner import MarketScanner
+from logger_setup import log
+
+
+@dataclass
+class Signal:
+    market: Dict
+    side: str
+    token_id: str
+    edge: float
+    true_prob: float
+    poly_price: float
+    kelly_size: float
+    asset: str
+    price_change_pct: float
+
+
+_STEEPNESS_BY_DURATION = {5: 80.0, 15: 55.0}
+
+
+def estimate_true_prob(price_change_pct: float, direction: str, duration_min: int) -&gt; float:
+    k = _STEEPNESS_BY_DURATION.get(duration_min, 65.0)
+    reversion_factor = 1.0 - 0.15 * math.log1p(duration_min / 5.0)
+    adjusted_move = price_change_pct * reversion_factor
+    prob_up = 1.0 / (1.0 + math.exp(-k * adjusted_move))
+    return prob_up if direction == &quot;UP&quot; else 1.0 - prob_up
+
+
+def kelly_size(true_prob: float, market_price: float, bankroll: float) -&gt; float:
+    if market_price &lt;= 0 or market_price &gt;= 1:
+        return 0.0
+    b = (1.0 - market_price) / market_price
+    q = 1.0 - true_prob
+    raw_kelly = (b * true_prob - q) / b
+    if raw_kelly &lt;= 0:
+        return 0.0
+    fractional = raw_kelly * config.KELLY_FRACTION
+    capped = min(fractional, config.MAX_POSITION_PCT)
+    return max(bankroll * capped, config.MIN_ORDER_USDC)
+
+
+class Strategy:
+    def __init__(self, price_feed, market_scanner):
+        self._pf = price_feed
+        self._ms = market_scanner
+
+    def scan(self, bankroll: float) -&gt; List[Signal]:
+        if bankroll &lt;= 0:
+            return []
+        signals = []
+        for market in self._ms.get_markets():
+            sig = self._evaluate(market, bankroll)
+            if sig:
+                signals.append(sig)
+        signals.sort(key=lambda s: s.edge, reverse=True)
+        return signals
+
+    def _evaluate(self, market: Dict, bankroll: float):
+        try:
+            asset = market.get(&quot;asset&quot;, &quot;UNKNOWN&quot;)
+            direction = market.get(&quot;direction&quot;, &quot;UP&quot;)
+            duration = market.get(&quot;duration&quot;) or market.get(&quot;duration_min&quot;, 5)
+            yes_price = market.get(&quot;yes_price&quot;) or market.get(&quot;price&quot;) or 0.5
+            token_id = market.get(&quot;token_id&quot;) or market.get(&quot;id&quot;)
+
+            asset_sym = f&quot;{asset.lower()}usdt&quot;
+            price_change = self._pf.price_change_pct(asset_sym, lookback_sec=config.LOOKBACK_SECONDS)
+
+            # Loud logging for every market every scan
+            log.info(
+                &quot;EVAL | %s %s %dmin | move=%.3f%% | YES=%.3f | true_prob=%.3f&quot;,
+                asset, direction, duration, price_change * 100, yes_price,
+                estimate_true_prob(price_change, direction, duration)
+            )
+
+            if abs(price_change) &lt; config.MIN_PRICE_MOVE_PCT:
+                return None
+            if yes_price &lt;= 0.02 or yes_price &gt;= 0.98:
+                return None
+
+            true_prob = estimate_true_prob(price_change, direction, duration)
+            no_price = 1.0 - yes_price
+
+            if true_prob &gt; yes_price + config.EDGE_THRESHOLD:
+                edge = true_prob - yes_price
+                side = &quot;BUY&quot;
+                token = token_id
+                poly_price = yes_price
+                prob_k = true_prob
+            elif (1.0 - true_prob) &gt; no_price + config.EDGE_THRESHOLD:
+                edge = (1.0 - true_prob) - no_price
+                side = &quot;BUY_NO&quot;
+                token = market.get(&quot;no_token_id&quot;) or token_id
+                poly_price = no_price
+                prob_k = 1.0 - true_prob
+            else:
+                return None
+
+            size = kelly_size(prob_k, poly_price, bankroll)
+            if size &lt; config.MIN_ORDER_USDC:
+                return None
+
+            log.info(&quot;SIGNAL | %s %s %dmin | %s edge=%.2f%% size=%.2f USDC&quot;, 
+                     asset, direction, duration, side, edge*100, size)
+
+            return Signal(
+                market=market, side=side, token_id=token, edge=edge,
+                true_prob=true_prob, poly_price=poly_price, kelly_size=size,
+                asset=asset, price_change_pct=price_change
+            )
+
+        except Exception as e:
+            log.debug(&quot;Error in _evaluate: %s&quot;, e)
+            return None</pre>

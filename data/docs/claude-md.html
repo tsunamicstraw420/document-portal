@@ -1,0 +1,83 @@
+<h1>AI_bots — House Rules</h1>
+<p>This folder holds all of Eddie&#x27;s ongoing projects, each in its own subfolder. New projects get new subfolders. <code>Claude_and_AI_Docs/</code> holds finished general documentation.</p>
+<h2>READ THIS FIRST — every session, before the first tool call</h2>
+<p>Cowork does <strong>not</strong> auto-load this file the way terminal Claude Code does. So:</p>
+<ol>
+<li>Read this file.</li>
+<li>Read the <code>CLAUDE.md</code> in the specific project subfolder you&#x27;re working in, if one exists.</li>
+<li>Only then start work.</li>
+</ol>
+<p>If you are reading this after already doing work, stop and check what you did against the rules below before continuing.</p>
+<hr>
+<h2>The 12 rules</h2>
+<p><strong>1. Verify before handing back. Never hand Eddie QA.</strong> Run the check yourself and report the actual number, path, or output. &quot;Should work,&quot; &quot;looks right,&quot; and &quot;I&#x27;ve updated it&quot; are not verification. If you wrote a file, read it back. If you edited code, run it. If you counted something, print the count.</p>
+<p><strong>2. Name your source for every factual claim.</strong> &quot;The log shows X&quot; is fine. &quot;X is happening&quot; without naming what you checked is forbidden when X is verifiable. The phrasing forces the discipline.</p>
+<p><strong>3. Live state beats written claims — including this file.</strong> Docs go stale. Before asserting where something runs, what version is deployed, or what a folder contains: go look. <code>ls</code>, <code>git log</code>, <code>docker ps</code>, read the file.</p>
+<p><strong>4. Copy the working example. Never design a new approach.</strong> If this project has done this kind of operation before, find how it was done and do it that way. Read the prior script or folder <em>before</em> forming a theory. Improvising a &quot;better&quot; method is the most expensive recurring mistake across these projects.</p>
+<p><strong>5. Empirical test beats documentation reading.</strong> &quot;Does this API do X?&quot; → write a 30-line probe and run it. WebFetch summaries, READMEs, and your own prior conclusions are not the live system.</p>
+<p><strong>6. Deliverables only — no intermediate artifacts.</strong> Asked for a PDF? Write the PDF, delete the generator. If you needed a <code>gen_*.py</code>, a probe, or a scratch <code>.md</code>, clean it up before saying you&#x27;re done. One output per ask. If unsure whether to keep an intermediate file, ask before leaving it behind.</p>
+<p><strong>7. Never write files with shell heredocs.</strong> Use the Write/Edit tools, or write in the cloud container and commit the file across. A broken heredoc silently appended <code>EOF</code> and a raw <code>cat</code> line into <code>zc_trading/CLAUDE.md</code> and sat there undetected. Heredocs fail silently; tools don&#x27;t.</p>
+<p><strong>8. Never modify <code>.env</code>, credentials, or key files.</strong> <code>.env</code>, <code>Accounts_info.rtf</code>, <code><em>_creds.rtf</code>, <code></em>.key</code>. Read only when required, never write, never echo contents into chat or logs.</p>
+<p><strong>9. Don&#x27;t make Eddie sit and watch.</strong> He multitasks. Any approach that pins his machine or needs supervision is a failed approach even if it eventually works. Route order: MCP connector → reconnect the connector → <code>device_bash</code>/<code>Bash</code> → a <code>.command</code> file he double-clicks once → Claude in Chrome (last resort; state which of the prior routes you tested and the exact error each gave).</p>
+<p><strong>10. Don&#x27;t ask for clicks until every other route has been tested.</strong> Not &quot;I think this is blocked&quot; — tested, with the error message in hand.</p>
+<p><strong>11. Fix the cause, not the instance.</strong> When something goes wrong, write the working method down so the next session inherits it instead of rediscovering it. That means editing the relevant <code>CLAUDE.md</code>, not just fixing the file in front of you.</p>
+<p><strong>12. Scope discipline.</strong> Don&#x27;t refactor, rename, reorganize, or &quot;clean up&quot; anything that wasn&#x27;t asked for. Don&#x27;t average two existing patterns — pick one and follow it.</p>
+<hr>
+<h2>Self-check before saying &quot;done&quot;</h2>
+<p>Cowork runs in the cloud and cannot execute the <code>.claude/</code> hook scripts on this Mac. There is no automated gate here. This checklist is the gate. Run it explicitly, in writing, before every final response that involved tool calls:</p>
+<pre class='code'><code>1. Did I actually verify each factual claim, and name the source?     yes / no
+2. Did I read back every file I wrote or edited?                      yes / no
+3. Did I delete every intermediate/scratch file I created?            yes / no
+4. Did I do anything that wasn&#x27;t asked for?                           yes / no
+5. Is there a check I skipped and am hoping is fine?                  yes / no</code></pre>
+<p>If #5 is yes, go run it. That question is the one that catches the real failures.</p>
+<hr>
+<h2>Correction ritual</h2>
+<p>When Eddie corrects a real mistake:</p>
+<ol>
+<li>Fix it.</li>
+<li>Append it to &quot;Learned from mistakes&quot; below — or to the project&#x27;s own <code>CLAUDE.md</code> if it&#x27;s</li>
+</ol>
+<p>project-specific — as a <strong>dated, specific, actionable</strong> rule.</p>
+<ol>
+<li>State that you did, and quote the line you added.</li>
+</ol>
+<p>Good: <em>&quot;2026-05-30: read a checkout 28 commits behind origin/main. Always <code>git fetch origin</code> at the start of any code work on this repo.&quot;</em> Bad: <em>&quot;Be more careful with git.&quot;</em></p>
+<p>Eddie&#x27;s half of the ritual, when he wants it enforced: end the correction with <strong>&quot;Update CLAUDE.md so you don&#x27;t make that mistake again.&quot;</strong></p>
+<hr>
+<h2>Learned from mistakes</h2>
+<p>Newest last. Keep each entry to a date, what happened, and the rule it produces.</p>
+<ul>
+<li><strong>2026-08-07: the self-correcting setup existed but was inert.</strong> Hooks were configured in</li>
+</ul>
+<p><code>Polymarket-Arbitrage-Bot/.claude/settings.json</code> only, and project hooks cannot fire in Cowork cloud sessions at all — the folder isn&#x27;t in the session&#x27;s filesystem. Result: the guardrails looked implemented and enforced nothing for the other 14 projects. <strong>Rule: never assume a guardrail is running because it&#x27;s configured. Check where it executes.</strong></p>
+<ul>
+<li><strong>2026-08-07: <code>zc_trading/CLAUDE.md</code> was silently corrupted</strong> by a heredoc that wrote its</li>
+</ul>
+<p>own <code>EOF</code> and a trailing <code>cat</code> command into the file. Nobody noticed. <strong>Rule: rule 7 above — no heredocs for file writes; read back what you wrote.</strong></p>
+<hr>
+<h2>Where the automated hooks do apply</h2>
+<p><code>.claude/settings.json</code> hooks only run in <strong>terminal Claude Code</strong>, launched from inside that project folder. They do nothing in Cowork. Projects that have them:</p>
+<table><thead><tr><th>Project</th><th>PreToolUse</th><th>PostToolUse</th><th>Stop</th></tr></thead><tbody><tr><td><code>Polymarket-Arbitrage-Bot/</code></td><td>block <code>.env</code> writes</td><td><code>py_compile</code> every edited <code>.py</code></td><td>all top-level <code>.py</code> must compile</td></tr><tr><td><code>Podcast/Podcast/</code></td><td>block credential writes</td><td>validate edited <code>.json</code>/<code>.py</code></td><td>no scratch files left behind</td></tr></tbody></table>
+<p>For everything else — and for all Cowork work — the checklist above is the only gate.</p>
+<hr>
+<h2>Content Creator template &amp; sound library — resolving &quot;use the X template/macro&quot;</h2>
+<p>Eddie downloaded the full contentcreatortemplates.com DaVinci Resolve library plus a sound sampler. From <strong>any</strong> chat (podcast episodes, etc.) he may say things like <em>&quot;use the Modern Titles Pack for the intro&quot;</em> or <em>&quot;grab the crt-effect macro&quot;</em>. Resolve it yourself — don&#x27;t make him hunt for files.</p>
+<ul>
+<li><strong>Template index:</strong> <code>Content_Creator_Learn/Templates_Macros/DaVinci_Templates_Index.csv</code></li>
+</ul>
+<p>— columns <code>Category, Name, ID, Filename, Link</code>. Match his words against <strong>Name</strong> (fuzzy is fine) or the numeric <strong>ID</strong>. If several match, list the candidates briefly and let him pick.</p>
+<ul>
+<li><strong>Pack file:</strong> <code>Content_Creator_Learn/Templates_Macros/&lt;Category&gt;/&lt;Filename&gt;</code> (a <code>.zip</code>).</li>
+</ul>
+<p>Inside each: <code>.setting</code>/<code>.drfx</code> macros (+ <code>Fonts/</code>, <code>Help/Tutorial.mp4</code>). ~1,335 packs across 12 categories: Titles, Lower Thirds, Transitions, Effects, Generator, Infographics, Overlays, YouTube, Text, Logos, Intros, Motion Graphics. (Packs are hard-linked across the categories they belong to, so a pack may appear in more than one category folder.)</p>
+<ul>
+<li><strong>Sounds:</strong> <code>Content_Creator_Learn/Sound_Effects/&lt;Category&gt;/&lt;slug&gt;.zip</code> (~2,000-file sampler).</li>
+<li><strong>Visual browser:</strong> <code>Content_Creator_Learn/Template_Sound_Gallery.html</code> (also on his Desktop</li>
+</ul>
+<p>as <code>Template &amp; Sound Gallery.html</code>) — how he eyeballs/previews/likes them. Previews stream from the site&#x27;s public storage; the downloaded packs are local and offline.</p>
+<ul>
+<li><strong>Install into Resolve:</strong> <code>Content_Creator_Learn/Templates_Macros/install_to_davinci.command</code></li>
+</ul>
+<p>unzips the macros into <code>~/Library/Application Support/Blackmagic Design/DaVinci Resolve/ Fusion/Templates/Edit/&lt;cat&gt;/</code> (Lower Thirds get their own bin under Titles). It skips the tutorial videos and fonts on purpose.</p>
+<p>When he names one: confirm the match (Name + Category), give the exact zip path, then help him actually use it — extract the <code>.setting</code>/<code>.drfx</code>, get it into DaVinci, and customize it for that episode. The bundled <code>Help/Tutorial.mp4</code> clips are auto-generated/sped-up and not worth surfacing; guide him directly instead.</p>

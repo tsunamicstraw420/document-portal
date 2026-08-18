@@ -1,0 +1,39 @@
+<p>Publish my learning portal to GitHub Pages so it&#x27;s live on the web and reachable from any device.</p>
+<p>CONTEXT</p>
+<ul>
+<li>The file to publish already exists on this Mac at:</li>
+</ul>
+<p>/Users/rubys/Desktop/AI_bots/Claude_and_AI_Docs/Learning_AI/Learning/index.html (a self-contained HTML page, ~45,710 bytes; an identical copy named Agents_Learning_Portal.html sits in the same folder.)</p>
+<ul>
+<li>The GitHub repo already exists and is PUBLIC:</li>
+</ul>
+<p>https://github.com/tsunamicstraw420/agents-portal (branch: main; it currently contains only a README.)</p>
+<ul>
+<li>My GitHub username is tsunamicstraw420. Use my existing git/gh auth on this</li>
+</ul>
+<p>machine. Run <code>gh auth status</code> first; if gh isn&#x27;t installed or authenticated, tell me the one command to fix it rather than asking me to paste a token.</p>
+<p>DO THIS</p>
+<ol>
+<li>Commit index.html to the ROOT of the agents-portal repo on the main branch</li>
+</ol>
+<p>(clone + commit + push, or use <code>gh api</code>). Keep the filename exactly index.html.</p>
+<ol>
+<li>Enable GitHub Pages: Source = &quot;Deploy from a branch&quot;, Branch = main,</li>
+</ol>
+<p>Folder = / (root). Use <code>gh api</code> (e.g. POST /repos/tsunamicstraw420/agents-portal/pages with {&quot;source&quot;:{&quot;branch&quot;:&quot;main&quot;,&quot;path&quot;:&quot;/&quot;}}) or the gh CLI.</p>
+<ol>
+<li>Wait for it to publish, then VERIFY: fetch the live URL, confirm it returns</li>
+</ol>
+<p>HTTP 200 and that the page actually serves the portal (the title &quot;Agents Learning Portal&quot; and the lesson checkboxes are present).</p>
+<ol>
+<li>Report the final live URL. Expected: https://tsunamicstraw420.github.io/agents-portal/</li>
+</ol>
+<p>NOTES</p>
+<ul>
+<li>The portal already has working &quot;Export progress&quot; / &quot;Import progress&quot; buttons for</li>
+</ul>
+<p>syncing checkbox progress across devices, so NO code changes are needed — just publish it as-is.</p>
+<ul>
+<li>Before finishing, confirm the byte size of the committed index.html matches the</li>
+</ul>
+<p>local file. If anything fails, fix the cause and retry; don&#x27;t hand me a broken URL.</p>

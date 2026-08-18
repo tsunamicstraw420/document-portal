@@ -1,0 +1,112 @@
+<div class='richdoc'>
+<p class="p1"><b>Plan: Add SOL and XRP to the Polymarket Arbitrage Bot</b><b></b></p>
+<p class="p2">4-asset expansion – drafted 2026-05-11, revisit when Vilnius + FAK + Chainlink have stabilized for 24h</p>
+<p class="p3"><br></p>
+<p class="p4"><b>Scope summary</b><b></b></p>
+<p class="p3"><br></p>
+<p class="p5">•<span class="Apple-tab-span">	</span>4 assets × 2 durations × 2 directions = 16 token combinations active per slot</p>
+<p class="p5">•<span class="Apple-tab-span">	</span>Up to <b>~128 active direction-tokens</b> scanned (vs current ~40)</p>
+<p class="p5">•<span class="Apple-tab-span">	</span>Price plumbing already in place: Chainlink RTDS firehose already includes sol/usd and xrp/usd; Binance has solusdt@miniTicker and xrpusdt@miniTicker</p>
+<p class="p3"><br></p>
+<p class="p4"><b>Code changes (in order of dependency)</b><b></b></p>
+<p class="p3"><br></p>
+<p class="p5"><b>Step 1 — config.py</b><b></b></p>
+<p class="p6">BINANCE_SYMBOLS = ["btcusdt", "ethusdt", "solusdt", "xrpusdt"]</p>
+<p class="p6">CHAINLINK_SYMBOLS = ["btc/usd", "eth/usd", "sol/usd", "xrp/usd"]</p>
+<p class="p6">CHAINLINK_TO_BINANCE = {</p>
+<p class="p6"><span class="Apple-tab-span">	</span>"btc/usd": "btcusdt", "eth/usd": "ethusdt",</p>
+<p class="p6"><span class="Apple-tab-span">	</span>"sol/usd": "solusdt", "xrp/usd": "xrpusdt",</p>
+<p class="p6">}</p>
+<p class="p6">BINANCE_TO_CHAINLINK = {v: k for k, v in CHAINLINK_TO_BINANCE.items()}</p>
+<p class="p5">Net: Binance subscribes to 4 streams. Chainlink firehose starts recording SOL/XRP frames instead of discarding them.</p>
+<p class="p3"><br></p>
+<p class="p5"><b>Step 2 — market_scanner.py</b><b></b></p>
+<p class="p6">_SLUG_PREFIX = {</p>
+<p class="p6"><span class="Apple-tab-span">	</span>("BTC", 5):<span class="Apple-converted-space">  </span>"btc-updown-5m",<span class="Apple-converted-space">  </span>("ETH", 5):<span class="Apple-converted-space">  </span>"eth-updown-5m",</p>
+<p class="p6"><span class="Apple-tab-span">	</span>("SOL", 5):<span class="Apple-converted-space">  </span>"sol-updown-5m",<span class="Apple-converted-space">  </span>("XRP", 5):<span class="Apple-converted-space">  </span>"xrp-updown-5m",</p>
+<p class="p6"><span class="Apple-tab-span">	</span>("BTC", 15): "btc-updown-15m", ("ETH", 15): "eth-updown-15m",</p>
+<p class="p6"><span class="Apple-tab-span">	</span>("SOL", 15): "sol-updown-15m", ("XRP", 15): "xrp-updown-15m",</p>
+<p class="p6">}</p>
+<p class="p5">Also verify the title-parsing regex <span class="s1">_ASSET_RE </span>recognizes SOL/XRP. The current regex has only BTC and ETH entries. Add:</p>
+<p class="p6">"SOL": re.compile(r"\bSolana\b|\bSOL\b", re.I),</p>
+<p class="p6">"XRP": re.compile(r"\bXRP\b|\bRipple\b", re.I),</p>
+<p class="p5"><b>Pre-deploy probe:</b> verify these regexes against actual Polymarket market titles. Don't assume the title format – query the Gamma API and inspect a real SOL or XRP market question string first.</p>
+<p class="p3"><br></p>
+<p class="p5"><b>Step 3 — strategy.py</b><b></b></p>
+<p class="p3"><br></p>
+<p class="p5">Almost certainly no change. <span class="s1">market.asset </span>is generic, the dispatcher is asset-agnostic, per-duration edge thresholds apply uniformly.</p>
+<p class="p3"><br></p>
+<p class="p5"><b>Caveat:</b> the <span class="s1">_STEEPNESS_BY_DURATION </span>constants (k=150 for 5min, k=100 for 15min) are empirically calibrated for BTC/ETH. SOL has roughly 1.5–2x BTC's daily realized volatility; XRP is somewhere in between. Same k would over-react to moves on SOL/XRP – a 0.4% SOL move is much more common than a 0.4% BTC move and shouldn't get the same probability boost.</p>
+<p class="p3"><br></p>
+<p class="p5"><b>Calibration options:</b><b></b></p>
+<p class="p5">•<span class="Apple-tab-span">	</span>Option A: ship as-is, accept over-firing for a few days, observe signal density and outcomes, then add per-asset k values. <b>Recommended</b> – empirical first.</p>
+<p class="p5">•<span class="Apple-tab-span">	</span>Option B: pre-calibrate by checking SOL/XRP historical vol vs BTC and dampening k proportionally. Replace <span class="s1">_STEEPNESS_BY_DURATION </span>with a <span class="s1">_STEEPNESS_BY_ASSET_DURATION </span>dict.</p>
+<p class="p3"><br></p>
+<p class="p5"><b>Step 4 — bot.py</b><b></b></p>
+<p class="p3"><br></p>
+<p class="p5">The STATUS print loop already iterates <span class="s1">config.BINANCE_SYMBOLS</span>. It'll auto-pick up SOL/XRP. The <span class="s1">feed_status() </span>line in price_feed.py also iterates the symbol map. No code changes needed – just longer log output. 4 assets x 2 feeds = 8 fields might wrap on narrow terminals. Acceptable cost.</p>
+<p class="p3"><br></p>
+<p class="p5"><b>Step 5 — cross-asset correlation guard (risk_manager.py + bot.py)</b><b></b></p>
+<p class="p3"><br></p>
+<p class="p5">Currently bot.py has a guard: if BTC UP 5min is open, block ETH UP 5min on the same Binance move. With 4 assets, this needs a design call:</p>
+<p class="p3"><br></p>
+<p class="p5">•<span class="Apple-tab-span">	</span>BTC UP + ETH UP same window – block ETH (current behavior)</p>
+<p class="p5">•<span class="Apple-tab-span">	</span>BTC UP + SOL UP same window – ??? (SOL is highly correlated with BTC/ETH)</p>
+<p class="p5">•<span class="Apple-tab-span">	</span>ETH UP + SOL UP – ??? (very correlated)</p>
+<p class="p5">•<span class="Apple-tab-span">	</span>BTC UP + XRP UP – ??? (less correlated than the others)</p>
+<p class="p3"><br></p>
+<p class="p5"><b>Three policies to choose between:</b><b></b></p>
+<p class="p5">•<span class="Apple-tab-span">	</span>(a) <b>Conservative</b>: continue blocking same-direction across all 4. May miss diversified trades.</p>
+<p class="p5">•<span class="Apple-tab-span">	</span>(b) <b>Middle ground</b>: block only within tight asset pairs (BTC&lt;-&gt;ETH, SOL&lt;-&gt;XRP), allow BTC+SOL.</p>
+<p class="p5">•<span class="Apple-tab-span">	</span>(c) <b>Aggressive</b>: drop cross-asset blocking entirely, rely on MAX_OPEN_POSITIONS only.</p>
+<p class="p3"><br></p>
+<p class="p5"><b>Recommended:</b> ship (c) initially – per-asset+direction+duration uniqueness only, no cross-asset blocking. Observe whether SOL/XRP + BTC/ETH same-direction races produce duplicate-exposure losses. Add correlation-aware blocking only if it does.</p>
+<p class="p3"><br></p>
+<p class="p4"><b>Validation steps (before going live on SOL/XRP)</b><b></b></p>
+<p class="p3"><br></p>
+<p class="p5">1.<span class="Apple-tab-span">	</span><b>Probe Polymarket market titles</b> for SOL and XRP to verify the _ASSET_RE regex matches the displayed question text (not the slug).</p>
+<p class="p5">2.<span class="Apple-tab-span">	</span><b>Verify Chainlink delivers sol/usd and xrp/usd continuously</b> (we caught one sol/usd sample in the May 11 probe – confirm freshness over time).</p>
+<p class="p5">3.<span class="Apple-tab-span">	</span><b>Verify Binance WS handles 4 symbol streams</b> without rate-limit issues. Should be fine but worth checking.</p>
+<p class="p5">4.<span class="Apple-tab-span">	</span><b>Depth check on SOL/XRP markets at the typical bot order size</b> ($12.52 USDC). Polymarket book depth for SOL/XRP markets is typically thinner than BTC/ETH – FAK fills should still work for that size, but a $50+ order may hit the no-liquidity wall faster.</p>
+<p class="p5">5.<span class="Apple-tab-span">	</span><b>Monitor the first hour after deploy</b> for: signal density (expect 2–3x more), order success rate (FAK should still hit on SOL/XRP), unexpected errors.</p>
+<p class="p3"><br></p>
+<p class="p4"><b>Risk profile</b><b></b></p>
+<p class="p3"><br></p>
+<p class="p5">•<span class="Apple-tab-span">	</span><b>Increased exposure</b>: if you trade SOL UP and BTC UP at the same time on the same Binance move, you're 2x exposed to the same underlying signal. Same as today's BTC+ETH problem but multiplied across more pairs.</p>
+<p class="p5">•<span class="Apple-tab-span">	</span><b>SOL/XRP liquidity</b>: Polymarket book depth for SOL/XRP markets is typically thinner than BTC/ETH.</p>
+<p class="p5">•<span class="Apple-tab-span">	</span><b>Calibration risk</b>: signals will likely over-fire on SOL/XRP at current _STEEPNESS_BY_DURATION = 150. May lose money on noisy small-move signals until calibrated.</p>
+<p class="p3"><br></p>
+<p class="p4"><b>Rollback plan</b><b></b></p>
+<p class="p3"><br></p>
+<p class="p5">If signal density is overwhelming or losses spike: revert _SLUG_PREFIX to BTC/ETH only. Single commit revert. Binance and Chainlink subscriptions can stay at 4-symbol – the unused data just gets ignored.</p>
+<p class="p3"><br></p>
+<p class="p4"><b>Estimated effort</b><b></b></p>
+<p class="p3"><br></p>
+<p class="p5">•<span class="Apple-tab-span">	</span>Code changes: 20–30 lines across 3 files</p>
+<p class="p5">•<span class="Apple-tab-span">	</span>Pre-deploy probes: 30–60 minutes (title regex check, depth check)</p>
+<p class="p5">•<span class="Apple-tab-span">	</span>Deploy: 5 minutes</p>
+<p class="p5">•<span class="Apple-tab-span">	</span>Initial observation window: 1–2 hours attentive monitoring</p>
+<p class="p5">•<span class="Apple-tab-span">	</span>Calibration iteration if needed: 1–2 days of data collection + per-asset k tuning</p>
+<p class="p3"><br></p>
+<p class="p4"><b>Pre-flight question</b><b></b></p>
+<p class="p3"><br></p>
+<p class="p5">Before implementing, decide:</p>
+<p class="p3"><br></p>
+<p class="p5"><b>Do you want the bot to treat 4 assets as independent positions, or apply a cross-asset correlation guard?</b><b></b></p>
+<p class="p3"><br></p>
+<p class="p5"><span class="Apple-tab-span">	</span>(a) Conservative: block all same-direction across 4 assets</p>
+<p class="p5"><span class="Apple-tab-span">	</span>(b) Middle: block within tight pairs only (BTC&lt;-&gt;ETH, SOL&lt;-&gt;XRP)</p>
+<p class="p5"><span class="Apple-tab-span">	</span>(c) Aggressive: drop cross-asset blocking, rely on MAX_OPEN_POSITIONS</p>
+<p class="p3"><br></p>
+<p class="p5">Default recommendation: (c) for initial deploy, evaluate after a few days of data.</p>
+<p class="p3"><br></p>
+<p class="p4"><b>Status when this plan was drafted (2026-05-11 evening)</b><b></b></p>
+<p class="p3"><br></p>
+<p class="p5">•<span class="Apple-tab-span">	</span>Vilnius VPS live in Lithuania (no geo-block)</p>
+<p class="p5">•<span class="Apple-tab-span">	</span>FAK BUY proven via 5/5 live test fills earlier today</p>
+<p class="p5">•<span class="Apple-tab-span">	</span>Chainlink RTDS streaming after the empty-filter fix – CL:0s, ~6 ticks/sec</p>
+<p class="p5">•<span class="Apple-tab-span">	</span>Binance-momentum and Chainlink-settle strategies both active</p>
+<p class="p5">•<span class="Apple-tab-span">	</span>Bot trading 2 assets (BTC, ETH); SOL and XRP markets available on Polymarket but currently ignored</p>
+<p class="p3"><br></p>
+<p class="p5">Recommend waiting until the current 2-asset config has produced clean fill data for 24h before adding SOL/XRP. Keep one variable at a time.</p>
+</div>

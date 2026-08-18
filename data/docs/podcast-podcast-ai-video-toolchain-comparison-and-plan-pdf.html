@@ -1,0 +1,172 @@
+<div class="pdfpages"><img class="pdfpage" loading="lazy" src="data/pdf/podcast-podcast-ai-video-toolchain-comparison-and-plan-pdf/p-1.jpg" alt="page 1">
+<img class="pdfpage" loading="lazy" src="data/pdf/podcast-podcast-ai-video-toolchain-comparison-and-plan-pdf/p-2.jpg" alt="page 2">
+<img class="pdfpage" loading="lazy" src="data/pdf/podcast-podcast-ai-video-toolchain-comparison-and-plan-pdf/p-3.jpg" alt="page 3"></div><div class="pdftext" hidden><pre> REALITY RECAPS UNFILTERED · AI VIDEO PIPELINE
+
+
+AI Image &amp; Video Toolchain — Comparison &amp; Plan
+Prepared for Eddie · July 6, 2026 · Planning document — no execution
+
+
+    Your brief (from the notebook): Every episode will be made with AI image &amp; video creation. Build an avatar of every character in the
+    episode plus a talking-head of Ruby who narrates. Based on what Ruby says, generate B-roll — animated characters and scenes
+    — matched to the narration, running as ~5-second clips / images over the narration. Flow: Script → Storyboard → Create AI
+    video clips. Digest everything in the AI Video Creation Summaries folder for strategy. Preferred working model: Claude engineers
+    the prompts (image → then animation), Eddie approves. This is a plan to compare and decide — not to execute yet.
+
+
+
+How I read the four tools against your needs
+
+They are not four versions of the same thing. Two are hubs that resell many models under one login (Artlist, PromptEdit), one is a single-
+vendor all-in-one (Grok), and one is a polish/upscale layer (Magnific). The course in your folder is built almost entirely around the
+PromptEdit hub and its models (Kling, Veo, Nano Banana Pro, HeyGen, ElevenLabs, Runway Aleph, Wan 2.2).
+
+                         Artlist (artlist.io)               PromptEdit (promptedit.com)         Grok (grok.com)                 Magnific (magnific.com)
+
+ What it is              Creative hub: 38+ video            Credit marketplace: pay-as-         Single-vendor all-in-one:       Image upscaler / enhancer
+                         models + royalty-free music,       you-go access to the same top       xAI&#x27;s Grok Imagine for          (now the Freepik parent
+                         SFX, stock, plugins, one           models, no subscription — the       image + video in one            brand after Apr 2026
+                         commercial license                 course&#x27;s recommended access         subscription                    rebrand); image, video,
+                                                            point                                                               upscale, audio
+
+ Models                  Seedance 2.0, Veo 3.1, Kling       Kling, Veo, HeyGen, Nano            Grok Imagine only (one          Own enhancement models +
+                         3.0, Grok Imagine, Wan 2.7,        Banana Pro, ElevenLabs,             model family)                   Freepik&#x27;s generation suite
+                         Sora 2 + more, pick per shot       Runway Aleph, Wan 2.2,
+                                                            SeaDance 2.0
+
+ Talking-head Ruby       Lipsync v2 Pro AI avatar built     HeyGen (course-rated industry       Grok Imagine lipsync            Not its purpose
+                         in                                 leader for &gt;10s speech) +           (improved 2026, single-step
+                                                            Hedra                               audio)
+
+ Consistent              Via Nano Banana / reference        Nano Banana Pro as &quot;source          &quot;Character reference&quot;           Can enhance/upscale a
+ character avatars       images                             of truth&quot; (course method)           system built in                 locked character image
+
+ 5-sec B-roll            Any model, image-to-video          Kling/Veo/Seedance image-to-        Up to 30s, 720p HD              No (enhances existing clips/
+                                                            video (course default: 5s)                                          frames)
+
+ Commercial              Yes — one clear license            Per-model terms; verify before      Check xAI terms; evolving       Yes for outputs
+ license (you            covers YouTube + podcast           publishing
+ monetize)
+
+ Price (mid-2026)        AI Suite $29.99–$79.99/mo;         Buy credits, no subscription;       Lite $10 · SuperGrok $30/       $39 · $99 · $299/mo (token-
+                         Max ~$50.66/mo (annual)            cost is per-generation (5s Kling    mo · Heavy $300                 based)
+                                                            ≈ 20 credits)
+
+ Best role for you       Primary platform                   Tutorial-accurate companion         Cheap rapid B-roll drafting /   Optional final polish on hero
+                                                            (HeyGen, Nano Banana)               experiments                     frames
+
+Note: CLAUDE.md lists Artlist Max at $39.99/mo — current pages show ~$50.66/mo on the annual Max plan, so that line likely needs updating. PromptEdit&#x27;s exact
+credit prices sit behind login; per-generation credit cost is what matters, and it mirrors the underlying models (e.g., Kling ~20 credits per 5s clip).
+
+
+
+Recommendation
+
+   Make Artlist Max your primary platform, with PromptEdit as the companion. Artlist Max is already in your budget, gives you the
+   same top models the course teaches (Veo, Kling, Seedance, Grok Imagine, Wan) plus the royalty-free music, SFX and stock you
+   already need — all under one commercial license that clearly covers a monetized YouTube + podcast. That single-license clarity is
+   the deciding factor since Reality Recaps is monetized.
+
+
+Keep a small PromptEdit credit balance for the two things the course leans on that are cleanest there: HeyGen for Ruby&#x27;s longer talking-
+head segments (it leads on speech over ~10 seconds) and Nano Banana Pro as the character &quot;source of truth.&quot; Use Grok (SuperGrok
+$30) only as a cheap sandbox to rough out B-roll ideas fast — mind the 720p cap and confirm its license before anything published.
+Magnific is optional: a final upscale/enhance pass on a few hero frames (cover-style shots), not a core tool.
+
+
+The production flow (your Script → Storyboard → Clips, detailed)
+
+                  1 · Script        →        2 · Storyboard           →        3 · Image prompt            →        4 · Animate prompt            →
+
+                                                                  5 · Assemble over narration
+
+This matches the course&#x27;s core lesson: don&#x27;t chase a one-click tool — plan first, then use image-to-video (refine a cheap still image, then
+animate it). Your two-prompt idea (image prompt, then animation prompt) is that method.
+
+
+
+   Where &quot;Claude creates, Eddie approves&quot; fits — the approval gates
+      • Gate A — Cast &amp; storyboard: From Ruby&#x27;s teleprompter script I draft the shot list — one row per narration beat — plus which cast
+       member/couple each B-roll shows (cross-checked against cast_manifest.json so no one is skipped). You approve the shot
+       list.
+      • Gate B — Image prompts: I write a Nano Banana-style image prompt for each frame (character template + scene). You approve
+       the prompts before any credits are spent generating images.
+      • Gate C — Animation prompts: For each approved still I write the 5-second animation prompt (subject action + camera +
+       emotion). You approve, then generate the clips.
+      • Gate D — Assembly: Clips + Ruby&#x27;s talking-head + narration audio are laid on the timeline in Riverside. Visual sync stays a
+       human editorial step.
+
+   I produce text (shot lists + prompts) at every gate; you approve; generation only happens after approval. That keeps you in control of spend and quality.
+
+
+
+
+Prompt templates (from the folder, ready to reuse)
+
+Character &quot;source of truth&quot; (build once per character, reuse every shot)
+
+  [Character name] — full-body reference, [age/build], [hair], [signature outfit/colors],
+  [distinguishing features]. Neutral expression, even studio lighting, plain background,
+  photoreal, 16:9, 2K. This image is the consistency reference for all later shots.
+
+
+
+Step 3 — Image prompt (still frame)
+
+  [Subject + who they are] in [environment/setting], [framing: close-up / medium / wide],
+  [visual style], [lighting], [time of day], [mood]. Use the character reference for likeness.
+
+
+
+Step 4 — Animation prompt (animate the approved still → ~5s)
+
+  Subject action: [exactly what they do — the most important line]
+  Camera movement: [e.g., &quot;no camera movement / tripod shot&quot; for a clean pro look, or a slow push-in]
+  Emotion / mood / tone: [what the viewer should feel]
+  Duration 5s · aspect 16:9 · generate sound: [on/off]
+
+
+Course guidance baked in: the still already carries subject, style, environment and lighting, so the animation prompt only needs those three lines. Prefer 5s over 10s
+(average pro shot is under 5s; saves credits). Keep camera moves simple.
+Talking-head Ruby — the specific recipe
+
+  • Lock one Ruby reference image (Nano Banana Pro), simple background — talking-head tools are weak on busy backgrounds.
+  • Drive the mouth with Ruby&#x27;s real narration audio (you already record it) rather than a preset voice — more realistic, and consistent with
+    the project&#x27;s &quot;Ruby records her own voice&quot; decision.
+  • Use HeyGen (via PromptEdit) or Artlist Lipsync for segments; for a 30-min episode, generate talking-head only for key stretches (intro,
+    transitions, outro) and let B-roll + narration carry the rest — the course&#x27;s money-saving pattern.
+
+
+Rough monthly cost of the recommended setup
+
+ Item                                                          Cost                                   Note
+
+ Artlist Max                                                   ~$50/mo (annual)                       Primary: models + music + SFX + stock + commercial license
+
+ PromptEdit credits                                            ~$20–40/mo (usage)                     HeyGen talking-head + Nano Banana; pay only for what you
+                                                                                                      generate
+
+ Grok SuperGrok                                                $30/mo (optional)                      Cheap B-roll sandbox; drop if Artlist covers it
+
+ Magnific                                                      $0–39/mo (optional)                    Only if you want an upscale pass on hero frames
+
+ Core recommendation                                           ~$70–90/mo                             Artlist + PromptEdit credits (Grok/Magnific optional)
+
+
+
+
+Open decisions before we execute
+
+  • Primary platform: Confirm Artlist Max as primary (vs. going PromptEdit-only to match the course tutorials 1:1).
+  • Talking-head tool: HeyGen (PromptEdit) vs. Artlist Lipsync vs. Grok — I&#x27;d pilot HeyGen first per the course.
+  • Grok in or out: Keep the $30 sandbox, or skip it and lean on Artlist&#x27;s Grok Imagine access.
+  • Pilot scope: Pick one episode (e.g., an existing teleprompter script) to storyboard end-to-end as the test run.
+
+Say the word and I&#x27;ll take one episode script and produce the Gate A shot list + Gate B image prompts for your approval — still no
+generation, just the prompt package.
+
+
+Sources: Artlist AI pricing &amp; model list (artlist.io); Magnific/Freepik pricing &amp; rebrand (magnific.com, myarchitectai.com); Grok Imagine &amp; SuperGrok pricing/features (x.ai,
+atlascloud.ai, felloai.com); Kling/Veo/HeyGen pricing (kling.ai, eesel.ai); PromptEdit &amp; course workflow (promptedit.com + your AI Video Creation Summaries folder,
+ContentCreator.com AI Creator Course). Pricing is mid-2026 and moves fast — verify at signup.
+</pre></div>

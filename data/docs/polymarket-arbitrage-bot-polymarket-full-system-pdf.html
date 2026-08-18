@@ -1,0 +1,337 @@
+<div class="pdfpages"><img class="pdfpage" loading="lazy" src="data/pdf/polymarket-arbitrage-bot-polymarket-full-system-pdf/p-01.jpg" alt="page 1">
+<img class="pdfpage" loading="lazy" src="data/pdf/polymarket-arbitrage-bot-polymarket-full-system-pdf/p-02.jpg" alt="page 2">
+<img class="pdfpage" loading="lazy" src="data/pdf/polymarket-arbitrage-bot-polymarket-full-system-pdf/p-03.jpg" alt="page 3">
+<img class="pdfpage" loading="lazy" src="data/pdf/polymarket-arbitrage-bot-polymarket-full-system-pdf/p-04.jpg" alt="page 4">
+<img class="pdfpage" loading="lazy" src="data/pdf/polymarket-arbitrage-bot-polymarket-full-system-pdf/p-05.jpg" alt="page 5">
+<img class="pdfpage" loading="lazy" src="data/pdf/polymarket-arbitrage-bot-polymarket-full-system-pdf/p-06.jpg" alt="page 6">
+<img class="pdfpage" loading="lazy" src="data/pdf/polymarket-arbitrage-bot-polymarket-full-system-pdf/p-07.jpg" alt="page 7">
+<img class="pdfpage" loading="lazy" src="data/pdf/polymarket-arbitrage-bot-polymarket-full-system-pdf/p-08.jpg" alt="page 8">
+<img class="pdfpage" loading="lazy" src="data/pdf/polymarket-arbitrage-bot-polymarket-full-system-pdf/p-09.jpg" alt="page 9">
+<img class="pdfpage" loading="lazy" src="data/pdf/polymarket-arbitrage-bot-polymarket-full-system-pdf/p-10.jpg" alt="page 10"></div><div class="pdftext" hidden><pre>             28 Tools Running Behind a Single
+              Polymarket Bot That Made $1M
+                                  Not a strategy – a full system stack
+                   By Phantom_Defi (@0xPhantomDefi) · X Article · Apr 22, 2026 · 236K views
+                         Source: x.com/0xPhantomDefi/status/2046998888255566066
+
+
+
+
+                    Cover – How Claude made $2,382,780 · from $300 arbitrage bot · Polymarket 2026
+
+
+
+
+Introduction
+28 repositories. Six layers. One stack. No gaps.
+
+How it works, why it works, and how to make your first $1,000 on Polymarket with the same algo – it&#x27;s all in
+here. Everything you need to build a profitable trading bot on Polymarket – from the brain to the backtest to
+the production execution layer.
+
+Before you read:
+→ Bookmark this. You&#x27;ll need it when you actually start building.
+→ Copy coinman2 trades via TG bot: https://t.me/PolyGunSniperBot?start=ref_simbaa0x
+→ Follow for more alpha: @0xPhantomDefi
+→ Polymarket account: polymarket.com
+
+
+Coinman2 – The Main Hero
+$1,003,450 PnL · 3,062 predictions · One wallet.
+Wallet address: 0x55be7aa03ecfbe37aa5460db791205f7ac9ddca3
+Polymarket handle: @coinman2 · Joined November 2024.
+When traders first saw the growth trajectory on-chain, the initial reaction from crypto Twitter was simple:
+fake. A seven-figure cumulative PnL from a retail-profile wallet belongs in a Telegram scam group, not in a
+verifiable on-chain dashboard. But the blockchain doesn&#x27;t lie. Every trade is public. Every settlement is
+verifiable. Developers reverse-engineered the approach within weeks. Then they asked Claude to rebuild it
+from scratch. This piece is about the full tool stack that makes this possible.
+
+
+
+
+                            coinman2 Polymarket wallet – $1,003,450 PnL · 3,062 predictions
+
+
+
+What Polymarket Is and Where the Edge Lives
+Polymarket is a prediction market. Users trade on outcomes: will Bitcoin be higher in 15 minutes? Each
+contract resolves at $1.00 (correct) or $0.00 (wrong). The platform&#x27;s weekly volume exceeded $2 billion in
+early 2026.
+
+The key category for automated trading is short-duration crypto contracts – 5-minute and 15-minute BTC
+and ETH up/down questions. Polymarket updates its prices slower than the underlying asset moves on
+Binance. In 2024, that lag averaged 12 seconds. By Q1 2026, competition had compressed it to 2.7
+seconds. 2.7 seconds is an eternity for a machine.
+
+
+The Mechanism, Step by Step
+A 15-minute BTC contract opens at 50/50. Ten minutes in, Bitcoin drops 0.6% on Binance in 30 seconds.
+The real probability that BTC will be lower at expiry shifts to ~78%. Polymarket still shows 54/46. That&#x27;s a
+24-point edge on a binary contract. A bot monitoring Binance&#x27;s WebSocket feed with under 50ms latency
+sees this immediately. It calculates the discrepancy, sizes a position using Kelly Criterion, and executes via
+Polymarket&#x27;s CLOB API. Two seconds later, the market corrects. Repeat 200–500 times per day.
+
+
+
+
+                                           Polymarket API surfaces overview
+
+Polymarket exposes four API surfaces. The official Python client py-clob-client (pip install py-clob-client)
+wraps all of them: three lines to fetch an order book, five to place a signed limit order on Polygon (chain ID
+137, USDC).
+Key repos to start:
+· Polymarket/agents – official AI agent framework (Gamma API, CLOB API, LangChain, Chroma vector DB)
+· polyterm – terminal dashboard: whale tracker, arbitrage scanner, insider detection, market risk A–F
+
+
+
+LAYER 1 – Brain (AI Reasoning)
+The coinman2 bot ran on Anthropic&#x27;s Claude. In March 2026, a controlled experiment ran Claude against
+the OpenClaw framework – same capital ($1,000), same market conditions, 48 hours. Claude: +1,322%
+return. OpenClaw: fully liquidated. The gap traced to risk management quality: Claude&#x27;s code had more
+conservative defaults, defensive edge cases, and cleaner error handling.
+
+
+
+
+              LAYER 1 – Claude reasoning trace: market context → Kelly-sized order (every decision auditable)
+
+· Claude (Anthropic) – Primary strategist. Reasons about market questions, estimates probability vs
+current price, identifies edge size.
+
+· Qwen3-Coder – Open source coding LLM. Watches live performance, detects crowded strategies,
+rewrites modules autonomously. github.com/QwenLM/Qwen3-Coder
+
+· G0DM0D3 – Uncensored AI interface. Engages with uncomfortable market theses without refusals.
+github.com/elder-plinius/G0DM0D3
+
+· Claude Squad – Runs multiple Claude instances in parallel – one watches politics, one crypto, one sports
+– all feeding the same engine. github.com/smtg-ai/claude-squad
+
+
+
+LAYER 2 – Orchestration
+Making agents do things. A reasoning engine with no execution layer is just an opinion generator.
+                             LAYER 2 – Bull vs Bear debate resolved by Risk Manager veto
+
+· Agency Agents – Role-based debate: Bull Agent vs Bear Agent vs Risk Manager veto. Consensus
+determines trade and size. github.com/msitarzewski/agency-agents
+
+· ClaudeAgent OneClick – One-click Claude agent deploy. Persistent 24/7 market watcher in minutes.
+github.com/cvxv666/ClaudeAgentOneClick
+
+· MiroThinker – Mandatory chain-of-thought layer. Bot must justify every position before entry.
+github.com/MiroMindAI/MiroThinker
+
+· Superpowers – Extends agents with web access, file ops, arbitrary API calls. Fresh data every decision
+cycle. github.com/obra/superpowers
+
+· TradingAgents – Multi-agent framework: fundamental analyst + technical analyst + sentiment analyst →
+aggregated signal. github.com/TauricResearch/TradingAgents
+
+
+
+LAYER 3 – Data &amp; Market Signals
+The eyes. The bot is only as good as what it can see. This layer brings it closer to a Bloomberg terminal than
+a script.
+                 LAYER 3 – The edge visualised: Binance-implied probability (blue) vs Polymarket price (red)
+
+· OpenBB – Open source Bloomberg. 100+ data sources: stocks, macro, crypto, options flow, news.
+github.com/OpenBB-finance/OpenBB
+
+· Dexter – Autonomous deep research. SEC filings, earnings transcripts, analyst reports – two hours of
+analyst work in seconds. github.com/virattt/dexter
+
+· MCP Server – Financial datasets via MCP protocol. Typed, validated data straight into Claude&#x27;s context
+window. github.com/financial-datasets/mcp-server
+
+· Crucix – On-chain aggregator. Whale wallet movements on Polygon can front-run the visible order book by
+minutes. github.com/calesthio/Crucix
+
+· fredapi – Every macroeconomic dataset the Federal Reserve publishes, free. CPI, unemployment, yield
+curves. github.com/mortada/fredapi
+
+· Binance Collector – Predicts market direction and computes fair value for short-duration BTC/ETH
+contracts. github.com/txbabaxyz/mlmodelpoly
+
+· Polymarket Assistant Tool – Indicator engine that surfaces directional bias on live markets.
+github.com/FiatFiorino/polymarket-assistant-tool
+
+·    lightweight-charts     –    TradingView&#x27;s              charting       library.      14k      stars,       45KB,   free.
+github.com/tradingview/lightweight-charts
+
+
+
+LAYER 4 – Market Intelligence
+What others have already built. Whale alerts, leaderboards, signal confluence – the institutional-grade view
+retail never used to have.
+                     LAYER 4 – Market intelligence: whale tracking, insider detection, signal confluence
+
+· Polyscope – Scans 2,000+ markets. Whale alerts ($5k/$10k/$20k), probability shifts, volume spikes – all
+to Telegram in real time. thepolyscope.com
+
+· Polywhaler – $10k+ whale trade tracker. Real-time alerts, insider detection, AI-generated signals.
+polywhaler.com
+
+· WHALES tracker (Apify) – Cross-references Gamma + Data + CLOB. Outputs Smart Money Consensus,
+Health Score, Conviction Score as structured JSON.
+
+· HyperBuildX bot – Rust-based, sub-100ms latency. AI ranks copy-trade signals when multiple whales pile
+into the same market. github.com/HyperBuildX/Polymarket-Trading-Bot
+
+· polymarketanalytics.com – Open trader analytics. Top wallet P&amp;L;, biggest wins, Kalshi
+cross-comparison.
+
+· polyrec – Real-time terminal dashboard: Chainlink oracle + Binance feed + full orderbook depth. 70+
+indicators, CSV logging, built-in backtester. github.com/txbabaxyz/polyrec
+
+· Polymarket-Trading-Bot (TypeScript) – 53k lines. Seven prebuilt strategies: arbitrage, momentum,
+market     making,     AI     forecast,    whale   copy-trade,     convergence,       and    more.
+github.com/dylanpersonguy/Polymarket-Trading-Bot
+
+
+
+LAYER 5 – Backtest &amp; Simulation
+Prove it before you run it. This is the layer most retail bots skip – and the reason most retail bots blow up.
+The only defense is running every idea against historical data and simulated execution before a single dollar
+touches the CLOB.
+                   LAYER 5 – Backtest report: 17 months live record, fees + slippage, drawdowns visible
+
+· prediction-market-backtesting – Backtests trading strategies against real historical Polymarket and
+Kalshi data. The first sanity check on any new idea. github.com/evan-kolberg/prediction-market-backtesting
+
+· polybot – Full execution and market-data infrastructure with paper trading. Kafka, ClickHouse, Grafana –
+the analytics pipeline an institutional desk would build. github.com/ent0n29/polybot
+
+
+The Complete Signal Flow
+                          The complete signal flow – world event to execution in &lt;10 seconds
+
+World event to execution: under 10 seconds in the ideal scenario.
+
+
+Human Traders vs Bots – The Data
+Same market, same strategy, same time window – bots generated ~$206,000, humans ~$100,000. A 2×
+performance gap driven entirely by execution quality.
+
+Systematic error                                Impact
+
+Late entries                                    Window often closed by the time humans place manually
+
+Inconsistent sizing                             Oversize when confident, undersize when uncertain — kills EV
+
+Fatigue                                         Human degrades over 8h session; bot is identical at hour 72
+
+Drawdown psychology                             Abandon working strategies or double down — both destroy capital
+
+
+
+
+Why Now
+The bots already running have a compounding advantage. The edge exists today. The window is narrowing.
+The best time to understand this stack was six months ago. The second best time is right now.
+
+Competition is way weaker than it looks. 99.9% of people will scream “too hard” and call it cap. Only the
+0.01% actually try… and eat.
+All Links &amp; Resources
+Every repository, tool, and resource referenced in the article.
+
+Source article on X
+https://x.com/0xPhantomDefi/status/2046998888255566066
+
+Author: @0xPhantomDefi
+https://x.com/0xPhantomDefi
+
+coinman2 Polymarket wallet
+https://polymarket.com/@coinman2
+
+PolyGun Sniper Telegram bot (copy trades)
+https://t.me/PolyGunSniperBot?start=ref_simbaa0x
+
+Polymarket
+https://polymarket.com
+
+py-clob-client (pip)
+https://pypi.org/project/py-clob-client/
+
+Polymarket/agents – official AI framework
+https://github.com/Polymarket/agents
+
+polyterm – terminal dashboard
+https://github.com/NYTEMODEONLY/polyterm
+
+Qwen3-Coder – open-source coding LLM
+https://github.com/QwenLM/Qwen3-Coder
+
+G0DM0D3 – uncensored AI interface
+https://github.com/elder-plinius/G0DM0D3
+
+Claude Squad – parallel Claude instances
+https://github.com/smtg-ai/claude-squad
+
+Agency Agents – role-based debate
+https://github.com/msitarzewski/agency-agents
+
+ClaudeAgent OneClick – one-click deploy
+https://github.com/cvxv666/ClaudeAgentOneClick
+
+MiroThinker – chain-of-thought layer
+https://github.com/MiroMindAI/MiroThinker
+
+Superpowers – web/file/API extension
+https://github.com/obra/superpowers
+
+TradingAgents – multi-agent signals
+https://github.com/TauricResearch/TradingAgents
+
+OpenBB – open-source Bloomberg terminal
+https://github.com/OpenBB-finance/OpenBB
+
+Dexter – autonomous deep research
+https://github.com/virattt/dexter
+
+MCP Server – financial datasets
+https://github.com/financial-datasets/mcp-server
+
+Crucix – on-chain Polygon aggregator
+https://github.com/calesthio/Crucix
+
+fredapi – FRED macroeconomic data
+https://github.com/mortada/fredapi
+
+Binance Collector / mlmodelpoly
+https://github.com/txbabaxyz/mlmodelpoly
+
+Polymarket Assistant Tool
+https://github.com/FiatFiorino/polymarket-assistant-tool
+
+lightweight-charts – TradingView lib
+https://github.com/tradingview/lightweight-charts
+
+Polyscope – 2,000+ market scanner
+https://thepolyscope.com
+
+Polywhaler – $10k+ whale tracker
+https://polywhaler.com
+
+HyperBuildX bot – Rust sub-100ms
+https://github.com/HyperBuildX/Polymarket-Trading-Bot
+
+polymarketanalytics.com
+https://polymarketanalytics.com
+
+polyrec – real-time terminal dashboard
+https://github.com/txbabaxyz/polyrec
+Polymarket-Trading-Bot (TypeScript 53k)
+https://github.com/dylanpersonguy/Polymarket-Trading-Bot
+
+prediction-market-backtesting
+https://github.com/evan-kolberg/prediction-market-backtesting
+
+polybot – execution + paper trading
+https://github.com/ent0n29/polybot
+
+
+
+ X article archived · x.com/0xPhantomDefi/status/2046998888255566066 · Apr 22, 2026 · PDF generated by Claude ·
+                                                   May 16, 2026
+</pre></div>

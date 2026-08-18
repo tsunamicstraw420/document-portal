@@ -1,0 +1,155 @@
+<h1>STOP — READ BEFORE DOING ANYTHING</h1>
+<p>These exist because ignoring them cost Eddie a full day (Aug 6-7 2026). They are not suggestions. Read them at the START of every session, and again before choosing HOW to do any operation.</p>
+<p><strong>0. NO IMPROVISING — EVER. FOLLOW THE DOCUMENT, EXACTLY.</strong> When an assembly/plan document exists (EDIT_TIMELINE, ANIM_WORKLIST, CAPTIONS_PLAN, a shot list, a beat sheet), build <strong>beat-by-beat to that document.</strong> Do NOT remap its numbering, substitute clips, merge beats, invent placements, or &quot;adapt&quot; it on the fly. If the document is stale, wrong, or conflicts with another document: <strong>STOP. Update the document first, get Eddie&#x27;s sign-off on the corrected document, THEN build strictly to it.</strong> A build that does not match the document is a FAILED build even if it imports and plays. Document first, build second — the build is a transcription of the document, never an improvisation. (This rule cost a full day of timeline rebuilds on EP11, Aug 15 2026: I wrote the EDIT_TIMELINE, then threw it out and improvised a hybrid instead of building to it.)</p>
+<p><strong>1. Copy the working example. Never design a new approach.</strong> If this project has done this kind of operation before - publishing, building, pushing, converting - find how it was done and do it that way. Read the prior script, folder, or memory FIRST, before forming a theory. Improvising a &quot;better&quot; method is the single most expensive mistake made on this project. A boring path that works beats a clever path that half-works.</p>
+<p><strong>2. Route order. Never skip down this list.</strong></p>
+<ol>
+<li>A connector / MCP tool that does the job directly</li>
+<li>Re-attaching a source or reconnecting a connector so that tool CAN do it</li>
+<li><code>device_bash</code> (Eddie&#x27;s files, no network) or <code>Bash</code> (cloud, has network)</li>
+<li>A <code>.command</code> file Eddie double-clicks once and walks away from</li>
+<li><strong>Claude in Chrome - LAST RESORT.</strong> It pins his laptop so he cannot work, and forces</li>
+</ol>
+<p>him to sit and watch. Before proposing it, state which of 1-4 were tried and the exact error each gave.</p>
+<p><strong>3. Do not ask Eddie for clicks until every other route has actually been tested.</strong> Not &quot;I think this is blocked&quot; - tested, with the error message in hand.</p>
+<p><strong>4. Never make him sit and watch.</strong> He multitasks. Any approach that occupies his machine or needs his supervision is a failed approach, even if it eventually works.</p>
+<p><strong>5. Verify before handing back.</strong> Run every check, report the numbers. Never hand him QA.</p>
+<p><strong>6. When something does go wrong, fix the cause, not the instance.</strong> Write the working method down so the next session inherits it instead of rediscovering it.</p>
+<p><strong>7. Never write files with shell heredocs.</strong> Use the Write/Edit tools or the Filesystem MCP. A heredoc silently wrote <code>EOF</code> and a raw <code>cat</code> line into another project&#x27;s <code>CLAUDE.md</code> and it sat there undetected for months.</p>
+<p>**8. Never open, echo, or edit <code>Accounts_info.rtf</code>, <code>kling.kling_key.rtf</code>, or any <code><em>_creds</code>/<code></em>.key</code> file.** Read only when the task requires it; never into chat.</p>
+<hr>
+<h1>Self-check before saying &quot;done&quot;</h1>
+<p>Cowork runs in Anthropic&#x27;s cloud and <strong>cannot execute the hook scripts in this folder&#x27;s <code>.claude/</code></strong> — that folder isn&#x27;t in the session&#x27;s filesystem. Those hooks only fire when Claude Code is launched in a terminal inside this directory. In Cowork, this checklist is the only gate. Run it in writing before every final response that involved tool calls:</p>
+<pre class='code'><code>1. Did I verify each factual claim, and name what I checked?          yes / no
+2. Did I read back every file I wrote or edited?                      yes / no
+3. Did I delete every scratch/intermediate file I created?            yes / no
+4. Did I do anything Eddie didn&#x27;t ask for?                            yes / no
+5. Is there a check I skipped and am hoping is fine?                  yes / no</code></pre>
+<p>If #5 is yes, go run it. That question is the one that catches the real failures.</p>
+<p>Project-specific checks that must actually be run, not assumed:</p>
+<ul>
+<li><strong>Script finalized</strong> → cross-check every cast couple/member against</li>
+</ul>
+<p><code>vps-pipeline/cast_manifest.json</code> (or the <code>&lt;Show&gt;_Cast/</code> folders) and confirm the intro roll-call count matches who&#x27;s actually named. Print the count.</p>
+<ul>
+<li><strong>Episode length</strong> → state the estimated runtime against the 15:00 cap.</li>
+<li><strong>Captions</strong> → confirm against the LOCKED decision below before building anything.</li>
+<li><strong>Any file written</strong> → <code>ls -la</code> it and report the byte size. Never report a write you</li>
+</ul>
+<p>didn&#x27;t confirm landed.</p>
+<hr>
+<h1>Learned from mistakes</h1>
+<p>Newest last. Date + what happened + the rule it produces. When Eddie corrects a real mistake: fix it, append it here as a dated actionable rule, and quote the line you added.</p>
+<ul>
+<li><strong>2026-08-06/07: improvised new approaches instead of reusing the working one</strong>, and</li>
+</ul>
+<p>handed Eddie QA instead of verifying. Cost a full day. Produced the STOP block at the top of this file. <strong>Rule: rules 1–6 above, read at the start of every session.</strong></p>
+<ul>
+<li>**2026-08-07: this folder had detailed rules but no verification gate and no <code>.claude/</code></li>
+</ul>
+<p>hooks at all<strong> — so nothing enforced the rules, and nothing accumulated when they were broken. </strong>Rule: the self-check block above runs before every &quot;done.&quot;**</p>
+<ul>
+<li><strong>EP-02: skipped Kara &amp; Guillermo in the recap</strong>, requiring a re-record. **Rule: cast</li>
+</ul>
+<p>cross-check against the manifest is mandatory, with a printed count.**</p>
+<ul>
+<li>**2026-08-11: transitions wouldn&#x27;t stick — every clip was rendered to its exact visible</li>
+</ul>
+<p>length, so it had zero handles<strong>, and DaVinci dipped to black / threw &quot;insufficient handles&quot; at every cut. I also wrongly told Eddie the &quot;seamless&quot; pack needed no handles (its own tutorial just uses normal footage that already has them). </strong>Rule: any clip destined for a timeline gets ≥1s of handle padded onto EACH end (ffmpeg <code>tpad=start_mode=clone:start_duration=1:stop_mode=clone:stop_duration=1</code>), and it is placed with in/out offset by the pad so the visible cut and A/V sync are unchanged. Never hand over a timeline of exact-length clips when transitions are coming — no transition, seamless or not, works without handles.**</p>
+<ul>
+<li><strong>2026-08-12: caption + Shorts drift.</strong> Everything was timed from the RAW narration word-JSON,</li>
+</ul>
+<p>but the master&#x27;s audio is edited/trimmed after recording, so timings drifted 1.6s→8s — the YouTube master&#x27;s burned karaoke AND all 10 Shorts were mistimed (clipped opening words, captions 2–8s off). Root cause: wrong source of truth. <strong>Rule: build captions AND Shorts clip-windows from a transcript of the FINAL exported master&#x27;s OWN audio (Whisper the master → <code>lipsync/&lt;ep&gt;.MASTER_words.json</code>), never the raw-narration JSON. Cut with frame-accurate two-stage seeking (<code>-ss</code> before AND after <code>-i</code>) so no opening word is clipped, and verify by transcribing each output&#x27;s first ~3s before handing back.</strong> Also group karaoke lines to <strong>break on pauses</strong> (&gt;~0.7s gap between words) and cap line length (~3.2s), so a line spanning one of Ruby&#x27;s dramatic pauses can&#x27;t show its later words before they&#x27;re spoken. <strong>Verify DENSELY across the whole runtime (every ~30s), not just 2–3 spots</strong> — a 3-point check missed a bad 6:19 pause once.</p>
+<ul>
+<li><strong>2026-08-12 (later): wasted a whole session handing Eddie repeated failed <code>.command</code> runs</strong></li>
+</ul>
+<p>instead of the boring reliable thing. The sandbox (where captions normally burn, because its ffmpeg HAS libass) was down, so I moved the burn onto Eddie&#x27;s Mac WITHOUT first checking his ffmpeg — then shipped three broken runs: (1) <code>-v error</code> hid the real ffmpeg error; (2) his newer Mac ffmpeg rejects the bare <code>subtitles=FILE:…</code> shorthand; (3) his <code>/usr/local/bin/ffmpeg</code> has NO libass at all, so it physically cannot burn <code>.ass</code>. <strong>Rules: (a) Before handing over ANY render that runs on the Mac instead of the sandbox, confirm the Mac tool can actually do it — the Mac&#x27;s ffmpeg has no libass. Use <code>EP05_S3E5/run_ep05_rerender.command</code>, which auto-acquires a caption-capable ffmpeg (checks every local ffmpeg → brew → static download) and burns/renders locally; reuse that pattern, don&#x27;t reinvent. (b) Caption filters are ALWAYS <code>subtitles=filename=…:fontsdir=…</code> and <code>ass=filename=…:fontsdir=…</code> — the bare form breaks on the Mac. (c) Never render with <code>-v error</code> when it might fail; keep full ffmpeg stderr in the log so the cause is visible on the first try. (d) When the sandbox is down, that IS the blocker — either wait for it or go straight to a Mac-local method that accounts for the Mac&#x27;s tools; do not improvise piecemeal and turn Eddie into the debugger.</strong></p>
+<ul>
+<li>**2026-08-13: the EP05 YouTube re-burn came out with karaoke captions ~2s AHEAD of the</li>
+</ul>
+<p>audio in every chunk EXCEPT chunk 0.<strong> Root cause: <code>burn_youtube_ep05.py</code>&#x27;s <code>_seek()</code> used a two-stage seek (<code>-ss t0-2 -i SRC -ss 2</code>). The <code>subtitles</code> filter reads frame PTS that reset to 0 at the seek point, so the shifted <code>.ass</code> got drawn ~2s early wherever the pre-roll was 2s — i.e. every chunk but chunk 0, whose pre-roll is 0 (that&#x27;s why chunk 0 alone looked aligned). The <code>.ass</code> was correct (matched MASTER_words to the word); the RENDER shifted it. </strong>Fixes: (a) <code>_seek()</code> now does a pure input seek (<code>-ss t0 -i SRC</code>), frame-accurate on modern ffmpeg, so every chunk aligns like chunk 0 — verified: frame @50s read &quot;SHE KIND OF WORDS…&quot; (wrong, +2s) before, &quot;OF PATRICK.&quot; (correct) after. (b) Verify the BURNED PIXELS, not just the .ass: extract real frames across the whole runtime and confirm the GOLD karaoke word matches the spoken word at that second. The .ass-vs-MASTER_words table will look perfect even when the burn is 2s off, because both sides come from the same source — only a pixel read catches a render-timing shift.**</p>
+<ul>
+<li><strong>2026-08-14: the YouTube uploader README&#x27;s Google-setup steps were stale</strong> — it</li>
+</ul>
+<p>described the old &quot;APIs &amp; Services → OAuth consent screen&quot; page, but Google now forces a <strong>Google Auth Platform</strong> 4-step wizard (App Information → Audience = External → Contact Information → Finish) first, with <strong>test users</strong> moved to the <strong>Audience</strong> page and the credential under <strong>Clients → Create client → Desktop app</strong>. Eddie hit the wizard and it wasn&#x27;t in the doc. Fixed the README. <strong>Rule: never write third-party console click-paths (Google Cloud, YouTube Studio, etc.) from memory — they drift. Verify against the live UI, or label the steps as &quot;may have changed&quot; and tell Eddie to expect a possibly-different wizard.</strong></p>
+<ul>
+<li><strong>2026-08-14: asserted an automation chain that doesn&#x27;t exist.</strong> Told Eddie that</li>
+</ul>
+<p>flipping a YouTube video Public &quot;fires the existing RSS → Zapier → Facebook/email flow&quot; — repeating the handoff + weekly-schedule docs without checking. Reality (<code>PROJECT_REFERENCE.md</code>): only <strong>Zap #1</strong> (podcast RSS → Notion tracker) is live; <strong>Zap #2</strong> (Facebook groups) and <strong>MailerLite</strong> (email) are unbuilt, and the RSS feed comes from <strong>Spotify for Creators</strong>, not from YouTube. <strong>Rule: never claim an automation/trigger is live from memory or from a planning doc. Verify against <code>PROJECT_REFERENCE.md</code>&#x27;s Done/Open lists and the actual Zap/feed first. The weekly schedule and handoffs describe the GOAL, not what runs today.</strong></p>
+<hr>
+<h1>Hard constraints</h1>
+<p>Non-negotiable. Violating one of these means redoing work.</p>
+<ul>
+<li><strong>Episode length: 15 MINUTES MAXIMUM</strong> (Eddie, July 20 2026). Scripts must be <em>written</em></li>
+</ul>
+<p>to land under 15 min after narration, not trimmed afterwards. EP-02 came in at 19:05 after already cutting 88 seconds. Shorter also means fewer shots to generate and review, which is the real production cost.</p>
+<ul>
+<li><strong>Cover EVERY cast couple/member of the show being recapped.</strong> Never skip one. Verify</li>
+</ul>
+<p>against the manifest before finalizing.</p>
+<ul>
+<li><strong>No Microsoft products.</strong> Always PDF — never DOCX, XLSX, or PPTX.</li>
+<li><strong>One folder per published episode — everything uploadable lives together.</strong> Every file</li>
+</ul>
+<p>that gets uploaded/published for an episode — the YouTube video, the Spotify master, the caption <code>.srt</code>, the Shorts, AND the upload pack doc — must live in that episode&#x27;s <code>_READY_TO_UPLOAD/&lt;EP&gt;/</code> folder. Never leave an upload asset only in the workshop folder or a buried subfolder like <code>captions/</code> (the EP05 <code>.srt</code> hid in <code>captions/</code> and Eddie couldn&#x27;t find it, Aug 12 2026). Shorts may sit in a clearly-named <code>Shorts/</code> subfolder inside it. Opening <code>_READY_TO_UPLOAD/&lt;EP&gt;/</code> must show everything needed to publish, with nothing to go hunting for.</p>
+<ul>
+<li><strong>Captions are LOCKED</strong> (full detail in each episode&#x27;s <code>CAPTIONS_PLAN.md</code>):</li>
+<li>Built from our OWN word-level transcript (<code>lipsync/*_CLEAN.words.json</code>), never YouTube.</li>
+<li><strong>YouTube video</strong> = karaoke captions BURNED IN <strong>and</strong> upload the plain <code>.srt</code> too</li>
+</ul>
+<p>(for search).</p>
+<ul>
+<li><strong>Spotify video</strong> = CLEAN. No burned captions, and do not upload the SRT — Spotify</li>
+</ul>
+<p>auto-captions.</p>
+<ul>
+<li><strong>Shorts</strong> = their own vertical karaoke burned in, always cut from the CLEAN master,</li>
+</ul>
+<p>never from the burned YouTube file.</p>
+<ul>
+<li>Long-form karaoke style is locked: Bangers 120, spoken word gold. Do NOT revert</li>
+</ul>
+<p>long-form to switchable-SRT-only — that was the pre-EP-04 approach.</p>
+<ul>
+<li><strong>Transcript source = YouTube</strong> (June 2026). Upload unlisted first, pull YouTube&#x27;s</li>
+</ul>
+<p>auto-generated transcript via Chrome, use it for show notes, description, and chapters. <strong>Not for captions</strong> — see above.</p>
+<ul>
+<li><strong>Teleprompter derivation:</strong> strip production notes, headers, dividers, and timing;</li>
+</ul>
+<p>keep spoken words, <code>[delivery tags]</code>, and <code>*<strong></code>/<code></strong>***</code> pause markers. Teleprompter Docs live in the podcast Google Drive &quot;Video scripts&quot; folder. See the <code>project_teleprompter_scripts_setup</code> memory.</p>
+<ul>
+<li><strong>Production pipeline = Ruby → Magnific → Resolve.</strong> Ruby records the voice; the Magnific</li>
+</ul>
+<p>process turns that recording into the show (animated Ruby lip-sync + scene visuals); everything out of Magnific goes into DaVinci Resolve for editing/assembly, then export. <strong>We do NOT use Riverside — do not reintroduce it.</strong> Shorts are cut from the exported master by timecode (<code>EP##/shorts_pipeline/make_shorts.py</code>), not by any auto-clipper.</p>
+<ul>
+<li><strong>Notion:</strong> only the <strong>Episode Tracker</strong> is auto-populated (Zap #1). <strong>Content Calendar</strong></li>
+</ul>
+<p>and <strong>Show Notes Library</strong> are written directly by Claude — they are NOT event-triggered Zaps. Don&#x27;t go looking for a Zap that doesn&#x27;t exist.</p>
+<hr>
+<h1>Weekly production schedule</h1>
+<table><thead><tr><th>Day</th><th>Who</th><th>What</th></tr></thead><tbody><tr><td>MON</td><td>Claude</td><td>Research episode topics, generate SEO titles, create Notion episode card</td></tr><tr><td>TUE</td><td>Claude drafts → Ruby refines</td><td>Claude writes the production script and strips it into the clean teleprompter Doc; Ruby reviews and tweaks</td></tr><tr><td>WED</td><td>Ruby → Magnific → Resolve</td><td>Ruby records the voice; Magnific turns it into the show (animated Ruby + scene visuals); assemble/edit in DaVinci Resolve; export; upload to YouTube <strong>unlisted</strong></td></tr><tr><td>THU</td><td>Eddie + Claude</td><td>Shorts cut from the master by timecode (<code>shorts_pipeline/make_shorts.py</code>); Claude writes show notes + captions</td></tr><tr><td>FRI</td><td>Eddie</td><td>(1) Flip YouTube unlisted→public. (2) Upload the episode audio to Spotify for Creators — THAT is what generates the RSS feed → Apple/Amazon/iHeart. (3) Post to the 4 FB groups + send email — <strong>both still MANUAL.</strong></td></tr></tbody></table>
+<blockquote>⚠️ <strong>Reality check (2026-08-14):</strong> the only live automation is <strong>Zap #1</strong> (podcast RSS → Notion Episode Tracker card). Flipping a YouTube video Public triggers <strong>nothing</strong> automated. <strong>Zap #2</strong> (episode → Facebook groups) is <strong>NOT built</strong>, and <strong>MailerLite</strong> (email) is <strong>not connected</strong> — both are on the Open list in <code>PROJECT_REFERENCE.md</code>. YouTube and the Spotify/RSS feed are separate distribution paths: a YouTube upload never touches the RSS feed. Do not describe FB/email as automated until Zap #2 + MailerLite actually exist.</blockquote>
+<p><strong>Roles:</strong> Claude drafts. Ruby refines and is the on-air host/voice. Eddie is the account holder and handles clips + publishing.</p>
+<hr>
+<h1>Where everything else lives</h1>
+<table><thead><tr><th>Need</th><th>File</th></tr></thead><tbody><tr><td>Background, status, tech stack, accounts, Zap IDs, monetization</td><td><code>PROJECT_REFERENCE.md</code></td></tr><tr><td>Full launch plan</td><td><code>podcast_master_plan.pdf</code></td></tr><tr><td>Full automation plan</td><td><code>podcast_automation_plan.pdf</code></td></tr><tr><td>The unlisted-Wed → public-Fri flow</td><td><code>podcast_automation_plan_video_first.pdf</code></td></tr><tr><td>Per-episode caption spec</td><td>that episode&#x27;s <code>CAPTIONS_PLAN.md</code></td></tr><tr><td>Credentials</td><td><code>Accounts_info.rtf</code> — see rule 8, do not open casually</td></tr></tbody></table>
+<hr>
+<h1>Content Creator templates &amp; sounds (for episode visuals)</h1>
+<p>Eddie downloaded the full contentcreatortemplates.com DaVinci Resolve library + a sound sampler. While working an episode he may name one (&quot;use the <strong>Modern Titles Pack</strong> for the intro&quot;, &quot;grab the <strong>crt-effect</strong> macro&quot;). Resolve it yourself — don&#x27;t make him hunt.</p>
+<ul>
+<li><strong>Index:</strong> <code>Content_Creator_Learn/Templates_Macros/DaVinci_Templates_Index.csv</code> (columns</li>
+</ul>
+<p><code>Category, Name, ID, Filename, Link</code>). Match his words on <strong>Name</strong> (fuzzy ok) or <strong>ID</strong>; if several match, list the candidates and let him pick.</p>
+<ul>
+<li><strong>Pack:</strong> <code>Content_Creator_Learn/Templates_Macros/&lt;Category&gt;/&lt;Filename&gt;</code> — a <code>.zip</code> of</li>
+</ul>
+<p><code>.setting</code>/<code>.drfx</code> macros. ~1,335 packs across 12 categories.</p>
+<ul>
+<li><strong>Sounds:</strong> <code>Content_Creator_Learn/Sound_Effects/&lt;Category&gt;/&lt;slug&gt;.zip</code> (~2,000 sampler).</li>
+<li><strong>How he&#x27;ll usually reference it:</strong> the gallery (<code>Template &amp; Sound Gallery.html</code> on his</li>
+</ul>
+<p>Desktop) has a <strong>&quot;Copy name&quot;</strong> button on every card, so he&#x27;ll often paste an exact filename like <code>modern-titles-pack-61417.zip</code> — that maps straight to the <code>Filename</code> column above.</p>
+<ul>
+<li>Full detail + the DaVinci install script: the matching section in <code>AI_bots/CLAUDE.md</code>.</li>
+</ul>
