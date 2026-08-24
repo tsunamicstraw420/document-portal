@@ -1,0 +1,189 @@
+<h1>VIDEO PROMPTING GUIDE — grounded motion, no floating / morphing</h1>
+<p><strong>What this fixes:</strong> clips where the character <strong>floats, hovers, &quot;flies in place,&quot;</strong> never actually crosses the frame, whose <strong>feet don&#x27;t touch the floor</strong>, whose <strong>face morphs</strong> mid-motion, or that <strong>jitter / melt</strong> — and clips where <strong>the model ignores the action</strong> entirely and just wobbles the keyframe.</p>
+<p><strong>Our exact pipeline (every rule below is written for it):</strong> still <strong>KEYFRAME</strong> first (Nano Banana / Imagen, 16:9, graphic-novel painterly style) → that still becomes the <strong>first frame</strong> of an <strong>image-to-video</strong> clip → <strong>Kling 3.0</strong> (also Kling 2.x; principles port to Runway Gen-3/4, Pika, Luma, Sora, Hailuo/MiniMax) → a <strong>5–10s, 720p</strong> clip animating <strong>ONE hero action</strong> or one subtle held beat.</p>
+<p><strong>Three hard project constraints baked into every template:</strong></p>
+<ol>
+<li><strong>Never animate the mouth</strong> — lips closed, no speech (voiceover is separate).</li>
+<li><strong>Face/identity stays on-model</strong> — no morphing, no warping.</li>
+<li><strong>Keep the graphic-novel style.</strong></li>
+</ol>
+<blockquote><strong>The single biggest lever is the KEYFRAME POSE, not the clip prompt.</strong> A video model does not invent a new action — it continues the pose it is handed. Hand it a mid-stride or leaping pose frozen in the air and it will hover that pose (&quot;flying in place&quot;). Hand it a <strong>grounded, weight-loaded, about-to-move</strong> pose and it will complete the move. Fix the free keyframe first, <em>then</em> spend clip credits. (This is exactly what burned 700 credits on the SC-18 &quot;Thais bolts&quot; clip — a terse prompt over an airborne-reading pose.)</blockquote>
+<hr>
+<h2>0. The two-prompt split — READ THIS FIRST (it&#x27;s where people go wrong)</h2>
+<p>We write <strong>two different prompts</strong> with <strong>opposite rules about the words &quot;no / not&quot;:</strong></p>
+<table><thead><tr><th></th><th><strong>KEYFRAME prompt</strong> (Nano Banana / Imagen — the still)</th><th><strong>CLIP prompt</strong> (Kling image-to-video — the motion)</th></tr></thead><tbody><tr><td>Job</td><td>Draw a <strong>grounded</strong> first frame in graphic-novel style</td><td>Describe the <strong>full motion arc</strong> beat-by-beat</td></tr><tr><td>Negations</td><td><strong>POSITIVE ONLY. Never write &quot;no/not/avoid.&quot;</strong> Naming a thing to forbid it <em>seeds</em> it in Nano Banana (&quot;NO border&quot; → drew a border). Describe the grounded pose as a fact: &quot;both feet flat on the floor, weight forward.&quot;</td><td>The anti-float / anti-morph / anti-jitter words go in <strong>Kling&#x27;s separate NEGATIVE-PROMPT FIELD</strong> — <em>not</em> smuggled into the positive description.</td></tr><tr><td>Face</td><td>Wire the character&#x27;s reference anchor; don&#x27;t re-describe their face in words (it overrides the anchor).</td><td>Keep motion restrained enough that the face survives; let camera hide the face during big moves.</td></tr></tbody></table>
+<p>So: <strong>grounded pose is engineered in the KEYFRAME (positively). &quot;Floating / morphing / jitter&quot; are banned in the CLIP&#x27;s NEGATIVE FIELD.</strong> If an engine/API has <em>no</em> negative field, append a short negative clause to the end of the positive prompt instead.</p>
+<p>Sources for the split: Nano Banana negation-backfire is our own logged failure (<code>magnific-keyframe-style-and-anchors</code> memory); Kling&#x27;s negative-prompt field is documented at <a href="https://www.atlascloud.ai/blog/mastering-kling-3.0-10-advanced-ai-video-prompts-for-realistic-human-motion" target="_blank" rel="noopener">atlascloud.ai</a> and <a href="https://www.veed.io/learn/kling-ai-prompting-guide" target="_blank" rel="noopener">veed.io</a>.</p>
+<hr>
+<h2>1. PROMPT FORMULA — character-action clip (fill-in-the-blanks)</h2>
+<p>Kling&#x27;s official order is <strong>Subject + Subject Movement + Scene + (Camera + Lighting + Atmosphere)</strong> (<a href="https://kling.ai/quickstart/text-to-video-prompt-guide" target="_blank" rel="noopener">kling.ai text-to-video guide</a>, via <a href="https://www.atlascloud.ai/blog/guides/kling-ai-video-prompt-guide" target="_blank" rel="noopener">atlascloud.ai</a>). We extend it with an explicit <strong>body-mechanics arc</strong> and a <strong>grounding clause</strong>, because that arc is what stops the float. Our house format keeps the <strong>camera block verbatim</strong> from <code>camera_movement_prompts.md</code> and adds the scene separately (<code>clip-camera-action-prompts</code> memory).</p>
+<p><strong>MAIN (positive) prompt — paste the camera block first, then fill the Scene:</strong></p>
+<pre class='code'><code>&lt;CAMERA BLOCK — pasted VERBATIM from camera_movement_prompts.md, e.g. Shot 17 follow shot from behind&gt;
+
+Scene: &lt;WHO&gt; in &lt;graphic-novel style reminder&gt;, in &lt;WHERE / set&gt;.
+Opening frame: &lt;exact starting pose — grounded, weight-loaded, both feet in contact&gt;.
+Motion arc: &lt;beat 1 — first body mechanic&gt; then &lt;beat 2&gt; then &lt;beat 3 — where they END UP
+in frame&gt;. Ground contact: &lt;heel-to-toe / weight transfer / visible foot-to-floor impact
+on every step&gt;, the body physically TRANSLATES &lt;direction&gt; and gets SMALLER/LARGER in frame
+as distance changes.
+Secondary motion: &lt;hair sways, coat/dress trails, chair rocks back, curtain stirs&gt;.
+End frame: &lt;where the subject and camera finish&gt;.
+Lips remain closed and still for the whole clip; the only motion is the camera move above,
+the body action described, and the secondary motion.</code></pre>
+<p><strong>NEGATIVE-PROMPT FIELD (Kling):</strong> paste the anti-float / anti-morph / anti-jitter list from §5 (trimmed — see the &quot;keep it short&quot; note there).</p>
+<p><strong>Duration / intensity:</strong> single hero action → <strong>5s</strong>, <strong>moderate motion intensity (~0.5)</strong>. See §6.</p>
+<hr>
+<h2>2. PROMPT FORMULA — &quot;held&quot; / subtle emotional beat (fill-in-the-blanks)</h2>
+<p>For a near-still beat (a couple leaning together, a held reaction), a <strong>locked or barely-moving</strong> frame will <em>freeze into a photo</em> unless you seed <strong>ambient</strong> motion. Give the camera a slow push and name small living details (<a href="https://www.atlascloud.ai/blog/mastering-kling-3.0-10-advanced-ai-video-prompts-for-realistic-human-motion" target="_blank" rel="noopener">atlascloud.ai</a>; <code>clip-camera-action-prompts</code> memory).</p>
+<pre class='code'><code>&lt;CAMERA BLOCK VERBATIM — Shot 05 slow zoom in OR Shot 08 dolly in
+(or Shot 01 static ONLY if you add ambient motion below)&gt;
+
+Scene: &lt;WHO&gt;, &lt;graphic-novel style reminder&gt;, in &lt;WHERE&gt;.
+Held pose: &lt;what they hold — leaning in, hand on hand, eyes meeting&gt;; bodies stay planted
+and stable.
+Micro-motion: &lt;a slow breath raising the shoulders, one slow blink, hair drifting, candle
+flame flickering, curtain and dust motes stirring, fabric settling&gt; — subtle, small-amplitude,
+continuous.
+End frame: &lt;same composition, slightly closer&gt;.
+Lips remain closed and still for the whole clip; the only motion is the slow camera push and
+the small ambient details above.</code></pre>
+<p><strong>NEGATIVE FIELD:</strong> anti-morph + anti-jitter list from §5 (you can drop the locomotion terms like &quot;moonwalk/sliding feet&quot; here — nobody&#x27;s walking).</p>
+<p><strong>Duration / intensity:</strong> <strong>5s</strong> and <strong>low intensity (~0.3)</strong> — a held beat over 10s tends to drift the face or invent unwanted movement.</p>
+<hr>
+<h2>3. PRE-FLIGHT CHECKLIST — run before every clip</h2>
+<p>Keyframe (the still) first:</p>
+<ul>
+<li>[ ] <strong>Pose is GROUNDED</strong> — both feet in contact with a visible floor, weight over the feet, <em>not</em> airborne / mid-leap / tip-toe. (Airborne pose → guaranteed hover.)</li>
+<li>[ ] <strong>Pose is the START of the action, not its peak</strong> — she is <em>rising</em>, not already sprinting; he is <em>stepping in</em>, not mid-lunge.</li>
+<li>[ ] <strong>Face is turned to hide warp on big moves</strong> — three-quarter or from-behind for anything with real body travel; face-forward only for near-still beats.</li>
+<li>[ ] Character <strong>reference anchor wired</strong>; face <strong>not</strong> re-described in words.</li>
+<li>[ ] Style preamble present; <strong>no negation words</strong> anywhere in the keyframe prompt.</li>
+<li>[ ] A <strong>visible floor + distinct background</strong> so the model has depth/ground to read (<a href="https://www.atlascloud.ai/blog/guides/kling-ai-image-to-video" target="_blank" rel="noopener">atlascloud.ai</a>; kling.ai i2v guide).</li>
+</ul>
+<p>Clip prompt (the motion):</p>
+<ul>
+<li>[ ] <strong>Camera block pasted VERBATIM</strong> from <code>camera_movement_prompts.md</code> (not paraphrased).</li>
+<li>[ ] <strong>ONE action only</strong> — one motion per clip.</li>
+<li>[ ] <strong>Full motion-arc spelled out</strong> beat-by-beat (opening pose → mechanics → end state).</li>
+<li>[ ] <strong>Ground-contact clause</strong> present (heel-to-toe / weight transfer / visible foot impact).</li>
+<li>[ ] <strong>Real translation</strong> stated — subject moves <em>across</em> frame and changes size, doesn&#x27;t stay put.</li>
+<li>[ ] <strong>Secondary/ambient motion</strong> named.</li>
+<li>[ ] <strong>Lips-closed line</strong> present (positive phrasing).</li>
+<li>[ ] <strong>Negative field filled</strong> from §5 (short list).</li>
+<li>[ ] <strong>Duration/intensity chosen</strong> (§6): 5s hero action, 5s low-intensity held beat.</li>
+<li>[ ] Prompt is genuinely <strong>hyper-descriptive</strong>, not terse (terse = freeze/hover = wasted credits — <code>video-prompts-hyperdescriptive</code> memory).</li>
+</ul>
+<hr>
+<h2>4. CAMERA-MOVE VOCABULARY — what the models reliably parse</h2>
+<p><strong>Canonical library (use it, don&#x27;t reinvent):</strong> <code>/Users/rubys/Desktop/AI_bots/Podcast/Podcast/camera_movement_prompts.md</code> — 46 blocks, each <code>&lt;move&gt;. Movement: … Speed: … Framing: … End: …</code>. <strong>Paste the exact block.</strong></p>
+<p>Camera motion isn&#x27;t decoration — a <strong>tracking / following</strong> camera measurably improves motion realism <em>and</em> <strong>hides face-warp</strong> during big body moves, because the face is smaller, moving, and partly turned (<a href="https://www.atlascloud.ai/blog/mastering-kling-3.0-10-advanced-ai-video-prompts-for-realistic-human-motion" target="_blank" rel="noopener">atlascloud.ai human-motion</a>; <a href="https://queststudio.io/blog/prevent-face-warping-image-to-video" target="_blank" rel="noopener">queststudio.io</a>).</p>
+<table><thead><tr><th>Your intent</th><th>Use (library shot)</th><th>Why</th></tr></thead><tbody><tr><td>Subject walks / bolts <strong>AWAY</strong> from camera</td><td><strong>Shot 17 — follow shot from behind</strong></td><td>Follows the travel; back-of-head hides face entirely</td></tr><tr><td>Subject walks <strong>TOWARD</strong> camera</td><td><strong>Shot 18 — reverse tracking / walk-and-talk</strong></td><td>Camera retreats at their pace; stable front framing</td></tr><tr><td>Subject moves <strong>across</strong> frame (side view)</td><td><strong>Shot 19 — side tracking</strong></td><td>Parallel move sells real ground travel</td></tr><tr><td>Emotional near-still, intensify</td><td><strong>Shot 05 — slow zoom in</strong> or <strong>Shot 08 — dolly in</strong></td><td>Gives a static beat life without inventing body motion</td></tr><tr><td>Near-still but must stay wide</td><td><strong>Shot 01 — static</strong> <em>plus ambient motion</em></td><td>Locked frame only works if hair/flame/curtain move</td></tr><tr><td>Reveal / re-angle a couple</td><td><strong>Shot 14 / 14B — arc L/R</strong> or <strong>Shot 12 / 12B — slider</strong></td><td>Changes angle without asking the bodies to travel</td></tr><tr><td>Establish a place (hall, house, plane)</td><td><strong>Shot 26 / 26B — drone push in / pull back</strong></td><td>Clean establishing motion, no character physics to break</td></tr><tr><td>Chase / high energy</td><td><strong>Shot 22 — chase shot</strong></td><td>Reactive close follow for fast action</td></tr><tr><td>Big body move, protect the face</td><td>any <strong>tracking</strong> shot (17/18/19)</td><td>Motion + turned/off-center face = less morph</td></tr></tbody></table>
+<p>General-model note: Runway / Luma / Pika parse the same vocab; their own guides recommend <strong>one or two camera behaviors per clip, not four</strong> (<a href="https://runway.com/research/introducing-gen-3-alpha" target="_blank" rel="noopener">runway research</a>; <a href="https://medium.com/@creativeaininja/how-to-actually-control-next-gen-video-ai-runway-kling-veo-and-sora-prompting-strategies-92ef0055658b" target="_blank" rel="noopener">medium — cross-model prompting</a>). Luma Dream Machine and Kling 3.0 also take a <strong>last frame</strong> as well as a first frame — set a grounded end pose to pin where the motion lands (<a href="https://www.imagine.art/features/kling-2-5-turbo-pro-first-and-last-frame" target="_blank" rel="noopener">imagine.art first/last frame</a>).</p>
+<hr>
+<h2>5. NEGATIVE-CUE LIST — for the CLIP&#x27;s negative field (NOT the keyframe)</h2>
+<p>Keep it <strong>short</strong> — an over-long negative prompt makes motion stiff (<a href="https://www.atlascloud.ai/blog/mastering-kling-3.0-10-advanced-ai-video-prompts-for-realistic-human-motion" target="_blank" rel="noopener">atlascloud.ai</a>). Pick the bucket(s) that match the risk; don&#x27;t paste all three every time.</p>
+<p><strong>Anti-float / ground (for any locomotion):</strong> <code>floating, hovering, flying in place, levitating, weightless, gliding, sliding feet, moonwalk, skating feet, feet not touching the ground, no foot contact, drifting</code></p>
+<p><strong>Anti-morph / identity (for any shot with a face):</strong> <code>face morphing, face warping, distorted face, changing face, melting features, identity drift, deformed hands, extra fingers, extra limbs, warping body</code></p>
+<p><strong>Anti-jitter / stability (always fine to include a couple):</strong> <code>jitter, flicker, stutter, shaking, wobbling, melting, boiling texture, blurry, background warping</code></p>
+<p><strong>Mouth (our hard rule — reinforce it here too):</strong> <code>talking, mouth opening, lip movement, speaking</code></p>
+<p>A solid <strong>default short set</strong> for a walking character: <code>floating, gliding, sliding feet, moonwalk, face morphing, warping, extra limbs, jitter, talking</code> (Kling&#x27;s own baseline is similar: <em>&quot;blurry limbs, distorted joints, extra fingers, unnatural movement, morphing body parts&quot;</em> — <a href="https://www.atlascloud.ai/blog/mastering-kling-3.0-10-advanced-ai-video-prompts-for-realistic-human-motion" target="_blank" rel="noopener">atlascloud.ai</a>.)</p>
+<hr>
+<h2>6. MOTION STRENGTH &amp; DURATION — 5s vs 10s</h2>
+<p><strong>Duration.</strong> Kling 3.0 supports <strong>3–15s</strong>; longer clips give the model more frames to <strong>drift the face, loop, or invent movement</strong> (<a href="https://www.atlascloud.ai/blog/guides/mastering-kling-3.0-10-advanced-ai-video-prompts-for-realistic-human-motion" target="_blank" rel="noopener">atlascloud.ai</a>). Our rule of thumb:</p>
+<table><thead><tr><th>Beat</th><th>Duration</th><th>Why</th></tr></thead><tbody><tr><td>Quick hero action (a bolt, a turn, a step-in, a door exit)</td><td><strong>5s</strong></td><td>Enough for one arc; cheaper; least drift/morph. <code>video-prompts-hyperdescriptive</code> memory: quick actions only need 5s.</td></tr><tr><td>Sustained locomotion that must cross the whole frame, or a held beat that needs to breathe</td><td><strong>up to 10s</strong></td><td>Only when the action genuinely needs the time — accept higher morph risk <strong>and</strong> higher cost (~700 credits/10s when unlimited doesn&#x27;t cover it — <code>magnific-clip-economics</code> memory).</td></tr></tbody></table>
+<p><strong>Motion intensity/strength.</strong> Where the slider exists, start at <strong>moderate (~0.5)</strong> for a walk/bolt and <strong>low (~0.3)</strong> for a held beat, then adjust (<a href="https://www.atlascloud.ai/blog/guides/mastering-kling-3.0-10-advanced-ai-video-prompts-for-realistic-human-motion" target="_blank" rel="noopener">atlascloud.ai</a>). <strong>Too low → the keyframe barely animates and reads as a floating photo; too high → limbs and face melt.</strong> If the character floats, the fix is almost never &quot;raise intensity&quot; — it&#x27;s a <strong>grounded keyframe + ground-contact wording</strong>; raising intensity on a bad pose just makes it hover <em>faster</em>.</p>
+<p><strong>One motion per clip.</strong> The most reliable single setting there is. Splitting &quot;stands up AND walks AND opens door AND exits&quot; across separate clips beats cramming it into one (<a href="https://www.atlascloud.ai/blog/guides/kling-ai-image-to-video" target="_blank" rel="noopener">atlascloud.ai</a>).</p>
+<hr>
+<h2>7. WORKED EXAMPLES</h2>
+<h3>7A. THE BOLT — corrected (centerpiece)</h3>
+<p><strong>Shot:</strong> <em>&quot;a woman (graphic-novel style) bolts up from a dining chair and rushes out the drawing-room door, moving away from camera.&quot;</em> This is the SC-18-type shot that hovered.</p>
+<p><strong>Terse version that FAILS (do not use):</strong></p>
+<pre class='code'><code>A woman bolts up from her chair and rushes out the door. Dynamic motion.</code></pre>
+<p><em>Why it floats:</em> no starting pose, no foot contact, no translation, no camera, no lips rule — the model just jitters the keyframe in place and burns credits.</p>
+<p><strong>KEYFRAME to generate first (Nano Banana — positive only, grounded):</strong></p>
+<pre class='code'><code>Graphic-novel illustration in a semi-real painterly style, deep dramatic cel shading and crisp
+inked linework, high-contrast cinematic lighting; one single fully-illustrated scene that fills
+the entire 16:9 frame edge to edge:
+A woman seen from behind at three-quarter back angle, caught in the first instant of rising from
+a dining chair: she is pushing up off the seat, one hand flat on the dining table taking her
+weight, both feet flat on the wooden floor directly beneath her hips, knees bent, torso leaning
+forward toward an open drawing-room doorway several steps ahead of her. The chair is tipped
+slightly back behind her knees. Warm lamplight from the left, a dim hallway visible through the
+open door. Her face is turned away toward the door. Take her face and hair strictly from the
+wired character reference.</code></pre>
+<p><em>(Grounded, weight over the feet, back-to-camera to hide any face-warp, START of the action — not airborne. No negation words.)</em></p>
+<p><strong>CLIP prompt (Kling 3.0 — camera block VERBATIM = Shot 17 follow shot from behind):</strong></p>
+<pre class='code'><code>follow shot from behind. Movement: move behind the subject along their route at shoulder height.
+Speed: match the subject&#x27;s pace. Framing: keep the back, shoulder or head as the foreground guide
+while the route ahead stays readable. End: continue following with the subject leading the frame.
+
+Scene: a woman in graphic-novel painterly style, in a warm lamplit drawing room with an open
+doorway ahead.
+Opening frame: she is mid-rise from the dining chair, one hand pushing off the table, both feet
+planted on the wooden floor, weight coming forward.
+Motion arc: she straightens up and pushes off the table, plants her left foot then her right in
+two firm accelerating strides, her body clearly TRANSLATING forward AWAY from camera and getting
+smaller in frame as the distance opens, and she reaches the doorway and crosses through it into
+the dim hallway. Ground contact: each step lands heel-to-toe with a clear weight transfer and a
+visible foot-to-floor contact, the floorboards taking her full weight on every step.
+Secondary motion: her hair and the hem of her dress trail behind the sudden movement, the chair
+rocks back slightly as she leaves it, the doorway light shifts across her as she passes through.
+End frame: she has passed through the doorway into the hall, small in frame, camera still trailing.
+Lips remain closed and still for the whole clip; the only motion is the following camera, her
+body rising and running through the door, and the trailing hair, dress and rocking chair.</code></pre>
+<p><strong>Negative field:</strong> <code>floating, hovering, gliding, sliding feet, moonwalk, feet not touching the ground, face morphing, warping, extra limbs, jitter, talking</code> <strong>Duration/intensity:</strong> <strong>5s</strong>, intensity <strong>~0.5</strong>.</p>
+<h3>7B. Man strides into a hall (toward camera)</h3>
+<p><strong>Keyframe:</strong> man one step inside a doorway, front foot landed flat on the floor, back foot pushing off, weight forward, coat mid-swing, face three-quarter — grounded, start of the stride. <strong>Camera:</strong> Shot 18 reverse tracking (verbatim). <strong>Scene:</strong> &quot;he walks straight toward camera, left then right foot each landing heel-to-toe with visible weight transfer on the stone floor, body growing larger in frame as he closes distance, coat swinging with each stride; camera retreats at his pace.&quot; Lips-closed line. <strong>Neg:</strong> float/slide/morph/jitter set. <strong>5s, ~0.5.</strong></p>
+<h3>7C. Couple leaning together (held beat)</h3>
+<p><strong>Keyframe:</strong> the two seated close, shoulders touching, hands clasped, both stable and planted, faces forward and evenly lit. <strong>Camera:</strong> Shot 05 slow zoom in (verbatim). <strong>Scene / micro-motion:</strong> &quot;bodies stay planted; a slow shared breath lifts their shoulders, one slow blink, her hair drifts, the candle flame flickers and dust motes stir in the lamplight.&quot; Lips-closed line. <strong>Neg:</strong> morph/jitter set only (drop the walking terms). <strong>5s, intensity ~0.3.</strong></p>
+<h3>7D. Reaction turn (quick beat)</h3>
+<p><strong>Keyframe:</strong> subject seated, torso already beginning to rotate toward a doorway, feet planted, weight settled — grounded. <strong>Camera:</strong> Shot 01 static <em>with</em> ambient motion, or Shot 05 slow zoom in (verbatim). <strong>Scene:</strong> &quot;she turns her head and shoulders toward the door over about four seconds, a smooth controlled rotation, feet and hips staying planted; hair swings with the turn, curtain stirs behind her.&quot; Slowing a head turn to ~4s reads smoother (<a href="https://www.atlascloud.ai/blog/mastering-kling-3.0-10-advanced-ai-video-prompts-for-realistic-human-motion" target="_blank" rel="noopener">atlascloud.ai</a>). Lips-closed line. <strong>Neg:</strong> morph/jitter set. <strong>5s, ~0.35.</strong></p>
+<hr>
+<h2>8. TROUBLESHOOTING — symptom → prompt fix</h2>
+<table><thead><tr><th>Symptom</th><th>Root cause</th><th>Fix</th></tr></thead><tbody><tr><td><strong>Flies in place</strong> (does the action but stays put / no travel)</td><td>Airborne or peak-action keyframe; no translation stated</td><td><strong>Regenerate the keyframe grounded</strong> (feet on floor, START of action). In the clip add: <em>&quot;the body clearly TRANSLATES &lt;direction&gt; and changes size in frame as distance changes,&quot;</em> plus explicit steps. Use a <strong>tracking</strong> camera (Shot 17/18/19).</td></tr><tr><td><strong>Hovers / levitates</strong></td><td>Intensity too high on a weak pose, or floor not readable</td><td>Grounded keyframe with a <strong>visible floor + distinct background</strong>; add ground-contact wording; <strong>lower</strong> intensity toward ~0.4; add <code>floating, hovering, levitating</code> to negative field.</td></tr><tr><td><strong>Feet off the floor / sliding / moonwalk</strong></td><td>No foot-physics described</td><td>Add: <em>&quot;each step lands heel-to-toe with a clear weight transfer and a visible foot-to-floor impact.&quot;</em> Negative: <code>sliding feet, moonwalk, gliding, no foot contact</code>. (<a href="https://www.atlascloud.ai/blog/mastering-kling-3.0-10-advanced-ai-video-prompts-for-realistic-human-motion" target="_blank" rel="noopener">atlascloud.ai</a>)</td></tr><tr><td><strong>Face morphs / warps / drifts</strong></td><td>Big motion starves the face of reference; take too long</td><td>Turn the face <strong>away</strong> (three-quarter/from-behind) in the keyframe; use a <strong>tracking</strong> camera to keep the face small/moving; <strong>shorten to 5s</strong>; wire the reference/Element; negative: <code>face morphing, warping, identity drift</code>. (<a href="https://queststudio.io/blog/prevent-face-warping-image-to-video" target="_blank" rel="noopener">queststudio.io</a>; <a href="https://unifab.ai/resource/fix-ai-video-face-distortion" target="_blank" rel="noopener">unifab.ai</a>)</td></tr><tr><td><strong>No movement</strong> (frozen photo)</td><td>Terse prompt; intensity too low; static camera with nothing ambient</td><td>Write the <strong>full motion arc</strong>; <strong>raise</strong> intensity to ~0.5; give the camera a <strong>slow push</strong> (Shot 05/08) and name <strong>ambient</strong> motion (hair/flame/curtain). (<a href="https://www.atlascloud.ai/blog/mastering-kling-3.0-10-advanced-ai-video-prompts-for-realistic-human-motion" target="_blank" rel="noopener">atlascloud.ai</a>)</td></tr><tr><td><strong>Jitter / melting / boiling</strong></td><td>Too much crammed in; intensity too high; over-long negative</td><td><strong>One motion per clip</strong>; <strong>lower</strong> intensity; <strong>trim</strong> the negative prompt (long negatives stiffen/destabilize); shorten to 5s. (<a href="https://www.atlascloud.ai/blog/mastering-kling-3.0-10-advanced-ai-video-prompts-for-realistic-human-motion" target="_blank" rel="noopener">atlascloud.ai</a>)</td></tr><tr><td><strong>Mouth moves / looks like talking</strong></td><td>Mouth left unconstrained</td><td>Positive line in main prompt: <em>&quot;lips remain closed and still for the whole clip; the only motion is …&quot;</em>; add <code>talking, mouth opening, lip movement</code> to negative field.</td></tr></tbody></table>
+<hr>
+<h2>9. WHEN <strong>NOT</strong> TO USE GENERATIVE MOTION — use Ken Burns instead</h2>
+<p>Generative motion is the risky, expensive option. For many beats a <strong>still + an editor Ken Burns move (slow push-in / pan) in DaVinci Resolve</strong> is <em>more</em> reliable, frame-accurate, free, and can&#x27;t morph a face (<a href="https://reelmind.ai/blog/ken-burns-effect-premiere-pro-for-video-simple-cinematic-panning" target="_blank" rel="noopener">reelmind.ai</a>; <a href="https://www.styleframe.ai/blog/the-ken-burns-effect" target="_blank" rel="noopener">styleframe.ai</a>).</p>
+<p><strong>Prefer Ken Burns when:</strong></p>
+<ul>
+<li>The beat is <strong>emotional / near-still</strong> — a reaction, a portrait, a couple holding — where the</li>
+</ul>
+<p>only &quot;motion&quot; you want is a slow push or drift. Generative adds morph risk for zero gain.</p>
+<ul>
+<li>The shot <strong>has no locomotion</strong> — nobody needs to cross the frame.</li>
+<li><strong>Face fidelity is paramount</strong> and the face is front-and-center (close-ups). Ken Burns keeps</li>
+</ul>
+<p>the on-model face pixel-perfect; a clip risks warping it.</p>
+<ul>
+<li>Clip <strong>credits are being charged</strong> and the beat doesn&#x27;t earn a generated clip</li>
+</ul>
+<p>(<code>magnific-clip-economics</code> memory: stage real clips only on the ~8 hero beats; the rest = free stills with motion added in the edit).</p>
+<ul>
+<li>A generated attempt <strong>already floated/morphed twice</strong> — stop re-rolling; hold the good</li>
+</ul>
+<p>keyframe as a still and Ken-Burns it.</p>
+<p><strong>Reserve generative motion for the hero beats</strong> that genuinely need <strong>real body locomotion or translation</strong> — a bolt, a stride-in, an exit through a door — where a static push can&#x27;t tell the story. Everything else: still + Ken Burns. (This also matches our editing law that every still gets motion in Resolve — <code>episode-timeline-reuse-rules</code> / <code>match-visuals-to-narration</code> memories.)</p>
+<hr>
+<h2>Sources</h2>
+<ul>
+<li>Kling official — text-to-video prompt guide (Subject+Movement+Scene+Camera formula): https://kling.ai/quickstart/text-to-video-prompt-guide</li>
+<li>Kling official — image-to-video guide (clear subject, distinct background, one motion): https://kling.ai/quickstart/image-to-video-guide</li>
+<li>Kling official — motion prompts (running/jumping/gestures): https://kling.ai/blog/kling-ai-motion-prompts-guide</li>
+<li>Atlas Cloud — Mastering Kling 3.0, realistic human motion (heel-to-toe, weight transfer, visible impact, negative-prompt baseline, tracking camera, keep negatives short): https://www.atlascloud.ai/blog/mastering-kling-3.0-10-advanced-ai-video-prompts-for-realistic-human-motion</li>
+<li>Atlas Cloud — Kling 3.0 prompt guide / formula &amp; motion intensity ~0.5: https://www.atlascloud.ai/blog/guides/kling-ai-video-prompt-guide</li>
+<li>Atlas Cloud — Kling image-to-video (one motion per clip, source-image depth): https://www.atlascloud.ai/blog/guides/kling-ai-image-to-video</li>
+<li>VEED — Kling prompting guide (formula, negative prompts): https://www.veed.io/learn/kling-ai-prompting-guide</li>
+<li>Quest Studio — prevent face warping in image-to-video (short takes, front-load reference, restrain motion): https://queststudio.io/blog/prevent-face-warping-image-to-video</li>
+<li>Unifab — fix face distortion &amp; morphing in AI video: https://unifab.ai/resource/fix-ai-video-face-distortion</li>
+<li>Imagine.art — Kling first &amp; last frame control: https://www.imagine.art/features/kling-2-5-turbo-pro-first-and-last-frame</li>
+<li>Runway — Gen-3 Alpha (Director Mode, camera/motion control, temporal control): https://runway.com/research/introducing-gen-3-alpha</li>
+<li>Medium (creativeaininja) — cross-model prompting Runway/Kling/Veo/Sora (one or two camera moves per clip): https://medium.com/@creativeaininja/how-to-actually-control-next-gen-video-ai-runway-kling-veo-and-sora-prompting-strategies-92ef0055658b</li>
+<li>ReelMind — Ken Burns for controlled, predictable motion in the edit: https://reelmind.ai/blog/ken-burns-effect-premiere-pro-for-video-simple-cinematic-panning</li>
+<li>Styleframe — the Ken Burns effect: https://www.styleframe.ai/blog/the-ken-burns-effect</li>
+</ul>
+<p><strong>Project files this guide builds on (copy the working example — don&#x27;t reinvent):</strong></p>
+<ul>
+<li><code>camera_movement_prompts.md</code> — the 46-move camera library (paste blocks verbatim)</li>
+<li>memory: <code>video-prompts-hyperdescriptive</code>, <code>clip-camera-action-prompts</code>,</li>
+</ul>
+<p><code>magnific-keyframe-style-and-anchors</code>, <code>magnific-clip-economics-and-board-gotchas</code>, <code>episode-timeline-reuse-rules</code>, <code>match-visuals-to-narration-no-filler</code> &lt;/content&gt; &lt;/invoke&gt;</p>
