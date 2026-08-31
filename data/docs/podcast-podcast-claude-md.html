@@ -92,8 +92,10 @@
 <li>**2026-08-23: destroyed a generated keyframe by delete+recreating a Magnific node just to</li>
 </ul>
 <p>reword its prompt — twice — after baking a WRONG rule into the skill/memory the day before (&quot;@-prompt edits no-op → delete + recreate&quot;). Eddie: &quot;Stop deleting my work… you were able to change prompts… stop taking shortcuts.&quot;<strong> VERIFIED live: a <code>spaces_edit</code> that rewrites a prompt&#x27;s descriptive text takes IN PLACE and </strong>preserves the node id, the generated image (<code>currentCreationIdentifier</code>), and every connection<strong> (SC-10 KF <code>ed553023</code>: same id, 7/7 refs intact, generation <code>Bhfcf44oQR</code> retained). </strong>Rule: NEVER delete + recreate a Magnific node to change its prompt — edit the prompt text in place; to change which reference a node uses, re-wire the connection, don&#x27;t delete the node. Deleting throws away the run Eddie already did. Verify in place with <code>spaces_get_nodes</code> (same id, new prompt, refs intact). <code>[name]</code> chips in the app UI are just the display form of <code>@name</code> mentions — not a bug, not &quot;brackets vs @.&quot;**</p>
-<hr>
-<h1>Hard constraints</h1>
+<ul>
+<li><strong>2026-08-24: nearly handed Eddie a timeline where visuals had drifted off their lines.</strong> After a</li>
+</ul>
+<p>pacing/mix rebalance (holding stills longer, moving anchors), four spots slid off-sync — a couple portrait landed on the NEXT couple&#x27;s name in the roll call, Kara&#x27;s &quot;new baby, two jobs&quot; insert played 10s early, the Thais bolt sat on the wrong sentence, and the six hot-take one-liners were off by one couple. Eddie: <strong>&quot;Do not hand me a timeline where audio and video don&#x27;t match. That has always wasted more than a day of my time. Never hand me anything before you double-checked it.&quot;</strong> **Rule: AUDIO↔PICTURE SYNC IS A HARD RELEASE GATE. <code>build_timeline.py</code> writes <code>roughcut/*_ALIGNMENT.txt</code> (exact words under every shot) every run; READ it and confirm each scene visual lands on the line it illustrates BEFORE handing over. ANY anchor move (pacing, mix, re-cut) silently shifts visuals off their lines — re-run the alignment and re-verify after every change. Baked into the <code>episode-visual-edit</code> verify gate. Never hand over a cut unverified.**</p>
 <p>Non-negotiable. Violating one of these means redoing work.</p>
 <ul>
 <li><strong>Episode length: 15 MINUTES MAXIMUM</strong> (Eddie, July 20 2026). Scripts must be <em>written</em></li>
