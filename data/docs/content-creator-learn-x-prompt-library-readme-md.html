@@ -1,0 +1,18 @@
+<h1>X Prompt Library — @TechieBySA</h1>
+<p>A browsable, reusable library of AI-animation prompts reverse-engineered from the X account <strong><a href="https://x.com/TechieBySA" target="_blank" rel="noopener">@TechieBySA</a></strong> (bio: <em>&quot;AI tools, prompts &amp; wild ideas&quot;</em>). Built so we can study his method and generate clips on par with his work.</p>
+<p><strong>Scraped:</strong> 2026-09-03 · <strong>Window:</strong> Jun 1 – Sep 3, 2026 (the full 3 months — 228 prompt-set threads plus standalone prompt posts = 297 browsable cards, 623 posts total).</p>
+<h2>What&#x27;s here</h2>
+<table><thead><tr><th>File</th><th>What it is</th></tr></thead><tbody><tr><td><strong><code>gallery.html</code></strong></td><td>The visual browser — open this first. 297 cards, each showing the clip poster (click → watch on X), the character-sheet image, and the full image + video prompts with one-click <strong>Copy</strong>. Search + filter by tool. Self-contained.</td></tr><tr><td><strong><code>STYLE_ANALYSIS.md</code></strong></td><td>The playbook — his exact prompt skeleton, recurring phrasings, and fill-in-the-blank templates for both stages. Read this to write new prompts in his style.</td></tr><tr><td><strong><code>prompts_index.csv</code></strong></td><td>Flat index — 351 prompts, one per row: set id, date, role, tools, post URL, media file, views, char count, full text. Sortable in any spreadsheet.</td></tr><tr><td><strong><code>media/</code></strong></td><td>468 downloaded stills — the GPT Image 2 character sheets (<code><em>_img.jpg</code>) and clip poster frames (<code></em>_clipframe.jpg</code>).</td></tr><tr><td><strong><code>data/techiebysa_raw.json</code></strong></td><td>The raw structured scrape (623 posts) — the source dataset everything else is built from.</td></tr><tr><td><strong><code>originals/</code></strong></td><td>Our <strong>own</strong> sets written in his formula (not scraped) — proof the reverse-engineering works. First one: <code>MIB_Agent_K_and_J.md</code>.</td></tr></tbody></table>
+<h2>His method in one line</h2>
+<p>Two-stage pipeline every time: <strong>GPT Image 2 &quot;character bible sheet&quot;</strong> (locks the look) → <strong>Seedance 2.0 / 2.5</strong> (animates it through an 8-beat, timecoded action arc). Full breakdown in <code>STYLE_ANALYSIS.md</code>.</p>
+<h2>Notes / honesty</h2>
+<ul>
+<li><strong>Clips are links + poster frames, not video files.</strong> X streams video, so the library stores</li>
+</ul>
+<p>each clip&#x27;s poster still and a link to watch it on X (the agreed approach). The full prompts and character-sheet images are captured completely.</p>
+<ul>
+<li><strong>Prompts are the full untruncated text</strong> — pulled from X&#x27;s data layer, including his</li>
+</ul>
+<p>long-form &quot;note&quot; posts, so nothing is cut off.</p>
+<h2>To refresh or go back further</h2>
+<p>Ask Claude to &quot;refresh the TechieBySA scrape&quot; (to pull newer posts) or &quot;go back further than June&quot; — the scraper pages through his timeline via your logged-in X session and rebuilds the gallery/CSV. (Scraping needs the browser session; it isn&#x27;t a standalone script.)</p>

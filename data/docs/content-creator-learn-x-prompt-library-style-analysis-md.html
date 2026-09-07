@@ -1,0 +1,164 @@
+<h1>TechieBySA — Reverse-Engineered Prompt Playbook</h1>
+<p><em>Built from 228 prompt-sets scraped Jun 1 – Sep 3, 2026. This is the &quot;how he actually writes&quot; guide — the recurring skeleton, the exact phrasings he reuses, and fill-in-the-blank templates so we can generate new clips on par with his. Pairs with <code>../../Claude_and_AI_Docs/VIDEO_PROMPTING_GUIDE.md</code> (the general motion playbook).</em></p>
+<hr>
+<h2>The big picture: it&#x27;s always a two-stage pipeline</h2>
+<p>Almost every banger on his feed is <strong>one thread of 3 posts</strong>:</p>
+<ol>
+<li><strong>The clip</strong> — the finished 15-second video (the hook post).</li>
+<li><strong>The image prompt</strong> — a <strong>GPT Image 2 &quot;character bible sheet&quot;</strong> that locks the characters&#x27; look. Comes with the generated sheet as a still.</li>
+<li><strong>The video prompt</strong> — a <strong>Seedance 2.0 / 2.5</strong> prompt that animates those locked characters through a beat-by-beat action scene.</li>
+</ol>
+<p><strong>The insight for us:</strong> he never asks a video model to invent characters on the fly. He first <em>builds a reference sheet as an image</em>, then feeds that locked look into the video model. Consistent characters = the whole reason his clips look pro instead of morphing. That&#x27;s the single most copyable move.</p>
+<p>His genre is a specific look he repeats every time: <strong>&quot;cinematic cel-shaded 3D anime,&quot;</strong> Unreal-Engine-grade, bold outlines — famous movies (Bad Boys, Rush Hour, Pulp Fiction) restaged as stylised anime action.</p>
+<hr>
+<h2>STAGE 1 — The character-sheet (image) prompt</h2>
+<h3>His skeleton (split-screen &quot;partner&quot; version)</h3>
+<p>Every buddy-duo sheet follows this exact order:</p>
+<ol>
+<li><strong>Identity lock</strong> — <code>Create a premium cinematic character bible sheet for [A] &amp; [B]. Use uploaded character sheets as strict visual reference for both characters. Do not change either&#x27;s appearance.</code></li>
+</ol>
+<p>→ This line is why his characters stay consistent. He uploads a reference and forbids drift.</p>
+<ol>
+<li><strong><code>LAYOUT:</code></strong> — <code>Split screen partner format. Two halves divided by a bold dramatic dividing element in the center.</code></li>
+<li><strong><code>LEFT SIDE — [NAME]:</code></strong> — a colour-coded watercolour splash + big brushstroke name + tiny role label (<code>DETECTIVE / MIAMI PD</code>) + <strong>one massive cropped hero image from mid-thigh up</strong>, with expression, head-to-toe wardrobe, and pose.</li>
+<li><strong><code>RIGHT SIDE — [NAME]:</code></strong> — same structure, contrasting colour.</li>
+<li><strong><code>CENTER:</code></strong> — the title in <code>deep red, slightly worn</code> + taglines.</li>
+<li><strong><code>BOTTOM CENTER:</code></strong> — an explicit <strong>colour palette</strong> list + a final tagline.</li>
+<li><strong><code>OVERALL:</code></strong> — his render signature (see below).</li>
+</ol>
+<h3>His render signature (copy this verbatim — it&#x27;s his &quot;look&quot;)</h3>
+<blockquote>Clean white background … <strong>bold flat color blocking, chunky simplified forms, hard edge shadows, thick black outlines, vibrant saturated colors, minimal clean typography, cinematic cel-shaded 3D anime, hand-painted textures, not cartoon not Disney not Pixar, print ready.</strong></blockquote>
+<h3>The other image variant — turnaround/concept sheet (single character)</h3>
+<blockquote><code>Professional character turnaround reference sheet of [character description head-to-toe]. Front, side, back, three quarter views. Close up panels of [detail], [detail], [detail]. White background, cinematic cel-shaded 3D anime, semi-realistic CGI, hand-painted textures, [render signature], Unreal Engine quality, anime proportions, premium concept art sheet.</code></blockquote>
+<h3>Fill-in-the-blank — Stage 1</h3>
+<pre class='code'><code>Create a premium cinematic character bible sheet for [NAME A] &amp; [NAME B]. Use uploaded
+character sheets as strict visual reference for both characters. Do not change either&#x27;s appearance.
+LAYOUT: Split screen partner format. Two halves divided by a bold dramatic dividing element in the center.
+LEFT SIDE — [NAME A]: [COLOR] watercolor splash behind him fading into center. Large bold
+brushstroke text [NAME A] top left in [COLOR]. Below small text: [ROLE] / [PLACE]. One massive
+dramatic cropped hero image from mid-thigh up — [EXPRESSION], [FULL WARDROBE], [POSE], [COLOR]
+watercolor splash radiating behind him.
+CENTER: Bold dramatic [TITLE] in deep red, slightly worn. Below small text: [TAGLINE 1]. [TAGLINE 2].
+RIGHT SIDE — [NAME B]: [contrasting COLOR] … (mirror of the left)
+BOTTOM CENTER: Color palette — [4 colors]. Tagline centered: [FINAL TAGLINE].
+OVERALL: Clean white background, [render signature].</code></pre>
+<hr>
+<h2>STAGE 2 — The Seedance (video) prompt — where the motion comes from</h2>
+<p>This is the part worth studying hardest. His video prompts run <strong>3,000–3,700 characters</strong> and are almost identical in structure every time.</p>
+<h3>His skeleton</h3>
+<ol>
+<li><strong>One-line premise</strong> — `Cinematic anime short film clip, 15 seconds. [SETTING — specific</li>
+</ol>
+<p>environment + specific lighting].<code> He always states duration and nails the location detail (</code>Miami street, bright Florida sunshine, palm trees, colorful Art Deco buildings`).</p>
+<ol>
+<li><strong><code>CHARACTER 1 — [NAME]:</code></strong> and <strong><code>CHARACTER 2 — [NAME]:</code></strong> — build + expression + **full</li>
+</ol>
+<p>wardrobe<strong> + a </strong>behaviour signature.** The behaviour line is his secret sauce: he gives each character a <em>consistent motion personality</em>, and they contrast:</p>
+<ul>
+<li><code>Moves with total cool precision — never rushed, never rattled.</code>  (calm one)</li>
+<li><code>Loud and reactive — shouting constantly, panicking occasionally, always getting the job done.</code> (chaotic one)</li>
+</ul>
+<ol>
+<li><strong>Antagonist block</strong> with a <strong>distinctness rule</strong> — `Thugs in casual street clothes only —</li>
+</ol>
+<p>jeans hoodies t-shirts baseball caps. No suits.` (so the model never confuses heroes and enemies).</p>
+<ol>
+<li><strong><code>AUDIO:</code></strong> — `High energy funky [genre] beat loud from frame one, every shot and impact</li>
+</ol>
+<p>synced to the beat, [name]&#x27;s voice audible shouting throughout, never dropping.`</p>
+<ol>
+<li><strong>The beat-by-beat timecode arc</strong> — the core. Eight 2-second beats:</li>
+</ol>
+<p><code>0:00–0:01</code>, <code>0:01–0:03</code> … <code>0:13–0:15</code>. Each beat is one line of explicit choreography.</p>
+<ul>
+<li><strong>He always opens &quot;Already mid-action&quot;</strong> — never a static establishing shot. (This is the</li>
+</ul>
+<p>single biggest anti-freeze trick; it matches the START+END-keyframe rule in our video guide.)</p>
+<ul>
+<li><strong>He ends every clip the same way:</strong> <code>Hero moment. Done.</code></li>
+<li>Camera directions live <em>inside</em> the beats: <code>Wide shot showing full parlour</code>, `close on</li>
+</ul>
+<p>Lee&#x27;s calm focused face<code>, </code>overhead looking straight down at the spinning clearing the room`.</p>
+<ol>
+<li><strong>Closing style stack</strong> — the render signature again + `film grain, [genre] beat dominant</li>
+</ol>
+<p>throughout, camera angles switching rapidly every action, [char 1 behaviour] throughout, [char 2 behaviour] throughout, [antagonist rule].`</p>
+<h3>Why his clips actually move (cross-ref to our VIDEO_PROMPTING_GUIDE)</h3>
+<ul>
+<li><strong>&quot;Already mid-action&quot; opening</strong> — kills the frozen/hover-in-place start.</li>
+<li><strong>Every 2-second beat has a start pose and an end state</strong> — that&#x27;s an implicit keyframe pair</li>
+</ul>
+<p>per beat, which is exactly what forces locomotion instead of a held pose.</p>
+<ul>
+<li><strong>Constant forward locomotion refrain</strong> — <code>keep walking forward</code>, <code>both advancing</code> — travels</li>
+</ul>
+<p>the characters through space instead of animating them on the spot.</p>
+<ul>
+<li><strong>Ground + environment contact</strong> — <code>slides onto the polished floor</code>, `vaults over a lounge</li>
+</ul>
+<p>chair<code>, </code>never touching the floor<code>, </code>uses chairs as a continuous obstacle course` — physical contact with the set reads as real weight and motion.</p>
+<ul>
+<li><strong>Beat-synced audio</strong> — <code>every impact synced to the beat</code> gives the edit rhythm.</li>
+</ul>
+<h3>His negative-prompting habit</h3>
+<p>He <strong>doesn&#x27;t use a separate negative field</strong> — he bakes negatives inline: <code>not cartoon not Disney not Pixar</code>, <code>NO SUITS</code>, <code>never rushed</code>, <code>never dropping</code>. → <strong>For Kling / Runway (which have a negative-prompt box):</strong> move these to that field — <code>cartoon, Disney, Pixar, floating, sliding feet, static pose, morphing faces, still frame</code>.</p>
+<h3>Fill-in-the-blank — Stage 2</h3>
+<pre class='code'><code>Cinematic anime short film clip, 15 seconds. [SETTING + LIGHTING].
+CHARACTER 1 — [NAME]: [build], [expression]. [full wardrobe]. [behaviour signature — calm/precise].
+CHARACTER 2 — [NAME]: [build], [expression]. [full wardrobe]. [behaviour signature — loud/reactive].
+[ANTAGONISTS]: [wardrobe] only — [items]. No [hero-item]. Aggressive and physical.
+AUDIO: High energy [genre] beat loud from frame one, every impact synced to the beat, [name]&#x27;s voice audible throughout, never dropping.
+0:00–0:01 — Already mid-action, [scene], [char actions establishing their behaviours].
+0:01–0:03 — [beat] … 0:03–0:05 — [beat] … 0:05–0:07 — … 0:07–0:09 — … 0:09–0:11 — … 0:11–0:13 — [biggest beat / signature move].
+0:13–0:15 — [last enemy down]. [both react in character]. Hero moment. Done.
+[render signature], film grain, [genre] beat dominant throughout, camera angles switching rapidly every action, [char1 behaviour] throughout, [char2 behaviour] throughout, [antagonist rule].</code></pre>
+<hr>
+<h2>His recurring vocabulary bank (steal these)</h2>
+<ul>
+<li><strong>Look:</strong> cel-shaded 3D anime · semi-realistic CGI · hand-painted textures · Unreal Engine</li>
+</ul>
+<p>quality · bold flat color blocking · chunky simplified forms · hard edge shadows · thick black outlines · vibrant saturated colors · film grain · print ready · premium concept art sheet.</p>
+<ul>
+<li><strong>Motion personalities:</strong> <em>cool precision, never rushed</em> vs <em>loud and reactive</em> — the</li>
+</ul>
+<p>calm/chaotic duo is his signature dynamic across nearly every set.</p>
+<ul>
+<li><strong>Camera:</strong> wide shot showing full [room] · close on [face] · overhead looking straight down</li>
+</ul>
+<p>· rapid cuts every takeout · camera angles switching rapidly every action.</p>
+<ul>
+<li><strong>Structural refrains:</strong> <code>Already mid-action</code> (open) · <code>keep walking forward</code> · <code>throughout</code></li>
+</ul>
+<p>· <code>never dropping</code> · <code>Hero moment. Done.</code> (close).</p>
+<ul>
+<li><strong>Consistency locks:</strong> <code>Use uploaded character sheets as strict visual reference</code> · `Do not</li>
+</ul>
+<p>change either&#x27;s appearance` · repeat wardrobe + behaviour at the top AND in the closing stack.</p>
+<hr>
+<h2>Second content lane — his &quot;Simply replace [X]&quot; template prompts</h2>
+<p>Separate from the movie-duo clips, he posts single-image viral templates people can reuse by swapping one word. Captured in the library under role <code>prompt_other</code>. Recurring types:</p>
+<ul>
+<li><strong>Isometric miniature scale-models</strong> — `Ultra-detailed photorealistic isometric miniature</li>
+</ul>
+<p>scale-model diorama of [LANDMARK/MOVIE/ANIME]`.</p>
+<ul>
+<li><strong>3D infographic travel posters</strong> — <code>A hyper-realistic 3D travel guide infographic poster for [CITY]</code>.</li>
+<li><strong>Macro fabric / product hero shots</strong> — <code>Extreme macro shot of woven cotton shirt fabric…</code>.</li>
+</ul>
+<p>Format: a one-line <code>Simply replace [TOKEN]:</code> instruction, then the prompt in quotes, often <code>Upload your reference image for enhanced accuracy</code>. Good for high-reach single stills, not the animation pipeline.</p>
+<hr>
+<h2>How to use this to make a clip &quot;on par with his&quot;</h2>
+<ol>
+<li>Pick two characters / a movie scene.</li>
+<li><strong>Stage 1:</strong> fill the character-sheet template → GPT Image 2 (or Nano Banana / equivalent) →</li>
+</ol>
+<p>get a clean split-screen bible sheet. Upload real reference images and keep the <em>Do not change appearance</em> lock.</p>
+<ol>
+<li><strong>Stage 2:</strong> fill the Seedance template, reusing the exact wardrobe + behaviour words from</li>
+</ol>
+<p>Stage 1 so the video matches the sheet. Keep the 8-beat timecode arc, the &quot;Already mid-action&quot; open, and the closing style stack.</p>
+<ol>
+<li>For <strong>Kling/Runway</strong> instead of Seedance: keep the beats and behaviour lines, but lift the</li>
+</ol>
+<p>inline negatives (<code>not cartoon…</code>, <code>NO SUITS</code>, <code>never rushed</code>) into the negative-prompt box, and pair a START keyframe (mid-stride) with an END keyframe per our VIDEO_PROMPTING_GUIDE.</p>
+<p>Browse <code>gallery.html</code> for 320 worked examples with the finished clips, the exact sheets, and the full prompts — copy any prompt straight from there.</p>
