@@ -1,0 +1,81 @@
+<h1>Onda Build Plan — What the Faceless-Channel Pipeline Needs</h1>
+<p>Grounded in Onda&#x27;s actual code (<code>studio/src/lib/config.ts</code>, <code>api/generate/route.ts</code>, <code>DOCS.md</code>), not guesses. Onda today = <strong>50 fal.ai models across two kinds only: <code>image</code> and <code>video</code></strong> (plus 7 edit tools and Director), a credit ledger, Flow canvas, Library, Stripe. The faceless pipeline needs several things Onda doesn&#x27;t have yet. Listed in build order.</p>
+<hr>
+<h2>What Onda already covers (no build needed)</h2>
+<table><thead><tr><th>Pipeline phase</th><th>Onda has it</th></tr></thead><tbody><tr><td>Style-key image</td><td>✅ 18 image models (FLUX, Seedream, Nano Banana, GPT Image 2, Recraft for vector/logo)</td></tr><tr><td>Per-block clips</td><td>✅ 25 video models — t2v <strong>and</strong> image→video, duration scaling, end-keyframe on 7 families</td></tr><tr><td>Image editing (thumbnails base, restyle)</td><td>✅ 7 edit tools incl. Nano Banana 2 Edit, GPT Image 2 Edit, erase, upscale</td></tr><tr><td>Motion prompt writing</td><td>✅ Director (Claude Opus + video-prompting playbook) — already the &quot;smart prompt&quot; layer</td></tr><tr><td>Credits / billing / library</td><td>✅ full ledger, ×3 pricing, auto-refund on failure, Library autosave</td></tr></tbody></table>
+<p>So the <em>visual</em> half of a faceless video is essentially done. The gaps are all in <strong>audio, assembly, and long-form orchestration</strong> — the parts that turn 60 clips into one publishable 10-minute film.</p>
+<hr>
+<h2>GAP 1 — Audio generation (TTS / voiceover) — <strong>HIGHEST PRIORITY</strong></h2>
+<p><strong>Why it&#x27;s #1:</strong> A faceless explainer is narration-first. Without TTS, Onda cannot produce the single most important asset in the pipeline. Every other gap is downstream of having voice.</p>
+<p><strong>What&#x27;s missing:</strong> <code>ModelKind</code> is <code>&quot;image&quot; | &quot;video&quot;</code> only. There is no audio lane in <code>config.ts</code>, no audio branch in <code>buildInput</code>, no audio dispatch in <code>api/generate/route.ts</code>.</p>
+<p><strong>What to build:</strong></p>
+<ul>
+<li>Add <code>&quot;audio&quot;</code> to <code>ModelKind</code> and an <code>audio</code> filter alongside <code>IMAGE_MODELS</code>/<code>VIDEO_MODELS</code>.</li>
+<li>Add fal audio endpoints. fal hosts the same engines Magnific resells — e.g. <code>fal-ai/elevenlabs/tts</code> (ElevenLabs v3/turbo), plus MiniMax/PlayHT TTS. Price them with the existing ×3 rule (fal bills TTS per character/second — mirror the token-billed pattern already used for GPT Image 2).</li>
+<li>Add a <code>family</code> (e.g. <code>&quot;tts&quot;</code>) → <code>buildInput</code> shape: <code>{ text, voice_id, stability, similarity_boost, speed }</code>.</li>
+<li>Charge-first → run → auto-refund is already the pattern; audio reuses it.</li>
+</ul>
+<p><strong>Effort:</strong> Medium. It&#x27;s a new kind, but it rides the existing generate/charge/refund/library rails.</p>
+<hr>
+<h2>GAP 2 — Voice cloning (&quot;clone your own voice&quot;) — <strong>HIGH</strong></h2>
+<p><strong>Why:</strong> It&#x27;s a named course module and a real differentiator — creators want <em>their</em> voice, not a stock one. Also a retention/upsell hook for Onda.</p>
+<p><strong>What&#x27;s missing:</strong> No concept of a user-owned voice asset. Library stores creations (images/videos), not voice models.</p>
+<p><strong>What to build:</strong></p>
+<ul>
+<li>fal endpoint for voice cloning (ElevenLabs IVC via fal, or PlayHT). Input = a reference audio sample; output = a persistent <code>voice_id</code>.</li>
+<li>A new Supabase table (<code>user_voices</code>: id, user_id, provider, external_voice_id, name) — the analog of Magnific&#x27;s <code>scope: mine</code> voices.</li>
+<li>Surface cloned voices in the TTS picker (Gap 1) as &quot;My Voices&quot;.</li>
+<li>Audio-file upload path: <code>api/upload/route.ts</code> today is <strong>images only, 10MB</strong>. Needs an audio branch (accept mp3/wav, larger cap).</li>
+</ul>
+<p><strong>Effort:</strong> Medium. Depends on Gap 1 existing first.</p>
+<hr>
+<h2>GAP 3 — Block assembly / concatenation (&quot;the full 10-min video&quot;) — <strong>HIGH</strong></h2>
+<p><strong>Why:</strong> This is the piece that makes it a <em>video</em>, not 60 loose clips + 60 audio files. It&#x27;s the hardest gap and the one with no clean fal equivalent — even Magnific leans on a bespoke assembler.</p>
+<p><strong>What&#x27;s missing:</strong> No tool that syncs N (audio, video) block pairs into one timed MP4. No concatenation, no per-block trim/pad.</p>
+<p><strong>What to build (pick one path):</strong></p>
+<ul>
+<li><strong>Path A — server-side ffmpeg job.</strong> A new backend route that takes an ordered list of <code>{videoUrl, audioUrl}</code> pairs, muxes audio onto each clip, trims/pads to block length, concatenates, optional burned captions. Runs on your VPS (you already deploy Docker on Hostinger) or a fal/serverless ffmpeg. Most control, most work.</li>
+<li><strong>Path B — fal assembly/stitch endpoint</strong> if one exists at build time (check fal&#x27;s ffmpeg-api). Less control, faster.</li>
+<li>Model it as a new <code>kind: &quot;assemble&quot;</code> job in the ledger so it&#x27;s billed and refunded like everything else.</li>
+</ul>
+<p><strong>Effort:</strong> High. This is the real engineering lift. Recommend Path A for control.</p>
+<hr>
+<h2>GAP 4 — Dubbing / localization (&quot;second language&quot;) — <strong>MEDIUM</strong></h2>
+<p><strong>Why:</strong> A named module and a strong multiplier (one video → many language markets), but it&#x27;s <em>post-production</em> — the channel works without it.</p>
+<p><strong>What&#x27;s missing:</strong> No dubbing lane. Magnific has a full dubbing studio (transcribe → translate → re-voice → caption, 12 languages).</p>
+<p><strong>What to build:</strong></p>
+<ul>
+<li>fal has dubbing endpoints (e.g. ElevenLabs dubbing). Add as an <code>audio</code>- or <code>video</code>-kind job: input a video URL + target language → dubbed video out.</li>
+<li>Simpler MVP that reuses earlier gaps: re-run TTS (Gap 1) with a translated script + the cloned voice (Gap 2), then re-assemble (Gap 3). No new supplier needed — just a &quot;translate script → regenerate audio track → remux&quot; flow.</li>
+</ul>
+<p><strong>Effort:</strong> Low–Medium if built on Gaps 1–3; Medium if using a dedicated fal dubbing endpoint.</p>
+<hr>
+<h2>GAP 5 — Video cutting for Shorts (&quot;20 shorts in one click&quot;) — <strong>MEDIUM</strong></h2>
+<p><strong>Why:</strong> Repurposing is high-leverage for reach, but it&#x27;s downstream of having a finished long-form video (Gap 3).</p>
+<p><strong>What&#x27;s missing:</strong> No cut/trim/crop/reframe tools. Onda&#x27;s video models <em>generate</em>; none <em>edit an existing video</em>.</p>
+<p><strong>What to build:</strong></p>
+<ul>
+<li>A cut/crop route (ffmpeg again — shares infrastructure with Gap 3): input a long video + timestamp ranges → N vertical 9:16 clips.</li>
+<li>Optionally a &quot;find the best beats&quot; helper (Claude reads the transcript, proposes short-worthy segments) — a natural Director-style extension.</li>
+</ul>
+<p><strong>Effort:</strong> Medium; largely reuses Gap 3&#x27;s ffmpeg service.</p>
+<hr>
+<h2>GAP 6 — Thumbnails &amp; titles — <strong>LOW (mostly covered)</strong></h2>
+<p><strong>Why low:</strong> Onda can already <em>make</em> the thumbnail image (image models + GPT Image 2 for on-image text + edit tools). The only missing pieces are YouTube-specific niceties.</p>
+<p><strong>What to build (optional polish):</strong></p>
+<ul>
+<li>A thumbnail template/aspect preset (1280×720) and a text-overlay helper — GPT Image 2 already renders text, so this is a prompt/preset, not a new supplier.</li>
+<li>Title generation is pure LLM (Claude) — already available via the Director/Anthropic integration; just a new prompt.</li>
+</ul>
+<p><strong>Effort:</strong> Low. Mostly presets + prompts, no new infra.</p>
+<hr>
+<h2>Suggested build order (dependency-aware)</h2>
+<ol>
+<li><strong>Audio/TTS</strong> (Gap 1) — unlocks the whole narration half. Nothing works without it.</li>
+<li><strong>Block assembly / ffmpeg service</strong> (Gap 3) — the other half; also the shared engine for Gaps 4 &amp; 5.</li>
+<li><strong>Voice cloning</strong> (Gap 2) — the differentiator; needs Gap 1.</li>
+<li><strong>Dubbing</strong> (Gap 4) — cheap once 1–3 exist.</li>
+<li><strong>Shorts cutting</strong> (Gap 5) — reuses Gap 3&#x27;s ffmpeg.</li>
+<li><strong>Thumbnail/title polish</strong> (Gap 6) — presets on top of what&#x27;s already there.</li>
+</ol>
+<p>The through-line: <strong>audio is the missing kind, and an ffmpeg service is the missing engine.</strong> Build those two and the faceless pipeline is ~90% Onda-native; everything else is presets and prompts on rails Onda already has (charge-first/refund, Library, Director, credit ledger).</p>

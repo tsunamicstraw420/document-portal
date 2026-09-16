@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>onda Cost & Margin</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1"></script>
+<style>
+:root{
+  --bg:#0e1116; --card:#171b22; --card2:#1e232c; --line:#2a303a;
+  --text:#e8ecf1; --muted:#98a2b3; --accent:#3aa0ff; --accent2:#7c5cff;
+  --pos:#3ecf8e; --neg:#ff6b6b; --warn:#ffb020;
+  --img:#3aa0ff; --imgvid:#7c5cff; --txtvid:#f472b6; --edit:#ffb020;
+  --radius:12px; --gap:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1440px;margin:0 auto;padding:20px}
+header.top{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:6px}
+h1{font-size:24px;font-weight:700;letter-spacing:-.02em}
+h1 .accent{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.sub{color:var(--muted);font-size:13px;margin-top:4px;max-width:660px}
+.basis{color:var(--muted);font-size:12px;margin:10px 0 18px;padding:10px 14px;background:var(--card);border:1px solid var(--line);border-radius:10px}
+.basis b{color:var(--text)}
+.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:18px}
+.filters .fg{display:flex;flex-direction:column;gap:4px}
+.filters label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+select{background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit}
+select:focus{outline:1px solid var(--accent)}
+.seg{display:inline-flex;background:var(--card2);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{background:transparent;color:var(--muted);border:0;padding:8px 12px;font-size:13px;cursor:pointer;font-family:inherit}
+.seg button.on{background:var(--accent);color:#04121f;font-weight:600}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:var(--gap);margin-bottom:var(--gap)}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px}
+.kpi .lab{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.kpi .val{font-size:26px;font-weight:700;margin-top:6px;letter-spacing:-.02em}
+.kpi .hint{font-size:12px;color:var(--muted);margin-top:3px}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);margin-bottom:var(--gap)}
+.charts .full{grid-column:1/-1}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px}
+.panel h3{font-size:13px;font-weight:600;margin-bottom:4px}
+.panel .psub{font-size:11px;color:var(--muted);margin-bottom:12px}
+.cwrap{position:relative;height:320px}
+.cwrap.tall{height:520px}
+.tablepanel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:860px}
+th{text-align:right;padding:9px 10px;border-bottom:1px solid var(--line);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;cursor:pointer;user-select:none}
+th:first-child,td:first-child{text-align:left}
+th:nth-child(2),td:nth-child(2){text-align:left}
+th:nth-child(3),td:nth-child(3){text-align:left}
+th:hover{color:var(--text)}
+td{padding:9px 10px;border-bottom:1px solid #21262f;white-space:nowrap}
+tbody tr:hover{background:var(--card2)}
+.tag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600;letter-spacing:.02em}
+.tag.Image{background:rgba(58,160,255,.15);color:var(--img)}
+.tag.Edit{background:rgba(255,176,32,.15);color:var(--edit)}
+.tag.Video.Image{background:rgba(124,92,255,.15);color:var(--imgvid)}
+.tag.Video.Text{background:rgba(244,114,182,.15);color:var(--txtvid)}
+.pos{color:var(--pos)}
+.mono{font-variant-numeric:tabular-nums}
+.bar{display:inline-block;height:6px;border-radius:3px;background:var(--accent);vertical-align:middle;margin-left:6px}
+.pill{font-size:9px;padding:1px 6px;border-radius:20px;margin-left:6px;vertical-align:middle;font-weight:600}
+.pill.native{background:rgba(62,207,142,.16);color:var(--pos)}
+.pill.norm{background:rgba(152,162,179,.15);color:var(--muted)}
+.pill.direct{background:rgba(255,107,107,.16);color:var(--neg)}
+.pill.match{background:rgba(152,162,179,.15);color:var(--muted)}
+.pill.cheaper{background:rgba(62,207,142,.16);color:var(--pos)}
+.pill.none{background:rgba(255,176,32,.14);color:var(--warn)}
+.section-h{font-size:18px;font-weight:700;margin:30px 0 4px;letter-spacing:-.01em}
+.section-sub{color:var(--muted);font-size:13px;margin-bottom:16px;max-width:720px}
+.legend-row{display:flex;gap:16px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-bottom:14px}
+.legend-row b{color:var(--text)}
+.dim{color:var(--muted)}
+.conf{font-size:10px;padding:1px 5px;border-radius:4px;background:var(--card2);color:var(--muted);margin-left:5px}
+.takeaways{background:linear-gradient(135deg,rgba(58,160,255,.08),rgba(124,92,255,.08));border:1px solid var(--line);border-radius:var(--radius);padding:18px 22px;margin-bottom:var(--gap)}
+.takeaways h2{font-size:15px;font-weight:700;margin-bottom:4px;letter-spacing:-.01em}
+.takeaways .tsub{font-size:12px;color:var(--muted);margin-bottom:14px}
+.tk-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tk{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.tk .h{font-size:13px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.tk .dot{width:9px;height:9px;border-radius:50%;flex:none}
+.tk.keep .dot{background:var(--pos)}
+.tk.direct .dot{background:var(--neg)}
+.tk ul{margin:0;padding-left:0;list-style:none}
+.tk li{font-size:12.5px;line-height:1.55;color:var(--text);padding:4px 0;border-bottom:1px solid #21262f}
+.tk li:last-child{border-bottom:none}
+.tk li b{color:var(--text)}
+.tk .big{color:var(--neg);font-weight:700;font-variant-numeric:tabular-nums}
+.tk .ok{color:var(--pos);font-weight:600}
+.tk .note{color:var(--muted);font-size:11.5px;margin-top:8px;display:block}
+@media(max-width:860px){.tk-grid{grid-template-columns:1fr}}
+footer{color:var(--muted);font-size:12px;margin-top:20px;text-align:center}
+@media(max-width:860px){.charts{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1><span class="accent">onda</span> · Cost & Margin per Output</h1>
+      <div class="sub">What each AI model costs you wholesale (fal.ai) vs. what users pay in onda, and the margin on every image and video clip.</div>
+    </div>
+    <div class="seg" id="metricSeg">
+      <button data-m="onda" class="on">User pays ($)</button>
+      <button data-m="wholesale">Your cost ($)</button>
+      <button data-m="margin">Margin ($)</button>
+    </div>
+  </header>
+
+  <div class="takeaways">
+    <h2>Bottom line: keep fal as the default — go direct only for a few high-volume models</h2>
+    <div class="tsub">For most models fal passes the provider's cost through at ~the direct rate, and several models can't be bought direct at all (open-weights, token-billed, or region-locked). fal earns its keep as one integration instead of a dozen. Three models are the real exceptions.</div>
+    <div class="tk-grid">
+      <div class="tk keep">
+        <div class="h"><span class="dot"></span>Keep on fal (the default)</div>
+        <ul>
+          <li><b>Almost everything.</b> fal ≈ direct on FLUX, GPT Image, Ideogram, Recraft, Hailuo/H3, PixVerse v5 — no meaningful savings in going direct.</li>
+          <li><b>Seedance 2.5</b> — fal pins 720p, so at 1080p fal is roughly <span class="ok">half</span> the direct price. Clear win; don't second-guess it.</li>
+          <li><b>Seedream / open-weights / GPT Image 2</b> — no clean direct option (region-locked, self-host, or token-billed). fal is the practical route.</li>
+        </ul>
+      </div>
+      <div class="tk direct">
+        <div class="h"><span class="dot"></span>Consider going direct — only if high-volume</div>
+        <ul>
+          <li><b>Kling</b> (Pro / Master / v3) — fal runs <span class="big">2–4×</span> Kling's own platform rate, even after matching resolution. The clearest case. <span class="note">Caveat: Kling charges one flat credit rate across its version tiers, and fal's higher tiers deliver higher res/fidelity — not a pure 1:1.</span></li>
+          <li><b>Veo 3.1 Fast</b> — fal $0.40/s vs Google direct <span class="big">$0.15/s</span> (2.7×), and it's your single priciest video model.</li>
+          <li><b>Nano Banana 2</b> — fal $0.15 vs Google direct <span class="big">$0.067</span>/image (2.2×).</li>
+        </ul>
+      </div>
+    </div>
+    <span class="tk note" style="margin-top:12px">At v1 launch volumes, fal-for-everything is almost certainly right. Revisit a per-model direct integration only when one of these three becomes a large share of spend. Direct prices are Sep-2026 list-price estimates — confirm live before switching.</span>
+  </div>
+
+  <div class="basis">
+    <b>Pricing basis:</b> 1 credit = $0.01 · onda price ≈ wholesale × 3 · Video credits scale linearly with clip length &amp; round up.
+    <b style="color:var(--pos)"> Native</b> = each model priced at its real base clip length (Veo 8s, Hailuo 6s, most others 5s). 5s / 10s views normalize every model to one length for like-for-like comparison. All wholesale $ verified from fal's model pages.
+  </div>
+
+  <div class="filters">
+    <div class="fg"><label>Clip length</label>
+      <select id="fLen">
+        <option value="native">Native base length (real)</option>
+        <option value="5">Normalize video → 5s</option>
+        <option value="10">Normalize video → 10s</option>
+      </select></div>
+    <div class="fg"><label>Category</label>
+      <select id="fGroup"><option value="all">All categories</option></select></div>
+    <div class="fg"><label>Provider</label>
+      <select id="fProv"><option value="all">All providers</option></select></div>
+    <div class="fg"><label>Show</label>
+      <select id="fKind">
+        <option value="all">Images + video</option>
+        <option value="Image">Images only</option>
+        <option value="Edit">Edit tools only</option>
+        <option value="video">Video only</option>
+      </select></div>
+  </div>
+
+  <section class="kpis" id="kpis"></section>
+
+  <section class="charts">
+    <div class="panel full">
+      <h3 id="c1title">Cost per output — ranked</h3>
+      <div class="psub" id="c1sub"></div>
+      <div class="cwrap tall"><canvas id="chartMain"></canvas></div>
+    </div>
+    <div class="panel">
+      <h3>onda price vs. your fal cost</h3>
+      <div class="psub">Each dot is one model at the selected length. Distance above the line = margin. Log scale.</div>
+      <div class="cwrap"><canvas id="chartScatter"></canvas></div>
+    </div>
+    <div class="panel">
+      <h3>Average markup by category</h3>
+      <div class="psub">How many × wholesale users pay, on average.</div>
+      <div class="cwrap"><canvas id="chartMarkup"></canvas></div>
+    </div>
+  </section>
+
+  <div class="tablepanel">
+    <table id="tbl">
+      <thead><tr>
+        <th data-s="label">Model</th>
+        <th data-s="group">Category</th>
+        <th data-s="unit">Unit</th>
+        <th data-s="credits">Credits</th>
+        <th data-s="onda">User pays</th>
+        <th data-s="wholesale">Your cost</th>
+        <th data-s="margin">Margin $</th>
+        <th data-s="markup">Markup ×</th>
+        <th data-s="marginPct">Margin %</th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- =================== DIRECT VS FAL SECTION =================== -->
+  <h2 class="section-h">fal.ai vs. going direct</h2>
+  <div class="section-sub">
+    fal is a reseller — for each model, is it cheaper to keep buying through fal, or to integrate the provider's own API? Comparing your fal cost to each provider's <b>direct API list price</b>, quoted at <b>both 720p and 1080p</b> where the provider offers tiered resolution (credit-bundle providers converted to per-clip USD). The right column to trust is whichever resolution that fal tier actually delivers. Researched Sep 2026 — list-price estimates, confirm before switching.
+  </div>
+  <div class="legend-row">
+    <span><span class="pill direct">fal pricier</span> fal costs more than direct at that res — a savings opportunity</span>
+    <span><span class="pill match">≈ matched</span> fal ≈ direct at that res</span>
+    <span><span class="pill cheaper">fal cheaper</span> fal undercuts direct (often because fal pins 720p)</span>
+    <span><span class="pill none">no direct rate</span> open-weights, token-billed, or no comparable API</span>
+  </div>
+
+  <div class="filters">
+    <div class="fg"><label>Clip length (direct)</label>
+      <select id="dLen">
+        <option value="native">Native base length</option>
+        <option value="5">Video → 5s</option>
+        <option value="10">Video → 10s</option>
+      </select></div>
+    <div class="fg"><label>Compare at</label>
+      <select id="dRes">
+        <option value="best">Best available res</option>
+        <option value="720">720p direct</option>
+        <option value="1080">1080p direct</option>
+      </select></div>
+    <div class="fg"><label>Show</label>
+      <select id="dShow">
+        <option value="comparable">Only models with a direct rate</option>
+        <option value="all">All models (incl. no-direct)</option>
+        <option value="pricier">Only where fal is pricier</option>
+      </select></div>
+  </div>
+
+  <section class="kpis" id="dkpis"></section>
+
+  <section class="charts">
+    <div class="panel full">
+      <h3>Your fal cost vs. direct API cost — per model</h3>
+      <div class="psub" id="dc1sub"></div>
+      <div class="cwrap tall"><canvas id="chartDirect"></canvas></div>
+    </div>
+  </section>
+
+  <div class="tablepanel">
+    <table id="dtbl">
+      <thead><tr>
+        <th data-s="label">Model</th>
+        <th data-s="group">Category</th>
+        <th data-s="unit">Unit</th>
+        <th data-s="wholesale">fal cost (you)</th>
+        <th data-s="direct720">Direct 720p</th>
+        <th data-s="falVs720">fal vs 720p</th>
+        <th data-s="direct1080">Direct 1080p</th>
+        <th data-s="falVs1080">fal vs 1080p</th>
+        <th>Source / note</th>
+      </tr></thead>
+      <tbody id="dtbody"></tbody>
+    </table>
+  </div>
+
+  <footer>Generated September 9, 2026 from studio/src/lib/config.ts · onda (Magnific_clone). fal wholesale verified from fal.ai; direct API prices researched Sep 2026 from provider docs — treat as list-price estimates, confirm before switching a model.</footer>
+</div>
+
+<script>
+const DATA = [{"id":"img-schnell","label":"FLUX Schnell","provider":"Black Forest Labs","group":"Image","unit":"image","seconds":null,"isBase":true,"credits":3,"onda":0.03,"wholesale":0.003,"margin":0.027,"markup":10.0,"marginPct":90.0,"note":"$0.003/MP","directStatus":"match","directSrc":"BFL/open-weights","directConf":"med","directNote":"Schnell is Apache-2.0 open weights; $0.003 is fal's run cost \u2014 self-host can be lower","direct":0.003,"falVsDirect":1.0,"falSaveVsDirect":0.0},{"id":"img-flux-dev","label":"FLUX.1 [dev]","provider":"Black Forest Labs","group":"Image","unit":"image","seconds":null,"isBase":true,"credits":8,"onda":0.08,"wholesale":0.025,"margin":0.055,"markup":3.2,"marginPct":68.8,"note":"$0.025/MP","directStatus":"match","directSrc":"BFL / providers","directConf":"med","directNote":"dev is non-commercial open weights; $0.025 is standard hosted rate","direct":0.025,"falVsDirect":1.0,"falSaveVsDirect":0.0},{"id":"img-flux-krea","label":"FLUX Krea","provider":"Black Forest Labs","group":"Image","unit":"image","seconds":null,"isBase":true,"credits":8,"onda":0.08,"wholesale":0.025,"margin":0.055,"markup":3.2,"marginPct":68.8,"note":"$0.025/MP","directStatus":"match","directSrc":"BFL / providers","directConf":"med","directNote":"same tier as dev","direct":0.025,"falVsDirect":1.0,"falSaveVsDirect":0.0},{"id":"img-qwen","label":"Qwen Image","provider":"Alibaba","group":"Image","unit":"image","seconds":null,"isBase":true,"credits":6,"onda":0.06,"wholesale":0.02,"margin":0.04,"markup":3.0,"marginPct":66.7,"note":"$0.02/MP","directStatus":"none","directSrc":"Alibaba open weights","directConf":"low","directNote":"Qwen-Image open weights; no simple per-image direct API \u2014 self-host or aggregator","direct":null,"falVsDirect":null,"falSaveVsDirect":null},{"id":"img-seedream","label":"Seedream 4","provider":"ByteDance","group":"Image","unit":"image","seconds":null,"isBase":true,"credits":9,"onda":0.09,"wholesale":0.03,"margin":0.06,"markup":3.0,"marginPct":66.7,"note":"$0.03/image","directStatus":"none","directSrc":"ByteDance/Volcengine","directConf":"low","directNote":"ByteDance direct API region-locked (not sold US/UK/EU); aggregator is the practical route","direct":null,"falVsDirect":null,"falSaveVsDirect":null},{"id":"img-ideogram","label":"Ideogram 3","provider":"Ideogram","group":"Image","unit":"image","seconds":null,"isBase":true,"credits":9,"onda":0.09,"wholesale":0.03,"margin":0.06,"markup":3.0,"marginPct":66.7,"note":"$0.03 turbo","directStatus":"match","directSrc":"Ideogram API","directConf":"med","directNote":"v3 turbo ~$0.03/image direct \u2014 same as fal","direct":0.03,"falVsDirect":1.0,"falSaveVsDirect":0.0},{"id":"img-recraft","label":"Recraft V3","provider":"Recraft","group":"Image","unit":"image","seconds":null,"isBase":true,"credits":12,"onda":0.12,"wholesale":0.04,"margin":0.08,"markup":3.0,"marginPct":66.7,"note":"$0.04/image","directStatus":"match","directSrc":"Recraft API","directConf":"med","directNote":"V3 ~$0.04/image direct (credit-based) \u2014 same as fal","direct":0.04,"falVsDirect":1.0,"falSaveVsDirect":0.0},{"id":"img-flux-pro","label":"FLUX 1.1 Pro","provider":"Black Forest Labs","group":"Image","unit":"image","seconds":null,"isBase":true,"credits":12,"onda":0.12,"wholesale":0.04,"margin":0.08,"markup":3.0,"marginPct":66.7,"note":"$0.04/MP","directStatus":"match","directSrc":"BFL docs (bfl.ml)","directConf":"high","directNote":"BFL official = $0.04/image, identical to fal","direct":0.04,"falVsDirect":1.0,"falSaveVsDirect":0.0},{"id":"img-nano","label":"Nano Banana","provider":"Google","group":"Image","unit":"image","seconds":null,"isBase":true,"credits":12,"onda":0.12,"wholesale":0.039,"margin":0.081,"markup":3.08,"marginPct":67.5,"note":"$0.039/image","directStatus":"match","directSrc":"Google Gemini API","directConf":"high","directNote":"Gemini 2.5 Flash Image ~$0.039/image direct \u2014 same as fal","direct":0.039,"falVsDirect":1.0,"falSaveVsDirect":0.0},{"id":"img-hidream","label":"HiDream I1","provider":"HiDream","group":"Image","unit":"image","seconds":null,"isBase":true,"credits":15,"onda":0.15,"wholesale":0.05,"margin":0.1,"markup":3.0,"marginPct":66.7,"note":"$0.05/MP","directStatus":"none","directSrc":"HiDream open weights","directConf":"low","directNote":"open weights; no first-party per-image API \u2014 aggregator/self-host","direct":null,"falVsDirect":null,"falSaveVsDirect":null},{"id":"img-seedream45","label":"Seedream 4.5","provider":"ByteDance","group":"Image","unit":"image","seconds":null,"isBase":true,"credits":12,"onda":0.12,"wholesale":0.04,"margin":0.08,"markup":3.0,"marginPct":66.7,"note":"$0.04/image","directStatus":"none","directSrc":"ByteDance/Volcengine","directConf":"low","directNote":"region-locked direct; aggregator-only in practice","direct":null,"falVsDirect":null,"falSaveVsDirect":null},{"id":"img-flux2-pro","label":"FLUX 2 Pro","provider":"Black Forest Labs","group":"Image","unit":"image","seconds":null,"isBase":true,"credits":9,"onda":0.09,"wholesale":0.03,"margin":0.06,"markup":3.0,"marginPct":66.7,"note":"$0.03/MP","directStatus":"match","directSrc":"BFL docs (bfl.ml)","directConf":"high","directNote":"FLUX.2 Pro from $0.03/MP direct \u2014 same as fal","direct":0.03,"falVsDirect":1.0,"falSaveVsDirect":0.0},{"id":"img-nano2","label":"Nano Banana 2","provider":"Google","group":"Image","unit":"image","seconds":null,"isBase":true,"credits":45,"onda":0.45,"wholesale":0.15,"margin":0.3,"markup":3.0,"marginPct":66.7,"note":"$0.15/image","directStatus":"direct","directSrc":"Google Gemini API","directConf":"high","directNote":"Direct 1K = $0.067/image ($60/1M tok); fal charges $0.15 \u2014 fal ~2.2x direct","direct":0.067,"falVsDirect":2.24,"falSaveVsDirect":-0.083},{"id":"img-ideogram4","label":"Ideogram V4","provider":"Ideogram","group":"Image","unit":"image","seconds":null,"isBase":true,"credits":3,"onda":0.03,"wholesale":0.0075,"margin":0.0225,"markup":4.0,"marginPct":75.0,"note":"$0.0075/image, floored","directStatus":"none","directSrc":"Ideogram API","directConf":"low","directNote":"v4 direct sold in credit tiers; fal's $0.0075 is an unusually low structured rate","direct":null,"falVsDirect":null,"falSaveVsDirect":null},{"id":"img-gpt15","label":"GPT Image 1.5","provider":"OpenAI","group":"Image","unit":"image","seconds":null,"isBase":true,"credits":10,"onda":0.1,"wholesale":0.034,"margin":0.066,"markup":2.94,"marginPct":66.0,"note":"$0.034/image @ medium 1024","directStatus":"match","directSrc":"OpenAI API","directConf":"high","directNote":"gpt-image-1.5 medium 1024\u00b2 = $0.034 direct \u2014 identical to fal","direct":0.034,"falVsDirect":1.0,"falSaveVsDirect":0.0},{"id":"img-gpt2","label":"GPT Image 2","provider":"OpenAI","group":"Image","unit":"image","seconds":null,"isBase":true,"credits":60,"onda":0.6,"wholesale":0.2,"margin":0.4,"markup":3.0,"marginPct":66.7,"note":"token-priced ~$0.20 high quality","directStatus":"none","directSrc":"OpenAI API","directConf":"low","directNote":"token-billed; onda pins credits for high quality \u2014 no clean 1:1 direct/image","direct":null,"falVsDirect":null,"falSaveVsDirect":null},{"id":"img-recraft41","label":"Recraft V4.1","provider":"Recraft","group":"Image","unit":"image","seconds":null,"isBase":true,"credits":11,"onda":0.11,"wholesale":0.035,"margin":0.075,"markup":3.14,"marginPct":68.2,"note":"$0.035/image","directStatus":"match","directSrc":"Recraft API","directConf":"low","directNote":"V4.1 direct ~ fal structured rate","direct":0.035,"falVsDirect":1.0,"falSaveVsDirect":0.0},{"id":"img-wan27","label":"Wan 2.7","provider":"Alibaba","group":"Image","unit":"image","seconds":null,"isBase":true,"credits":9,"onda":0.09,"wholesale":0.03,"margin":0.06,"markup":3.0,"marginPct":66.7,"note":"$0.03/image","directStatus":"none","directSrc":"Alibaba","directConf":"low","directNote":"no clean public direct per-image API","direct":null,"falVsDirect":null,"falSaveVsDirect":null},{"id":"edit-recraft-upscale","label":"Crisp Upscale","provider":"Recraft","group":"Edit","unit":"image","seconds":null,"isBase":true,"credits":3,"onda":0.03,"wholesale":0.004,"margin":0.026,"markup":7.5,"marginPct":86.7,"note":"$0.004/image, floored","directStatus":"none","directSrc":"Recraft API","directConf":"low","directNote":"credit-bundle direct; fal $0.004 is a low structured rate","direct":null,"falVsDirect":null,"falSaveVsDirect":null},{"id":"edit-recraft-creative","label":"Creative Upscale","provider":"Recraft","group":"Edit","unit":"image","seconds":null,"isBase":true,"credits":75,"onda":0.75,"wholesale":0.25,"margin":0.5,"markup":3.0,"marginPct":66.7,"note":"$0.25/image","directStatus":"match","directSrc":"Recraft API","directConf":"low","directNote":"creative upscale ~$0.25 direct \u2014 same as fal","direct":0.25,"falVsDirect":1.0,"falSaveVsDirect":0.0},{"id":"edit-clarity","label":"Clarity Upscaler","provider":"Clarity","group":"Edit","unit":"image","seconds":null,"isBase":true,"credits":155,"onda":1.55,"wholesale":0.0517,"margin":1.4983,"markup":30.0,"marginPct":96.7,"note":"$0.03/out-MP, full 2x of max upload","directStatus":"none","directSrc":"Clarity (open)","directConf":"low","directNote":"Clarity upscaler is open-source; fal hosts it \u2014 no first-party paid API","direct":null,"falVsDirect":null,"falSaveVsDirect":null},{"id":"edit-qwen2511","label":"Qwen Edit 2511","provider":"Alibaba","group":"Edit","unit":"image","seconds":null,"isBase":true,"credits":9,"onda":0.09,"wholesale":0.03,"margin":0.06,"markup":3.0,"marginPct":66.7,"note":"$0.03/MP, ~1MP out","directStatus":"none","directSrc":"Alibaba open weights","directConf":"low","directNote":"open weights; aggregator/self-host only","direct":null,"falVsDirect":null,"falSaveVsDirect":null},{"id":"edit-flux-erase","label":"FLUX Erase","provider":"Black Forest Labs","group":"Edit","unit":"image","seconds":null,"isBase":true,"credits":15,"onda":0.15,"wholesale":0.05,"margin":0.1,"markup":3.0,"marginPct":66.7,"note":"$0.03 first MP + $0.004/MP after","directStatus":"match","directSrc":"BFL docs","directConf":"med","directNote":"FLUX Pro erase ~$0.05 direct \u2014 same as fal","direct":0.05,"falVsDirect":1.0,"falSaveVsDirect":0.0},{"id":"edit-seedream45","label":"Seedream 4.5 Edit","provider":"ByteDance","group":"Edit","unit":"image","seconds":null,"isBase":true,"credits":12,"onda":0.12,"wholesale":0.04,"margin":0.08,"markup":3.0,"marginPct":66.7,"note":"$0.04/image","directStatus":"none","directSrc":"ByteDance","directConf":"low","directNote":"region-locked direct \u2014 aggregator-only in practice","direct":null,"falVsDirect":null,"falSaveVsDirect":null},{"id":"edit-nano2","label":"Nano Banana 2 Edit","provider":"Google","group":"Edit","unit":"image","seconds":null,"isBase":true,"credits":24,"onda":0.24,"wholesale":0.08,"margin":0.16,"markup":3.0,"marginPct":66.7,"note":"$0.08/image","directStatus":"direct","directSrc":"Google Gemini API","directConf":"med","directNote":"Nano Banana 2 edit priced like generation direct ($0.067 @1K); fal $0.08","direct":0.067,"falVsDirect":1.19,"falSaveVsDirect":-0.013},{"id":"edit-ideogram-char","label":"Ideogram Character","provider":"Ideogram","group":"Edit","unit":"image","seconds":null,"isBase":true,"credits":30,"onda":0.3,"wholesale":0.1,"margin":0.2,"markup":3.0,"marginPct":66.7,"note":"~$0.10/image","directStatus":"match","directSrc":"Ideogram API","directConf":"low","directNote":"~$0.10 direct \u2014 same as fal","direct":0.1,"falVsDirect":1.0,"falSaveVsDirect":0.0},{"id":"edit-gpt2","label":"GPT Image 2 Edit","provider":"OpenAI","group":"Edit","unit":"image","seconds":null,"isBase":true,"credits":60,"onda":0.6,"wholesale":0.2,"margin":0.4,"markup":3.0,"marginPct":66.7,"note":"token-billed, top quality","directStatus":"none","directSrc":"OpenAI API","directConf":"low","directNote":"token-billed edit \u2014 no clean 1:1","direct":null,"falVsDirect":null,"falSaveVsDirect":null},{"id":"vid-pixverse","label":"PixVerse V5","provider":"PixVerse","group":"Video Image","inputType":"image\u2192video","unit":"5s video","seconds":5,"base":5,"isBase":true,"selectable":true,"credits":60,"onda":0.6,"wholesale":0.2,"margin":0.4,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.2/clip; selectable [5, 8]","directStatus":"match","directSrc":"PixVerse platform","directConf":"low","directNote":"PixVerse v5 legacy: 720p ~$0.20/5s official; 1080p ~1.5x. fal $0.20/5s (720p) \u2014 matched at 720p.","direct":0.2,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":0.2,"direct1080":0.3,"falVs720":1.0,"falVs1080":0.67,"directStatus720":"match","directStatus1080":"cheaper"},{"id":"vid-pixverse","label":"PixVerse V5","provider":"PixVerse","group":"Video Image","inputType":"image\u2192video","unit":"10s video","seconds":10,"base":5,"isBase":false,"selectable":false,"credits":120,"onda":1.2,"wholesale":0.4,"margin":0.8,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.2/clip; selectable [5, 8]","directStatus":"match","directSrc":"PixVerse platform","directConf":"low","directNote":"PixVerse v5 legacy: 720p ~$0.20/5s official; 1080p ~1.5x. fal $0.20/5s (720p) \u2014 matched at 720p.","direct":0.4,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":0.4,"direct1080":0.6,"falVs720":1.0,"falVs1080":0.67,"directStatus720":"match","directStatus1080":"cheaper"},{"id":"vid-hailuo","label":"Hailuo 02","provider":"MiniMax","group":"Video Image","inputType":"image\u2192video","unit":"5s video","seconds":5,"base":6,"isBase":false,"selectable":false,"credits":68,"onda":0.68,"wholesale":0.225,"margin":0.455,"markup":3.02,"marginPct":66.9,"note":"base 6s @ $0.27/clip; selectable [6, 10]","directStatus":"match","directSrc":"MiniMax platform","directConf":"med","directNote":"MiniMax official: Hailuo 02 std 768p 6s $0.27; 1080p ~$0.47/6s. fal 'standard' = 768p tier.","direct":0.225,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":0.225,"direct1080":0.3917,"falVs720":1.0,"falVs1080":0.57,"directStatus720":"match","directStatus1080":"cheaper"},{"id":"vid-hailuo","label":"Hailuo 02","provider":"MiniMax","group":"Video Image","inputType":"image\u2192video","unit":"6s video","seconds":6,"base":6,"isBase":true,"selectable":true,"credits":81,"onda":0.81,"wholesale":0.27,"margin":0.54,"markup":3.0,"marginPct":66.7,"note":"base 6s @ $0.27/clip; selectable [6, 10]","directStatus":"match","directSrc":"MiniMax platform","directConf":"med","directNote":"MiniMax official: Hailuo 02 std 768p 6s $0.27; 1080p ~$0.47/6s. fal 'standard' = 768p tier.","direct":0.27,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":0.27,"direct1080":0.47,"falVs720":1.0,"falVs1080":0.57,"directStatus720":"match","directStatus1080":"cheaper"},{"id":"vid-hailuo","label":"Hailuo 02","provider":"MiniMax","group":"Video Image","inputType":"image\u2192video","unit":"10s video","seconds":10,"base":6,"isBase":false,"selectable":true,"credits":135,"onda":1.35,"wholesale":0.45,"margin":0.9,"markup":3.0,"marginPct":66.7,"note":"base 6s @ $0.27/clip; selectable [6, 10]","directStatus":"match","directSrc":"MiniMax platform","directConf":"med","directNote":"MiniMax official: Hailuo 02 std 768p 6s $0.27; 1080p ~$0.47/6s. fal 'standard' = 768p tier.","direct":0.45,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":0.45,"direct1080":0.7833,"falVs720":1.0,"falVs1080":0.57,"directStatus720":"match","directStatus1080":"cheaper"},{"id":"vid-kling","label":"Kling 2.1","provider":"Kling","group":"Video Image","inputType":"image\u2192video","unit":"5s video","seconds":5,"base":5,"isBase":true,"selectable":true,"credits":84,"onda":0.84,"wholesale":0.28,"margin":0.56,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.28/clip; selectable [5, 10]","directStatus":"match","directSrc":"Kling platform","directConf":"med","directNote":"Kling platform: 720p=6cr/s, 1080p=8cr/s (~$0.011/cr). fal 'maintains input quality' \u2014 compare against whichever res you request.","direct":0.33,"falVsDirect":0.85,"falSaveVsDirect":0.05,"direct720":0.33,"direct1080":0.44,"falVs720":0.85,"falVs1080":0.64,"directStatus720":"cheaper","directStatus1080":"cheaper"},{"id":"vid-kling","label":"Kling 2.1","provider":"Kling","group":"Video Image","inputType":"image\u2192video","unit":"10s video","seconds":10,"base":5,"isBase":false,"selectable":true,"credits":168,"onda":1.68,"wholesale":0.56,"margin":1.12,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.28/clip; selectable [5, 10]","directStatus":"match","directSrc":"Kling platform","directConf":"med","directNote":"Kling platform: 720p=6cr/s, 1080p=8cr/s (~$0.011/cr). fal 'maintains input quality' \u2014 compare against whichever res you request.","direct":0.66,"falVsDirect":0.85,"falSaveVsDirect":0.1,"direct720":0.66,"direct1080":0.88,"falVs720":0.85,"falVs1080":0.64,"directStatus720":"cheaper","directStatus1080":"cheaper"},{"id":"vid-kling-pro","label":"Kling 2.1 Pro","provider":"Kling","group":"Video Image","inputType":"image\u2192video","unit":"5s video","seconds":5,"base":5,"isBase":true,"selectable":true,"credits":240,"onda":2.4,"wholesale":0.8,"margin":1.6,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.8/clip; selectable [5, 10]","directStatus":"direct","directSrc":"Kling platform","directConf":"med","directNote":"Kling platform: 720p=6cr/s, 1080p=8cr/s (~$0.011/cr). fal 'maintains input quality' \u2014 compare against whichever res you request.","direct":0.33,"falVsDirect":2.42,"falSaveVsDirect":-0.47,"direct720":0.33,"direct1080":0.44,"falVs720":2.42,"falVs1080":1.82,"directStatus720":"direct","directStatus1080":"direct"},{"id":"vid-kling-pro","label":"Kling 2.1 Pro","provider":"Kling","group":"Video Image","inputType":"image\u2192video","unit":"10s video","seconds":10,"base":5,"isBase":false,"selectable":true,"credits":480,"onda":4.8,"wholesale":1.6,"margin":3.2,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.8/clip; selectable [5, 10]","directStatus":"direct","directSrc":"Kling platform","directConf":"med","directNote":"Kling platform: 720p=6cr/s, 1080p=8cr/s (~$0.011/cr). fal 'maintains input quality' \u2014 compare against whichever res you request.","direct":0.66,"falVsDirect":2.42,"falSaveVsDirect":-0.94,"direct720":0.66,"direct1080":0.88,"falVs720":2.42,"falVs1080":1.82,"directStatus720":"direct","directStatus1080":"direct"},{"id":"vid-kling-master","label":"Kling 2.1 Master","provider":"Kling","group":"Video Image","inputType":"image\u2192video","unit":"5s video","seconds":5,"base":5,"isBase":true,"selectable":true,"credits":420,"onda":4.2,"wholesale":1.4,"margin":2.8,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $1.4/clip; selectable [5, 10]","directStatus":"direct","directSrc":"Kling platform","directConf":"med","directNote":"Kling platform: 720p=6cr/s, 1080p=8cr/s (~$0.011/cr). fal 'maintains input quality' \u2014 compare against whichever res you request.","direct":0.33,"falVsDirect":4.24,"falSaveVsDirect":-1.07,"direct720":0.33,"direct1080":0.44,"falVs720":4.24,"falVs1080":3.18,"directStatus720":"direct","directStatus1080":"direct"},{"id":"vid-kling-master","label":"Kling 2.1 Master","provider":"Kling","group":"Video Image","inputType":"image\u2192video","unit":"10s video","seconds":10,"base":5,"isBase":false,"selectable":true,"credits":840,"onda":8.4,"wholesale":2.8,"margin":5.6,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $1.4/clip; selectable [5, 10]","directStatus":"direct","directSrc":"Kling platform","directConf":"med","directNote":"Kling platform: 720p=6cr/s, 1080p=8cr/s (~$0.011/cr). fal 'maintains input quality' \u2014 compare against whichever res you request.","direct":0.66,"falVsDirect":4.24,"falSaveVsDirect":-2.14,"direct720":0.66,"direct1080":0.88,"falVs720":4.24,"falVs1080":3.18,"directStatus720":"direct","directStatus1080":"direct"},{"id":"vid-hailuo-pro","label":"Hailuo 02 Pro","provider":"MiniMax","group":"Video Image","inputType":"image\u2192video","unit":"5s video","seconds":5,"base":6,"isBase":false,"selectable":false,"credits":120,"onda":1.2,"wholesale":0.4,"margin":0.8,"markup":3.0,"marginPct":66.7,"note":"base 6s @ $0.48/clip; selectable [6, 10]","directStatus":"match","directSrc":"MiniMax platform","directConf":"med","directNote":"MiniMax official: Hailuo 02 Pro is the 1080p product ($0.48/6s). 768p col shown for reference; fal $0.48 = 1080p match.","direct":0.4,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":0.2333,"direct1080":0.4,"falVs720":1.71,"falVs1080":1.0,"directStatus720":"direct","directStatus1080":"match"},{"id":"vid-hailuo-pro","label":"Hailuo 02 Pro","provider":"MiniMax","group":"Video Image","inputType":"image\u2192video","unit":"6s video","seconds":6,"base":6,"isBase":true,"selectable":true,"credits":144,"onda":1.44,"wholesale":0.48,"margin":0.96,"markup":3.0,"marginPct":66.7,"note":"base 6s @ $0.48/clip; selectable [6, 10]","directStatus":"match","directSrc":"MiniMax platform","directConf":"med","directNote":"MiniMax official: Hailuo 02 Pro is the 1080p product ($0.48/6s). 768p col shown for reference; fal $0.48 = 1080p match.","direct":0.48,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":0.28,"direct1080":0.48,"falVs720":1.71,"falVs1080":1.0,"directStatus720":"direct","directStatus1080":"match"},{"id":"vid-hailuo-pro","label":"Hailuo 02 Pro","provider":"MiniMax","group":"Video Image","inputType":"image\u2192video","unit":"10s video","seconds":10,"base":6,"isBase":false,"selectable":true,"credits":240,"onda":2.4,"wholesale":0.8,"margin":1.6,"markup":3.0,"marginPct":66.7,"note":"base 6s @ $0.48/clip; selectable [6, 10]","directStatus":"match","directSrc":"MiniMax platform","directConf":"med","directNote":"MiniMax official: Hailuo 02 Pro is the 1080p product ($0.48/6s). 768p col shown for reference; fal $0.48 = 1080p match.","direct":0.8,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":0.4667,"direct1080":0.8,"falVs720":1.71,"falVs1080":1.0,"directStatus720":"direct","directStatus1080":"match"},{"id":"vid-kling-turbo","label":"Kling 2.5 Turbo Pro","provider":"Kling","group":"Video Image","inputType":"image\u2192video","unit":"5s video","seconds":5,"base":5,"isBase":true,"selectable":true,"credits":105,"onda":1.05,"wholesale":0.35,"margin":0.7,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.35/clip; selectable [5, 10]","directStatus":"direct","directSrc":"Kling platform","directConf":"med","directNote":"Kling platform: 720p=6cr/s, 1080p=8cr/s (~$0.011/cr). fal 'maintains input quality' \u2014 compare against whichever res you request.","direct":0.33,"falVsDirect":1.06,"falSaveVsDirect":-0.02,"direct720":0.33,"direct1080":0.44,"falVs720":1.06,"falVs1080":0.8,"directStatus720":"direct","directStatus1080":"cheaper"},{"id":"vid-kling-turbo","label":"Kling 2.5 Turbo Pro","provider":"Kling","group":"Video Image","inputType":"image\u2192video","unit":"10s video","seconds":10,"base":5,"isBase":false,"selectable":true,"credits":210,"onda":2.1,"wholesale":0.7,"margin":1.4,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.35/clip; selectable [5, 10]","directStatus":"direct","directSrc":"Kling platform","directConf":"med","directNote":"Kling platform: 720p=6cr/s, 1080p=8cr/s (~$0.011/cr). fal 'maintains input quality' \u2014 compare against whichever res you request.","direct":0.66,"falVsDirect":1.06,"falSaveVsDirect":-0.04,"direct720":0.66,"direct1080":0.88,"falVs720":1.06,"falVs1080":0.8,"directStatus720":"direct","directStatus1080":"cheaper"},{"id":"vid-seedance","label":"Seedance 1.0 Pro","provider":"ByteDance","group":"Video Image","inputType":"image\u2192video","unit":"5s video","seconds":5,"base":5,"isBase":true,"selectable":true,"credits":186,"onda":1.86,"wholesale":0.62,"margin":1.24,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.62/clip; selectable [5, 10]","directStatus":"match","directSrc":"ByteDance","directConf":"low","directNote":"ByteDance Seedance 1.0 Pro outputs 1080p; official ~$0.14/s @1080 (region-locked). fal $0.124/s \u2014 matched. No 720p tier compared.","direct":0.62,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":null,"direct1080":0.7,"falVs720":null,"falVs1080":0.89,"directStatus720":null,"directStatus1080":"cheaper"},{"id":"vid-seedance","label":"Seedance 1.0 Pro","provider":"ByteDance","group":"Video Image","inputType":"image\u2192video","unit":"10s video","seconds":10,"base":5,"isBase":false,"selectable":true,"credits":372,"onda":3.72,"wholesale":1.24,"margin":2.48,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.62/clip; selectable [5, 10]","directStatus":"match","directSrc":"ByteDance","directConf":"low","directNote":"ByteDance Seedance 1.0 Pro outputs 1080p; official ~$0.14/s @1080 (region-locked). fal $0.124/s \u2014 matched. No 720p tier compared.","direct":1.24,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":null,"direct1080":1.4,"falVs720":null,"falVs1080":0.89,"directStatus720":null,"directStatus1080":"cheaper"},{"id":"vid-veo","label":"Veo 3.1","provider":"Google","group":"Video Image","inputType":"image\u2192video","unit":"5s video","seconds":5,"base":8,"isBase":false,"selectable":false,"credits":600,"onda":6.0,"wholesale":2.0,"margin":4.0,"markup":3.0,"marginPct":66.7,"note":"base 8s @ $3.2/clip; selectable [4, 6, 8]","directStatus":"match","directSrc":"Google Gemini/Vertex","directConf":"high","directNote":"Google Veo 3.1 direct = $0.40/s (audio incl., res-independent); fal $0.40/s \u2014 matched.","direct":2.0,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":null,"direct1080":2.0,"falVs720":null,"falVs1080":1.0,"directStatus720":null,"directStatus1080":"match"},{"id":"vid-veo","label":"Veo 3.1","provider":"Google","group":"Video Image","inputType":"image\u2192video","unit":"8s video","seconds":8,"base":8,"isBase":true,"selectable":true,"credits":960,"onda":9.6,"wholesale":3.2,"margin":6.4,"markup":3.0,"marginPct":66.7,"note":"base 8s @ $3.2/clip; selectable [4, 6, 8]","directStatus":"match","directSrc":"Google Gemini/Vertex","directConf":"high","directNote":"Google Veo 3.1 direct = $0.40/s (audio incl., res-independent); fal $0.40/s \u2014 matched.","direct":3.2,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":null,"direct1080":3.2,"falVs720":null,"falVs1080":1.0,"directStatus720":null,"directStatus1080":"match"},{"id":"vid-veo","label":"Veo 3.1","provider":"Google","group":"Video Image","inputType":"image\u2192video","unit":"10s video","seconds":10,"base":8,"isBase":false,"selectable":false,"credits":1200,"onda":12.0,"wholesale":4.0,"margin":8.0,"markup":3.0,"marginPct":66.7,"note":"base 8s @ $3.2/clip; selectable [4, 6, 8]","directStatus":"match","directSrc":"Google Gemini/Vertex","directConf":"high","directNote":"Google Veo 3.1 direct = $0.40/s (audio incl., res-independent); fal $0.40/s \u2014 matched.","direct":4.0,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":null,"direct1080":4.0,"falVs720":null,"falVs1080":1.0,"directStatus720":null,"directStatus1080":"match"},{"id":"vid-hailuo23-fast","label":"Hailuo 2.3 Fast","provider":"MiniMax","group":"Video Image","inputType":"image\u2192video","unit":"5s video","seconds":5,"base":6,"isBase":false,"selectable":false,"credits":48,"onda":0.48,"wholesale":0.1583,"margin":0.3217,"markup":3.03,"marginPct":67.0,"note":"base 6s @ $0.19/clip; selectable [6, 10]","directStatus":"direct","directSrc":"MiniMax (768p)","directConf":"low","directNote":"MiniMax 768p ~$0.04/s direct listing vs fal $0.19/6s=$0.032/s \u2014 roughly matched","direct":0.1585,"falVsDirect":1.0,"falSaveVsDirect":0.0002,"direct720":null,"direct1080":0.1585,"falVs720":null,"falVs1080":1.0,"directStatus720":null,"directStatus1080":"match"},{"id":"vid-hailuo23-fast","label":"Hailuo 2.3 Fast","provider":"MiniMax","group":"Video Image","inputType":"image\u2192video","unit":"6s video","seconds":6,"base":6,"isBase":true,"selectable":true,"credits":57,"onda":0.57,"wholesale":0.19,"margin":0.38,"markup":3.0,"marginPct":66.7,"note":"base 6s @ $0.19/clip; selectable [6, 10]","directStatus":"direct","directSrc":"MiniMax (768p)","directConf":"low","directNote":"MiniMax 768p ~$0.04/s direct listing vs fal $0.19/6s=$0.032/s \u2014 roughly matched","direct":0.1902,"falVsDirect":1.0,"falSaveVsDirect":0.0002,"direct720":null,"direct1080":0.1902,"falVs720":null,"falVs1080":1.0,"directStatus720":null,"directStatus1080":"match"},{"id":"vid-hailuo23-fast","label":"Hailuo 2.3 Fast","provider":"MiniMax","group":"Video Image","inputType":"image\u2192video","unit":"10s video","seconds":10,"base":6,"isBase":false,"selectable":true,"credits":95,"onda":0.95,"wholesale":0.3167,"margin":0.6333,"markup":3.0,"marginPct":66.7,"note":"base 6s @ $0.19/clip; selectable [6, 10]","directStatus":"direct","directSrc":"MiniMax (768p)","directConf":"low","directNote":"MiniMax 768p ~$0.04/s direct listing vs fal $0.19/6s=$0.032/s \u2014 roughly matched","direct":0.317,"falVsDirect":1.0,"falSaveVsDirect":0.0003,"direct720":null,"direct1080":0.317,"falVs720":null,"falVs1080":1.0,"directStatus720":null,"directStatus1080":"match"},{"id":"vid-kling3-turbo-std","label":"Kling v3 Turbo","provider":"Kling","group":"Video Image","inputType":"image\u2192video","unit":"5s video","seconds":5,"base":5,"isBase":true,"selectable":true,"credits":168,"onda":1.68,"wholesale":0.56,"margin":1.12,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.56/clip; selectable [5, 10]","directStatus":"direct","directSrc":"Kling platform","directConf":"med","directNote":"Kling platform: 720p=6cr/s, 1080p=8cr/s (~$0.011/cr). fal 'maintains input quality' \u2014 compare against whichever res you request.","direct":0.33,"falVsDirect":1.7,"falSaveVsDirect":-0.23,"direct720":0.33,"direct1080":0.44,"falVs720":1.7,"falVs1080":1.27,"directStatus720":"direct","directStatus1080":"direct"},{"id":"vid-kling3-turbo-std","label":"Kling v3 Turbo","provider":"Kling","group":"Video Image","inputType":"image\u2192video","unit":"10s video","seconds":10,"base":5,"isBase":false,"selectable":true,"credits":336,"onda":3.36,"wholesale":1.12,"margin":2.24,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.56/clip; selectable [5, 10]","directStatus":"direct","directSrc":"Kling platform","directConf":"med","directNote":"Kling platform: 720p=6cr/s, 1080p=8cr/s (~$0.011/cr). fal 'maintains input quality' \u2014 compare against whichever res you request.","direct":0.66,"falVsDirect":1.7,"falSaveVsDirect":-0.46,"direct720":0.66,"direct1080":0.88,"falVs720":1.7,"falVs1080":1.27,"directStatus720":"direct","directStatus1080":"direct"},{"id":"vid-kling3-turbo-pro","label":"Kling v3 Turbo Pro","provider":"Kling","group":"Video Image","inputType":"image\u2192video","unit":"5s video","seconds":5,"base":5,"isBase":true,"selectable":true,"credits":210,"onda":2.1,"wholesale":0.7,"margin":1.4,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.7/clip; selectable [5, 10]","directStatus":"direct","directSrc":"Kling platform","directConf":"med","directNote":"Kling platform: 720p=6cr/s, 1080p=8cr/s (~$0.011/cr). fal 'maintains input quality' \u2014 compare against whichever res you request.","direct":0.33,"falVsDirect":2.12,"falSaveVsDirect":-0.37,"direct720":0.33,"direct1080":0.44,"falVs720":2.12,"falVs1080":1.59,"directStatus720":"direct","directStatus1080":"direct"},{"id":"vid-kling3-turbo-pro","label":"Kling v3 Turbo Pro","provider":"Kling","group":"Video Image","inputType":"image\u2192video","unit":"10s video","seconds":10,"base":5,"isBase":false,"selectable":true,"credits":420,"onda":4.2,"wholesale":1.4,"margin":2.8,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.7/clip; selectable [5, 10]","directStatus":"direct","directSrc":"Kling platform","directConf":"med","directNote":"Kling platform: 720p=6cr/s, 1080p=8cr/s (~$0.011/cr). fal 'maintains input quality' \u2014 compare against whichever res you request.","direct":0.66,"falVsDirect":2.12,"falSaveVsDirect":-0.74,"direct720":0.66,"direct1080":0.88,"falVs720":2.12,"falVs1080":1.59,"directStatus720":"direct","directStatus1080":"direct"},{"id":"vid-kling3-pro","label":"Kling v3 Pro","provider":"Kling","group":"Video Image","inputType":"image\u2192video","unit":"5s video","seconds":5,"base":5,"isBase":true,"selectable":true,"credits":294,"onda":2.94,"wholesale":0.98,"margin":1.96,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.98/clip; selectable [5, 10]","directStatus":"direct","directSrc":"Kling platform","directConf":"med","directNote":"Kling platform: 720p=6cr/s, 1080p=8cr/s (~$0.011/cr). fal 'maintains input quality' \u2014 compare against whichever res you request.","direct":0.33,"falVsDirect":2.97,"falSaveVsDirect":-0.65,"direct720":0.33,"direct1080":0.44,"falVs720":2.97,"falVs1080":2.23,"directStatus720":"direct","directStatus1080":"direct"},{"id":"vid-kling3-pro","label":"Kling v3 Pro","provider":"Kling","group":"Video Image","inputType":"image\u2192video","unit":"10s video","seconds":10,"base":5,"isBase":false,"selectable":true,"credits":588,"onda":5.88,"wholesale":1.96,"margin":3.92,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.98/clip; selectable [5, 10]","directStatus":"direct","directSrc":"Kling platform","directConf":"med","directNote":"Kling platform: 720p=6cr/s, 1080p=8cr/s (~$0.011/cr). fal 'maintains input quality' \u2014 compare against whichever res you request.","direct":0.66,"falVsDirect":2.97,"falSaveVsDirect":-1.3,"direct720":0.66,"direct1080":0.88,"falVs720":2.97,"falVs1080":2.23,"directStatus720":"direct","directStatus1080":"direct"},{"id":"vid-seedance25","label":"Seedance 2.5","provider":"ByteDance","group":"Video Image","inputType":"image\u2192video","unit":"5s video","seconds":5,"base":5,"isBase":true,"selectable":true,"credits":330,"onda":3.3,"wholesale":1.1025,"margin":2.1975,"markup":2.99,"marginPct":66.6,"note":"base 5s @ $1.1025/clip; selectable [5, 10]","directStatus":"match","directSrc":"BytePlus ModelArk","directConf":"med","directNote":"ByteDance BytePlus: Seedance 2.5 720p $0.2312/s; 1080p ~2.15x ($0.497/s). fal pins 720p ($0.2205/s). Direct region-locked (no US/UK/EU).","direct":1.156,"falVsDirect":0.95,"falSaveVsDirect":0.0535,"direct720":1.156,"direct1080":2.4854,"falVs720":0.95,"falVs1080":0.44,"directStatus720":"match","directStatus1080":"cheaper"},{"id":"vid-seedance25","label":"Seedance 2.5","provider":"ByteDance","group":"Video Image","inputType":"image\u2192video","unit":"10s video","seconds":10,"base":5,"isBase":false,"selectable":true,"credits":660,"onda":6.6,"wholesale":2.205,"margin":4.395,"markup":2.99,"marginPct":66.6,"note":"base 5s @ $1.1025/clip; selectable [5, 10]","directStatus":"match","directSrc":"BytePlus ModelArk","directConf":"med","directNote":"ByteDance BytePlus: Seedance 2.5 720p $0.2312/s; 1080p ~2.15x ($0.497/s). fal pins 720p ($0.2205/s). Direct region-locked (no US/UK/EU).","direct":2.312,"falVsDirect":0.95,"falSaveVsDirect":0.107,"direct720":2.312,"direct1080":4.9708,"falVs720":0.95,"falVs1080":0.44,"directStatus720":"match","directStatus1080":"cheaper"},{"id":"vid-h3max-turbo","label":"H3 Max Turbo","provider":"MiniMax","group":"Video Image","inputType":"image\u2192video","unit":"5s video","seconds":5,"base":5,"isBase":true,"selectable":true,"credits":60,"onda":0.6,"wholesale":0.2,"margin":0.4,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.2/clip; selectable [5, 10]","directStatus":"match","directSrc":"MiniMax","directConf":"low","directNote":"MiniMax H3 Max Turbo 768P ~$0.04/s (no 1080p); fal $0.04/s \u2014 matched.","direct":0.2,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":0.2,"direct1080":null,"falVs720":1.0,"falVs1080":null,"directStatus720":"match","directStatus1080":null},{"id":"vid-h3max-turbo","label":"H3 Max Turbo","provider":"MiniMax","group":"Video Image","inputType":"image\u2192video","unit":"10s video","seconds":10,"base":5,"isBase":false,"selectable":true,"credits":120,"onda":1.2,"wholesale":0.4,"margin":0.8,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.2/clip; selectable [5, 10]","directStatus":"match","directSrc":"MiniMax","directConf":"low","directNote":"MiniMax H3 Max Turbo 768P ~$0.04/s (no 1080p); fal $0.04/s \u2014 matched.","direct":0.4,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":0.4,"direct1080":null,"falVs720":1.0,"falVs1080":null,"directStatus720":"match","directStatus1080":null},{"id":"vid-h3max","label":"H3 Max","provider":"MiniMax","group":"Video Image","inputType":"image\u2192video","unit":"5s video","seconds":5,"base":5,"isBase":true,"selectable":true,"credits":120,"onda":1.2,"wholesale":0.4,"margin":0.8,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.4/clip; selectable [5, 10]","directStatus":"match","directSrc":"MiniMax","directConf":"low","directNote":"MiniMax H3 Max 768P ~$0.08/s official (no 1080p); fal $0.08/s \u2014 matched.","direct":0.4,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":0.4,"direct1080":null,"falVs720":1.0,"falVs1080":null,"directStatus720":"match","directStatus1080":null},{"id":"vid-h3max","label":"H3 Max","provider":"MiniMax","group":"Video Image","inputType":"image\u2192video","unit":"10s video","seconds":10,"base":5,"isBase":false,"selectable":true,"credits":240,"onda":2.4,"wholesale":0.8,"margin":1.6,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.4/clip; selectable [5, 10]","directStatus":"match","directSrc":"MiniMax","directConf":"low","directNote":"MiniMax H3 Max 768P ~$0.08/s official (no 1080p); fal $0.08/s \u2014 matched.","direct":0.8,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":0.8,"direct1080":null,"falVs720":1.0,"falVs1080":null,"directStatus720":"match","directStatus1080":null},{"id":"vid-h3-std","label":"H3","provider":"MiniMax","group":"Video Image","inputType":"image\u2192video","unit":"5s video","seconds":5,"base":5,"isBase":true,"selectable":true,"credits":75,"onda":0.75,"wholesale":0.25,"margin":0.5,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.25/clip; selectable [5, 10]","directStatus":"match","directSrc":"MiniMax","directConf":"low","directNote":"MiniMax H3 max res is 768P (no 1080p). 768P ~$0.05/s official; fal $0.05/s \u2014 matched. (open-weight; self-host cheaper)","direct":0.25,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":0.25,"direct1080":null,"falVs720":1.0,"falVs1080":null,"directStatus720":"match","directStatus1080":null},{"id":"vid-h3-std","label":"H3","provider":"MiniMax","group":"Video Image","inputType":"image\u2192video","unit":"10s video","seconds":10,"base":5,"isBase":false,"selectable":true,"credits":150,"onda":1.5,"wholesale":0.5,"margin":1.0,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.25/clip; selectable [5, 10]","directStatus":"match","directSrc":"MiniMax","directConf":"low","directNote":"MiniMax H3 max res is 768P (no 1080p). 768P ~$0.05/s official; fal $0.05/s \u2014 matched. (open-weight; self-host cheaper)","direct":0.5,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":0.5,"direct1080":null,"falVs720":1.0,"falVs1080":null,"directStatus720":"match","directStatus1080":null},{"id":"vid-h3-std-t2v","label":"H3","provider":"MiniMax","group":"Video Text","inputType":"text\u2192video","unit":"5s video","seconds":5,"base":5,"isBase":true,"selectable":true,"credits":75,"onda":0.75,"wholesale":0.25,"margin":0.5,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.25/clip; selectable [5, 10]","directStatus":"match","directSrc":"MiniMax","directConf":"low","directNote":"MiniMax H3 max res is 768P (no 1080p). 768P ~$0.05/s official; fal $0.05/s \u2014 matched. (open-weight; self-host cheaper)","direct":0.25,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":0.25,"direct1080":null,"falVs720":1.0,"falVs1080":null,"directStatus720":"match","directStatus1080":null},{"id":"vid-h3-std-t2v","label":"H3","provider":"MiniMax","group":"Video Text","inputType":"text\u2192video","unit":"10s video","seconds":10,"base":5,"isBase":false,"selectable":true,"credits":150,"onda":1.5,"wholesale":0.5,"margin":1.0,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.25/clip; selectable [5, 10]","directStatus":"match","directSrc":"MiniMax","directConf":"low","directNote":"MiniMax H3 max res is 768P (no 1080p). 768P ~$0.05/s official; fal $0.05/s \u2014 matched. (open-weight; self-host cheaper)","direct":0.5,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":0.5,"direct1080":null,"falVs720":1.0,"falVs1080":null,"directStatus720":"match","directStatus1080":null},{"id":"vid-pixverse6-t2v","label":"PixVerse V6","provider":"PixVerse","group":"Video Text","inputType":"text\u2192video","unit":"5s video","seconds":5,"base":5,"isBase":true,"selectable":true,"credits":68,"onda":0.68,"wholesale":0.225,"margin":0.455,"markup":3.02,"marginPct":66.9,"note":"base 5s @ $0.225/clip; selectable [5, 8]","directStatus":"direct","directSrc":"PixVerse platform","directConf":"med","directNote":"PixVerse v6 official: 9cr/5s @720p, bulk cr ~$0.01 = ~$0.09/5s; 1080p ~1.5x = ~$0.135/5s. fal $0.225/5s (720p) \u2014 fal ~2.5x direct at 720p.","direct":0.09,"falVsDirect":2.5,"falSaveVsDirect":-0.135,"direct720":0.09,"direct1080":0.135,"falVs720":2.5,"falVs1080":1.67,"directStatus720":"direct","directStatus1080":"direct"},{"id":"vid-pixverse6-t2v","label":"PixVerse V6","provider":"PixVerse","group":"Video Text","inputType":"text\u2192video","unit":"10s video","seconds":10,"base":5,"isBase":false,"selectable":false,"credits":136,"onda":1.36,"wholesale":0.45,"margin":0.91,"markup":3.02,"marginPct":66.9,"note":"base 5s @ $0.225/clip; selectable [5, 8]","directStatus":"direct","directSrc":"PixVerse platform","directConf":"med","directNote":"PixVerse v6 official: 9cr/5s @720p, bulk cr ~$0.01 = ~$0.09/5s; 1080p ~1.5x = ~$0.135/5s. fal $0.225/5s (720p) \u2014 fal ~2.5x direct at 720p.","direct":0.18,"falVsDirect":2.5,"falSaveVsDirect":-0.27,"direct720":0.18,"direct1080":0.27,"falVs720":2.5,"falVs1080":1.67,"directStatus720":"direct","directStatus1080":"direct"},{"id":"vid-h3max-turbo-t2v","label":"H3 Max Turbo","provider":"MiniMax","group":"Video Text","inputType":"text\u2192video","unit":"5s video","seconds":5,"base":5,"isBase":true,"selectable":true,"credits":60,"onda":0.6,"wholesale":0.2,"margin":0.4,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.2/clip; selectable [5, 10]","directStatus":"match","directSrc":"MiniMax","directConf":"low","directNote":"MiniMax H3 Max Turbo 768P ~$0.04/s (no 1080p); fal $0.04/s \u2014 matched.","direct":0.2,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":0.2,"direct1080":null,"falVs720":1.0,"falVs1080":null,"directStatus720":"match","directStatus1080":null},{"id":"vid-h3max-turbo-t2v","label":"H3 Max Turbo","provider":"MiniMax","group":"Video Text","inputType":"text\u2192video","unit":"10s video","seconds":10,"base":5,"isBase":false,"selectable":true,"credits":120,"onda":1.2,"wholesale":0.4,"margin":0.8,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.2/clip; selectable [5, 10]","directStatus":"match","directSrc":"MiniMax","directConf":"low","directNote":"MiniMax H3 Max Turbo 768P ~$0.04/s (no 1080p); fal $0.04/s \u2014 matched.","direct":0.4,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":0.4,"direct1080":null,"falVs720":1.0,"falVs1080":null,"directStatus720":"match","directStatus1080":null},{"id":"vid-h3max-t2v","label":"H3 Max","provider":"MiniMax","group":"Video Text","inputType":"text\u2192video","unit":"5s video","seconds":5,"base":5,"isBase":true,"selectable":true,"credits":120,"onda":1.2,"wholesale":0.4,"margin":0.8,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.4/clip; selectable [5, 10]","directStatus":"match","directSrc":"MiniMax","directConf":"low","directNote":"MiniMax H3 Max 768P ~$0.08/s official (no 1080p); fal $0.08/s \u2014 matched.","direct":0.4,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":0.4,"direct1080":null,"falVs720":1.0,"falVs1080":null,"directStatus720":"match","directStatus1080":null},{"id":"vid-h3max-t2v","label":"H3 Max","provider":"MiniMax","group":"Video Text","inputType":"text\u2192video","unit":"10s video","seconds":10,"base":5,"isBase":false,"selectable":true,"credits":240,"onda":2.4,"wholesale":0.8,"margin":1.6,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.4/clip; selectable [5, 10]","directStatus":"match","directSrc":"MiniMax","directConf":"low","directNote":"MiniMax H3 Max 768P ~$0.08/s official (no 1080p); fal $0.08/s \u2014 matched.","direct":0.8,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":0.8,"direct1080":null,"falVs720":1.0,"falVs1080":null,"directStatus720":"match","directStatus1080":null},{"id":"vid-hailuo23-t2v","label":"Hailuo 2.3","provider":"MiniMax","group":"Video Text","inputType":"text\u2192video","unit":"5s video","seconds":5,"base":6,"isBase":false,"selectable":false,"credits":70,"onda":0.7,"wholesale":0.2333,"margin":0.4667,"markup":3.0,"marginPct":66.7,"note":"base 6s @ $0.28/clip; selectable [6, 10]","directStatus":"match","directSrc":"MiniMax platform","directConf":"med","directNote":"MiniMax official: Hailuo 2.3 std 768p $0.28/6s; 1080p $0.49/6s. fal 'standard' = 768p tier.","direct":0.2333,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":0.2333,"direct1080":0.4083,"falVs720":1.0,"falVs1080":0.57,"directStatus720":"match","directStatus1080":"cheaper"},{"id":"vid-hailuo23-t2v","label":"Hailuo 2.3","provider":"MiniMax","group":"Video Text","inputType":"text\u2192video","unit":"6s video","seconds":6,"base":6,"isBase":true,"selectable":true,"credits":84,"onda":0.84,"wholesale":0.28,"margin":0.56,"markup":3.0,"marginPct":66.7,"note":"base 6s @ $0.28/clip; selectable [6, 10]","directStatus":"match","directSrc":"MiniMax platform","directConf":"med","directNote":"MiniMax official: Hailuo 2.3 std 768p $0.28/6s; 1080p $0.49/6s. fal 'standard' = 768p tier.","direct":0.28,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":0.28,"direct1080":0.49,"falVs720":1.0,"falVs1080":0.57,"directStatus720":"match","directStatus1080":"cheaper"},{"id":"vid-hailuo23-t2v","label":"Hailuo 2.3","provider":"MiniMax","group":"Video Text","inputType":"text\u2192video","unit":"10s video","seconds":10,"base":6,"isBase":false,"selectable":true,"credits":140,"onda":1.4,"wholesale":0.4667,"margin":0.9333,"markup":3.0,"marginPct":66.7,"note":"base 6s @ $0.28/clip; selectable [6, 10]","directStatus":"match","directSrc":"MiniMax platform","directConf":"med","directNote":"MiniMax official: Hailuo 2.3 std 768p $0.28/6s; 1080p $0.49/6s. fal 'standard' = 768p tier.","direct":0.4667,"falVsDirect":1.0,"falSaveVsDirect":0.0,"direct720":0.4667,"direct1080":0.8167,"falVs720":1.0,"falVs1080":0.57,"directStatus720":"match","directStatus1080":"cheaper"},{"id":"vid-kling3-t2v","label":"Kling v3 Turbo Pro","provider":"Kling","group":"Video Text","inputType":"text\u2192video","unit":"5s video","seconds":5,"base":5,"isBase":true,"selectable":true,"credits":210,"onda":2.1,"wholesale":0.7,"margin":1.4,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.7/clip; selectable [5, 10]","directStatus":"direct","directSrc":"Kling platform","directConf":"med","directNote":"Kling platform: 720p=6cr/s, 1080p=8cr/s (~$0.011/cr). fal 'maintains input quality' \u2014 compare against whichever res you request.","direct":0.33,"falVsDirect":2.12,"falSaveVsDirect":-0.37,"direct720":0.33,"direct1080":0.44,"falVs720":2.12,"falVs1080":1.59,"directStatus720":"direct","directStatus1080":"direct"},{"id":"vid-kling3-t2v","label":"Kling v3 Turbo Pro","provider":"Kling","group":"Video Text","inputType":"text\u2192video","unit":"10s video","seconds":10,"base":5,"isBase":false,"selectable":true,"credits":420,"onda":4.2,"wholesale":1.4,"margin":2.8,"markup":3.0,"marginPct":66.7,"note":"base 5s @ $0.7/clip; selectable [5, 10]","directStatus":"direct","directSrc":"Kling platform","directConf":"med","directNote":"Kling platform: 720p=6cr/s, 1080p=8cr/s (~$0.011/cr). fal 'maintains input quality' \u2014 compare against whichever res you request.","direct":0.66,"falVsDirect":2.12,"falSaveVsDirect":-0.74,"direct720":0.66,"direct1080":0.88,"falVs720":2.12,"falVs1080":1.59,"directStatus720":"direct","directStatus1080":"direct"},{"id":"vid-seedance25-t2v","label":"Seedance 2.5","provider":"ByteDance","group":"Video Text","inputType":"text\u2192video","unit":"5s video","seconds":5,"base":5,"isBase":true,"selectable":true,"credits":330,"onda":3.3,"wholesale":1.1025,"margin":2.1975,"markup":2.99,"marginPct":66.6,"note":"base 5s @ $1.1025/clip; selectable [5, 10]","directStatus":"match","directSrc":"BytePlus ModelArk","directConf":"med","directNote":"Seedance 2.5 t2v: 720p $0.2312/s; 1080p ~2.15x. fal 720p. Region-locked direct.","direct":1.156,"falVsDirect":0.95,"falSaveVsDirect":0.0535,"direct720":1.156,"direct1080":2.4854,"falVs720":0.95,"falVs1080":0.44,"directStatus720":"match","directStatus1080":"cheaper"},{"id":"vid-seedance25-t2v","label":"Seedance 2.5","provider":"ByteDance","group":"Video Text","inputType":"text\u2192video","unit":"10s video","seconds":10,"base":5,"isBase":false,"selectable":true,"credits":660,"onda":6.6,"wholesale":2.205,"margin":4.395,"markup":2.99,"marginPct":66.6,"note":"base 5s @ $1.1025/clip; selectable [5, 10]","directStatus":"match","directSrc":"BytePlus ModelArk","directConf":"med","directNote":"Seedance 2.5 t2v: 720p $0.2312/s; 1080p ~2.15x. fal 720p. Region-locked direct.","direct":2.312,"falVsDirect":0.95,"falSaveVsDirect":0.107,"direct720":2.312,"direct1080":4.9708,"falVs720":0.95,"falVs1080":0.44,"directStatus720":"match","directStatus1080":"cheaper"},{"id":"vid-veo-t2v","label":"Veo 3.1 Fast","provider":"Google","group":"Video Text","inputType":"text\u2192video","unit":"5s video","seconds":5,"base":8,"isBase":false,"selectable":false,"credits":600,"onda":6.0,"wholesale":2.0,"margin":4.0,"markup":3.0,"marginPct":66.7,"note":"base 8s @ $3.2/clip; selectable [4, 6, 8]","directStatus":"direct","directSrc":"Google Gemini/Vertex","directConf":"high","directNote":"Google Veo 3.1 FAST direct = $0.15/s (audio incl., res-independent); fal charges $0.40/s \u2014 fal 2.7x direct.","direct":0.75,"falVsDirect":2.67,"falSaveVsDirect":-1.25,"direct720":null,"direct1080":0.75,"falVs720":null,"falVs1080":2.67,"directStatus720":null,"directStatus1080":"direct"},{"id":"vid-veo-t2v","label":"Veo 3.1 Fast","provider":"Google","group":"Video Text","inputType":"text\u2192video","unit":"8s video","seconds":8,"base":8,"isBase":true,"selectable":true,"credits":960,"onda":9.6,"wholesale":3.2,"margin":6.4,"markup":3.0,"marginPct":66.7,"note":"base 8s @ $3.2/clip; selectable [4, 6, 8]","directStatus":"direct","directSrc":"Google Gemini/Vertex","directConf":"high","directNote":"Google Veo 3.1 FAST direct = $0.15/s (audio incl., res-independent); fal charges $0.40/s \u2014 fal 2.7x direct.","direct":1.2,"falVsDirect":2.67,"falSaveVsDirect":-2.0,"direct720":null,"direct1080":1.2,"falVs720":null,"falVs1080":2.67,"directStatus720":null,"directStatus1080":"direct"},{"id":"vid-veo-t2v","label":"Veo 3.1 Fast","provider":"Google","group":"Video Text","inputType":"text\u2192video","unit":"10s video","seconds":10,"base":8,"isBase":false,"selectable":false,"credits":1200,"onda":12.0,"wholesale":4.0,"margin":8.0,"markup":3.0,"marginPct":66.7,"note":"base 8s @ $3.2/clip; selectable [4, 6, 8]","directStatus":"direct","directSrc":"Google Gemini/Vertex","directConf":"high","directNote":"Google Veo 3.1 FAST direct = $0.15/s (audio incl., res-independent); fal charges $0.40/s \u2014 fal 2.7x direct.","direct":1.5,"falVsDirect":2.67,"falSaveVsDirect":-2.5,"direct720":null,"direct1080":1.5,"falVs720":null,"falVs1080":2.67,"directStatus720":null,"directStatus1080":"direct"}];
+const COLORS = {"Image":"#3aa0ff","Edit":"#ffb020","Video Image":"#7c5cff","Video Text":"#f472b6"};
+let metric = "onda";
+let sortCol = "onda", sortDir = "desc";
+
+const $ = id => document.getElementById(id);
+const money = v => v>=1 ? "$"+v.toFixed(2) : "$"+v.toFixed(3);
+const uniq = (a)=>[...new Set(a)].sort();
+
+uniq(DATA.map(d=>d.group)).forEach(g=>{const o=document.createElement("option");o.value=g;o.textContent=g;$("fGroup").appendChild(o);});
+uniq(DATA.map(d=>d.provider)).forEach(p=>{const o=document.createElement("option");o.value=p;o.textContent=p;$("fProv").appendChild(o);});
+
+// Pick one row per model according to the clip-length mode.
+function selectRows(){
+  const len=$("fLen").value;
+  const out=[];
+  const seen=new Set();
+  for(const d of DATA){
+    if(d.unit==="image"){ out.push(d); continue; }
+    // video row
+    if(len==="native"){ if(d.isBase) out.push(d); }
+    else { if(d.seconds===+len) out.push(d); }
+  }
+  return out;
+}
+
+function applyFilters(rows){
+  const g=$("fGroup").value, p=$("fProv").value, k=$("fKind").value;
+  return rows.filter(d=>{
+    if(g!=="all"&&d.group!==g) return false;
+    if(p!=="all"&&d.provider!==p) return false;
+    if(k==="Image"&&d.group!=="Image") return false;
+    if(k==="Edit"&&d.group!=="Edit") return false;
+    if(k==="video"&&!d.group.startsWith("Video")) return false;
+    return true;
+  });
+}
+const current = () => applyFilters(selectRows());
+
+let charts={};
+function fmtLabel(d){return d.label + (d.unit==="image"?"":" · "+d.unit);}
+
+function render(){
+  const rows=current();
+  renderKPIs(rows); renderMain(rows); renderScatter(rows); renderMarkup(rows); renderTable(rows);
+}
+
+function renderKPIs(rows){
+  const imgs=rows.filter(r=>r.unit==="image");
+  const vids=rows.filter(r=>r.unit!=="image");
+  const mk=rows.filter(r=>r.markup);
+  const avgMarkup=mk.reduce((a,b)=>a+b.markup,0)/(mk.length||1);
+  const avgMarginPct=rows.reduce((a,b)=>a+b.marginPct,0)/(rows.length||1);
+  const cheapImg=imgs.length?Math.min(...imgs.map(r=>r.onda)):null;
+  const cheapVid=vids.length?Math.min(...vids.map(r=>r.onda)):null;
+  const dearest=rows.length?Math.max(...rows.map(r=>r.onda)):0;
+  const kpis=[
+    {lab:"Models shown",val:new Set(rows.map(r=>r.id)).size,hint:rows.length+" priced rows"},
+    {lab:"Cheapest image",val:cheapImg!=null?money(cheapImg):"—",hint:"user price / image"},
+    {lab:"Cheapest video clip",val:cheapVid!=null?money(cheapVid):"—",hint:"user price / clip"},
+    {lab:"Avg markup",val:avgMarkup.toFixed(1)+"×",hint:"user pays vs. fal cost"},
+    {lab:"Avg gross margin",val:avgMarginPct.toFixed(0)+"%",hint:"of user price"},
+    {lab:"Priciest output",val:money(dearest),hint:"most expensive unit"},
+  ];
+  $("kpis").innerHTML=kpis.map(k=>`<div class="kpi"><div class="lab">${k.lab}</div><div class="val">${k.val}</div><div class="hint">${k.hint}</div></div>`).join("");
+}
+
+const metricTitles={onda:"User price per output — ranked",wholesale:"Your fal cost per output — ranked",margin:"Margin per output — ranked"};
+function renderMain(rows){
+  const sorted=[...rows].sort((a,b)=>b[metric]-a[metric]);
+  const lenTxt=$("fLen").value==="native"?"native base clip length":("all video normalized to "+$("fLen").value+"s");
+  $("c1title").textContent=metricTitles[metric];
+  $("c1sub").textContent=`${sorted.length} rows · ${lenTxt} · sorted high → low · color = category`;
+  const labels=sorted.map(fmtLabel);
+  const vals=sorted.map(r=>r[metric]);
+  const bg=sorted.map(r=>COLORS[r.group]||"#888");
+  charts.main&&charts.main.destroy();
+  charts.main=new Chart($("chartMain"),{
+    type:"bar",
+    data:{labels,datasets:[{data:vals,backgroundColor:bg.map(c=>c+"cc"),borderColor:bg,borderWidth:1,borderRadius:4}]},
+    options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,animation:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const r=sorted[c.dataIndex];return [`User pays: ${money(r.onda)}`,`Your cost: ${money(r.wholesale)}`,`Margin: ${money(r.margin)} (${r.marginPct}%)`,r.markup?`Markup: ${r.markup}×`:""].filter(Boolean);}}}},
+      scales:{x:{beginAtZero:true,grid:{color:"#232833"},ticks:{color:"#98a2b3",callback:v=>"$"+v}},
+              y:{grid:{display:false},ticks:{color:"#c7ced9",font:{size:11},autoSkip:false}}}}
+  });
+  $("chartMain").parentElement.style.height=Math.max(360,sorted.length*22)+"px";
+}
+
+function renderScatter(rows){
+  const pts=rows.filter(r=>r.wholesale>0).map(r=>({x:r.wholesale,y:r.onda,g:r.group,label:fmtLabel(r),mk:r.markup,pct:r.marginPct}));
+  const byG={}; pts.forEach(p=>{(byG[p.g]=byG[p.g]||[]).push(p);});
+  const ds=Object.keys(byG).map(g=>({label:g,data:byG[g],backgroundColor:(COLORS[g]||"#888")+"cc",borderColor:COLORS[g]||"#888",pointRadius:5,pointHoverRadius:7}));
+  const maxv=Math.max(...pts.map(p=>Math.max(p.x,p.y))), minv=Math.min(...pts.map(p=>Math.min(p.x,p.y)));
+  ds.push({label:"1× (cost = price)",type:"line",data:[{x:minv,y:minv},{x:maxv,y:maxv}],borderColor:"#5a6472",borderDash:[5,4],borderWidth:1,pointRadius:0,fill:false});
+  charts.scatter&&charts.scatter.destroy();
+  charts.scatter=new Chart($("chartScatter"),{
+    type:"scatter",data:{datasets:ds},
+    options:{responsive:true,maintainAspectRatio:false,animation:false,
+      plugins:{legend:{labels:{color:"#c7ced9",usePointStyle:true,boxWidth:8,font:{size:10}}},
+        tooltip:{callbacks:{label:c=>c.raw.label?[`${c.raw.label}`,`User: ${money(c.raw.y)} · Cost: ${money(c.raw.x)}`,`Markup ${c.raw.mk}× · Margin ${c.raw.pct}%`]:""}}},
+      scales:{x:{type:"logarithmic",title:{display:true,text:"Your fal cost ($)",color:"#98a2b3"},grid:{color:"#232833"},ticks:{color:"#98a2b3"}},
+              y:{type:"logarithmic",title:{display:true,text:"User pays ($)",color:"#98a2b3"},grid:{color:"#232833"},ticks:{color:"#98a2b3"}}}}
+  });
+}
+
+function renderMarkup(rows){
+  const groups={}; rows.filter(r=>r.markup).forEach(r=>{(groups[r.group]=groups[r.group]||[]).push(r.markup);});
+  const labels=Object.keys(groups), vals=labels.map(g=>groups[g].reduce((a,b)=>a+b,0)/groups[g].length);
+  charts.markup&&charts.markup.destroy();
+  charts.markup=new Chart($("chartMarkup"),{
+    type:"bar",data:{labels,datasets:[{data:vals,backgroundColor:labels.map(g=>(COLORS[g]||"#888")+"cc"),borderColor:labels.map(g=>COLORS[g]||"#888"),borderWidth:1,borderRadius:5}]},
+    options:{responsive:true,maintainAspectRatio:false,animation:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y.toFixed(2)+"× avg markup"}}},
+      scales:{x:{grid:{display:false},ticks:{color:"#c7ced9",font:{size:11}}},
+              y:{beginAtZero:true,grid:{color:"#232833"},ticks:{color:"#98a2b3",callback:v=>v+"×"}}}}
+  });
+}
+
+function renderTable(rows){
+  const s=[...rows].sort((a,b)=>{
+    let av=a[sortCol],bv=b[sortCol];
+    if(typeof av==="string"){const c=av.localeCompare(bv);return sortDir==="asc"?c:-c;}
+    av=av??0;bv=bv??0;return sortDir==="asc"?av-bv:bv-av;
+  });
+  const maxMargin=Math.max(...rows.map(r=>r.margin),0.0001);
+  $("tbody").innerHTML=s.map(r=>{
+    const gc=r.group.replace(" ",".");
+    const bw=Math.max(2,Math.round(r.margin/maxMargin*60));
+    let pill="";
+    if(r.unit!=="image"){ pill = r.isBase ? '<span class="pill native">native</span>' : '<span class="pill norm">normalized</span>'; }
+    return `<tr>
+      <td>${r.label}${pill}</td>
+      <td><span class="tag ${gc}">${r.group}</span></td>
+      <td class="mono" style="color:var(--muted)">${r.unit}</td>
+      <td class="mono">${r.credits}</td>
+      <td class="mono">${money(r.onda)}</td>
+      <td class="mono" style="color:var(--muted)">${money(r.wholesale)}</td>
+      <td class="mono pos">${money(r.margin)}<span class="bar" style="width:${bw}px"></span></td>
+      <td class="mono">${r.markup?r.markup+"×":"—"}</td>
+      <td class="mono">${r.marginPct}%</td>
+    </tr>`;
+  }).join("");
+}
+
+document.querySelectorAll("#metricSeg button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("#metricSeg button").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on");metric=b.dataset.m;renderMain(current());
+});
+["fLen","fGroup","fProv","fKind"].forEach(id=>$(id).onchange=render);
+document.querySelectorAll("#tbl th").forEach(th=>th.onclick=()=>{
+  const c=th.dataset.s;
+  if(sortCol===c)sortDir=sortDir==="asc"?"desc":"asc";else{sortCol=c;sortDir="desc";}
+  renderTable(current());
+});
+
+/* ===================== DIRECT VS FAL (dual-resolution) ===================== */
+let dSortCol="falVs1080", dSortDir="desc";
+let chartDirect=null;
+
+// pick the direct price + ratio for a row given the res mode
+function pickDirect(r){
+  const mode=$("dRes").value;
+  if(mode==="720") return {d:r.direct720, ratio:r.falVs720, res:"720p"};
+  if(mode==="1080") return {d:r.direct1080, ratio:r.falVs1080, res:"1080p"};
+  // best available: prefer 1080p if present, else 720p
+  if(r.direct1080!=null) return {d:r.direct1080, ratio:r.falVs1080, res:"1080p"};
+  if(r.direct720!=null) return {d:r.direct720, ratio:r.falVs720, res:"720p"};
+  // images: fall back to the single 'direct' field
+  if(r.unit==="image") return {d:r.direct, ratio:r.falVsDirect, res:"—"};
+  return {d:null, ratio:null, res:"—"};
+}
+function hasDirect(r){ return pickDirect(r).d!=null; }
+
+function dSelectRows(){
+  const len=$("dLen").value, out=[];
+  for(const d of DATA){
+    if(d.unit==="image"){ out.push(d); continue; }
+    if(len==="native"){ if(d.isBase) out.push(d); }
+    else { if(d.seconds===+len) out.push(d); }
+  }
+  return out;
+}
+function dCurrent(){
+  const show=$("dShow").value;
+  let rows=dSelectRows();
+  if(show==="comparable") rows=rows.filter(hasDirect);
+  else if(show==="pricier") rows=rows.filter(r=>{const p=pickDirect(r);return p.ratio!=null&&p.ratio>1.05;});
+  return rows;
+}
+
+function statusPillFor(ratio){
+  if(ratio==null) return '<span class="pill none">no direct rate</span>';
+  if(ratio>1.05) return '<span class="pill direct">fal pricier</span>';
+  if(ratio<0.95) return '<span class="pill cheaper">fal cheaper</span>';
+  return '<span class="pill match">≈ matched</span>';
+}
+
+function dRender(){ const rows=dCurrent(); dKPIs(rows); dChart(rows); dTable(rows); }
+
+function dKPIs(rows){
+  const comp=rows.filter(hasDirect);
+  const rat=r=>pickDirect(r).ratio;
+  const pricier=comp.filter(r=>rat(r)>1.05);
+  const matched=comp.filter(r=>rat(r)>=0.95 && rat(r)<=1.05);
+  const cheaper=comp.filter(r=>rat(r)<0.95);
+  const noDirect=rows.filter(r=>!hasDirect(r));
+  let big=null; comp.forEach(r=>{if(!big||rat(r)>rat(big))big=r;});
+  const avgGap=comp.length? comp.reduce((a,b)=>a+rat(b),0)/comp.length :0;
+  const resTxt={best:"best res",720:"720p",1080:"1080p"}[$("dRes").value];
+  const kpis=[
+    {lab:"Models w/ direct rate",val:new Set(comp.map(r=>r.id)).size,hint:"compared at "+resTxt},
+    {lab:"fal ≈ direct",val:new Set(matched.map(r=>r.id)).size,hint:"passes cost through"},
+    {lab:"fal pricier",val:new Set(pricier.map(r=>r.id)).size,hint:"switch = savings"},
+    {lab:"fal cheaper",val:new Set(cheaper.map(r=>r.id)).size,hint:"often fal pins 720p"},
+    {lab:"No direct rate",val:new Set(noDirect.map(r=>r.id)).size,hint:"open/token/n-a"},
+    {lab:"Biggest gap",val:big?rat(big)+"×":"—",hint:big?big.label+" @"+pickDirect(big).res:"—"},
+  ];
+  $("dkpis").innerHTML=kpis.map(k=>`<div class="kpi"><div class="lab">${k.lab}</div><div class="val">${k.val}</div><div class="hint">${k.hint}</div></div>`).join("");
+}
+
+function dChart(rows){
+  const comp=[...rows].filter(hasDirect).sort((a,b)=>b.wholesale-a.wholesale);
+  const lenTxt=$("dLen").value==="native"?"native base length":("video → "+$("dLen").value+"s");
+  const resTxt={best:"best available res",720:"720p direct",1080:"1080p direct"}[$("dRes").value];
+  $("dc1sub").textContent=`${comp.length} models · ${lenTxt} · your fal cost vs. ${resTxt}`;
+  const labels=comp.map(r=>fmtLabel(r)+" ("+pickDirect(r).res+")");
+  chartDirect&&chartDirect.destroy();
+  chartDirect=new Chart($("chartDirect"),{
+    type:"bar",
+    data:{labels,datasets:[
+      {label:"Your fal cost",data:comp.map(r=>r.wholesale),backgroundColor:"#3aa0ffcc",borderColor:"#3aa0ff",borderWidth:1,borderRadius:3},
+      {label:"Direct API cost",data:comp.map(r=>pickDirect(r).d),backgroundColor:"#ff6b6bcc",borderColor:"#ff6b6b",borderWidth:1,borderRadius:3},
+    ]},
+    options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,animation:false,
+      plugins:{legend:{labels:{color:"#c7ced9",usePointStyle:true,boxWidth:10}},
+        tooltip:{callbacks:{afterBody:items=>{const r=comp[items[0].dataIndex];const p=pickDirect(r);return p.ratio?`\nfal is ${p.ratio}× direct @${p.res}`:"";}}}},
+      scales:{x:{beginAtZero:true,grid:{color:"#232833"},ticks:{color:"#98a2b3",callback:v=>"$"+v}},
+              y:{grid:{display:false},ticks:{color:"#c7ced9",font:{size:11},autoSkip:false}}}}
+  });
+  $("chartDirect").parentElement.style.height=Math.max(360,comp.length*30)+"px";
+}
+
+function dTable(rows){
+  const s=[...rows].sort((a,b)=>{
+    let av=a[dSortCol],bv=b[dSortCol];
+    if(typeof av==="string"){const c=av.localeCompare(bv);return dSortDir==="asc"?c:-c;}
+    if(av==null&&bv==null)return 0; if(av==null)return 1; if(bv==null)return -1;
+    return dSortDir==="asc"?av-bv:bv-av;
+  });
+  const cell=v=> v!=null ? money(v) : '<span class="dim">—</span>';
+  const rcell=(v)=> v!=null ? `<span>${v}× ${statusPillFor(v)}</span>` : '<span class="dim">—</span>';
+  $("dtbody").innerHTML=s.map(r=>{
+    const gc=r.group.replace(" ",".");
+    const conf=r.directConf?`<span class="conf">${r.directConf}</span>`:"";
+    // images have only single direct: show it in the 1080 column, dash 720
+    let d720=r.direct720, d1080=r.direct1080, f720=r.falVs720, f1080=r.falVs1080;
+    if(r.unit==="image"){ d720=null; f720=null; d1080=r.direct; f1080=r.falVsDirect; }
+    return `<tr>
+      <td>${r.label}</td>
+      <td><span class="tag ${gc}">${r.group}</span></td>
+      <td class="mono dim">${r.unit}</td>
+      <td class="mono">${money(r.wholesale)}</td>
+      <td class="mono">${cell(d720)}</td>
+      <td class="mono">${rcell(f720)}</td>
+      <td class="mono">${cell(d1080)}</td>
+      <td class="mono">${rcell(f1080)}</td>
+      <td class="dim" style="white-space:normal;max-width:340px;font-size:12px">${r.directSrc||"—"}${conf}<br>${r.directNote||""}</td>
+    </tr>`;
+  }).join("");
+}
+
+document.querySelectorAll("#dtbl th").forEach(th=>{ if(!th.dataset.s)return; th.style.cursor="pointer"; th.onclick=()=>{
+  const c=th.dataset.s;
+  if(dSortCol===c)dSortDir=dSortDir==="asc"?"desc":"asc";else{dSortCol=c;dSortDir="desc";}
+  dTable(dCurrent());
+};});
+["dLen","dRes","dShow"].forEach(id=>$(id).onchange=dRender);
+
+render();
+dRender();
+</script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<h1>Reverse-Engineering the Higgsfield Skill — Teardown + Magnific/Kling Adaptation Plan</h1>
+<p>Source: <code>github.com/higgsfield-ai/skills</code> (v0.12.0, MIT license). Nine skills, cloned and read in full.</p>
+<hr>
+<h2>Part 1 — How the Higgsfield skill actually works</h2>
+<h3>1.1 The core insight</h3>
+<p>Every one of the nine skills is a <strong>thin Markdown wrapper around one CLI binary</strong> (<code>higgsfield</code>). No skill talks to the API directly. From <code>CLAUDE.md</code>:</p>
+<blockquote>All skills route through one binary: the <code>higgsfield</code> CLI. <strong>Do not call <code>api.higgsfield.ai</code> directly with curl.</strong> The CLI handles auth, retries, polling, schema validation, and auto-uploads. Skipping it bypasses critical behavior.</blockquote>
+<p>So the &quot;skill&quot; contributes <em>zero</em> runtime code. It is pure <strong>instruction + knowledge</strong>: it tells the agent when to fire, which command to run, which model to pick, and how to present the result. The CLI does all the heavy lifting.</p>
+<p>This is the single most important thing to internalize for your adaptation: <strong>a skill is a decision-making layer, not an execution layer.</strong> The execution layer (CLI for Higgsfield; MCP tools for Magnific/Kling) already exists.</p>
+<h3>1.2 Repository anatomy</h3>
+<pre class='code'><code>skills/
+├── VERSION                      # single source of truth (0.12.0) — every manifest must match
+├── README / INSTALL / INSTALL_FOR_AGENTS / CLAUDE / COOKBOOK / CONTRIBUTING
+├── setup                        # idempotent bash installer (detect host → install CLI → auth → symlink)
+├── .claude-plugin/              # marketplace.json + plugin.json  (Claude Code)
+├── .codex-plugin/plugin.json    # Codex
+├── .cursor-plugin/plugin.json   # Cursor
+├── .github/workflows/           # CI validates frontmatter, version sync, refs, orphans
+└── higgsfield-&lt;name&gt;/           # one folder per skill
+    ├── SKILL.md                 # the entry point (loaded into context on trigger)
+    ├── references/*.md          # loaded on demand, after a path is chosen
+    ├── scripts/*.py             # deterministic local helpers (only where needed)
+    └── agents/openai.yaml       # per-agent variant metadata</code></pre>
+<p>Nine skills: <code>generate</code> (flagship), <code>soul-id</code>, <code>product-photoshoot</code>, <code>brandkit</code>, <code>marketplace-cards</code>, <code>websites</code>, <code>video-explainer</code>, <code>youtube-thumbnail</code>, <code>game-generation</code>.</p>
+<h3>1.3 The SKILL.md contract</h3>
+<p>Every SKILL.md follows the same skeleton. This is the reusable template:</p>
+<p><strong>Frontmatter</strong> (YAML) — four fields that matter:</p>
+<ul>
+<li><code>name</code> — the skill id.</li>
+<li><code>description</code> — a <strong>triggering block</strong>, not a summary. It packs literal user phrases (&quot;generate an image&quot;, &quot;animate this photo&quot;, &quot;make a UGC video&quot;) so the agent knows <em>when</em> to load the skill, plus explicit <code>Chain with…</code> and <code>NOT for…</code> lines to route away misfires. This is the highest-leverage part of the whole file — it&#x27;s how the agent decides to use the skill at all.</li>
+<li><code>argument-hint</code> — the shape of a slash-command invocation.</li>
+<li><code>allowed-tools: Bash</code> — the skill only needs a shell (because everything is a CLI call).</li>
+</ul>
+<p><strong>Body</strong>, in a fixed order:</p>
+<ol>
+<li><strong>Step 0 — Bootstrap.</strong> Check the binary is installed and authed; if not, install/auth. Runs before anything else.</li>
+<li><strong>UX Rules.</strong> Global rules that apply on every turn: be concise, no raw IDs/JSON in chat, detect language, don&#x27;t batch questions, prefer the quality default, use one-shot <code>--wait</code>.</li>
+<li><strong>Decision trees.</strong> The bulk of the file: a model-selection matrix (&quot;cinematic still → Soul Cinema; logo → Recraft; default → GPT Image 2&quot;), mode selection, target detection, and <em>routing to other skills</em> when out of scope.</li>
+<li><strong>Command recipes.</strong> Copy-pasteable command shapes with real flags.</li>
+<li><strong>Errors.</strong> Symptom → fix table.</li>
+<li><strong>Reference pointers.</strong> <code>See references/X.md for details.</code></li>
+</ol>
+<h3>1.4 The 300-line rule (context economy)</h3>
+<p>From <code>CLAUDE.md</code>:</p>
+<blockquote>Each SKILL.md should aim for under 300 lines… loaded into the agent&#x27;s context whenever the skill triggers — every line costs latency and tokens.  <strong>The test:</strong> if removing a section would NOT break the agent&#x27;s ability to decide what to do next, it belongs in <code>references/</code>.</blockquote>
+<p>So SKILL.md holds <strong>only what&#x27;s needed to decide the next action</strong>. Everything an agent needs <em>once, after deciding</em> — full flag tables, prompt galleries, troubleshooting trees, model catalogs — moves to <code>references/*.md</code>, loaded on demand. The flagship <code>generate/SKILL.md</code> is 325 lines; its 14 reference files add ~1,300 more that load only when relevant.</p>
+<h3>1.5 Source-of-truth discipline</h3>
+<p>The skill <strong>never hardcodes the model list as fact</strong>. It ships a <code>references/model-catalog.md</code> as an <em>intent→command mapping</em>, but repeatedly instructs: run <code>higgsfield model list --json</code> for the live catalog, <code>higgsfield workflow list</code> for workflows, <code>higgsfield preset list</code> for presets. The catalog in the repo is a routing hint; the CLI is the truth. This keeps the skill from rotting when the backend changes.</p>
+<h3>1.6 Skill chaining via return values</h3>
+<p>Skills compose through <strong>explicit outputs, not shared state</strong>:</p>
+<ul>
+<li><code>soul-id</code> trains a face → returns a <code>reference_id</code>.</li>
+<li><code>generate</code> consumes it via <code>--soul-id &lt;id&gt;</code>.</li>
+<li>Rule: &quot;Skills communicate through return values, not implicit state.&quot;</li>
+</ul>
+<p>And a scope contract on every skill: <code>Use when</code> (triggers) / <code>Chain</code> (hand-offs) / <code>NOT for</code> (boundaries). This is what stops nine overlapping skills from stepping on each other.</p>
+<h3>1.7 Multi-agent portability</h3>
+<p>The same skill folder ships to Claude Code (<code>~/.claude/skills/</code>), Cursor (<code>~/.cursor/plugins/</code>), and Codex (<code>~/.codex/plugins/</code>) via three parallel manifests + an auto-detecting <code>setup</code> script. Each skill folder is <strong>fully self-contained</strong> — no <code>../</code> references — so any single skill can be installed standalone. CI enforces self-containment and version sync on every PR.</p>
+<h3>1.8 One-shot execution pattern</h3>
+<p>The command pattern to copy: <code>higgsfield generate create &lt;model&gt; --prompt &quot;…&quot; [media flags] --wait</code>. The <code>--wait</code> flag blocks until the job is terminal and prints the result URL itself — so the skill never writes polling loops. Media flags (<code>--image</code>, <code>--start-image</code>, <code>--video</code>) accept a local path (auto-uploaded) <em>or</em> a UUID (a prior job&#x27;s output), which is what makes chaining (image → video) trivial.</p>
+<hr>
+<h2>Part 2 — Mapping onto Magnific / Kling</h2>
+<h3>2.1 The one structural difference</h3>
+<table><thead><tr><th></th><th>Higgsfield</th><th>Your setup (Magnific / Kling)</th></tr></thead><tbody><tr><td>Execution layer</td><td><code>higgsfield</code> CLI binary</td><td><strong>MCP servers, already connected</strong></td></tr><tr><td>Install needed</td><td>Yes (curl script + PATH)</td><td><strong>No</strong> — tools are live in-session</td></tr><tr><td>Auth flow</td><td><code>higgsfield auth login</code> (browser OAuth)</td><td><strong>Already authenticated</strong> via the connector</td></tr><tr><td>Skill&#x27;s <code>allowed-tools</code></td><td><code>Bash</code></td><td>the MCP tool names (<code>mcp<strong>Magnific</strong><em></code>, <code>mcp<strong>KlingAI</strong></em></code>)</td></tr><tr><td>&quot;run command&quot; step</td><td><code>higgsfield generate create …</code></td><td>call the MCP tool</td></tr><tr><td>Polling</td><td><code>--wait</code> flag</td><td><code>creations_wait</code> (Magnific) / <code>query_tasks</code> (Kling)</td></tr><tr><td>Source of truth</td><td><code>higgsfield model list</code></td><td><code>images_models_list</code> (Magnific) / <code>who_am_i</code> (Kling)</td></tr></tbody></table>
+<p>Everything else — the frontmatter triggering block, UX rules, the model-selection decision tree, references split by the 300-line rule, chaining by return value, scope boundaries — <strong>transfers directly and unchanged.</strong> You are swapping the execution verbs, not the architecture.</p>
+<h3>2.2 Verb-by-verb translation</h3>
+<p><strong>Bootstrap (Step 0).</strong> Higgsfield checks the binary + auth. Yours checks the connector is live and reads capabilities:</p>
+<ul>
+<li>Magnific: <code>account_profile</code> / <code>account_balance</code>, then <code>images_models_list</code>, <code>video_models_list</code>.</li>
+<li>Kling: <code>who_am_i</code> first (the server&#x27;s own instructions require it), then <code>query_membership_and_credits</code>.</li>
+</ul>
+<p><strong>Generate an image.</strong></p>
+<ul>
+<li>Higgsfield: <code>higgsfield generate create gpt_image_2 --prompt &quot;…&quot; --wait</code></li>
+<li>Magnific: <code>images_generate</code> (then <code>creations_wait</code> on the returned identifier, then <code>creations_show</code> for inline preview)</li>
+<li>Kling: <code>text_to_image</code></li>
+</ul>
+<p><strong>Image → image / edit / upscale / restyle.</strong></p>
+<ul>
+<li>Magnific has the richest surface here: <code>images_upscale</code>, <code>images_variations</code>, <code>images_expand</code>, <code>images_relight</code>, <code>images_retouch</code>, <code>images_remove_background</code>, <code>images_change_camera</code>, <code>images_to_svg</code>. (This is Magnific&#x27;s core strength — it&#x27;s an editing/upscaling engine as much as a generator.)</li>
+<li>Kling: <code>image_to_image</code></li>
+</ul>
+<p><strong>Text → video / image → video.</strong></p>
+<ul>
+<li>Magnific: <code>video_generate</code> (chain by passing the image <em>creation identifier</em>, per the server&#x27;s relay instructions — never the <code>webUrl</code>)</li>
+<li>Kling: <code>text_to_video</code>, <code>image_to_video</code>, plus <code>motion_control</code> for driven motion</li>
+</ul>
+<p><strong>Audio.</strong> Magnific: <code>audio_tts</code>, <code>audio_music_generate</code>, <code>audio_sfx_generate</code>, <code>audio_voice_change</code>, <code>audio_isolate</code>. (Kling has no audio.)</p>
+<p><strong>3D.</strong> Magnific: <code>models3d_generate</code>, <code>models3d_rig</code>. (Direct analog to Higgsfield&#x27;s <code>multi_image_to_3d</code>.)</p>
+<p><strong>Poll / retrieve.</strong> Magnific: <code>creation_status</code>, <code>creations_wait</code>, <code>creations_get</code>. Kling: <code>query_tasks</code>.</p>
+<h3>2.3 Two Magnific-specific rules the skill must encode</h3>
+<p>Read straight from the connector&#x27;s own instructions — these are the equivalent of Higgsfield&#x27;s &quot;don&#x27;t curl the API&quot; rule:</p>
+<ol>
+<li><strong>After any generation, call <code>creations_show</code> for inline preview, then <code>creations_wait</code> (1–8 ids per call) to confirm before replying.</strong> Never regenerate queued creations.</li>
+<li><strong>When chaining image→video, pass the creation <code>identifier</code> (or the <code>url</code> from <code>creations_get</code>/<code>creations_wait</code>), never the <code>webUrl</code>.</strong> And for local input files, call <code>creations_upload_show</code> — the server can&#x27;t read chat attachments.</li>
+</ol>
+<p>Kling&#x27;s equivalent house rules: call <code>who_am_i</code> first; every job is charged, so confirm intent before submitting (no trial jobs); map any alias words to canonical model/argument names before calling.</p>
+<h3>2.4 Model routing — the piece you&#x27;ll customize most</h3>
+<p>Higgsfield&#x27;s decision tree is its most valuable IP (&quot;cinematic still → Soul Cinema, logo → Recraft, fast/cheap → Z Image, default → GPT Image 2&quot;). Yours becomes a <strong>Magnific-vs-Kling + which-tool</strong> matrix, and — following Higgsfield&#x27;s source-of-truth discipline — it should be built by <em>reading <code>images_models_list</code> / <code>video_models_list</code> / <code>who_am_i</code> live</em>, not hardcoded. A first-cut routing table:</p>
+<table><thead><tr><th>Brief</th><th>Route</th></tr></thead><tbody><tr><td>Upscale / enhance / &quot;make this sharper / bigger&quot;</td><td><strong>Magnific</strong> <code>images_upscale</code> (its flagship capability)</td></tr><tr><td>Edit an existing image (relight, retouch, expand, remove bg, restyle)</td><td><strong>Magnific</strong> image-edit family</td></tr><tr><td>General text-to-image</td><td>Magnific <code>images_generate</code> or Kling <code>text_to_image</code> — pick per model list</td></tr><tr><td>Vector / SVG</td><td>Magnific <code>images_to_svg</code> / <code>images_generate_svg</code></td></tr><tr><td>Driven / controlled motion video</td><td><strong>Kling</strong> <code>motion_control</code></td></tr><tr><td>Straight text/image-to-video</td><td>Kling <code>text_to_video</code> / <code>image_to_video</code>, or Magnific <code>video_generate</code></td></tr><tr><td>Audio (TTS, music, SFX)</td><td><strong>Magnific</strong> audio family (Kling can&#x27;t)</td></tr><tr><td>3D mesh</td><td><strong>Magnific</strong> <code>models3d_generate</code></td></tr></tbody></table>
+<h3>2.5 What you get to drop entirely</h3>
+<p>Because the MCP layer replaces the CLI:</p>
+<ul>
+<li>The <code>setup</code> script, the CLI installer, the OAuth bootstrap — <strong>gone.</strong> No install, no auth, no PATH.</li>
+<li>Polling-loop code — <strong>gone.</strong> <code>creations_wait</code> / <code>query_tasks</code> are single tool calls.</li>
+<li>The multi-agent manifests (<code>.claude-plugin</code>, <code>.codex-plugin</code>, <code>.cursor-plugin</code>) — only needed if you want to <em>distribute</em> the skill across agents. For a personal skill, one <code>SKILL.md</code> in your skills directory is enough.</li>
+</ul>
+<hr>
+<h2>Part 3 — A concrete skeleton for your skill</h2>
+<p>A single starter skill (<code>media-generate</code>) that mirrors Higgsfield&#x27;s flagship but drives your MCP tools:</p>
+<pre class='code'><code>---
+name: media-generate
+description: |
+  Generate and edit images, video, audio, and 3D via Magnific and Kling
+  (both connected as MCP servers — no install, no auth).
+  Use when: &quot;generate an image&quot;, &quot;make a video&quot;, &quot;animate this photo&quot;,
+  &quot;upscale/enhance this&quot;, &quot;relight/retouch/expand this image&quot;,
+  &quot;remove the background&quot;, &quot;make a sound effect / music / voiceover&quot;,
+  &quot;text-to-video&quot;, &quot;controlled motion&quot;, &quot;create a 3D model&quot;.
+  Routing: Magnific for upscaling, image editing, audio, and 3D;
+  Kling for text/image-to-video and motion control; either for
+  plain text-to-image (check the live model list).
+  NOT for: brand systems, YouTube thumbnails, or website builds.
+allowed-tools: mcp__Magnific__*, mcp__KlingAI__*
+---
+
+# Media Generate
+
+## Step 0 — Capabilities
+- Kling: call `who_am_i` first (required by the server), then check credits.
+- Magnific: `account_profile`; read `images_models_list` / `video_models_list`
+  for the LIVE model set. Never hardcode model names.
+
+## UX Rules
+1. Be concise. Show the rendered result (Magnific: `creations_show`), not raw ids/JSON.
+2. Every job is charged — confirm intent, no trial runs, never regenerate a queued job.
+3. Pick a sane default and ask one thing at a time only if genuinely missing.
+4. Local input files → Magnific `creations_upload_show` (the server can&#x27;t read chat attachments).
+
+## Routing (verify against the live model list)
+[the Part 2.4 table]
+
+## Recipes
+- Image:  images_generate → creations_wait → creations_show
+- Upscale: images_upscale → creations_wait → creations_show
+- Video (chain): pass the image CREATION IDENTIFIER (not webUrl) into video_generate
+- Kling video: text_to_video / image_to_video → query_tasks
+- Audio: audio_tts / audio_music_generate / audio_sfx_generate
+
+## Errors
+- Missing prompt → ask for it.
+- Kling alias word → map to canonical model/arg name before calling.
+- On timeout/failure → tell the user, ask before retrying (don&#x27;t auto-resubmit).
+
+## References (load on demand)
+- references/magnific-editing.md — the full image-edit family + flags
+- references/kling-motion.md — motion_control and driven-motion inputs
+- references/routing.md — the full decision matrix</code></pre>
+<p>That&#x27;s the whole pattern: <strong>the same architecture, with <code>higgsfield generate create</code> swapped for MCP tool calls and the install/auth machinery deleted.</strong></p>
+<hr>
+<h2>Bottom line</h2>
+<p>The Higgsfield skill&#x27;s real value isn&#x27;t code — it&#x27;s a disciplined <strong>instruction architecture</strong>: a trigger-packed description, a fixed body order (bootstrap → UX rules → decision tree → recipes → errors → references), the 300-line context-economy rule, live-source-of-truth over hardcoding, and composition by return value with explicit scope boundaries. All of that ports 1:1 to Magnific/Kling. The only thing you throw away is the part you never needed: the CLI install and auth, because your execution layer is already live in-session as MCP tools.</p>

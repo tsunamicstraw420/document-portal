@@ -1,0 +1,56 @@
+<h1>onda-render-worker</h1>
+<p>The ffmpeg assembly worker for onda. Runs as a <strong>Render.com Background Worker</strong> (Docker). It polls the Supabase <code>render_jobs</code> queue, downloads each job&#x27;s video blocks + narration, muxes and concatenates them into one MP4 (optionally with burned-in captions), uploads the result to the <code>renders</code> Storage bucket, and settles the credit ledger (charge first as <code>assemble:&lt;job id&gt;</code>, auto-refund on failure — both once-only per job, so crash retries can never double-charge).</p>
+<p>The main onda app (Vercel) only <strong>enqueues</strong> jobs by inserting <code>render_jobs</code> rows; this worker only <strong>consumes</strong> them.</p>
+<h2>Job spec (the <code>spec</code> jsonb column)</h2>
+<pre class='code'><code>{
+  &quot;credits&quot;: 30,
+  &quot;blocks&quot;: [
+    { &quot;videoUrl&quot;: &quot;https://…/clip1.mp4&quot;, &quot;audioUrl&quot;: &quot;https://…/voice1.mp3&quot; },
+    { &quot;videoUrl&quot;: &quot;https://…/clip2.mp4&quot; }
+  ],
+  &quot;captions&quot;: [
+    { &quot;start&quot;: 0, &quot;end&quot;: 3.2, &quot;text&quot;: &quot;First line&quot; }
+  ]
+}</code></pre>
+<ul>
+<li><code>credits</code> — what to charge the user (the app computes it at enqueue time).</li>
+</ul>
+<p><code>0</code>/absent = free render.</p>
+<ul>
+<li><code>blocks</code> — ordered; <code>audioUrl</code> is optional per block (silence is used so all</li>
+</ul>
+<p>blocks concat cleanly). Every block is normalized to the first clip&#x27;s resolution, 30 fps, H.264 + AAC.</p>
+<ul>
+<li><code>captions</code> — optional; either an array of <code>{start, end, text}</code> (seconds) or a</li>
+</ul>
+<p>raw SRT string. Burned into the final video.</p>
+<h2>One-time Supabase setup</h2>
+<p>Run <code>supabase/render.sql</code> from the main onda repo (studio → <code>supabase/render.sql</code>) in the Supabase SQL Editor. It creates the <code>render_jobs</code> table + RLS, the <code>claim_render_job()</code> RPC (atomic claim via <code>for update skip locked</code>), the service-role <code>spend_credits_for()</code> ledger function, and the public <code>renders</code> Storage bucket. If the bucket insert is rejected, create it in the dashboard: Storage → New bucket → name <code>renders</code> → Public.</p>
+<h2>Deploy on Render</h2>
+<ol>
+<li>Push this repo to GitHub.</li>
+<li>Render dashboard → <strong>New → Background Worker</strong> → connect the</li>
+</ol>
+<p><code>onda-render-worker</code> repo.</p>
+<ol>
+<li>Language: <strong>Docker</strong> (auto-detected from the Dockerfile). Branch: <code>main</code>.</li>
+</ol>
+<p>Region: a US region (Oregon/Virginia/Ohio — ideally the one closest to your Supabase project).</p>
+<ol>
+<li>Instance: <strong>Starter</strong> to begin with; bump to Standard if 1080p renders feel slow.</li>
+<li>Environment variables:</li>
+</ol>
+<ul>
+<li><code>SUPABASE_URL</code></li>
+<li><code>SUPABASE_SERVICE_ROLE_KEY</code> (the secret/service_role key — same one the</li>
+</ul>
+<p>Stripe webhook uses)</p>
+<p>No <code>FAL_KEY</code> — this worker never calls fal, it only assembles clips that already exist.</p>
+<ol>
+<li>Create the worker. Every push to <code>main</code> auto-deploys.</li>
+</ol>
+<h2>Local run</h2>
+<pre class='code'><code>cp .env.example .env   # fill in the two values
+npm install
+node --env-file=.env worker.js</code></pre>
+<p>Requires ffmpeg on your PATH (<code>brew install ffmpeg</code> on macOS).</p>
