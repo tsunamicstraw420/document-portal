@@ -1,0 +1,38 @@
+<h1>vflow.live prompt library — scrape &amp; curation</h1>
+<p>Full scrape of <strong>vflow.live</strong> (an &quot;AI video prompts you can watch before you copy&quot; library), categorized, plus a curated set of samples chosen for the <strong>SoloRender</strong> site.</p>
+<p><em>Scraped 2026-09-18. The site self-reported 8,961 prompts; we captured all 8,961.</em></p>
+<h2>What&#x27;s here</h2>
+<table><thead><tr><th>File</th><th>What it is</th></tr></thead><tbody><tr><td><code>vflow_prompts_full.csv</code></td><td>All 8,961 prompts, one row each. Columns: model, category, title, <strong>prompt</strong>, keywords, description, author, author_url, date, video_dims, source_post, thumbnail, video_url, url.</td></tr><tr><td><code>vflow_prompts_grouped.json</code></td><td>Same data, nested <strong>model → category → [prompts]</strong> for browsing/filtering in code.</td></tr><tr><td><code>category_breakdown.md</code></td><td>Counts by model and by category.</td></tr><tr><td><code>SOLORENDER_SAMPLES.md</code></td><td><strong>The deliverable pick:</strong> 30 hand-chosen starter prompts, verbatim, with a one-line rationale each.</td></tr></tbody></table>
+<h2>The corpus at a glance</h2>
+<ul>
+<li><strong>3 model libraries:</strong> Seedance 2.0 (5,918) · Grok Imagine (1,985) · Seedance 2.5 (1,058).</li>
+<li><strong>31 categories</strong> — biggest are <em>cinematic realistic</em> (1,769), <em>fantasy magical</em> (917),</li>
+</ul>
+<p><em>brand commercial</em> (681), <em>anime</em> (664), <em>cyberpunk scifi</em> (570).</p>
+<ul>
+<li>Every row carries the <strong>exact prompt text as the author wrote it</strong>, the credited author + a</li>
+</ul>
+<p>link to the original X post, and a direct link to the source clip.</p>
+<h2>How it was scraped</h2>
+<p>Each vflow prompt page embeds a JSON-LD <code>CreativeWork</code> block containing the prompt text, title, vflow&#x27;s own one-paragraph analysis, the extracted tags (category · camera · lighting · mood), author, date, source post, and a direct video URL. We pulled every English prompt URL from the site&#x27;s 65 sitemaps (8,961 — matching the site&#x27;s own count) and read that block from each page. <code>robots.txt</code> explicitly allows all agents. Non-English pages were skipped: they are translations of vflow&#x27;s <em>analysis</em>, not different prompts — the prompt text itself is the same original.</p>
+<h2>Known limitation — vflow truncates long prompts</h2>
+<p><strong>~41% of prompts (3,676 of 8,961) are stored truncated by vflow itself</strong> — long prompts (often multi-shot scripts) are cut mid-sentence on vflow&#x27;s own pages, so that is all that can be captured. Short and medium prompts are complete. A prompt whose text ends without terminal punctuation is likely truncated at the source. <strong>Every one of the 30 curated samples was checked to be complete</strong> (they read as finished prompts, not mid-action cuts).</p>
+<h2>How the 30 samples were chosen</h2>
+<p>Filters applied before hand-picking (see <code>SOLORENDER_SAMPLES.md</code>):</p>
+<ul>
+<li><strong>Seedance-weighted</strong> — SoloRender ships Seedance models, so these run as-is; Seedance prompts</li>
+</ul>
+<p>are directly usable, not just stylistically transferable.</p>
+<ul>
+<li><strong>Self-contained</strong> — no dependency on an uploaded reference image or a linked source clip.</li>
+<li><strong>Safe to publish</strong> — English only, no real brands, celebrities, or trademarked characters.</li>
+<li><strong>Well-formed</strong> — each names a camera move, the single field vflow&#x27;s data flags as the #1</li>
+</ul>
+<p>marker of a working prompt (77.6% of the corpus names one; only 24.9% state an aspect ratio).</p>
+<ul>
+<li><strong>Complete</strong> — no mid-sentence truncation.</li>
+<li><strong>Diverse</strong> — spread across 7 use-case buckets (cinematic, product/commercial, people/UGC,</li>
+</ul>
+<p>nature/travel, anime/3D, VFX/transitions, stylized/vintage/stop-motion).</p>
+<h2>Note on use</h2>
+<p>These prompts were written by named third-party creators and published on X. <code>SOLORENDER_SAMPLES.md</code> keeps the author credit and source link for each. If SoloRender publishes any of these as on-site sample/starter prompts, keep the attribution or (cleaner) treat them as <strong>references</strong> and rewrite the on-site copy in SoloRender&#x27;s own voice.</p>

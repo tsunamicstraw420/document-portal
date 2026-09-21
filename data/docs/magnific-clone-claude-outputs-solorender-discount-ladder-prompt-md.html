@@ -1,0 +1,46 @@
+<h1>Claude Code prompt — change the tier credit-discount ladder (0/5/10/35%)</h1>
+<p>Working in <code>/Users/rubys/Desktop/AI_bots/Magnific_clone</code>. This is a <strong>pricing/design change</strong>, no billing is wired yet.</p>
+<h2>Decision (already made — do not re-ask)</h2>
+<p>Change the per-tier credit <strong>discount vs standard</strong> ladder:</p>
+<table><thead><tr><th>Tier</th><th>Old discount</th><th><strong>New discount</strong></th></tr></thead><tbody><tr><td>Solo</td><td>Standard (0%)</td><td>Standard (0%)</td></tr><tr><td>Studio</td><td>17% off</td><td><strong>5% off</strong></td></tr><tr><td>Max</td><td>33% off</td><td><strong>10% off</strong></td></tr><tr><td>Super Max</td><td>50% off</td><td><strong>35% off</strong></td></tr></tbody></table>
+<p><strong>Hold prices fixed. Recompute the credit grants.</strong> Do NOT change any plan price. Do NOT change the displayed labels only — the numbers must actually match the math.</p>
+<h2>The price rule (from <code>studio/src/components/PricingPlans.tsx</code> header comment)</h2>
+<p><code>monthly price = markup × (credits ÷ 300)</code>, where <code>markup = 3 × (1 − discount)</code>. Equivalently: <strong><code>credits = price × 300 ÷ markup</code></strong>, <code>markup = 3 × (1 − discount)</code>.</p>
+<p>Since price is held fixed, a smaller discount ⇒ larger markup ⇒ <strong>fewer credits</strong>.</p>
+<h3>Recomputed credit grants (verify these, then apply)</h3>
+<p>Use each tier&#x27;s existing <strong>monthly</strong> price as the anchor (Solo $20, Studio $40, Max $80). Super Max is a one-time $250 but keep its credits pinned at 50,000 per the existing comment (it&#x27;s the anchor, not derived) UNLESS you decide the 35% label should drive it — see note below.</p>
+<ul>
+<li><strong>Solo</strong> — 0% off → markup 3.0 → 20 × 300 ÷ 3.0 = <strong>2,000 credits</strong> (unchanged) ✅</li>
+<li><strong>Studio</strong> — 5% off → markup 2.85 → 40 × 300 ÷ 2.85 = 4,210.5 → round to a clean number: <strong>4,200 credits</strong> (was 4,800)</li>
+<li><strong>Max</strong> — 10% off → markup 2.70 → 80 × 300 ÷ 2.70 = 8,888.9 → round: <strong>8,900 credits</strong> (was 12,000). Consider <strong>9,000</strong> if you prefer a rounder grant — note it slightly under-charges the discount; flag which you picked.</li>
+<li><strong>Super Max</strong> — pinned <strong>50,000 credits</strong> (one-time, unchanged). The &quot;35% off&quot; is the <em>rate label</em> for this pile; at $250 for 50,000 cr the implied rate is already ~40% off standard, so 35% is a safe, honest label. Keep 50,000.</li>
+</ul>
+<p>**Round grants to clean numbers and pick the rounding direction that never <em>over</em>-charges the customer vs the stated discount (round credits UP or keep price the same → never claim a bigger discount than delivered).** State the final chosen numbers in your summary.</p>
+<h2>Files to edit (grep first, these are the known spots)</h2>
+<ol>
+<li><code>studio/src/components/PricingPlans.tsx</code></li>
+</ol>
+<ul>
+<li><code>PLANS[]</code>: update each plan&#x27;s <code>credits</code> and its <code>rate</code> string (&quot;17% off credits&quot; → &quot;5% off credits&quot;, &quot;33% off credits&quot; → &quot;10% off credits&quot;, &quot;50% off credits — best rate&quot; → &quot;35% off credits — best rate&quot;). Solo&#x27;s <code>rate</code> stays &quot;Credits at standard rate&quot;.</li>
+<li>Update the feature-list lines that hardcode the numbers, e.g. <code>&quot;4,800 credits / month&quot;</code>, <code>&quot;17% off every credit&quot;</code>, <code>&quot;12,000 credits / month&quot;</code>, <code>&quot;33% off every credit&quot;</code>, <code>&quot;50,000 credits — one-time, never expire&quot;</code> (50,000 unchanged), and the gold &quot;X% off every credit&quot; lines.</li>
+<li>Update the header comment block so the documented ladder reads <code>Solo 3× · Studio 2.85× · Max 2.7× · Super Max 1.95×</code> and <code>0% / 5% / 10% / 35% off</code>.</li>
+</ul>
+<ol>
+<li><code>studio/src/app/pricing/page.tsx</code></li>
+</ol>
+<ul>
+<li><code>COMPARE[]</code>: the <code>&quot;Credits&quot;</code> row cells (<code>&quot;4,800 / mo&quot;</code> → new, <code>&quot;12,000 / mo&quot;</code> → new) and the <code>&quot;Credit rate vs pay-as-you-go&quot;</code> row cells (<code>&quot;17% off&quot;</code> / <code>&quot;33% off&quot;</code> / <code>&quot;50% off&quot;</code> → <code>&quot;5% off&quot;</code> / <code>&quot;10% off&quot;</code> / <code>&quot;35% off&quot;</code>).</li>
+<li>The <code>FAQ</code> entry &quot;Do bigger plans make credits cheaper?&quot; — update the &quot;Studio is 17% off, Max 33% off, and Super Max ... 50% off&quot; sentence to 5% / 10% / 35%.</li>
+</ul>
+<ol>
+<li>Grep the whole repo for any other hardcoded <code>17%</code>, <code>33%</code>, <code>50% off</code>, <code>4,800</code>, <code>4800</code>, <code>12,000</code>, <code>12000</code> in pricing/marketing copy (landing page <code>page.tsx</code>, DOCS.md, <code>onda-program-copy.md</code>) and fix anything customer-facing. Leave <code>lib/config.ts</code> per-model credit costs ALONE — those are the ×3 model prices, not the tier grants.</li>
+</ol>
+<h2>Guardrails</h2>
+<ul>
+<li><strong>Do not touch</strong> <code>lib/config.ts</code> model <code>credits:</code> values, <code>CREDIT_PACKS</code>, <code>TRIAL</code>, or <code>lib/credits.ts</code> (ledger logic). Only tier grants + discount labels change.</li>
+<li>No price changes anywhere.</li>
+<li>After editing, <code>grep -rn &quot;17%\|33%\|50% off\|4,800\|4800\|12,000\|12000&quot; studio/src</code> and confirm no stale customer-facing values remain.</li>
+<li>Run <code>npm run build</code> (or <code>next build</code>) in <code>studio/</code> to confirm no type/syntax breakage.</li>
+</ul>
+<h2>Report back</h2>
+<p>List the final credit grants you applied (with rounding choice for Max), every file touched, and paste the <code>grep</code> result proving no stale numbers remain.</p>

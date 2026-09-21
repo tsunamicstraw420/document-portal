@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>solorender · Scaling Plan</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1"></script>
+<style>
+:root{
+  --bg:#0e1116; --card:#171b22; --card2:#1e232c; --line:#2a303a;
+  --text:#e8ecf1; --muted:#98a2b3; --accent:#3aa0ff; --accent2:#7c5cff;
+  --pos:#3ecf8e; --neg:#ff6b6b; --warn:#ffb020;
+  --radius:12px; --gap:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1440px;margin:0 auto;padding:20px}
+header.top{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:6px}
+h1{font-size:24px;font-weight:700;letter-spacing:-.02em}
+h1 .accent{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.sub{color:var(--muted);font-size:13px;margin-top:4px;max-width:720px}
+.basis{color:var(--muted);font-size:12.5px;margin:14px 0 18px;padding:12px 16px;background:var(--card);border:1px solid var(--line);border-radius:10px;line-height:1.6}
+.basis b{color:var(--text)}
+.basis .hl{color:var(--accent)}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:var(--gap);margin-bottom:var(--gap)}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px}
+.kpi .lab{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.kpi .val{font-size:26px;font-weight:700;margin-top:6px;letter-spacing:-.02em}
+.kpi .hint{font-size:12px;color:var(--muted);margin-top:3px}
+.kpi.now{border-left:3px solid var(--pos)}
+.kpi.mid{border-left:3px solid var(--warn)}
+.kpi.high{border-left:3px solid var(--accent)}
+.kpi.cogs{border-left:3px solid var(--neg)}
+
+.section-h{font-size:18px;font-weight:700;margin:30px 0 4px;letter-spacing:-.01em}
+.section-sub{color:var(--muted);font-size:13px;margin-bottom:16px;max-width:820px}
+
+.takeaways{background:linear-gradient(135deg,rgba(58,160,255,.08),rgba(124,92,255,.08));border:1px solid var(--line);border-radius:var(--radius);padding:18px 22px;margin-bottom:var(--gap)}
+.takeaways h2{font-size:15px;font-weight:700;margin-bottom:4px;letter-spacing:-.01em}
+.takeaways .tsub{font-size:12px;color:var(--muted);margin-bottom:14px}
+.tk-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tk{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.tk .h{font-size:13px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.tk .dot{width:9px;height:9px;border-radius:50%;flex:none}
+.tk.pay .dot{background:var(--pos)}
+.tk.work .dot{background:var(--neg)}
+.tk ul{margin:0;padding-left:0;list-style:none}
+.tk li{font-size:12.5px;line-height:1.55;color:var(--text);padding:5px 0;border-bottom:1px solid #21262f}
+.tk li:last-child{border-bottom:none}
+.tk li b{color:var(--text)}
+
+.rank{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:var(--gap)}
+.rk{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:13px 16px}
+.rk .num{font-size:22px;font-weight:800;line-height:1;width:30px;flex:none;text-align:center;font-variant-numeric:tabular-nums}
+.rk.hi .num{color:var(--neg)} .rk.md .num{color:var(--warn)} .rk.lo .num{color:var(--pos)}
+.rk .body{flex:1}
+.rk .t{font-size:13.5px;font-weight:700;margin-bottom:2px}
+.rk .d{font-size:12.5px;color:var(--muted);line-height:1.5}
+.rk .d b{color:var(--text)}
+
+.tablepanel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:8px 8px 4px;overflow-x:auto;margin-bottom:var(--gap)}
+table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:1000px}
+th{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;vertical-align:bottom}
+td{padding:12px 12px;border-bottom:1px solid #21262f;vertical-align:top;line-height:1.5}
+tbody tr:hover{background:var(--card2)}
+td .svc{font-weight:700;font-size:13px}
+td .plain{color:var(--muted);font-size:11.5px;margin-top:2px;display:block;white-space:normal;max-width:230px}
+td.wrap-cell{white-space:normal;max-width:260px}
+.cost{font-variant-numeric:tabular-nums;white-space:nowrap}
+.arrow{color:var(--muted)}
+.risk{display:inline-block;font-size:10px;padding:3px 9px;border-radius:20px;font-weight:700;letter-spacing:.03em;text-transform:uppercase}
+.risk.hi{background:rgba(255,107,107,.16);color:var(--neg)}
+.risk.md{background:rgba(255,176,32,.16);color:var(--warn)}
+.risk.lo{background:rgba(62,207,142,.16);color:var(--pos)}
+.risk.none{background:rgba(152,162,179,.15);color:var(--muted)}
+
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin-bottom:var(--gap)}
+.panel h3{font-size:13px;font-weight:600;margin-bottom:4px}
+.panel .psub{font-size:11px;color:var(--muted);margin-bottom:12px}
+.cwrap{position:relative;height:340px}
+
+footer{color:var(--muted);font-size:12px;margin-top:20px;text-align:center;line-height:1.6}
+@media(max-width:860px){.tk-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1><span class="accent">solorender</span> · Scaling Plan</h1>
+      <div class="sub">Every piece of the stack: what it does, what you run today, what to move to for <b>10,000 users / 1,000–5,000 active at once</b>, when to pull the trigger, and the rough monthly cost.</div>
+    </div>
+  </header>
+
+  <div class="basis">
+    <b class="hl">Read this first:</b> "5,000 people online" is <b>not</b> your load — <b>generation and render events are.</b> Most people online are typing, tweaking, or waiting; only a fraction are firing paid work at any instant. So the sizing below tracks the <b>work rate</b> (generations + film renders per minute), not the headcount. Three services (Vercel, Supabase, Stripe) mostly just autoscale when you pay. The short list that actually <b>breaks or blows up the bill</b> is called out in red.
+    <br><b>Cost note:</b> all $ are rough monthly estimates for infrastructure. <b>fal.ai is excluded from the totals</b> — it's your cost-of-goods and rises directly with generation volume, paid out of credit revenue.
+  </div>
+
+  <section class="kpis">
+    <div class="kpi now"><div class="lab">Now (as-is)</div><div class="val">~$65/mo</div><div class="hint">Vercel Pro + Supabase Pro + 1 render worker + Claude API</div></div>
+    <div class="kpi mid"><div class="lab">~1–2k concurrent</div><div class="val">~$150–350/mo</div><div class="hint">+ email service, R2/CDN, 2 render workers</div></div>
+    <div class="kpi high"><div class="lab">~5k concurrent</div><div class="val">~$800–1,500/mo</div><div class="hint">Supabase Team, 3–5 render workers, more bandwidth/storage</div></div>
+    <div class="kpi cogs"><div class="lab">fal.ai (separate)</div><div class="val">Variable</div><div class="hint">Cost-of-goods — scales with generations, watch vs. credit pricing</div></div>
+  </section>
+
+  <div class="takeaways">
+    <h2>Two kinds of upgrade: "just pay" vs. "real work"</h2>
+    <div class="tsub">Some services you fix by clicking a bigger plan. Others need an actual change (a phone call, a config, or code) — a bigger plan alone won't save you.</div>
+    <div class="tk-grid">
+      <div class="tk pay">
+        <div class="h"><span class="dot"></span>Money solves it (just upgrade the plan)</div>
+        <ul>
+          <li><b>Vercel</b> — Pro autoscales your site to thousands of visitors; you only watch the bandwidth meter.</li>
+          <li><b>Supabase</b> — Pro now, step up to Team as you near 5k concurrent. Must use the connection pooler.</li>
+          <li><b>Stripe</b> — nothing to do; scales infinitely, cost is just a % of revenue.</li>
+          <li><b>Claude API</b> — stay on auto-reload; email them to raise the rate limit if a text feature gets hammered.</li>
+          <li><b>GitHub watchdog</b> — free tier is fine at any scale.</li>
+        </ul>
+      </div>
+      <div class="tk work">
+        <div class="h"><span class="dot"></span>Needs a real change (not just a plan)</div>
+        <ul>
+          <li><b>fal.ai</b> — call them to raise your concurrency cap + get volume pricing <b>before</b> peak load, or users see "generation failed."</li>
+          <li><b>Render worker</b> — bigger instance to stop the out-of-memory crashes, <b>and run several in parallel</b> (your queue already supports it).</li>
+          <li><b>Email</b> — wire Resend/Postmark into Supabase or new-signup verification emails silently throttle and fail.</li>
+          <li><b>Cloudflare R2</b> — move finished media off Supabase so viewing/downloads stop racking up bandwidth fees.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section-h">What actually breaks first</h2>
+  <div class="section-sub">Do these in order. The top three are the ones that fail loudly or silently under real load; the rest just cost more money.</div>
+  <div class="rank">
+    <div class="rk hi"><div class="num">1</div><div class="body"><div class="t">fal.ai concurrency limit</div><div class="d">Every fal account caps how many generations run at once. At peak you'll hit it and users see <b>"generation failed."</b> Fix: contact fal to raise the cap + negotiate volume pricing <b>before</b> you scale.</div></div></div>
+    <div class="rk hi"><div class="num">2</div><div class="body"><div class="t">Render worker: crashes + queue backlog</div><div class="d">One worker does one film at a time and runs out of memory on big clips. Fix: <b>bigger instance (2–4 GB)</b> to stop crashes, and <b>run several workers</b> so films don't pile up in a queue.</div></div></div>
+    <div class="rk hi"><div class="num">3</div><div class="body"><div class="t">Signup emails silently fail</div><div class="d">If verification emails still go through Supabase's built-in sender, new signups won't get them at volume. Fix: plug in <b>Resend or Postmark</b>. Cheap, and prevents a "nobody can sign up" outage.</div></div></div>
+    <div class="rk md"><div class="num">4</div><div class="body"><div class="t">Storage &amp; bandwidth bill balloons</div><div class="d">Every clip watched or downloaded is a fee when served from Supabase. Fix: store media in <b>Cloudflare R2</b> (near-zero fee to serve) behind the CDN.</div></div></div>
+    <div class="rk md"><div class="num">5</div><div class="body"><div class="t">Database connection limit</div><div class="d">Thousands of users can exhaust the database's connection slots. Fix: use the <b>Supabase pooler</b> (you likely already do), and move to Team tier near 5k concurrent.</div></div></div>
+  </div>
+
+  <h2 class="section-h">The full stack — current → target → trigger → cost</h2>
+  <div class="section-sub">Each service, in plain terms. "Trigger to upgrade" is the signal to watch for. Risk = how likely it is to hurt you at 1–5k concurrent if ignored.</div>
+  <div class="tablepanel">
+    <table>
+      <thead><tr>
+        <th>Service</th>
+        <th>Running today</th>
+        <th>Target at 1–5k concurrent</th>
+        <th>Trigger to upgrade</th>
+        <th>Est. cost / mo</th>
+        <th>Risk</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="svc">Vercel</span><span class="plain">The website + all its buttons/endpoints. This is solorender.com.</span></td>
+          <td class="wrap-cell">Pro (~$20)</td>
+          <td class="wrap-cell">Stay on Pro — but serve big media from R2/CDN, not through Vercel.</td>
+          <td class="wrap-cell">Bandwidth line item climbing; long functions burning GB-hours.</td>
+          <td class="cost">$20 <span class="arrow">→</span> $20–200</td>
+          <td><span class="risk lo">Low</span></td>
+        </tr>
+        <tr>
+          <td><span class="svc">Supabase</span><span class="plain">Database, login system, and file storage. The "brain" that records users, credits, and jobs.</span></td>
+          <td class="wrap-cell">Pro (~$25, assumed)</td>
+          <td class="wrap-cell">Pro up to ~1–2k concurrent → <b>Team (~$599)</b> as you near 5k. Always via the connection pooler.</td>
+          <td class="wrap-cell">Connection-limit errors under load; storage/egress climbing; want point-in-time backups.</td>
+          <td class="cost">$25 <span class="arrow">→</span> $599+</td>
+          <td><span class="risk md">Medium</span></td>
+        </tr>
+        <tr>
+          <td><span class="svc">fal.ai</span><span class="plain">The actual AI generation engine. You buy generation wholesale and resell it — your cost-of-goods.</span></td>
+          <td class="wrap-cell">Pay-as-you-go</td>
+          <td class="wrap-cell">Same billing + <b>raised concurrency limit</b> + volume/committed-use pricing. Call them.</td>
+          <td class="wrap-cell">"Generation failed" at peak = hit the cap. Act <b>before</b> 5k concurrent, not after.</td>
+          <td class="cost">Variable (COGS)</td>
+          <td><span class="risk hi">High #1</span></td>
+        </tr>
+        <tr>
+          <td><span class="svc">Render worker</span><span class="plain">The film assembler (ffmpeg). Stitches clips + narration into one MP4, burns captions.</span></td>
+          <td class="wrap-cell">1 small instance on Render.com (crashes on big clips)</td>
+          <td class="wrap-cell"><b>2–4 GB instance</b> to stop crashes + <b>several workers in parallel</b> (queue already supports it).</td>
+          <td class="wrap-cell">Out-of-memory crashes now; render queue backing up under load.</td>
+          <td class="cost">$25–85 <span class="arrow">×</span> N workers</td>
+          <td><span class="risk hi">High #2</span></td>
+        </tr>
+        <tr>
+          <td><span class="svc">Transactional email</span><span class="plain">The emails your app sends: verify signup, reset password, receipts.</span></td>
+          <td class="wrap-cell">Supabase default + Google Workspace (both throttle)</td>
+          <td class="wrap-cell"><b>Resend or Postmark</b> wired into Supabase auth.</td>
+          <td class="wrap-cell">Act now/early — auth emails throttle at even modest signup volume.</td>
+          <td class="cost">$20–90</td>
+          <td><span class="risk hi">High #3</span></td>
+        </tr>
+        <tr>
+          <td><span class="svc">Cloudflare + R2</span><span class="plain">Points the domain to Vercel today. R2 = a cheap file warehouse with ~free serving.</span></td>
+          <td class="wrap-cell">DNS only (free)</td>
+          <td class="wrap-cell">Add <b>CDN caching</b> + store media in <b>R2</b> so serving files is near-free.</td>
+          <td class="wrap-cell">Supabase/Vercel bandwidth bill climbing with viewing/downloads.</td>
+          <td class="cost">~$15 / TB stored</td>
+          <td><span class="risk md">Medium</span></td>
+        </tr>
+        <tr>
+          <td><span class="svc">Stripe</span><span class="plain">Takes the money — subscriptions, intro offer, Super Max, top-ups.</span></td>
+          <td class="wrap-cell">Standard (LIVE)</td>
+          <td class="wrap-cell">No change. Ask for volume pricing when revenue is large.</td>
+          <td class="wrap-cell">None for capacity — it scales infinitely.</td>
+          <td class="cost">~2.9% + 30¢ / charge</td>
+          <td><span class="risk none">None</span></td>
+        </tr>
+        <tr>
+          <td><span class="svc">Claude API</span><span class="plain">A text-AI helper inside the app (prompt help / assistant).</span></td>
+          <td class="wrap-cell">Pay-as-you-go</td>
+          <td class="wrap-cell">Same + request a higher per-minute rate limit if used heavily.</td>
+          <td class="wrap-cell">Rate-limit errors on a text feature at peak.</td>
+          <td class="cost">Modest usage</td>
+          <td><span class="risk lo">Low</span></td>
+        </tr>
+        <tr>
+          <td><span class="svc">GitHub Actions watchdog</span><span class="plain">Pings you on Telegram every 30 min if the site goes down.</span></td>
+          <td class="wrap-cell">Free tier</td>
+          <td class="wrap-cell">No change.</td>
+          <td class="wrap-cell">None.</td>
+          <td class="cost">$0</td>
+          <td><span class="risk none">None</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h3>Estimated monthly infrastructure cost by stage</h3>
+    <div class="psub">Rough composition at each growth stage. Excludes fal.ai cost-of-goods. Numbers are estimates for planning, not quotes.</div>
+    <div class="cwrap"><canvas id="costChart"></canvas></div>
+  </div>
+
+  <footer>
+    Stack verified live in <b>studio/package.json</b>, the render worker's <b>Dockerfile</b> &amp; <b>README</b> · deployment, monetization &amp; render details cross-checked against project memory · direct/plan prices are Sep-2026 estimates — confirm live before committing.<br>
+    solorender scaling plan · generated 2026-09-20
+  </footer>
+</div>
+
+<script>
+const ctx = document.getElementById('costChart');
+const svcColor = {
+  'Vercel':'#3aa0ff','Supabase':'#7c5cff','Render workers':'#f472b6',
+  'Email':'#ffb020','Cloudflare R2':'#3ecf8e','Claude API':'#98a2b3'
+};
+// Rough midpoint estimates per stage ($/mo), excluding fal COGS.
+const stages = ['Now (as-is)','~1–2k concurrent','~5k concurrent'];
+const data = {
+  'Vercel':        [20, 60, 150],
+  'Supabase':      [25, 25, 599],
+  'Render workers':[15, 85, 255],
+  'Email':         [0,  20, 90],
+  'Cloudflare R2': [0,  40, 120],
+  'Claude API':    [5,  20, 40]
+};
+new Chart(ctx,{
+  type:'bar',
+  data:{
+    labels:stages,
+    datasets:Object.keys(data).map(k=>({
+      label:k, data:data[k], backgroundColor:svcColor[k], borderRadius:4, barPercentage:.6
+    }))
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{labels:{color:'#98a2b3',boxWidth:12,font:{size:12}}},
+      tooltip:{callbacks:{label:c=>c.dataset.label+': $'+c.parsed.y+'/mo'}}
+    },
+    scales:{
+      x:{stacked:true,ticks:{color:'#e8ecf1',font:{size:13,weight:'600'}},grid:{display:false}},
+      y:{stacked:true,ticks:{color:'#98a2b3',callback:v=>'$'+v},grid:{color:'#21262f'},title:{display:true,text:'Estimated $/mo (excl. fal)',color:'#98a2b3'}}
+    }
+  }
+});
+</script>
+</body>
+</html>
