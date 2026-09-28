@@ -72,6 +72,10 @@
 <li>**2026-09-18: burned three paid runs (615 + 615 + 1,230 credits, all refunded) guessing why</li>
 </ul>
 <p>fal rejected FLUX 3 Extend with a generic <code>invalid_request</code>, and only THEN read the model&#x27;s docs page.<strong> The very first rejection of a schema-valid request was the signal that the problem wasn&#x27;t in the fields I could see. </strong>Rule: one paid attempt per model. If a paid call fails and the request already matches the schema, STOP — read the model&#x27;s docs/API page, compare against its exact example body, and run a free check (schema endpoint, HEAD, a minimal probe) before spending again. Changing one guessed parameter and re-paying is not debugging.**</p>
+<ul>
+<li>**2026-09-21: rebuilt Magnific&#x27;s characters from raw cast photos on disk — and spent 24</li>
+</ul>
+<p>credits on a test generation — when the finished character assets (styled cover portraits + stored reference images) already existed in the Magnific web app.<strong> Eddie had to point at the Characters library page. The API/MCP listing didn&#x27;t expose image URLs, but the logged-in web app did (pikaso.cdnpk.net signed URLs, readable via Chrome). </strong>Rule: when importing or replicating an asset that lives in a connected service, FIRST open that service&#x27;s own UI (logged-in Chrome) and take the finished asset as-is. Rebuild from source materials only when the finished asset truly can&#x27;t be reached — and never spend credits generating something that already exists.**</p>
 <hr>
 <h2>Where the automated hooks do apply</h2>
 <p><code>.claude/settings.json</code> hooks only run in <strong>terminal Claude Code</strong>, launched from inside that project folder. They do nothing in Cowork. Projects that have them:</p>

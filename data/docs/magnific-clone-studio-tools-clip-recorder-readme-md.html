@@ -1,0 +1,30 @@
+<h1>clip-recorder</h1>
+<p>Unattended screen recording of the solorender app. Nobody has to sit and film anything — a headless Chromium drives the real product and writes MP4s.</p>
+<p><strong>One episode produces two files</strong>, and they are <em>not</em> the same footage cropped:</p>
+<table><thead><tr><th>File</th><th>Size</th><th>Layout</th><th>For</th></tr></thead><tbody><tr><td><code>&lt;slug&gt;--desktop-16x9.mp4</code></td><td>1920×1080</td><td>desktop</td><td>tutorials, YouTube, the docs</td></tr><tr><td><code>&lt;slug&gt;--social-9x16.mp4</code></td><td>1080×1920</td><td>phone</td><td>Shorts, TikTok, Reels, Facebook, Pinterest, LinkedIn, X</td></tr></tbody></table>
+<p>solorender is responsive, so each run renders the layout that shape was designed for. No letterboxing, no re-cut, no panning around a wide screenshot.</p>
+<h2>Setup (once)</h2>
+<pre class='code'><code>cd studio/tools/clip-recorder
+npm run setup</code></pre>
+<p>That installs Playwright and its Chromium (~100 MB, cached outside this repo). <code>ffmpeg</code> must be on PATH — it already is on Eddie&#x27;s Mac (<code>/usr/local/bin/ffmpeg</code>).</p>
+<h2>Use</h2>
+<p>Start the app first (<code>npm run dev</code> in <code>studio/</code>), then:</p>
+<pre class='code'><code>node record.mjs --model img-flux2-pro --prompt &quot;Make it Lego.&quot; --slug nano-lego
+node record.mjs --episodes episodes.example.json
+node record.mjs --episodes episodes.example.json --format social</code></pre>
+<p>Options: <code>--base</code> (default <code>http://localhost:3000</code>), <code>--out</code> (default <code>./out</code>), <code>--pace</code> (ms per keystroke, default 45), <code>--format</code> (<code>both</code> | <code>desktop</code> | <code>social</code>).</p>
+<p>The prompts in <code>studio/src/lib/model-guides.ts</code> are the script library — each starter prompt is one episode.</p>
+<h2>Two traps this script already handles</h2>
+<p>Both were found by getting them wrong, so don&#x27;t &quot;simplify&quot; them away:</p>
+<ol>
+<li><strong>The CSS viewport width picks the layout</strong>, not the output size and not</li>
+</ol>
+<p><code>isMobile</code>. A 1080-wide viewport is past the <code>md:</code> breakpoint (768px), so it renders the <em>desktop</em> layout stretched into a tall frame with a dead void below. The phone layout needs a genuinely narrow viewport (360px).</p>
+<ol>
+<li><strong>Playwright&#x27;s <code>deviceScaleFactor</code> does not feed the video encoder.</strong> It only</li>
+</ol>
+<p>scales the viewport <em>down</em> into the output frame, never up — so a narrow viewport plus a large <code>recordVideo.size</code> comes out pillarboxed in grey. The thing that actually raises the raster is Chromium&#x27;s <code>--force-device-scale-factor</code> launch flag. Both are set and must agree.</p>
+<h2>What it deliberately does NOT do</h2>
+<p>It never clicks <strong>Generate</strong>. A real run spends credits, and this has to be safe to re-run a hundred times. It types the prompt and lands on the price. Produce the generated asset separately (the solorender MCP tools) and composite it in.</p>
+<h2>Why it is isolated</h2>
+<p>Its own <code>package.json</code>, excluded from the app build via <code>studio/.vercelignore</code>. The root <code>npm install</code> never sees it (no workspaces) and <code>tsc</code> never reads it (<code>.mjs</code> is outside the tsconfig include), so it cannot slow or break a deploy.</p>
