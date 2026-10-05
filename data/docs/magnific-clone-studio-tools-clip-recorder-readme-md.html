@@ -24,6 +24,15 @@ node record.mjs --episodes episodes.example.json --format social</code></pre>
 <li><strong>Playwright&#x27;s <code>deviceScaleFactor</code> does not feed the video encoder.</strong> It only</li>
 </ol>
 <p>scales the viewport <em>down</em> into the output frame, never up — so a narrow viewport plus a large <code>recordVideo.size</code> comes out pillarboxed in grey. The thing that actually raises the raster is Chromium&#x27;s <code>--force-device-scale-factor</code> launch flag. Both are set and must agree.</p>
+<h2>Turning a recording into a finished episode — <code>compose.py</code></h2>
+<pre class='code'><code>python3 compose.py --recording out/x--social-9x16.mp4 --result result.mp4 \
+  --title &quot;Kling 2.6&quot; --tag &quot;video with sound&quot; --price &quot;210 credits&quot; \
+  --sub &quot;5 seconds · dialogue + rain + sizzle, one pass&quot; \
+  --line &quot;“Last bowl of the night, friend.”&quot; --out out/x--episode.mp4</code></pre>
+<p>The typing shot (sped up 1.4×) → the real result on a dark canvas with its own sound → burned-in captions, readable muted. <code>--result</code> can be a video or a picture (held 4 s); a silent result gets a silent track. Make the result first with the solorender MCP tools.</p>
+<p><strong>Captions use the Podcast project&#x27;s method — don&#x27;t invent another.</strong> This Mac&#x27;s ffmpeg has no caption filters; <code>compose.py</code> burns with the libass-capable ffmpeg at <code>Podcast/Podcast/90Day_LastResort_Season3/_SHARED/bin/ffmpeg</code> (override with <code>FFMPEG=…</code>), from an ASS file, using the explicit <code>subtitles=filename=…:fontsdir=…</code> form.</p>
+<p><strong>Fonts:</strong> <code>fonts/</code> holds solorender&#x27;s own Manrope (SemiBold, ExtraBold) and Syne (ExtraBold), from Google Fonts under the SIL Open Font License (licences alongside). In the ASS file they <strong>must be named in full</strong> — <code>Syne ExtraBold</code> with Bold 0. Writing <code>Syne</code> plus a weight silently falls back to Arial on this Mac; that was verified by rendering every variant side by side.</p>
+<p><strong>Record against the live site</strong>, not localhost: the local dev server shows a Next.js &quot;N&quot; badge in the corner of every frame.</p>
 <h2>What it deliberately does NOT do</h2>
 <p>It never clicks <strong>Generate</strong>. A real run spends credits, and this has to be safe to re-run a hundred times. It types the prompt and lands on the price. Produce the generated asset separately (the solorender MCP tools) and composite it in.</p>
 <h2>Why it is isolated</h2>
