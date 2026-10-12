@@ -1,0 +1,103 @@
+<h1>GTO_Holdem — Project Rules</h1>
+<p>Read the house rules in <code>../CLAUDE.md</code> first. This file adds the rules for this project only.</p>
+<h2>What this project is</h2>
+<p>Eddie&#x27;s own NLHE GTO study and drill system. It covers preflop charts, push/fold, ICM, postflop solutions and a drill trainer, across four formats: 6-max cash, MTTs with ICM, Spin &amp; Go, and live full-ring.</p>
+<ul>
+<li>Off-table study only. Never build real-time assistance.</li>
+<li>It is built to become a paid web app.</li>
+</ul>
+<p><strong>The plan comes in two copies. Change both together.</strong></p>
+<ul>
+<li><code>IMPLEMENTATION_PLAN.md</code> is Claude&#x27;s working copy.</li>
+<li><code>IMPLEMENTATION_PLAN.html</code> is Eddie&#x27;s copy. After every change, republish it from that same path so it stays at https://claude.ai/artifact/XjLVMo1zSYrYZBVEHL7eMc.</li>
+</ul>
+<h2>Talking to Eddie</h2>
+<ul>
+<li><strong>Eddie reads HTML, never Markdown.</strong> Never link or send him a <code>.md</code> file, this one included.</li>
+<li><strong>Explain in poker terms first.</strong> Code and file names come second, as footnotes.</li>
+<li><strong>Look and feel: PeakGTO&#x27;s dark palette</strong> (Eddie asked on 2026-10-06; values read from peakgto.com&#x27;s stylesheet). Use it for every page and for the app. Colors only: our own name, logo and layout, never theirs.</li>
+</ul>
+<table><thead><tr><th>Role</th><th>Color</th></tr></thead><tbody><tr><td>Background</td><td><code>#0a0f18</code></td></tr><tr><td>Cards</td><td><code>#111827</code></td></tr><tr><td>Text</td><td><code>#edf0f5</code></td></tr><tr><td>Muted text</td><td><code>#8a9ab0</code></td></tr><tr><td>Accent</td><td><code>#f4714a</code></td></tr><tr><td>Buttons</td><td><code>#dc3c28</code></td></tr><tr><td>Good / pass</td><td><code>#00b87a</code></td></tr><tr><td>Gold (caution, highlight numbers)</td><td><code>#fbbf24</code></td></tr></tbody></table>
+<ul>
+<li><strong>Strategy charts:</strong> check/call <code>#00b87a</code>, bet/raise <code>#dc3c28</code>, all-in <code>#7f1d1d</code>, not in range light grey <code>#d1d5db</code> with dark label text <code>#374151</code> (Eddie asked on 2026-10-06).</li>
+<li>The token blocks at the top of <code>IMPLEMENTATION_PLAN.html</code> and <code>validation/phase0_report.html</code> are the reference.</li>
+<li><strong>Every test ends with the result shown to him.</strong> That means a rendered chart, drill screen or results page, sent via SendUserFile. Numbers go alongside the result, never instead of it.</li>
+</ul>
+<h2>License firewall (never break it)</h2>
+<ul>
+<li><strong>AGPL code runs only offline, on our own machines.</strong> That covers b-inary postflop-solver, wasm-postflop, desktop-postflop and TexasSolver.</li>
+<li>It never goes on the web server.</li>
+<li>It never ships in a browser bundle.</li>
+<li>It is never linked into the app.</li>
+<li>Only its output files cross into the product.</li>
+<li><strong>App dependencies are MIT, Apache, BSD, ISC, or our own code.</strong> Check every new dependency&#x27;s license before adding it. Never add GPL or AGPL code, or code with no license at all.</li>
+<li><strong>Never import, scrape or copy third-party poker content into anything that ships.</strong> That covers GTO Wizard content (free tier included), PioSolver output, and charts from training sites. Comparing by eye to validate our own results is fine.</li>
+<li><strong>Preflop charts are built in-house, never licensed.</strong> Eddie decided this on 2026-10-06.</li>
+<li><strong>Our own postflop engine (Phase 7) is written clean-room</strong> from the published papers, such as DCFR. Never copy from AGPL source.</li>
+</ul>
+<h2>Where files live</h2>
+<p>Do not move code off the Desktop. iCloud Desktop sync is Eddie&#x27;s only Mac backup.</p>
+<table><thead><tr><th>What</th><th>Where</th></tr></thead><tbody><tr><td>Code and docs</td><td>This folder. Backed up by iCloud plus a private GitHub repo, pushed after every change. GitHub is the source of truth for code.</td></tr><tr><td>Build output</td><td><code>~/GTO_Holdem_work/build/</code>. Never inside this folder; point the Rust and web build output there.</td></tr><tr><td>AGPL solver copy</td><td><code>~/GTO_Holdem_work/agpl-solvers/</code>, which has its own private GitHub repo.</td></tr><tr><td>Solved library and solver output</td><td>Cloudflare R2, the master copy. Rented machines upload straight to it.</td></tr><tr><td>Local test runs</td><td><code>~/GTO_Holdem_work/runs/</code>. Delete them after use.</td></tr></tbody></table>
+<p>Never write output that spans many files or gigabytes into this folder. That would repeat the iCloud ghost-file problem; see the house rules entry dated 2026-09-07.</p>
+<h2>Working rules</h2>
+<ul>
+<li><strong>Every phase ends with its &quot;Done when&quot; gate from the plan.</strong> Report the actual numbers.</li>
+<li><strong>Label every number</strong> as Verified, Checked or Estimate.</li>
+<li><strong>Paid compute:</strong></li>
+<li>Run a test batch first: about 20 solves on one rented machine, under $1.</li>
+<li>Only then start a full run.</li>
+<li>Rented machines must shut themselves down when the job list is empty.</li>
+<li><strong>Budget is Lean:</strong> about $400 of compute in total. That covers the 6-max cash starter, the 8-max MTT starter, Spin on 184 flops, and one 100bb preflop run. Ask Eddie before going over it.</li>
+<li>The MTT and Spin preflop runs are not inside the $400. Measure each one with a test batch, then get Eddie&#x27;s approval.</li>
+<li><strong>Table sizes (decided 2026-10-06):</strong></li>
+<li>Cash: 6-max, 7-handed and 9-handed.</li>
+<li>MTTs: 7-, 8- and 9-handed.</li>
+<li>6-max cash and 8-max MTTs come first. 7- and 9-handed follow once 6-max preflop is proven, with their own budget approval.</li>
+<li>Each table size is a separate preflop solve. Postflop stays heads-up.</li>
+<li><strong>Pace is the fast track:</strong> daily sessions, with three tracks run in parallel.</li>
+<li>Track A, short stacks to the first paid product: Phase 1 → Phase 2 → Launch 1.</li>
+<li>Track B, postflop and cash charts: Phase 3 → Phase 4 → Phase 5 → Phase 6.</li>
+<li>Track C, our own engine: Phase 7.</li>
+<li><strong>Tooling on this Mac</strong> (2019 Intel, macOS 26):</li>
+<li>Rust lives in <code>~/.cargo/bin</code>, which is not on PATH. Call <code>~/.cargo/bin/cargo</code> directly. It was installed with the official rustup installer, after its checksum was verified against rust-lang.org.</li>
+<li><strong>Don&#x27;t use Homebrew for build tools here.</strong> It has no ready-made packages for this Intel/macOS combination, so it compiles things like cmake from source for hours.</li>
+<li>pnpm 12 reads its settings from <code>web/pnpm-workspace.yaml</code>, <strong>not</strong> <code>.npmrc</code>. The <code>virtualStoreDir</code> setting there keeps packages out of iCloud.</li>
+<li>The postflop-solver copy needs <code>bincode</code> and <code>bincode_derive</code> pinned to <code>2.0.0-rc.3</code> in its Cargo.lock. It also has three one-line fixes in <code>action_tree.rs</code> for Rust 1.99.</li>
+<li><strong>The trainer for Eddie: https://claude.ai/artifact/6CFTAGSMfbhe8z293KCz5j.</strong> It&#x27;s a private page that opens on any device. The Drill, Charts and ICM screens work there; the Postflop screen needs the local service on the Mac.</li>
+<li>To update it:</li>
+</ul>
+<ol>
+<li>Build with <code>pnpm --dir web exec vite build --base ./ --outDir ~/GTO_Holdem_work/build/artifact-dist</code>.</li>
+<li>In the session scratchpad, assemble a page: <code>&lt;title&gt;</code>, the Google Fonts link, the built CSS inlined in <code>&lt;style&gt;</code>, <code>&lt;div id=&quot;root&quot;&gt;</code>, and <code>&lt;script type=&quot;module&quot; src=&quot;assets/app.js&quot;&gt;</code>.</li>
+<li>Publish it with <code>url</code> = the link above. Pass <code>files</code> mapping <code>assets/app.js</code> → the built JS and <code>data/pushfold_hu.json</code> → the chart data.</li>
+</ol>
+<ul>
+<li>The localhost dev preview (<code>.claude/launch.json</code> &quot;drill-app&quot;) is for development only. The Claude app stops it on its own.</li>
+<li><strong>Local postflop service (AGPL zone, this Mac only):</strong></li>
+<li>Start it: <code>cd ~/GTO_Holdem_work/agpl-solvers/postflop-solver &amp;&amp; ./target/release/examples/gto_spot_server</code>. It serves 127.0.0.1:8777, and the app&#x27;s Postflop screen talks to it.</li>
+<li><strong>Stop it when you&#x27;re done</strong> (<code>pkill -f gto_spot_server</code>). A solved flop holds about 5 GB.</li>
+<li><strong>TexasSolver (cross-checks only):</strong></li>
+<li>Build with <code>make -C build-mac</code> in <code>~/GTO_Holdem_work/agpl-solvers/TexasSolver</code>, on the local branch <code>gto-holdem-local</code>. Don&#x27;t push it.</li>
+<li>It needs no OpenMP or CMake; its two OpenMP loops were swapped for C++ threads.</li>
+<li>It uses about 1.4× postflop-solver&#x27;s memory and is about 4.5× slower.</li>
+<li><strong>Real memory limit on this Mac:</strong> with Eddie&#x27;s apps open, only solves up to about <strong>5 GB</strong> run cleanly. Over that:</li>
+<li>use <code>&quot;compress&quot;: true</code> (16-bit, half the memory);</li>
+<li>or run while the Mac is idle;</li>
+<li>or rent a machine.</li>
+</ul>
+<p>A 7.65 GB solve swapped to a halt on 2026-10-06.</p>
+<ul>
+<li><strong>Measured flop solve time here:</strong> 2 flop sizes + all-in, 100bb-deep single-raised pot (pot 55, stack 975), 8 threads. It takes about <strong>11 minutes and 4.8 GB</strong> per flop.</li>
+<li><strong>License exception on record:</strong> <code>lightningcss</code> (MPL-2.0) is Vite&#x27;s build-time CSS tool. It doesn&#x27;t ship in the app and is used unmodified. Flag it for the Phase 8 lawyer review. No other non-permissive license is allowed without asking Eddie.</li>
+<li><strong>Eddie creates all accounts. Never create one for him.</strong></li>
+<li>AWS, with a payment method, is needed before Phase 4.</li>
+<li>Cloudflare, with R2 switched on, is needed before Phase 5.</li>
+</ul>
+<h2>Learned from mistakes (this project)</h2>
+<p>Newest entries go last.</p>
+<ul>
+<li><strong>2026-10-06: I recommended moving the code off the Desktop to protect git from iCloud.</strong> That would have taken the code out of Eddie&#x27;s only backup, and split the project into two places. <strong>Rule: the project stays on the Desktop. Keep only build output and big data out of iCloud. iCloud &quot;2&quot; conflict copies are acceptable, because GitHub is the source of truth for code.</strong></li>
+<li><strong>2026-10-06: the Lean budget counted one preflop run, but it also funds MTT and Spin postflop libraries.</strong> Each of those needs its own preflop charts as input. Eddie approved a budget that was missing those runs. <strong>Rule: when pricing any library, count one preflop run for every format and table size it feeds, and show that line separately.</strong></li>
+<li><strong>2026-10-06: pnpm 12 silently ignored <code>virtual-store-dir</code> in <code>.npmrc</code>.</strong> 989 package files (73 MB) landed in the iCloud-synced <code>web/node_modules</code> before the Phase 0 file-count gate caught it. <strong>Rule: after any web install, count the files in <code>web/node_modules</code>. About 11 links is correct; hundreds means packages leaked into iCloud. Delete them right away and fix the setting.</strong></li>
+<li><strong>2026-10-07: told Eddie &quot;the app is running at http://localhost:5173&quot;.</strong> The Claude app had stopped that preview server hours earlier, and the browser pane was hidden, so he saw nothing. <strong>Rule: before telling Eddie something is running or viewable, check it live in the same turn (<code>preview_list</code> or a request to it). Anything he should be able to open at any time, from any device, gets published as a private artifact; never point him at localhost.</strong></li>
+</ul>

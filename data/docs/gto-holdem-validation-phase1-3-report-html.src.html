@@ -1,0 +1,223 @@
+<meta charset="utf-8">
+<title>Phases 1 and 3 Results</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+/* Layout: one reading column; gate cards first, then the evidence. PeakGTO's dark palette (see CLAUDE.md "Look and feel"). */
+:root {
+  --bg: #0a0f18; --surface: #111827; --ink: #edf0f5; --muted: #8a9ab0; --rule: rgba(255, 255, 255, 0.08);
+  --accent: #f4714a; --good: #00b87a; --good-soft: rgba(0, 184, 122, 0.13);
+  --gold: #fbbf24; --gold-soft: rgba(251, 191, 36, 0.12); --th-bg: #0d1420;
+  --shove: #dc3c28; --call: #00b87a; --fold: #5b8def; --empty: #d1d5db;
+  --display: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --body: "Source Serif 4", Georgia, serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.6; margin: 0; padding-inline: 16px; padding-block: 0 64px; }
+table { font-size: inherit; }
+main { max-width: 860px; margin: 0 auto; display: grid; gap: 48px; padding-block: 40px 0; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.2; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(1.9rem, 4.5vw, 2.6rem); font-weight: 700; }
+h2 { font-size: 1.45rem; } h3 { font-size: 1.05rem; }
+p { margin: 0; }
+ul, ol { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+section { display: grid; gap: 14px; min-width: 0; }
+.eyebrow { font-family: var(--display); font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.muted { color: var(--muted); } .small { font-size: 0.92rem; }
+.sec-head { border-top: 2px solid var(--ink); padding-top: 12px; display: grid; gap: 2px; }
+.sec-num { font-family: var(--mono); font-size: 0.78rem; color: var(--muted); }
+.gates { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 760px) { .gates { grid-template-columns: minmax(0, 1fr); } }
+.gate { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 14px 16px; display: grid; gap: 6px; align-content: start; }
+.gate-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.gate-top h3 { font-size: 0.95rem; }
+.pill { font-family: var(--display); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
+.pass { color: var(--good); background: var(--good-soft); }
+.part { color: var(--gold); background: var(--gold-soft); }
+.big { font-family: var(--mono); font-size: 1.2rem; color: var(--gold); font-variant-numeric: tabular-nums; }
+.gate p { font-size: 0.9rem; }
+.group { font-family: var(--display); font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.tbl { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+.tbl table { width: 100%; border-collapse: collapse; font-family: var(--display); font-size: 0.88rem; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-size: 0.72rem; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); background: var(--th-bg); }
+tr:last-child td { border-bottom: 0; }
+.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.callout { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 14px 16px; display: grid; gap: 8px; font-size: 0.97rem; }
+.callout.ask { border-color: var(--gold); }
+.charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 760px) { .charts { grid-template-columns: minmax(0, 1fr); } }
+.chart { display: grid; gap: 8px; min-width: 0; }
+.grid-wrap { overflow-x: auto; }
+.grid { display: grid; grid-template-columns: repeat(13, minmax(22px, 1fr)); gap: 2px; min-width: 320px; }
+.cell { aspect-ratio: 1 / 1; border-radius: 3px; position: relative; overflow: hidden; font-family: var(--mono); font-size: 0.56rem; display: flex; }
+.cell span { height: 100%; }
+.cell b { position: absolute; left: 2px; top: 1px; font-weight: 500; color: #fff; text-shadow: 0 0 2px rgba(0,0,0,0.7); }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-family: var(--display); font-size: 0.85rem; }
+.sw { display: inline-block; width: 12px; height: 12px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+</style>
+
+<main>
+  <header style="display:grid;gap:12px">
+    <div class="eyebrow">GTO Holdem · Build plan Phases 1 and 3</div>
+    <h1>Phases 1 and 3 Results</h1>
+    <p>Phase 1 (short-stack toolkit and drill app) is done and checked. One last step needs your OK. Phase 3 (postflop study on your Mac) works end to end, but its cross-check against a second solver is only partly done: your Mac ran out of memory. Runs on 6–7 October 2026.</p>
+  </header>
+
+  <section>
+    <span class="group">Phase 1 · Short stacks and drill app</span>
+    <div class="gates">
+      <div class="gate"><div class="gate-top"><h3>ICM calculator</h3><span class="pill part">1 STEP WAITING</span></div>
+        <span class="big">exact to 13 decimals</span>
+        <p>Two independent checks pass. The comparison against HRC's calculator needs your OK, because it sends numbers to their site.</p></div>
+      <div class="gate"><div class="gate-top"><h3>Push/fold vs HRC</h3><span class="pill pass">PASS</span></div>
+        <span class="big">168/169 · 169/169</span>
+        <p>Shove and call thresholds match HRC's published Nash charts (no ante) within 0.1bb.</p></div>
+      <div class="gate"><div class="gate-top"><h3>Drill app runs</h3><span class="pill pass">PASS</span></div>
+        <span class="big">4 screens working</span>
+        <p>Drill, push/fold charts, ICM calculator and postflop. Screenshots were sent with this page.</p></div>
+    </div>
+    <span class="group">Phase 3 · Postflop study on your Mac</span>
+    <div class="gates">
+      <div class="gate"><div class="gate-top"><h3>Reference spots solved</h3><span class="pill part">4 OF 5</span></div>
+        <span class="big">≤ 0.50% of pot</span>
+        <p>Four flops solved to target. A♠7♣2♦ needs a quiet Mac, or the half-memory mode.</p></div>
+      <div class="gate"><div class="gate-top"><h3>Second-solver cross-check</h3><span class="pill part">1 OF 5</span></div>
+        <span class="big">EV within 0.06 chips</span>
+        <p>On T♦9♦6♥ both solvers value the spot the same, but their check/bet mixes differ by about 8%.</p></div>
+      <div class="gate"><div class="gate-top"><h3>Timing recorded</h3><span class="pill pass">PASS</span></div>
+        <span class="big">≈11 min · 4.8 GB</span>
+        <p>Per flop on your Mac: 2 bet sizes plus all-in, 100bb deep.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">PHASE 1</span><h2>Heads-up push/fold at 10bb</h2></div>
+    <p>These are the engine's own solutions, drawn straight from its data. At 10bb the small blind shoves <strong>58.3%</strong> of hands and the big blind calls <strong>37.4%</strong>. Half-colored squares are hands the solver mixes.</p>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--shove)"></span>Shove</span>
+      <span><span class="sw" style="background:var(--call)"></span>Call</span>
+      <span><span class="sw" style="background:var(--fold)"></span>Fold</span>
+    </div>
+    <div class="charts">
+      <div class="chart"><h3>Small blind: shove</h3><div class="grid-wrap"><div class="grid" id="sb" role="img" aria-label="Small blind shoving chart at 10bb"></div></div></div>
+      <div class="chart"><h3>Big blind: call a shove</h3><div class="grid-wrap"><div class="grid" id="bb" role="img" aria-label="Big blind calling chart at 10bb"></div></div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">PHASE 1 · CHECKS</span><h2>How we know the charts are right</h2></div>
+    <div class="tbl"><table>
+      <thead><tr><th>Check</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr><td>Exactness of the solutions</td><td>Worst exploitability over all 158 charts (1–40bb, with and without antes): <strong>0.00000001 bb per hand</strong>. The target was 0.001.</td></tr>
+        <tr><td>HRC published charts, no ante</td><td>Small-blind shoves: <strong>168/169</strong> hands within 0.1bb. The one exception, Q4o, matches HRC's 7.9bb, but we also shove a 0.1bb sliver HRC leaves out. Big-blind calls: <strong>169/169</strong>.</td></tr>
+        <tr><td>HRC published charts, with ante</td><td>154/169 shoves and 155/169 calls within 0.1bb. The rest are hands the solver mixes near HRC's edge. HRC's page says its charts simplify mixed hands.</td></tr>
+        <tr><td>My own look at HRC's live page</td><td>Checked K2o, Q2o, J2o, 32o, A2o and 22, plus the 63s and 43s gaps. Every one matches within our 0.5bb chart steps; for example, K2o shoves to 11.5bb in ours and 11.6bb in HRC's.</td></tr>
+        <tr><td>All-in equity table</td><td><strong>Identical, number for number, on all 1,624,350 hand-vs-hand matchups</strong> to b-inary's independently published table. Examples: AA vs KK 81.95%, AKs vs QQ 46.05%, 72o vs AA 11.80%.</td></tr>
+        <tr><td>ICM, check 1</td><td>Against a brute-force listing of every possible finishing order, 212 cases: worst gap 1.7 × 10⁻¹³ of the prize pool.</td></tr>
+        <tr><td>ICM, check 2</td><td>The app's ICM and the engine's ICM were written separately. They agree on 12 test cases to 2.3 × 10⁻¹³.</td></tr>
+        <tr><td>ICM, check 3</td><td><em>Waiting:</em> the same 12 cases typed into HRC's free online calculator. It sends what you type to their server, so it needs your OK.</td></tr>
+      </tbody>
+    </table></div>
+    <p class="small muted">HRC's numbers were used only as an answer key. They are kept in the work folder and never ship in the app.</p>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">PHASE 1 · DRILL</span><h2>Graded by EV lost</h2></div>
+    <p>The drill deals a random stack depth, seat and hand, weighted the way real cards are dealt. You shove, call or fold, and it grades you by how much EV the choice gives up compared with the solver:</p>
+    <ul>
+      <li><strong>Best</strong>, or <strong>Mixed: fine</strong>: when the solver plays your action at least sometimes.</li>
+      <li><strong>Inaccuracy:</strong> under 0.1bb lost.</li>
+      <li><strong>Mistake:</strong> under 0.5bb lost.</li>
+      <li><strong>Blunder:</strong> 0.5bb or more.</li>
+    </ul>
+    <p>In the screenshot sent with this page, calling a 7.5bb shove with 75s is graded a <strong>blunder</strong>. The call is worth −1.62bb against −1.00bb for folding, so it loses 0.62bb. Running totals (hands, % correct, bb lost) are kept on your device.</p>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">PHASE 3</span><h2>Postflop study on your Mac</h2></div>
+    <p>The <strong>Postflop</strong> screen works end to end:</p>
+    <ol>
+      <li>Set up a spot: ranges, board, pot, stack and bet sizes.</li>
+      <li>Solve it on your Mac.</li>
+      <li>Click through checks, bets and dealt cards.</li>
+      <li>Open any hand to see each combo's strategy, EV and equity.</li>
+    </ol>
+    <p>In the screenshot (T♦9♦6♥Q♣, a turn spot), A♦K♦ is the only AK that ever bets, 12% of the time. On this two-diamond board it holds a flush draw: 47% equity against 33% for the other AKs. That's the kind of detail a study tool should show.</p>
+    <h3>Reference flops</h3>
+    <p class="small muted">Pot 55, stacks 975 (100bb deep), flop bets 33% and 75% plus all-in, the solver's test ranges, solved on your Mac with 8 threads.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Flop</th><th class="num">Time</th><th class="num">Memory</th><th class="num">Accuracy</th><th>First move (check / small / big bet)</th><th>Second solver</th></tr></thead>
+      <tbody>
+        <tr><td>T♦ 9♦ 6♥</td><td class="num">10.6 min</td><td class="num">4.76 GB</td><td class="num">0.48%</td><td>52.5 / 45.4 / 2.1%</td><td>TexasSolver: 47.6 min, 6.63 GB, 0.46%</td></tr>
+        <tr><td>K♥ 8♥ 3♠</td><td class="num">11.2 min</td><td class="num">4.77 GB</td><td class="num">0.50%</td><td>57.2 / 42.2 / 0.6%</td><td class="muted">not run yet</td></tr>
+        <tr><td>9♣ 8♣ 7♦</td><td class="num">11.1 min</td><td class="num">4.78 GB</td><td class="num">0.50%</td><td>45.5 / 54.0 / 0.5%</td><td class="muted">not run yet</td></tr>
+        <tr><td>Q♠ 5♠ 5♥</td><td class="num">11.6 min</td><td class="num">4.76 GB</td><td class="num">0.49%</td><td>28.7 / 71.2 / 0.04%</td><td class="muted">not run yet</td></tr>
+        <tr><td>A♠ 7♣ 2♦</td><td colspan="5" class="muted">Not solved. It needs 7.65 GB, or 3.97 GB in half-memory mode. The full-size run swapped to a halt, and the half-memory run was stopped when the Mac got overloaded.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="callout">
+      <h3>What the one cross-check shows</h3>
+      <ul>
+        <li><strong>Same value:</strong> both solvers put the out-of-position player's share of the pot at about 28.2–28.3 chips. The gap is 0.06 chips, inside the margin of error.</li>
+        <li><strong>Different mix:</strong> TexasSolver checks 46% and makes the small bet 53%; ours checks 52.5% and makes it 45%. The average hand differs by about 8%. The biggest gaps are AKs (checks 76% vs 60%), 65s, 75s, 85s and 98s.</li>
+        <li><strong>Likely reading, not yet proven:</strong> when two strategies are worth the same, both can be correct. The hands are indifferent between checking and betting small. TexasSolver's known turn/river bug (#95) could also play a part.</li>
+        <li><strong>The test that settles it:</strong> force our solver to use TexasSolver's first-move mix and measure the EV lost. If the loss is tiny, both mixes are equally good.</li>
+      </ul>
+    </div>
+    <div class="callout">
+      <h3>What this means for the plan</h3>
+      <ul>
+        <li><strong>Your Mac solves one study spot at a time comfortably, at about 11 minutes and 5 GB per flop.</strong> With your apps open, about 5 GB is the practical limit; bigger trees need half-memory mode or a quiet Mac.</li>
+        <li><strong>The library still belongs on rented machines,</strong> as planned. A 32-core machine should take roughly 3 minutes per flop of this kind <em>(estimate)</em>, which is what the cost table assumed.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">FIXES</span><h2>Problems found and fixed while testing</h2></div>
+    <ul>
+      <li>The postflop screen read the service's "no spot solved yet" reply as "service not running", which greyed out the Solve button. It now tells the two cases apart.</li>
+      <li>Range weights arrived as combo counts (AKs up to 4); the chart now converts them to a share of the hand.</li>
+      <li>A turn spot was labeled "Flop". Labels now name the right street.</li>
+      <li>Two charts side by side were cut off on narrower windows. The grids now fit.</li>
+      <li>Helper B left two idle waiting loops running after it finished. I stopped them; nothing of ours is running now.</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">WAITING ON YOU</span><h2>Two decisions</h2></div>
+    <div class="callout ask">
+      <ol>
+        <li><strong>OK to use HRC's online ICM calculator?</strong> I'd type our 12 made-up test cases into holdemresources.net/icmcalculator. Nothing about you is sent.</li>
+        <li><strong>When can your Mac sit idle for about 3 hours?</strong> That finishes Phase 3: three TexasSolver cross-checks (about 50 minutes each), the A♠7♣2♦ solve and the settle-the-mix test. Overnight is ideal. The other option is to rent a machine once your AWS account exists.</li>
+      </ol>
+    </div>
+  </section>
+</main>
+
+<script>
+const ranks = "AKQJT98765432";
+const name = (r, c) => r === c ? ranks[r] + ranks[c] : r < c ? ranks[r] + ranks[c] + "s" : ranks[c] + ranks[r] + "o";
+// Engine output: heads-up push/fold, no ante, 10bb (pushfold_hu.json), 169 hands in chart order.
+const data = {"sb":[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,0,0,1,1,1,1,1,1,0,0,1,1,0,0,0,0,0,1,1,1,1,0,0,1,1,0,0,0,0,0,0,0,1,1,1,0,1,1,0,0,0,0,0,0,0,0,1,0.7105,0,1,1,0,0,0,0,0,0,0,0,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,1],
+"bb":[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0.4013,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,1,1,1,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,0,0,0,0,1,1,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,0,0,0,1,0,0,0,0,1,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,1]};
+function draw(id, freqs, color) {
+  const el = document.getElementById(id);
+  freqs.forEach((f, i) => {
+    const r = Math.floor(i / 13), c = i % 13, h = name(r, c);
+    const cell = document.createElement("div"); cell.className = "cell";
+    cell.title = `${h}: ${Math.round(f * 100)}%`;
+    const a = document.createElement("span"); a.style.width = (f * 100) + "%"; a.style.background = color;
+    const b = document.createElement("span"); b.style.width = ((1 - f) * 100) + "%"; b.style.background = "var(--fold)";
+    const label = document.createElement("b"); label.textContent = h;
+    cell.append(a, b, label); el.appendChild(cell);
+  });
+}
+draw("sb", data.sb, "var(--shove)");
+draw("bb", data.bb, "var(--call)");
+</script>

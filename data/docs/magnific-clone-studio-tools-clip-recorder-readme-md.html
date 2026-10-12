@@ -28,11 +28,12 @@ node record.mjs --episodes episodes.example.json --format social</code></pre>
 <pre class='code'><code>python3 compose.py --recording out/x--social-9x16.mp4 --result result.mp4 \
   --title &quot;Kling 2.6&quot; --tag &quot;video with sound&quot; --price &quot;210 credits&quot; \
   --sub &quot;5 seconds · dialogue + rain + sizzle, one pass&quot; \
-  --line &quot;“Last bowl of the night, friend.”&quot; --out out/x--episode.mp4</code></pre>
+  --line &quot;“Last bowl of the night, friend.”&quot; --out out/x--episode-9x16.mp4</code></pre>
+<p><strong>Both shapes, every time.</strong> Run it a second time with <code>--format desktop</code>, the <code>--desktop-16x9.mp4</code> recording and the same result and captions to get the 16:9 episode (<code>--out out/x--episode-16x9.mp4</code>). The vertical one stacks price → result → link; the wide one puts the result on the left and the price, details and link in a column on its right.</p>
 <p>The typing shot (sped up 1.4×) → the real result on a dark canvas with its own sound → burned-in captions, readable muted. <code>--result</code> can be a video or a picture (held 4 s); a silent result gets a silent track. Make the result first with the solorender MCP tools.</p>
 <p><strong>Captions use the Podcast project&#x27;s method — don&#x27;t invent another.</strong> This Mac&#x27;s ffmpeg has no caption filters; <code>compose.py</code> burns with the libass-capable ffmpeg at <code>Podcast/Podcast/90Day_LastResort_Season3/_SHARED/bin/ffmpeg</code> (override with <code>FFMPEG=…</code>), from an ASS file, using the explicit <code>subtitles=filename=…:fontsdir=…</code> form.</p>
 <p><strong>Fonts:</strong> <code>fonts/</code> holds solorender&#x27;s own Manrope (SemiBold, ExtraBold) and Syne (ExtraBold), from Google Fonts under the SIL Open Font License (licences alongside). In the ASS file they <strong>must be named in full</strong> — <code>Syne ExtraBold</code> with Bold 0. Writing <code>Syne</code> plus a weight silently falls back to Arial on this Mac; that was verified by rendering every variant side by side.</p>
-<p><strong>Record against the live site</strong>, not localhost: the local dev server shows a Next.js &quot;N&quot; badge in the corner of every frame.</p>
+<p><strong>Record against the local dev server</strong> (the default <code>--base</code>). The live site&#x27;s Studio needs a sign-in, which the recorder doesn&#x27;t have: pointed at solorender.com it lands on the login page and times out waiting for the prompt box (tested 2026-10-06). The dev server&#x27;s Next.js &quot;N&quot; badge is hidden by the recorder itself once the page is up.</p>
 <h2>What it deliberately does NOT do</h2>
 <p>It never clicks <strong>Generate</strong>. A real run spends credits, and this has to be safe to re-run a hundred times. It types the prompt and lands on the price. Produce the generated asset separately (the solorender MCP tools) and composite it in.</p>
 <h2>Why it is isolated</h2>

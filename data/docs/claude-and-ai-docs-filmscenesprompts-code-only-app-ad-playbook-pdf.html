@@ -1,0 +1,334 @@
+<div class="pdfpages"><img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-filmscenesprompts-code-only-app-ad-playbook-pdf/p-1.jpg" alt="page 1">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-filmscenesprompts-code-only-app-ad-playbook-pdf/p-2.jpg" alt="page 2">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-filmscenesprompts-code-only-app-ad-playbook-pdf/p-3.jpg" alt="page 3">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-filmscenesprompts-code-only-app-ad-playbook-pdf/p-4.jpg" alt="page 4">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-filmscenesprompts-code-only-app-ad-playbook-pdf/p-5.jpg" alt="page 5">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-filmscenesprompts-code-only-app-ad-playbook-pdf/p-6.jpg" alt="page 6">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-filmscenesprompts-code-only-app-ad-playbook-pdf/p-7.jpg" alt="page 7">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-filmscenesprompts-code-only-app-ad-playbook-pdf/p-8.jpg" alt="page 8">
+<img class="pdfpage" loading="lazy" src="data/pdf/claude-and-ai-docs-filmscenesprompts-code-only-app-ad-playbook-pdf/p-9.jpg" alt="page 9"></div><div class="pdftext" hidden><pre>F R E E P L AY B O O K · A I V I D E O A D S
+
+
+
+
+The Code-Only
+App Ad Playbook
+How I made a 39-second app ad where every frame is code. A phone, a dating app,
+an AI app, notifications, music. No image generation, no video generation, no screen
+recording, no editor. Claude writes it, Chrome renders it.
+
+1 0 0 % C O D E · $ 0 O N G E N E R AT I O N · 4 P R O M P T S
+0 1 · W H Y T H I S F O R M AT
+
+
+
+The best place to show an app is the phone
+it lives on.
+An app ad usually means screen recordings, an editor and a lot of fiddling, or AI video
+that garbles every bit of text on screen. Building the phone in code skips both.
+
+WHAT YOU GET                              WHY IT MATTERS
+
+
+Every pixel is real text                  Chat bubbles, buttons, prices, ratings: all crisp and spelled right, because
+                                          they&#x27;re HTML, not a model guessing at letters.
+
+It looks native                           It reads like a screen recording, so people watch it like content instead of
+                                          skipping it like an ad.
+
+$0 per render                             No credits. Re-rendering costs nothing but a few minutes, so you can test as
+                                          many versions as you like.
+
+Edits are one line                        New hook, new message, new price: change the text, render again. No re-
+                                          shoot, no re-generation, no drift.
+
+Any app, any flow                         Dating, fitness, finance, SaaS. If it happens on a screen, you can stage it
+                                          exactly the way you want.
+
+
+
+
+0:09 · the pain: every reply     0:12 · screenshot flash, then the   0:23 · the AI&#x27;s reply pasted back   0:37 · the end card
+typed, then deleted              swipe home                          in
+
+
+
+
+THE CODE-ONLY APP AD PLAYBOOK                                                                                                  2
+02 · HOW IT WORKS
+
+
+
+A web page that knows what every second
+looks like.
+The whole ad is one HTML file. It has one job: given a time, say 12.4 seconds, it puts every
+bubble, banner and button exactly where it should be at that moment. Then a browser
+takes a screenshot of every frame.
+
+ 1 · Script                     2 · Scene                     3 · Render                   4 · Sound
+ One conversation,              One HTML page. The            Headless Chrome              Python makes every
+ beat by beat, with             phone, every screen,          steps through it at 30       pop, tap and beat on
+ timings.
+                        →       every animation as a
+                                                       →      fps and saves every
+                                                                                       →   the same timings,
+                                function of time.             frame.                       then ffmpeg joins it
+                                                                                           all.
+
+
+
+Why &quot;a function of time&quot; matters
+Nothing plays on its own. There are no timers and no CSS animations running in the background. Frame
+372 always looks exactly the same, so a slow laptop can never drop a frame, and 60 fps just takes longer.
+It&#x27;s also why the sound lines up perfectly: the page hands over a list of every pop and swoosh with its
+exact time.
+
+What you need
+
+TOOL                                COST
+
+
+Claude Code                         Your Claude plan. The only paid part.
+
+Node.js, Python, ffmpeg, Chrome Free. Claude installs anything missing in Step 1.
+
+One stock photo (if a person        Free from Unsplash or Pexels.
+appears)
+
+Your app&#x27;s icon and App Store       Already yours.
+screenshots
+
+
+
+   Time: about an hour end to end, most of it Claude working while you wait. A 39-second render
+   takes about 3 minutes.
+
+
+
+
+THE CODE-ONLY APP AD PLAYBOOK                                                                                     3
+03 · THE STORY
+
+
+
+One conversation. Every screen change has
+a reason.
+My first version of this format jumped across eight screens and two chats. Nobody could
+follow it. These are the rules that fixed it.
+1. One thread from start to finish. One person, one problem, one chat. No second storyline.
+2. Every app switch is caused by the beat before it. Stuck on a reply, so screenshot. Screenshot, so
+   open the app. Copied, so paste. The viewer never has to work out where they are.
+3. Show the pain with the sound off. Three replies typed and deleted says &quot;I&#x27;m stuck&quot; faster than any
+   caption.
+4. The app is the answer inside the flow, not a detour to a product page.
+5. Use real language. I searched real dating openers first. &quot;Two truths and a lie&quot; tested best, so it became
+   the hook.
+6. End on a payoff notification. A calendar invite or a &quot;good morning&quot; text. It&#x27;s the reward, and it&#x27;s on
+   screen in half a second.
+
+The Rizz ad, beat by beat (39 s)
+
+TIME         SCREEN                  WHAT HAPPENS
+
+
+0–2 s        Lock screen             Notification: &quot;Sofia: two truths and a lie. go 😏&quot;
+
+2–7 s        Dating app              Chat, then her profile: the taco prompt gets highlighted
+
+7–12 s       Dating app              &quot;Your turn&quot; pulses. Three replies typed and deleted
+
+12–14 s      Screenshot, home        White flash, thumbnail shrinks, swipe home, tap the app
+
+14–22 s      The AI app              Upload, &quot;Reading the conversation…&quot;, three reply cards, copy one
+
+22–30 s      Dating app              Paste, send, she replies, &quot;deal. thursday?&quot;
+
+30–35 s      Notifications           Calendar invite, then next morning: &quot;good morning taco guy ☀️&quot;
+
+35–39 s      End card                Icon, promise, rating, Download button
+
+
+
+
+THE CODE-ONLY APP AD PLAYBOOK                                                                               4
+04 · THE WORKFLOW
+
+
+
+Four prompts. Paste them into Claude Code
+in order.
+Make an empty folder, open it in Claude Code and paste these one at a time. Fill in the [pink parts].
+
+   P R O M P T 1 · S E T U P · once per folder
+
+   Set up this folder so we can make phone-screen video ads entirely in code.
+      Check that Node.js 20+, Python 3.10+, ffmpeg and Google Chrome are installed. Install anything missing
+      (Windows: winget, Mac: Homebrew) and tell me what you installed.
+      Create a Node project and install puppeteer-core, using my installed Chrome with no browser download.
+      Install the Python packages numpy and scipy.
+      Write render.mjs. It opens an HTML page in headless Chrome, calls window.seek(t) for every frame at 30 fps,
+      screenshots each frame at 1080x1920 and joins them into an mp4 with ffmpeg.
+      Prove it works: render a 3-second test page with a bouncing circle and the words &quot;It works!&quot; to out/test.mp4.
+
+
+
+   P R O M P T 2 · R E S E A R C H A N D S C R I P T · then stop and wait for me
+
+   You&#x27;re my creative director. We&#x27;re making a 35–40 second 9:16 ad for my app where the whole video is a phone
+   screen, built 100% in code. No image or video AI.
+   APP: [App Store link]
+   WHO IT&#x27;S FOR: [one line]
+   WHERE THE PAIN HAPPENS: [e.g. a dating chat, a group chat, a budget spreadsheet]
+      Read the App Store page. List the rating, number of ratings, how the app works and every claim, word for
+      word. Only use these.
+      Search the web for how real people talk in that situation and pull 10 real lines worth using.
+      Give me 3 story options. Each one: one conversation or task from start to finish, the pain visible with the
+      sound off, my app appearing as the answer inside that flow, every screen change caused by the beat before it,
+      and a payoff notification at the end.
+      For each option, a table: time, screen, what&#x27;s on screen, motion and sound.
+      5 hooks for the first 2 seconds: a notification, a typed-then-deleted message, a badge, a search, a lock screen.
+   Save it to script.md.
+
+
+
+
+THE CODE-ONLY APP AD PLAYBOOK                                                                                            5
+04 · THE WORKFLOW
+
+
+   PROMPT 3 · BUILD THE SCENE
+
+   Approved: option [letter], hook [number]. Build it as one HTML page, scene.html.
+     Draw a phone on a soft gradient background: bezel, rounded corners, Dynamic Island, status bar. Every screen
+     (lock screen, home screen, [the other app], my app, end card) is HTML and CSS inside the phone. Copy my
+     app&#x27;s real look from its App Store screenshots.
+     The page must be deterministic: window.seek(t) sets every element for time t. No CSS animations, no timers.
+     Chat bubbles pop in with a spring. Incoming messages show typing dots first. Outgoing ones get typed into
+     the input bar while the keyboard keys light up.
+     Screen changes are real motion: tabs slide, swipe home, apps zoom open from their icon, a white flash and
+     shrinking thumbnail for screenshots, banners that drop from the top. Show a tap circle wherever a finger taps.
+     Keep all text inside the safe area (top 17%, bottom 19%, sides 9%) and make chat text big, around 50 px.
+     Use [stock photo link] for the person and my real app icon from the App Store page.
+     End card: icon, a one-line promise, rating, Download button, and small fine print saying the conversation is
+     illustrative.
+   Then render 15 stills across the ad into one contact sheet, look at it yourself, and fix anything cut off, overlapping
+   or hard to read before you show me.
+
+
+
+
+   PROMPT 4 · SOUND AND FINAL RENDER
+
+     Make every sound in code with Python, on the same times as the visuals: message pop, send swoosh,
+     keyboard taps, screenshot shutter, notification buzz and ding, a whoosh on every screen change.
+     Add a light lo-fi beat that sounds muffled while the user is stuck and opens up clean the moment my app
+     opens.
+     Have the page export its list of sound cues so the audio always matches the picture.
+     Render at 30 fps, 1080x1920, mix to about -14 LUFS, save out/final.mp4.
+     Make a one-frame-per-second contact sheet of the final video and check it before you tell me it&#x27;s done.
+
+
+
+
+   Extra versions, one line each: &quot;Add ?bare=1 for a screen-only version that looks like a screen
+   recording&quot; and &quot;Add ?phone=1 for the phone body with no background.&quot; Same page, same audio.
+
+
+
+
+THE CODE-ONLY APP AD PLAYBOOK                                                                                               6
+0 5 · W H AT W E N T W R O N G
+
+
+
+Five things that broke, so you can skip
+them.
+1          Too many screens
+           Eight screens and two chats in 40 seconds read as chaos. One conversation, and a reason for
+           every switch.
+
+
+
+2 Emoji rendering as blank boxes
+  Web emoji fonts load one character at a time, so anything that appears later in the video can render
+       invisible. Fix: put every emoji and late-appearing word in a hidden block on the page so it loads up
+       front.
+
+
+
+3         Chat bubbles showing through other apps
+          A bubble set to &quot;visible&quot; shows even when its whole screen is hidden. Tell Claude: bubbles use
+          visibility &quot;inherit&quot;, never &quot;visible&quot;.
+
+
+
+4          A long pasted message covering the keyboard
+           Anchor the message box to the bottom so it grows upward, like a real phone.
+
+
+
+5         Trusting it without looking
+          Every bug above was caught on a contact sheet, not in the code. Make Claude look at one after
+          every render.
+
+
+
+
+picking the screenshot          three replies, one chosen   the reply lands         the payoff
+
+
+
+
+THE CODE-ONLY APP AD PLAYBOOK                                                                                 7
+06 · HOOKS AND TWEAKS
+
+
+
+Test hooks, not whole ads.
+Only the first two seconds change, so every new hook is a free re-render. Five that work
+for app ads:
+
+HOOK                             EXAMPLE
+
+
+The notification                 Lock screen at 11:47 PM: &quot;Sofia: two truths and a lie. go 😏&quot;
+
+The deleted draft                Open on &quot;hey haha&quot; being backspaced letter by letter
+
+The badge                        &quot;Your turn&quot; pulsing over a message from two hours ago
+
+The search                       A search bar typing &quot;what do i reply to two truths and a lie&quot;
+
+The late-night lock screen       &quot;Sofia: you&#x27;re quiet… 👀&quot; at 1:14 AM
+
+
+Change anything in plain words
+   &quot;Use hook 3 and re-render.&quot;
+   &quot;Make the chat text bigger and slow the replies down.&quot;
+   &quot;Swap the dating app for a generic one with no brand.&quot;
+   &quot;Cut a 20-second version: hook, the app, the payoff.&quot;
+   &quot;Same structure, new app: [link]. Start from Prompt 2.&quot;
+
+
+   Before you run it as a paid ad: show other companies&#x27; apps only in a generic style, use photos
+   with a licence that covers ads, and keep the fine print. Organic posts are far more forgiving than ad
+   review.
+
+
+
+
+THE CODE-ONLY APP AD PLAYBOOK                                                                              8
+T H AT &#x27; S T H E W H O L E M E T H O D
+
+
+
+No credits. No camera. No editor.
+One HTML page, a browser and four prompts. Everything in this playbook is enough to
+make your first one tonight.
+
+
+
+
+Want one built for your app?
+DM me &quot;APP&quot; and tell me what it does.
+</pre></div>

@@ -1,0 +1,623 @@
+<h1>GTO Holdem — Implementation Plan</h1>
+<p><em>Written 2026-10-06 from the deep-research run plus three follow-up research checks (licensing, tournament math, library cost). Updated the same day with the file layout, GitHub, Cloudflare R2, the fast-track schedule, the AWS account and the table sizes. Every number carries a label telling you how far to trust it:</em></p>
+<ul>
+<li><strong>[Verified]</strong>: passed a 3-checker adversarial fact-check against the source.</li>
+<li><strong>[Checked]</strong>: one research agent read the primary source (official docs, repo, or paper) and quoted it.</li>
+<li><strong>[Estimate]</strong>: our own arithmetic or judgment, built on the numbers above. Treat it as a planning guess.</li>
+</ul>
+<hr>
+<h2>1. The plan on one page</h2>
+<p><strong>What we&#x27;re building:</strong> your own NLHE study and drill system, covering preflop charts, postflop solutions, push/fold, ICM, and a trainer. It&#x27;s for all four formats you play: 6-max cash, MTTs, Spin &amp; Go, and live full-ring. It starts as your personal tool and is designed so it can become a paid web app later.</p>
+<p><strong>The six ideas the whole plan rests on:</strong></p>
+<ol>
+<li><strong>The library is the product. The solver is the machine that produces it.</strong> Drills need instant answers, but a solve takes minutes, so the trainer serves answers that were solved ahead of time and stored. That&#x27;s how GTO Wizard works too: its stock libraries are pre-computed with standard solvers to ≤0.3% of pot, and rivers are re-solved live <strong>[Checked]</strong>.</li>
+<li><strong>There&#x27;s a license firewall.</strong> The best free solvers are AGPL, which is &quot;share-alike&quot;. We run them <strong>only offline, on machines you control</strong>, and the website serves only their output files. Output of an AGPL program isn&#x27;t covered by the AGPL (AGPL §2, FSF FAQ) <strong>[Checked]</strong>. The paid app itself uses only permissively licensed code (MIT, Apache, BSD) or our own code.</li>
+<li><strong>The postflop engine is b-inary&#x27;s postflop-solver, not TexasSolver.</strong></li>
+</ol>
+<ul>
+<li>postflop-solver was about 5× faster in its author&#x27;s benchmark: 12–15 s versus 67–96 s, using a quarter to half the RAM (0.68–1.27 GB vs 2.84 GB) <strong>[Checked]</strong>.</li>
+<li>TexasSolver has a known accuracy bug: it slightly misweights turn and river cards. The bug has been open since 2022, and a fix was only proposed on 2026-10-06 <strong>[Checked]</strong>.</li>
+<li>TexasSolver stays on as a second-opinion cross-check.</li>
+</ul>
+<ol>
+<li><strong>Start with short stacks, not deep cash.</strong> Push/fold and ICM are exact, cheap and checkable against published tables, and they serve three of your four formats. Deep-stack preflop charts need the hardest piece in the plan, a full-game preflop solver, so that comes later.</li>
+</ol>
+<ul>
+<li>Short stacks also become the <strong>first paid product</strong> (§4, Launch 1).</li>
+<li><em>This reverses what I told you earlier, that cash would come first. The research showed deep-stack cash depends on the hardest component.</em></li>
+</ul>
+<ol>
+<li><strong>Spins are mostly chip-EV.</strong> On GGPoker&#x27;s Spin &amp; Gold 3-max table, <strong>97.6% of games are winner-take-all</strong>. In those games ICM equals chip share, so cash-style &quot;chip-EV&quot; solutions are exactly right. ICM only matters on the ×10 wheel and above <strong>[Checked]</strong>.</li>
+<li><strong>Rent compute, don&#x27;t buy it.</strong> Every spot is an independent job. A rented 32-core machine costs about <strong>$0.60/hour</strong> on AWS spot pricing <strong>[Checked]</strong>, so a solid cash library comes to roughly <strong>$600</strong> <strong>[Estimate]</strong>. Your Intel MacBook is for building and testing, not for weeks of nonstop solving.</li>
+</ol>
+<p><strong>Timeline, fast track [Estimate]:</strong> this assumes daily working sessions, with me building and you reviewing, and independent pieces built side by side.</p>
+<ul>
+<li>First usable trainer (push/fold + ICM): about 2–3 weeks.</li>
+<li>Personal postflop study on your Mac: about 1–1.5 months.</li>
+<li><strong>First paid product</strong>, a short-stack trainer for push/fold, ICM and Spin &amp; Go: about 2–3 months.</li>
+<li>GTO-Wizard-style cash drills from your own library: about 3–4 months.</li>
+<li>Full paid product (all formats, own engine): about 5–6 months.</li>
+</ul>
+<p>If we work only a few times a week, roughly double each of these.</p>
+<p><strong>First step:</strong> Phase 0 (section 4).</p>
+<hr>
+<h2>2. What you&#x27;ll have, and what we won&#x27;t match</h2>
+<p><strong>You will have:</strong></p>
+<table><thead><tr><th>Feature</th><th>Paid-tool equivalent</th><th>Phase</th></tr></thead><tbody><tr><td>ICM calculator (final tables and big fields)</td><td>HRC / ICMizer / GTO Wizard ICM calc</td><td>1</td></tr><tr><td>Heads-up push/fold charts, 1–40bb, with and without ante</td><td>HRC Nash tables</td><td>1</td></tr><tr><td>3-handed push/fold with ICM (Spins, final tables)</td><td>ICMizer / GTO Wizard Spin library</td><td>2</td></tr><tr><td>Chart viewer and push/fold drills</td><td>GTO Wizard Practice (short stacks)</td><td>1–2</td></tr><tr><td>Single-spot postflop solving with your own ranges and bet sizes</td><td>PioSolver / GTO+ / GTO Wizard custom solve</td><td>3</td></tr><tr><td>Preflop charts: cash at 6-max, 7-handed and 9-handed; MTTs at 7-, 8- and 9-handed; Spin at 25bb</td><td>GTO Wizard / PeakGTO preflop</td><td>4</td></tr><tr><td>Pre-solved postflop library and postflop drills</td><td>GTO Wizard Study + Practice</td><td>5</td></tr><tr><td>MTT and Spin postflop libraries (chip-EV), plus a set of ICM spots</td><td>GTO Wizard MTT / Spin libraries</td><td>6</td></tr><tr><td>Our own postflop engine (on-demand solves, no license strings)</td><td>GTO Wizard AI custom solving</td><td>7</td></tr></tbody></table>
+<p><strong>What we won&#x27;t match, and why:</strong></p>
+<ul>
+<li><strong>3-way postflop pots.</strong></li>
+<li>No free solver handles them.</li>
+<li>GTO Wizard says a third player multiplies complexity by about 1,000× or more, and its own 3-way solving relies on proprietary neural networks <strong>[Checked]</strong>.</li>
+<li>This affects limped Spin pots and multiway live pots. We stay heads-up postflop.</li>
+<li><strong>Library size.</strong></li>
+<li>GTO Wizard reports &quot;over 70,000 unique ICM situations&quot; (March 2026) <strong>[Checked]</strong>.</li>
+<li>PeakGTO advertises &quot;1M+ GTO solutions&quot; <strong>[Checked]</strong>.</li>
+<li>We compete on correctness, drills and price, not size.</li>
+<li><strong>Neural-network instant solving.</strong> GTO Wizard&#x27;s AI reaches about 0.12% of pot on flops <strong>[Checked]</strong>. That&#x27;s years of R&amp;D. Phase 7 gives us a solid conventional on-demand solver instead.</li>
+</ul>
+<hr>
+<h2>3. Architecture</h2>
+<h3>3.1 The big picture</h3>
+<pre class='code'><code>   OFFLINE FACTORY  (your Mac, or rented machines)            ONLINE APP  (web)
+ ┌───────────────────────────────────────────────────┐      ┌──────────────────────────┐
+ │ Spot menu ─► Job runner ─► Solvers ─► Accuracy gate │ ───► │ Library (stored answers) │
+ │ (what to     (queues,       (ours +    (rejects any │files │   ├─► Study viewer        │
+ │  solve)       resumes)      AGPL zone)  bad solve)  │ only │   ├─► Drill trainer       │
+ └───────────────────────────────────────────────────┘      │   └─► ICM / push-fold tools│
+                                                            └──────────────────────────┘</code></pre>
+<p>Only <strong>finished answer files</strong> cross from the left box to the right box. No AGPL code ever runs on the website or ships to a user&#x27;s browser.</p>
+<h3>3.2 Components: reuse or build</h3>
+<table><thead><tr><th>Component</th><th>What it does, in plain English</th><th>Reuse or build</th><th>License zone</th></tr></thead><tbody><tr><td><strong>Card engine</strong></td><td>Ranks hands, deals boards, reads ranges like &quot;TT+, AKs&quot;</td><td><strong>Reuse</strong> <code>rs-poker</code> (Rust, Apache-2.0, active Aug 2026). It includes a fast hand evaluator, range parsing, Monte Carlo equity and ICM simulation <strong>[Checked]</strong></td><td>Permissive</td></tr><tr><td><strong>All-in equity tables</strong></td><td>Pre-computed &quot;hand A vs hand B&quot; win rates, so push/fold solves are instant</td><td><strong>Build</strong> (a one-time computation)</td><td>Ours</td></tr><tr><td><strong>ICM calculator</strong></td><td>Converts chip stacks into $ value</td><td><strong>Build</strong>. Exact Malmuth-Harville, calculated only down to the paid places, plus Monte Carlo for big fields. No well-established open-source ICM library exists <strong>[Checked]</strong></td><td>Ours</td></tr><tr><td><strong>Push/fold solver</strong></td><td>Nash shove/call ranges, heads-up and 3+ handed, chip-EV or ICM</td><td><strong>Build</strong>. BSD-licensed <code>poker-cfr</code> has a heads-up push/fold example we can learn from <strong>[Checked]</strong></td><td>Ours</td></tr><tr><td><strong>CFR core</strong></td><td>The equilibrium-finding loop (DCFR for single spots, Monte Carlo CFR for preflop)</td><td><strong>Build</strong>, written from the published papers</td><td>Ours</td></tr><tr><td><strong>Preflop solver</strong></td><td>Full-game solve that produces opening, 3-bet and 4-bet charts</td><td><strong>Build</strong> on our CFR core. Option to start from <code>robopoker</code> (MIT), which is promising but still weak: it loses −13.1 bb/100 to Slumbot <strong>[Verified]</strong></td><td>Ours / permissive</td></tr><tr><td><strong>Postflop solver (factory)</strong></td><td>Solves one flop spot exactly</td><td><strong>Reuse</strong> b-inary <code>postflop-solver</code> (Rust, AGPL). It&#x27;s frozen since October 2023 <strong>[Verified]</strong>, so we keep our own copy</td><td><strong>AGPL, offline only</strong></td></tr><tr><td><strong>Cross-check solver</strong></td><td>A second opinion on spot solves</td><td><strong>Reuse</strong> TexasSolver (C++, AGPL), built from its console branch</td><td><strong>AGPL, offline only</strong></td></tr><tr><td><strong>Job runner</strong></td><td>Turns a &quot;spot menu&quot; into thousands of jobs, runs them in parallel, resumes after interruptions, rejects inaccurate results</td><td><strong>Build</strong></td><td>Ours</td></tr><tr><td><strong>Library store</strong></td><td>Compact files (one per solved flop) plus an index to find them, kept in Cloudflare R2</td><td><strong>Build</strong> our file format; <strong>rent</strong> R2 storage</td><td>Ours</td></tr><tr><td><strong>Web app</strong></td><td>Chart viewer, spot browser, drill trainer, ICM tools, progress stats</td><td><strong>Build</strong> (TypeScript + React)</td><td>Ours</td></tr><tr><td><strong>Own postflop engine</strong> (later)</td><td>Same job as postflop-solver, but ours, so it can run on the server or in the browser</td><td><strong>Build</strong> in Phase 7, written from the DCFR paper, not copied from AGPL code</td><td>Ours</td></tr></tbody></table>
+<h3>3.3 Technology choices</h3>
+<ul>
+<li><strong>Rust</strong> for all the number-crunching.</li>
+<li>The free poker engines worth borrowing from are already Rust: postflop-solver, robopoker, poker-cfr and rs-poker.</li>
+<li>Rust can also compile to <strong>WebAssembly</strong>, so later our own solver could run inside a customer&#x27;s browser at zero server cost.</li>
+<li>Rust isn&#x27;t installed on your Mac yet <strong>[Checked: <code>cargo</code>/<code>rustc</code> not found]</strong>.</li>
+<li><strong>TypeScript + React</strong> for the web app. Node 26 is already installed <strong>[Checked]</strong>.</li>
+<li>Version 1 is a local web page that reads the library files and needs no server.</li>
+<li>Accounts, payments and hosting come only in Phase 8.</li>
+<li><strong>Library format:</strong></li>
+<li>Store <strong>flop strategies only</strong>: about 0.1–0.3 MB per solved flop after compression <strong>[Estimate]</strong>.</li>
+<li>A full saved tree including turn and river is gigabytes <strong>[Checked: Pio docs; postflop-solver issue #31 shows a 1.8 GB save]</strong>.</li>
+<li>Turn and river come later through on-demand re-solving (Phase 7).</li>
+<li>The library&#x27;s master copy lives in <strong>Cloudflare R2</strong>, which is cloud file storage. Rented solving machines upload straight to it, and later the paid app serves files from it.</li>
+</ul>
+<h3>3.4 Where files live</h3>
+<p>This matches how your other projects work:</p>
+<ul>
+<li>the project folder sits on the Desktop;</li>
+<li>iCloud backs it up;</li>
+<li>GitHub is the source of truth for code, pushed after every change.</li>
+</ul>
+<p>Only throwaway or huge generated files stay out of iCloud. Your Desktop does sync to iCloud <strong>[Checked: Finder&#x27;s <code>FXICloudDriveDesktop</code> = 1]</strong>, and the Sept 2026 &quot;ghost fragment&quot; incident in your house rules shows what happens when thousands of generated files hit it.</p>
+<table><thead><tr><th>What</th><th>Where</th><th>Backed up by</th></tr></thead><tbody><tr><td><strong>Code and docs</strong>: solver code, app, plan pages</td><td><code>~/Desktop/AI_bots/GTO_Holdem/</code>, the only local copy</td><td>iCloud, plus a private GitHub repo pushed after every change</td></tr><tr><td><strong>Build output</strong>: thousands of throwaway files</td><td><code>~/GTO_Holdem_work/build/</code> (local, not synced)</td><td>Nothing needed. Building recreates it</td></tr><tr><td><strong>Our copy of the AGPL solvers</strong></td><td><code>~/GTO_Holdem_work/agpl-solvers/</code>, kept apart for the license firewall</td><td>Its own private GitHub repo</td></tr><tr><td><strong>Library and solver results</strong> (gigabytes)</td><td><strong>Cloudflare R2</strong>, the single master copy. Rented machines upload straight there</td><td>R2 itself</td></tr><tr><td><strong>Test runs on the Mac</strong></td><td><code>~/GTO_Holdem_work/runs/</code>, temporary and deleted after use</td><td>Nothing needed</td></tr></tbody></table>
+<pre class='code'><code>~/Desktop/AI_bots/GTO_Holdem/      ← iCloud + GitHub
+    IMPLEMENTATION_PLAN.html / .md
+    engine/       Rust source: cards, equity, ICM, push/fold, CFR, preflop, (later) postflop
+    factory/      spot menus, job runner, cloud scripts
+    web/          the study/drill app source
+    validation/   reference answers and check results
+
+~/GTO_Holdem_work/                 ← local only, never synced
+    build/        compiler and web build output
+    agpl-solvers/ postflop-solver + TexasSolver (own GitHub repo; offline only, never deployed)
+    runs/         temporary local test runs
+
+Cloudflare R2                      ← the library</code></pre>
+<ul>
+<li><strong>Web app packages:</strong> tens of thousands of files that normally sit inside the project folder. Phase 0 tests a way to keep iCloud from syncing them, and reports whether it worked.</li>
+<li><strong>iCloud &quot; 2&quot; conflict copies</strong> already exist in two of your other projects&#x27; version history: <code>Magnific_clone/studio</code> and <code>Podcast/.../rru-posting-desk</code>.</li>
+<li>Both passed git&#x27;s integrity check (<code>git fsck</code>, 2026-10-06), so no damage was done.</li>
+<li>GitHub is the source of truth, so any future damage is fixed by re-downloading from GitHub.</li>
+</ul>
+<hr>
+<h2>4. Phased build plan</h2>
+<p>Each phase ends with a <strong>&quot;Done when&quot;</strong> gate. These are concrete checks I run and report with actual numbers before moving on.</p>
+<p>Effort sizes assume the fast-track pace: daily sessions, with helper agents building independent pieces at the same time.</p>
+<ul>
+<li><strong>S</strong> ≈ under 1 week</li>
+<li><strong>M</strong> ≈ 1–2 weeks</li>
+<li><strong>L</strong> ≈ 2–4 weeks</li>
+<li><strong>XL</strong> ≈ 1–1.5+ months</li>
+</ul>
+<p><strong>After Phase 0, three tracks run side by side:</strong></p>
+<ul>
+<li><strong>Track A, short stacks to the first paid product:</strong> Phase 1 → Phase 2 → Launch 1.</li>
+<li><strong>Track B, postflop and cash:</strong> Phase 3 → Phase 4 → Phase 5 → Phase 6.</li>
+<li><strong>Track C, our own engine:</strong> Phase 7 starts once Phase 3 gives us a reference solver to check against.</li>
+<li>All three meet at Phase 8, the full launch.</li>
+</ul>
+<h3>Phase 0: Foundations (S)</h3>
+<p><strong>You get:</strong> nothing visible yet. This proves the base is correct.</p>
+<ul>
+<li>Install the Rust toolchain. Set up the layout from §3.4. Create a private GitHub repo for the project and another for the AGPL solver copy, then push after every change.</li>
+<li>Point all build output at <code>~/GTO_Holdem_work/build/</code>. Test a way to keep the web app&#x27;s packages from syncing to iCloud. Confirm both with a real build: nothing new should appear in iCloud.</li>
+<li>Wire in <code>rs-poker</code> for cards, hands and ranges.</li>
+<li>Write the CFR core (DCFR, from Brown &amp; Sandholm 2019) and test it on <strong>Kuhn poker</strong>, a 3-card toy game with a known exact answer.</li>
+<li>Build postflop-solver in the AGPL zone. Time one sample flop solve on this Mac. That gives us <strong>our own measured benchmark</strong> instead of guesses.</li>
+</ul>
+<p><strong>Done when:</strong></p>
+<ol>
+<li>The hand evaluator reproduces the exact counts for every possible showdown: 2 hole cards + 5 board cards, ranked by the best 5 of the 7. That&#x27;s 133,784,560 showdowns in total, including 4,047,644 flushes and 41,584 straight flushes. These are standard published combinatorics.</li>
+<li>The Kuhn poker solver converges to first-player value −1/18 ≈ −0.0556.</li>
+<li>postflop-solver solves a sample spot on this Mac, and its time and RAM are recorded in this plan.</li>
+<li>A full build of the engine and the web app adds no new build files to iCloud.</li>
+</ol>
+<p><strong>Result, 2026-10-06: all four gates passed.</strong> The full report is <code>validation/phase0_report.html</code>.</p>
+<ol>
+<li><strong>Evaluator:</strong> all 133,784,560 showdowns (2 hole + 5 board, best 5 of 7) ranked, and all 9 categories match exactly. It took 0.1 s on 16 threads.</li>
+<li><strong>Kuhn poker:</strong> value −0.055557 against the exact −0.055556 after 10,000 rounds. Exploitability is 0.0013, versus 0.0021 for plain CFR. The strategy matches the textbook equilibrium: K bets 0.697 against a theory value of 3α = 0.706, and Q calls 0.569 against α + ⅓ = 0.569.</li>
+<li><strong>This Mac, measured:</strong></li>
+</ol>
+<ul>
+<li>The solver&#x27;s turn example took 0.9 s and 17 MB, reaching 0.46% of the pot.</li>
+<li>A flop spot (T♦9♦6♥, pot 200, stack 900, a 60% bet plus all-in) took <strong>8.0 s and 489 MB</strong>, reaching 0.43% of the pot.</li>
+<li>Library trees will be bigger, so the cost estimates stay unchanged until the test batch.</li>
+</ul>
+<ol>
+<li><strong>iCloud:</strong> the first try failed. pnpm 12 ignored <code>.npmrc</code>, and 989 files landed in iCloud before being deleted. After the fix, a build adds 0 files, and an install leaves 11 links (28 KB).</li>
+</ol>
+<p>Also done:</p>
+<ul>
+<li>Rust 1.99 installed.</li>
+<li>Two private GitHub repos created.</li>
+<li>postflop-solver repaired for today&#x27;s Rust.</li>
+<li>All dependency licenses are permissive, except lightningcss (MPL-2.0, a build-only tool). It&#x27;s flagged for the lawyer.</li>
+</ul>
+<h3>Phase 1: Short-stack toolkit and drill app v1 (M)</h3>
+<p><strong>You get:</strong> a working trainer for push/fold spots, which covers the heads-up phase of Spins, HU SNGs and late MTTs. You also get an ICM calculator.</p>
+<ul>
+<li><strong>ICM calculator.</strong></li>
+<li>Exact Malmuth-Harville, computed only down to the paid places. That limit is the big speedup: in a test, 16 players with 3 paid took 0.04 s, while 16 players with all paid took 12.9 s <strong>[Checked]</strong>.</li>
+<li>Monte Carlo for big fields. In a test it came within $0.06 on a $100 pool <strong>[Checked]</strong>.</li>
+<li><strong>All-in equity table:</strong> every starting hand against every other hand, computed once.</li>
+<li><strong>Heads-up push/fold solver:</strong> chip-EV, 1–40bb, no ante and 10% ante.</li>
+<li><strong>Drill app v1:</strong></li>
+<li>a 13×13 chart viewer;</li>
+<li>a push/fold quiz with random stack depths;</li>
+<li>an ICM calculator page;</li>
+<li>grading that accepts any action the solver mixes at a meaningful frequency.</li>
+</ul>
+<p><strong>Done when:</strong></p>
+<ol>
+<li>ICM matches HRC&#x27;s free calculator to the cent on 10 test cases.</li>
+<li>Push/fold matches HRC&#x27;s published heads-up Nash tables (1–200bb in 0.05bb steps) <strong>[Checked]</strong> at 20+ sampled depths. Only borderline mixed hands may differ.</li>
+</ol>
+<ul>
+<li>HRC&#x27;s tables have no stated license, so we <strong>use them only as an answer key</strong>. We never ship them.</li>
+</ul>
+<ol>
+<li>A drill session runs end-to-end in your browser.</li>
+</ol>
+<p><strong>Result, 2026-10-07: done.</strong> One ICM step is waiting for Eddie&#x27;s OK. Full report: <code>validation/phase1_3_report.html</code>.</p>
+<ul>
+<li><strong>Equity table:</strong> identical, number for number, to b-inary/poker-cfr&#x27;s table on all 1,624,350 matchups.</li>
+<li><strong>ICM:</strong></li>
+<li>matches a brute-force check of every finishing order (212 cases, to 1.7e-13 of the pool);</li>
+<li>the web app&#x27;s ICM and the engine&#x27;s agree on 12 vectors to 2.3e-13;</li>
+<li>the comparison against HRC&#x27;s online calculator is waiting, because that tool sends what you type to HRC&#x27;s server.</li>
+<li><strong>Push/fold:</strong></li>
+<li>158 charts covering 1–40bb, no ante and 0.1bb ante (the ante that best fits HRC&#x27;s chart);</li>
+<li>worst exploitability 1e-8 bb per hand;</li>
+<li>with no ante, they match HRC&#x27;s published charts on 168/169 shove and 169/169 call thresholds within 0.1bb. With the ante: 154/169 and 155/169, with the misses on mixed hands.</li>
+<li><strong>The drill app works</strong>, with the drill, charts, ICM and postflop screens. It grades by EV lost.</li>
+</ul>
+<h3>Phase 2: Spin &amp; Go and final-table push/fold (M)</h3>
+<p><strong>You get:</strong> Spin push/fold drills with random uneven stacks, plus short-stacked final-table push/fold with ICM.</p>
+<ul>
+<li><strong>3-way all-in equities:</strong></li>
+<li>When computed exactly, this was the expensive part in the 2008 research: &quot;a month using 16 processors&quot; <strong>[Checked]</strong>.</li>
+<li>We use Monte Carlo sampling instead. Minutes to hours on rented cores <strong>[Estimate]</strong>.</li>
+<li><strong>3-handed push/fold solver:</strong> chip-EV, uneven stacks, about 1–12bb grid, pre-solved offline.</li>
+<li><strong>ICM payout switch</strong> on the same solver:</li>
+<li>Spin ×10, which pays 1st and 2nd <strong>[Checked]</strong>;</li>
+<li>MTT final tables at 3–6 handed first, then 7-, 8- and 9-handed.</li>
+<li>Bubble factor and risk premium come straight out of this.</li>
+<li>Optional later: <strong>FGS</strong> (future game simulation), which looks one or two hands ahead. It only matters at 6 or fewer players under about 10bb <strong>[Checked: ICMizer]</strong>.</li>
+</ul>
+<p><strong>Done when:</strong></p>
+<ol>
+<li>The solver reproduces Ganzfried &amp; Sandholm&#x27;s published 3-player jam/fold results on their test structure <strong>[Checked]</strong>.</li>
+<li>ICM charts move in the known direction. Example: a big blind facing two all-ins calls about 9× less often under tournament payouts than in a single cash hand (0.197 vs 0.021) <strong>[Checked]</strong>.</li>
+</ol>
+<h3>Launch 1: First paid product, the short-stack trainer (M–L)</h3>
+<p><strong>You get:</strong> a product you can charge for. It drills push/fold and ICM for Spin &amp; Go, SNGs and MTT short stacks.</p>
+<ul>
+<li>Everything in it is our own code from Phases 1–2. It has no AGPL code and does no on-demand solving, so it doesn&#x27;t need Phase 7.</li>
+<li>Accounts, subscriptions (Stripe) and hosting.</li>
+<li>Our own terms of service (see Phase 8, &quot;Our own terms, modeled on GTO Wizard&#x27;s&quot;).</li>
+<li>A license audit and a lawyer review before taking any money.</li>
+</ul>
+<p><strong>Done when:</strong></p>
+<ol>
+<li>A test customer can sign up, pay with a Stripe test card, and finish a drill session on the hosted site.</li>
+<li>The license audit finds no GPL or AGPL code.</li>
+<li>The lawyer has reviewed the terms.</li>
+</ol>
+<h3>Phase 3: Postflop study on your Mac (M)</h3>
+<p><strong>You get:</strong> your own &quot;PioSolver&quot;. You enter ranges and bet sizes for one spot, solve it, and browse the strategy hand by hand. This is for personal study.</p>
+<ul>
+<li>A command-line wrapper around postflop-solver (AGPL zone). A community fork already reads config files and writes JSON <strong>[Checked]</strong>.</li>
+<li>A <strong>range editor</strong>: enter ranges by hand for personal study until our own preflop charts exist (Phase 4).</li>
+<li>A <strong>spot viewer</strong> in the web app: strategy per hand and per node, plus EV and equity.</li>
+<li>A cross-check of 5 reference spots in TexasSolver, built with Homebrew LLVM for multithreading on macOS <strong>[Checked: issue #126]</strong>.</li>
+</ul>
+<p><strong>Done when:</strong></p>
+<ol>
+<li>5 reference spots converge to ≤0.5% of pot exploitability, the same stopping point postflop-solver&#x27;s own example uses <strong>[Verified]</strong>.</li>
+<li>postflop-solver and TexasSolver agree within expected tolerance. Small gaps are expected from TexasSolver&#x27;s turn/river weighting bug.</li>
+<li>Solve times and RAM on your Mac are recorded.</li>
+</ol>
+<p><strong>Result, 2026-10-07: partly done.</strong></p>
+<ul>
+<li><strong>What works:</strong> the local postflop service plus the app&#x27;s Postflop screen. You can solve, click through the tree, and see each combo&#x27;s strategy, EV and equity.</li>
+<li><strong>TexasSolver</strong> builds on this Mac without Homebrew.</li>
+<li><strong>Reference flops:</strong> 4 of 5 solved to ≤0.5% of the pot, at about 11 min and 4.8 GB each.</li>
+<li>A♠7♣2♦ needs 7.65 GB. It swapped to a halt on the Mac with Eddie&#x27;s apps open.</li>
+<li><strong>Cross-check:</strong> 1 of 5 done (T♦9♦6♥).</li>
+<li>The two solvers value the spot the same, within 0.06 chips.</li>
+<li>Their check/small-bet mixes differ by about 8% per hand.</li>
+<li>Not yet settled whether that&#x27;s two equally good mixes or TexasSolver&#x27;s bug #95. A lock test is planned.</li>
+<li><strong>Remaining:</strong> about 3 hours on an idle Mac, or a rented machine.</li>
+</ul>
+<p><strong>Rule:</strong> anything solved from hand-entered ranges copied from a training site stays personal. It never goes into the paid library (see §7).</p>
+<h3>Phase 4: Preflop solver for deep stacks (XL, the biggest technical risk)</h3>
+<p><strong>You get:</strong> your own preflop charts for:</p>
+<ul>
+<li>cash at 6-max, 7-handed and 9-handed, at 100bb;</li>
+<li>MTTs at 7-, 8- and 9-handed, at the MTT stack depths with big-blind ante;</li>
+<li>Spin, 3-handed at 25bb and below.</li>
+</ul>
+<p>Every postflop library needs these as its starting ranges.</p>
+<ul>
+<li><strong>How paid tools did it:</strong></li>
+<li>GTO Wizard&#x27;s original cash preflop came from MonkerSolver on a very large server <strong>[Checked]</strong>.</li>
+<li>PeakGTO&#x27;s preflop comes from HRC or MonkerSolver <strong>[Checked]</strong>.</li>
+<li><strong>Our approach</strong> is the same family as Monker and Pluribus:</li>
+<li><strong>Monte Carlo CFR</strong> over the whole hand. It samples the game instead of walking every branch. <strong>[Verified]</strong> that it&#x27;s the right tool for whole-game solving.</li>
+<li><strong>Hand bucketing</strong> on later streets, which groups similar hands. MonkerSolver&#x27;s guide recommends 15–30 buckets per street <strong>[Checked; vendor guide]</strong>.</li>
+<li>A small bet menu.</li>
+<li><strong>Table sizes (decided 2026-10-06):</strong></li>
+<li>Cash: 6-max, 7-handed and 9-handed.</li>
+<li>MTTs: 7-, 8- and 9-handed.</li>
+<li>Each table size is its own preflop solve.</li>
+<li>The postflop solver doesn&#x27;t change, because almost every postflop pot is heads-up whatever the table size. Table size only changes the preflop ranges that go into each pot.</li>
+<li><strong>Build order:</strong></li>
+</ul>
+<ol>
+<li>Heads-up 100bb first. It&#x27;s two players, so we can <em>measure</em> exploitability properly.</li>
+<li>Then 6-max 100bb cash.</li>
+<li>Then MTTs at 8-max, the first MTT table size, at the MTT stack depths.</li>
+<li>Then Spin, 3-handed at 25bb.</li>
+<li><strong>Next step, once 6-max is proven:</strong> 7- and 9-handed cash, then 7- and 9-handed MTTs. This step is approved separately (see §5).</li>
+</ol>
+<ul>
+<li><strong>Test to run here: can late seats be shared?</strong></li>
+<li>The cutoff, button and blinds have the same number of players left to act at any table size, so their ranges should be close <strong>[Estimate]</strong>.</li>
+<li>If the 6-max and 9-handed solves confirm that within our accuracy target, those postflop spots get reused across table sizes. 7- and 9-handed then only add the early-seat spots, which lowers their library cost.</li>
+<li>Seat matchups grow quickly with table size. Counting single-raised pots only, there are 15 at 6-max, 21 at 7-handed and 36 at 9-handed.</li>
+<li><strong>Compute:</strong></li>
+<li>Rented big-memory servers for days.</li>
+<li>Reference: the Pluribus 6-max blueprint took 12,400 core-hours and under 512 GB of RAM <strong>[Verified]</strong>. At today&#x27;s about $0.019 per core-hour that&#x27;s about $235 per run, and expect several runs while tuning <strong>[Estimate]</strong>.</li>
+<li>Big-memory machines cost more than the compute machines priced in §5. That price hasn&#x27;t been researched yet.</li>
+<li><strong>Your part:</strong> create an AWS account with a payment method before this phase. It&#x27;s the first time we rent machines, and only you can create the account.</li>
+<li><strong>Caveat:</strong> with 3+ players there is no guarantee of &quot;unexploitable&quot; <strong>[Verified: Pluribus paper]</strong>. Multi-way charts are validated by stability and sanity checks, not by a single exploitability number.</li>
+</ul>
+<p><strong>Done when:</strong></p>
+<ol>
+<li>The heads-up solution&#x27;s measured exploitability falls steadily as iterations increase.</li>
+<li>6-max charts are stable across two independent runs, and they pass sanity rules: ranges widen from UTG to BTN, and the blinds defend sensibly.</li>
+<li>You spot-check them by eye against charts you trust. You compare only; nothing is imported.</li>
+</ol>
+<p><strong>We build these charts ourselves.</strong> Licensing outside preflop charts is ruled out (your decision, 2026-10-06).</p>
+<p><strong>If quality stalls:</strong> spend more compute, use finer hand buckets, and carry over the settings that tested well heads-up. Meanwhile, personal study keeps using hand-entered ranges.</p>
+<h3>Phase 5: Library factory and postflop drills (L)</h3>
+<p><strong>You get:</strong> GTO-Wizard-style cash study. You browse thousands of pre-solved flops and get drilled on them.</p>
+<ul>
+<li><strong>Spot menu → job list:</strong> format, stack depth, preflop line, flop and bet menu.</li>
+<li><strong>Runner:</strong></li>
+<li>runs jobs in parallel on rented machines;</li>
+<li><strong>resumes after interruptions</strong>, because spot instances can be reclaimed;</li>
+<li>rejects any solve above the accuracy target;</li>
+<li>packs flop strategies into compact files plus an index;</li>
+<li>uploads finished files straight to Cloudflare R2, so the library never has to pass through your Mac.</li>
+<li><strong>Your part:</strong> create a Cloudflare account and switch on R2 before this phase. I can&#x27;t create accounts for you. R2 has a checkout step, and its docs don&#x27;t say whether that step asks for a card even on the free tier <strong>[Checked]</strong>.</li>
+<li><strong>First library: &quot;Cash starter&quot;</strong> (see §5): 6-max 100bb, about 15 preflop lines, on the <strong>184-flop subset</strong>.</li>
+<li>PioSolver picked that subset to best match all 1,755 flops, and says it performs really well <strong>[Checked]</strong>.</li>
+<li>Cost: about $65 rented, or 3–5 weeks nonstop on your Mac <strong>[Estimate]</strong>.</li>
+<li><strong>How the rented run works:</strong></li>
+<li>The 2,760 solves are independent, and rented machines bill by the hour. So 4 machines finish in about a day for the same ~$65 that 1 machine would cost over 4–5 days <strong>[Estimate]</strong>.</li>
+<li>AWS &quot;spot&quot; machines are spare capacity at about a third of the normal price, but AWS can take them back. If it does, their unfinished jobs simply go back on the list.</li>
+<li>The machines shut themselves down when the list is empty, so billing stops.</li>
+<li><strong>Test batch first:</strong> about 20 solves on one rented machine, for under $1. It measures the real per-solve time before we commit to the full run.</li>
+<li><strong>Postflop drills:</strong></li>
+<li>deals spots from the library;</li>
+<li>grades your action against solver frequencies and EV loss;</li>
+<li>filters by position, board texture and subset;</li>
+<li>re-drills your mistakes more often (spaced repetition);</li>
+<li>keeps progress stats.</li>
+<li>Then <strong>expand to all 1,755 flops (&quot;Cash core&quot;, about $615)</strong>. Subsets are weaker for studying how bet sizing changes by board texture <strong>[Checked: GTO Wizard]</strong>.</li>
+</ul>
+<p><strong>Done when:</strong></p>
+<ol>
+<li>A random 1% of library spots, re-solved independently, match.</li>
+<li>Every stored solve is under the accuracy target.</li>
+<li>A full drill session runs off the library.</li>
+</ol>
+<h3>Phase 6: Tournament postflop (L)</h3>
+<p><strong>You get:</strong> MTT and Spin postflop study, plus a curated set of ICM postflop spots.</p>
+<ul>
+<li><strong>Spin postflop library at ≤25bb, chip-EV.</strong> Correct for the 97.6% of Spins that are winner-take-all <strong>[Checked]</strong>.</li>
+<li><strong>MTT postflop library:</strong> a handful of depths × about 10 lines, chip-EV first.</li>
+<li><strong>ICM postflop:</strong></li>
+<li>The method: play the hand in chips, then convert final stacks to $ using ICM at every point where the hand ends <strong>[Checked: ICMizer, GTO Wizard]</strong>.</li>
+<li>Cost per solve is about the same as chip-EV <strong>[Estimate]</strong>.</li>
+<li>We change the payout code in our offline copy of postflop-solver. Another user has done this before <strong>[Checked: issue #28]</strong>.</li>
+<li><strong>A curated ICM set</strong> of common final-table spots, not GTO Wizard&#x27;s 50,000+.</li>
+</ul>
+<p><strong>Done when:</strong></p>
+<ol>
+<li>The ICM postflop results move in the expected direction versus chip-EV (tighter calling off, more aggression from big stacks).</li>
+<li>A sample is cross-checked against the Phase 2 push/fold results in shallow spots, where the two should agree.</li>
+</ol>
+<h3>Phase 7: Our own postflop engine (XL; needed for the full launch, not for Launch 1)</h3>
+<p><strong>Why:</strong> storing turn and river data for a whole library runs into terabytes <strong>[Estimate]</strong>. So paid tools re-solve later streets on demand, and GTO Wizard re-solves rivers live <strong>[Checked]</strong>. Running an AGPL solver on the server for paying users would force you to open-source the app, or buy TexasSolver&#x27;s commercial license <strong>[Checked]</strong>. b-inary offers no commercial license <strong>[Checked]</strong>.</p>
+<ul>
+<li>Write a DCFR postflop solver from the published paper (&quot;clean-room&quot;: no copying from AGPL code).</li>
+<li>Compile it to WebAssembly as well, so solves can run <strong>in the customer&#x27;s browser</strong> at no server cost.</li>
+<li>Validate it against postflop-solver on 50+ spots.</li>
+</ul>
+<p><strong>Done when:</strong> it matches postflop-solver within tolerance on 50+ spots, at comparable speed.</p>
+<h3>Phase 8: Full launch (M)</h3>
+<ul>
+<li>Extend Launch 1&#x27;s accounts, subscriptions and hosting to the full product: cash, MTT and Spin libraries, postflop drills, and on-demand solving.</li>
+<li>Library files are served from Cloudflare R2. Downloads are free there, which matters once customers pull files all day <strong>[Checked]</strong>.</li>
+<li><strong>Our own terms of service.</strong> See &quot;Our own terms, modeled on GTO Wizard&#x27;s&quot; below.</li>
+<li><strong>No GGPoker hand-history import.</strong> GG&#x27;s policy §7.2–7.3 bans third-party import and sharing of hand histories <strong>[Checked]</strong>.</li>
+<li><strong>License audit:</strong> every dependency listed with its license, and no GPL/AGPL in the server or browser bundle.</li>
+<li><strong>Lawyer review</strong> before launch. This plan is not legal advice.</li>
+<li><strong>Know your moat.</strong> Machine-generated solver numbers get weak copyright protection <strong>[Checked: US Copyright Office Compendium §313]</strong>. Competitors could copy your charts more easily than you could copy theirs. Our terms and fingerprints (below) are the protection, and your edge has to be quality, drills and price.</li>
+</ul>
+<h4>Our own terms, modeled on GTO Wizard&#x27;s</h4>
+<p>We borrow each protection and write it in our own words; we don&#x27;t copy their text. A lawyer reviews it before launch. Sources are GTO Wizard&#x27;s terms (gtowizard.com/terms) and Pio&#x27;s license page <strong>[Checked]</strong>.</p>
+<ol>
+<li><strong>No commercial use of our content</strong> (from their §7.5). Users can&#x27;t sell, republish or build products from our charts, ranges, trees or solutions. That includes doing it through third-party apps.</li>
+<li><strong>Covers every tier, free included</strong> (from §4.1). The terms protect the whole service, so there&#x27;s no free-tier loophole.</li>
+<li><strong>No scraping or automation</strong> (from §7.7). No scripts, bots, bulk downloading or automated requests.</li>
+<li><strong>Study only, never during play</strong> (from §7.1). GGPoker and PokerStars require the same for study tools to be allowed <strong>[Checked]</strong>.</li>
+<li><strong>Protections they don&#x27;t spell out, but we should:</strong></li>
+</ol>
+<ul>
+<li>one person per account, with no sharing;</li>
+<li>no reselling or redistributing exports;</li>
+<li>no reverse-engineering our library files;</li>
+<li>we can suspend accounts that break the rules.</li>
+</ul>
+<ol>
+<li><strong>Decide our stance on coaching use.</strong> Pio&#x27;s personal license lets users put results in coaching materials, books and videos, but not into on-demand services <strong>[Checked]</strong>. We need to choose whether students and coaches can show our charts in videos.</li>
+</ol>
+<p><strong>Why this matters more for us than for GTO Wizard:</strong></p>
+<ul>
+<li>GTO Wizard is in the EU, where database law protects its library even without a contract <strong>[Checked: EU Directive 96/9/EC]</strong>.</li>
+<li>The US has no equivalent database right, and machine-generated solver numbers get weak copyright protection. The copyright part is <strong>[Checked]</strong>. The database-right point is general legal background for the lawyer to confirm.</li>
+<li>So our terms of service are our main legal shield.</li>
+</ul>
+<p><strong>Technical add-on: fingerprints.</strong></p>
+<ul>
+<li>Plant a few harmless, unique quirks in rarely viewed spots. If someone copies our data, we can prove it. GTO Wizard&#x27;s own quirks would expose anyone copying them in the same way.</li>
+<li>Every quirk stays inside the accuracy target, so drills never teach a worse play. The Phase 5 re-solve check still passes.</li>
+<li><em>This is an idea to check with the lawyer. We haven&#x27;t researched whether it&#x27;s established practice.</em></li>
+</ul>
+<hr>
+<h2>5. Library: what to solve, cost and time</h2>
+<p>All figures are <strong>[Estimate]</strong>. They assume heads-up postflop solved to about 0.3–0.5% of pot with a postflop-solver-class engine on a 32-core machine, at AWS spot pricing of about $0.60/hour <strong>[Checked]</strong>. Ranges show 3× faster or slower. Storage is flop strategies only.</p>
+<table><thead><tr><th>Library tier</th><th>Flop solves</th><th>Machine-hours</th><th>Cost at spot price</th><th>Your 16 GB Mac?</th></tr></thead><tbody><tr><td><strong>Cash starter</strong>: 6-max 100bb, 10 single-raised + 5 3-bet pots, 184 flops</td><td>2,760</td><td>107 (36–322)</td><td><strong>$65</strong> ($22–$194)</td><td>Yes, but about 18–36 days nonstop</td></tr><tr><td><strong>Cash core</strong>: same 15 lines, all 1,755 flops</td><td>26,325</td><td>1,024 (341–3,071)</td><td><strong>$615</strong> ($205–$1,846)</td><td>No (6–11 months)</td></tr><tr><td>Cash broad: 15 single-raised + 15 3-bet pots, 1,755 flops</td><td>52,650</td><td>1,755</td><td>$1,055 ($352–$3,164)</td><td>No</td></tr><tr><td><strong>MTT starter</strong>: 8-max, 4 depths × 10 lines, 184 flops, chip-EV</td><td>7,360</td><td>123 (41–368)</td><td><strong>$74</strong> ($25–$221)</td><td>Yes, about 20–41 days</td></tr><tr><td>MTT full: 8-max, 4 depths × 10 lines, 1,755 flops</td><td>70,200</td><td>1,170</td><td>$703 ($234–$2,110)</td><td>No</td></tr><tr><td><strong>Spin</strong>: 4 depths ≤25bb × 6 heads-up lines, 1,755 flops</td><td>42,120</td><td>351 (117–1,053)</td><td><strong>$211</strong> ($70–$633)</td><td>No (2–4 months)</td></tr><tr><td><em>Next step:</em> <strong>7-handed cash starter</strong>, 15 most common lines, 184 flops</td><td>2,760</td><td>107 (36–322)</td><td><strong>$65</strong> ($22–$194)</td><td>Yes, about 18–36 days</td></tr><tr><td><em>Next step:</em> <strong>9-handed cash starter</strong>, 15 most common lines, 184 flops</td><td>2,760</td><td>107 (36–322)</td><td><strong>$65</strong> ($22–$194)</td><td>Yes, about 18–36 days</td></tr><tr><td><em>Next step:</em> <strong>MTT starter at 7-handed or 9-handed</strong> (each), 4 depths × 10 lines, 184 flops</td><td>7,360</td><td>123 (41–368)</td><td><strong>$74</strong> ($25–$221)</td><td>Yes, about 20–41 days</td></tr><tr><td>9-handed cash full (live or online): 15 single-raised + 5 3-bet pots, 1,755 flops</td><td>35,100</td><td>1,462</td><td>$879 ($293–$2,637)</td><td>No</td></tr><tr><td>Cash core + MTT full + Spin + 9-handed cash full</td><td>173,745</td><td>4,007</td><td><strong>~$2,400</strong> (on-demand ~$6,600)</td><td>No</td></tr></tbody></table>
+<p>The next-step rows are lower if the late-seat sharing test in Phase 4 passes.</p>
+<p><strong>Plus preflop solver runs (Phase 4):</strong> about $250–$1,000 per setup at 100bb, and the most uncertain number in this plan <strong>[Estimate]</strong>.</p>
+<ul>
+<li>Every table size and format needs its own run.</li>
+<li>Shorter stacks make a much smaller game, so the MTT and Spin runs should cost less than a 100bb cash run <strong>[Estimate]</strong>. Each one is measured with a test batch under $1 before spending.</li>
+</ul>
+<p><strong>Three budget paths [Estimate]:</strong></p>
+<ul>
+<li><strong>Lean, about $400 (chosen 2026-10-06).</strong> 6-max cash starter + 8-max MTT starter + Spin on 184 flops + one 100bb preflop run.</li>
+<li><em>Correction, 2026-10-06: the MTT and Spin preflop runs are not inside the $400.</em> The Lean figure only counted one preflop run. Those runs will be measured first and brought to you for approval.</li>
+<li><strong>Next step, approved separately once 6-max preflop is proven:</strong></li>
+<li>7- and 9-handed cash starters, about $65 each;</li>
+<li>7- and 9-handed MTT starters, about $74 each;</li>
+<li>a preflop run for each table size.</li>
+<li><strong>Solid, about $1,400.</strong> Cash core + MTT starter + full Spin + two preflop runs.</li>
+<li><strong>Broad, about $3,300.</strong> Everything in the table + several preflop runs.</li>
+</ul>
+<p><strong>Storage</strong> for flop-only data is small: about 0.6 GB for cash starter, 5 GB for cash core, and about 35 GB for everything <strong>[Estimate]</strong>. Adding stored turn data would push it into terabytes, which is why Phase 7 exists.</p>
+<p><strong>Storage cost in Cloudflare R2:</strong></p>
+<ul>
+<li>$0.015 per GB per month, with the first 10 GB free and free downloads <strong>[Checked: R2 pricing page]</strong>.</li>
+<li>Cash starter and cash core fit in the free tier.</li>
+<li>Everything (~35 GB) is about <strong>$0.38 a month</strong> <strong>[Estimate]</strong>.</li>
+<li>Uploading ~174,000 files uses well under R2&#x27;s 1 million free monthly uploads <strong>[Checked]</strong>.</li>
+</ul>
+<p>GitHub can&#x27;t hold the library. It blocks single files over 100 MB and strongly recommends keeping a repo under 5 GB <strong>[Checked: GitHub docs]</strong>.</p>
+<p><strong>Time on rented machines:</strong> every spot is independent, so it splits perfectly. For example, the full bundle on 20 machines takes about 9 days of calendar time for the same total cost <strong>[Estimate]</strong>.</p>
+<hr>
+<h2>6. Hardware</h2>
+<p><strong>Your Mac:</strong> 2019 16&quot; MacBook Pro, Intel, 8 cores, 16 GB RAM, 305 GB free <strong>[Checked]</strong>.</p>
+<ul>
+<li><strong>Good for:</strong></li>
+<li>all of Phases 0–3;</li>
+<li>development and testing;</li>
+<li>push/fold and ICM;</li>
+<li>single postflop spots with 1–2 bet sizes. A one-size single-raised-pot tree needs about 1.2 GB <strong>[Checked: Pio docs]</strong>.</li>
+<li><strong>Measured on this Mac (Phase 0):</strong> a flop spot with one bet size plus all-in solved to 0.43% of the pot in 8.0 s, using 489 MB.</li>
+<li><strong>Not good for:</strong></li>
+<li>library building (weeks of nonstop running, and your house rules say don&#x27;t pin your machine);</li>
+<li>big trees. Two sizes everywhere needs about 7.8 GB, and deep-stack low-pot trees reached 40+ GB in TexasSolver <strong>[Checked]</strong>.</li>
+<li>the preflop solver, which needs 128–512 GB of RAM <strong>[Verified/Checked]</strong>.</li>
+<li><strong>Intel-specific:</strong> expect extra build steps. TexasSolver needs Homebrew LLVM on macOS <strong>[Checked]</strong>.</li>
+</ul>
+<p><strong>Rent for library builds [Checked prices, 2026-10-06]:</strong></p>
+<table><thead><tr><th>Machine</th><th>Cores / RAM</th><th>Price</th></tr></thead><tbody><tr><td><strong>AWS c7a.8xlarge, spot</strong> (recommended)</td><td>32 real cores, 64 GB</td><td><strong>$0.60/h</strong></td></tr><tr><td>Oracle E5 Flex, preemptible</td><td>32 cores, 64 GB</td><td>about $0.27/h (half of $0.544 on-demand)</td></tr><tr><td>Hetzner AX102, dedicated monthly</td><td>16 cores, 128 GB</td><td>€259/month + €129 setup</td></tr></tbody></table>
+<p>The Hetzner box is good if you want a machine that&#x27;s always on and has more RAM.</p>
+<p><strong>Rent for the preflop solver:</strong> a big-memory machine (128–512 GB) for days. Prices not yet researched.</p>
+<p><strong>Don&#x27;t buy a GPU.</strong></p>
+<ul>
+<li>The only GPU poker solver, TexasSolverGPU, is closed-source, Windows-only and NVIDIA-only <strong>[Checked]</strong>.</li>
+<li>It can&#x27;t run on your Mac or on Linux cloud machines.</li>
+</ul>
+<p><strong>Buy a desktop only if</strong> you&#x27;ll be solving continuously for many months. A 16-core desktop with 64–128 GB RAM would do. Prices not researched; renting is the default.</p>
+<hr>
+<h2>7. Licensing rules (keep these forever)</h2>
+<p><em>General information, not legal advice. These come from the licensing research check <strong>[Checked]</strong>.</em></p>
+<ol>
+<li><strong>AGPL code stays offline.</strong> That means postflop-solver, wasm-postflop, desktop-postflop and TexasSolver.</li>
+</ol>
+<ul>
+<li>Never on the web server.</li>
+<li>Never in the browser bundle. Shipping wasm-postflop to browsers counts as distribution.</li>
+<li>Only their <strong>output files</strong> cross into the app.</li>
+</ul>
+<ol>
+<li><strong>The app uses only permissive code</strong> (MIT, Apache, BSD, ISC) plus our own.</li>
+</ol>
+<ul>
+<li>Candidates: rs-poker, robopoker, OpenSpiel, phevaluator, OMPEval, eval7, pokerkit.</li>
+<li>Avoid GPL ICM calculators: isaacflaum and null22277 are GPL-3.0.</li>
+<li>Avoid repos with no license at all.</li>
+</ul>
+<ol>
+<li><strong>Never import paid-tool content.</strong></li>
+</ol>
+<ul>
+<li>GTO Wizard&#x27;s terms (§7.5) forbid commercial use of any ranges, trees or charts from the service, free tier included. §7.7 bans scraping.</li>
+<li>Pio&#x27;s personal license forbids serving its results on demand. Its business license is €5,000/month.</li>
+<li>&quot;Free charts&quot; from training sites are personal-use only (Upswing was the example checked).</li>
+</ul>
+<ol>
+<li><strong>Every number in the paid product must come from our own runs.</strong> That includes runs of offline AGPL tools, whose output is ours under AGPL §2.</li>
+<li><strong>TexasSolver&#x27;s README</strong> asks for a commercial license for &quot;internet services&quot;, even though its LICENSE file is plain AGPL.</li>
+</ol>
+<ul>
+<li>Since TexasSolver is only a cross-check here, this doesn&#x27;t touch the product.</li>
+<li>If that ever changes, get the author&#x27;s OK in writing.</li>
+</ul>
+<hr>
+<h2>8. How we&#x27;ll know it&#x27;s right</h2>
+<p>You won&#x27;t be reading code, so correctness has to be shown by checks against <strong>known answers</strong>:</p>
+<table><thead><tr><th>What</th><th>Checked against</th><th>Phase</th></tr></thead><tbody><tr><td>Hand evaluator</td><td>Exact published counts for every showdown (2 hole + 5 board, best 5 of 7)</td><td>0</td></tr><tr><td>CFR engine</td><td>Kuhn poker exact value −1/18</td><td>0</td></tr><tr><td>ICM</td><td>HRC / GTO Wizard free ICM calculators, to the cent</td><td>1</td></tr><tr><td>Heads-up push/fold</td><td>HRC published Nash tables</td><td>1</td></tr><tr><td>3-handed push/fold</td><td>Ganzfried &amp; Sandholm 2008 published results</td><td>2</td></tr><tr><td>Postflop spot solves</td><td>Exploitability ≤0.5% of pot; agreement between postflop-solver and TexasSolver</td><td>3</td></tr><tr><td>Preflop (heads-up)</td><td>Measured exploitability falling over time</td><td>4</td></tr><tr><td>Preflop (6-max)</td><td>Stable across runs, plus sanity rules and your spot-check by eye</td><td>4</td></tr><tr><td>Library</td><td>Random 1% re-solved independently; every file under target</td><td>5</td></tr><tr><td>Own engine</td><td>Matches postflop-solver on 50+ spots</td><td>7</td></tr></tbody></table>
+<p>Every phase report gives you the actual numbers from these checks, not &quot;should work&quot;.</p>
+<hr>
+<h2>9. Risks</h2>
+<table><thead><tr><th>Risk</th><th>Why it matters</th><th>What we do about it</th></tr></thead><tbody><tr><td><strong>Preflop solver quality</strong></td><td>It&#x27;s the hardest piece, and every postflop library depends on its ranges</td><td>Heads-up first (measurable), then widen. The range editor fallback keeps personal study moving</td></tr><tr><td>postflop-solver is unmaintained (frozen Oct 2023) <strong>[Verified]</strong></td><td>No upstream bug fixes</td><td>We own our copy. Phase 7 replaces it</td></tr><tr><td>TexasSolver accuracy bug (#95; fix #233 proposed 2026-10-06) <strong>[Checked]</strong></td><td>Slightly wrong turn and river results</td><td>Cross-check only, never the library engine</td></tr><tr><td>No free 3-way postflop solver</td><td>Limped Spin pots and multiway live pots aren&#x27;t covered</td><td>Accept it; heads-up postflop only</td></tr><tr><td>ICM spots can have more than one equilibrium <strong>[Checked: GTO Wizard]</strong></td><td>Drills might mark a reasonable play wrong</td><td>Grade by EV loss with tolerance, not exact frequency</td></tr><tr><td>Library-size gap vs paid tools</td><td>Fewer spots to study</td><td>Compete on correctness, drills and price</td></tr><tr><td>Spot instances get reclaimed mid-run</td><td>Lost compute</td><td>The runner checkpoints and resumes</td></tr><tr><td>The fast track depends on our pace</td><td>The times assume daily sessions</td><td>If we work less often, times roughly double. Nothing else changes</td></tr><tr><td>iCloud and big or generated files</td><td>Ghost files, sync churn, &quot; 2&quot; conflict copies in version history</td><td>The §3.4 layout: build output stays local, the library lives in R2, and GitHub is the source of truth for code</td></tr><tr><td>Legal and licensing</td><td>A paid product has real exposure</td><td>The §7 rules; license audit and lawyer review in Phase 8</td></tr></tbody></table>
+<hr>
+<h2>10. Your to-dos and decisions</h2>
+<p><strong>Still to do (only you can):</strong></p>
+<ol>
+<li><strong>AWS account:</strong> create one with a payment method before Phase 4, the first time we rent machines.</li>
+<li><strong>Cloudflare account:</strong> create one and switch on R2 before Phase 5.</li>
+</ol>
+<p><strong>Decided on 2026-10-06:</strong></p>
+<ul>
+<li><strong>Fast track:</strong> daily sessions, three parallel tracks, and a short-stack product launches first (Launch 1).</li>
+<li><strong>Budget: Lean, about $400 of compute.</strong> That covers the 6-max cash starter, the 8-max MTT starter, Spin on 184 flops, and one 100bb preflop run. I&#x27;ll ask before going over it. The MTT and Spin preflop runs are measured first and approved separately.</li>
+<li><strong>Table sizes:</strong> cash at 6-max, 7-handed and 9-handed; MTTs at 7-, 8- and 9-handed. 6-max cash and 8-max MTTs come first. 7- and 9-handed follow once 6-max preflop is proven, with their own budget approval.</li>
+<li><strong>Preflop charts are built in-house</strong>, never licensed.</li>
+<li><strong>Files:</strong> code stays on the Desktop (iCloud + GitHub), build output stays local, and the library lives in Cloudflare R2.</li>
+<li><strong>Project rules file added.</strong> Every future session on this project follows the license firewall, the file layout and these decisions automatically.</li>
+</ul>
+<hr>
+<h2>11. Algorithm cheat sheet (plain English)</h2>
+<ul>
+<li><strong>CFR (counterfactual regret minimization):</strong> the solver plays the spot against itself millions of times. Each time it shifts toward the actions it &quot;regrets&quot; not taking. The <em>average</em> strategy converges to equilibrium.</li>
+<li><strong>CFR+:</strong> a faster variant that never lets regrets go negative. Typically 10× or more faster than plain CFR <strong>[Verified]</strong>.</li>
+<li><strong>DCFR (Discounted CFR):</strong> discounts early, bad iterations. It matched or beat CFR+ everywhere tested, usually reaching 2–3× lower exploitability <strong>[Verified]</strong>. This is the right algorithm for single postflop spots. postflop-solver uses it, with its own parameter tweaks <strong>[Verified]</strong>.</li>
+<li><strong>MCCFR (Monte Carlo CFR):</strong> samples parts of the game instead of walking every branch. It&#x27;s needed for whole-game and preflop solves. Pluribus used it <strong>[Verified]</strong>.</li>
+<li><strong>Abstraction / bucketing:</strong> NLHE has about 10^165 game states <strong>[Verified]</strong>, so whole-game solvers group similar hands into buckets and limit bet sizes. Single-spot postflop solvers don&#x27;t need hand buckets.</li>
+<li><strong>Bet-size mapping:</strong> when a user picks a size that isn&#x27;t in the tree, map it to the nearest solved sizes with the <strong>pseudoharmonic mapping</strong> Pluribus used <strong>[Verified]</strong>.</li>
+<li><strong>Exploitability:</strong> how much a perfect opponent could win against the strategy.</li>
+<li>Full games measure it in mbb/hand, where about 1 means essentially solved <strong>[Verified]</strong>.</li>
+<li>Single spots measure it as % of pot: 0.3–0.5% is the practical target, and GTO Wizard&#x27;s libraries are ≤0.3% <strong>[Checked]</strong>.</li>
+<li><strong>ICM (Malmuth-Harville):</strong> your chance of finishing 1st equals your share of the chips. Then the same rule is applied to who&#x27;s left for 2nd, and so on. Multiply each finish by its prize and add them up.</li>
+<li>It&#x27;s slightly biased against reality: off by an average of $0.37 per $100 pool in one study <strong>[Checked]</strong>.</li>
+<li><strong>FGS:</strong> looks a hand or two ahead instead of &quot;paying out now&quot;. It matters only short-handed with under about 10bb <strong>[Checked]</strong>.</li>
+<li><strong>Bubble factor:</strong> $ lost when you lose ÷ $ gained when you win. Required equity = BF ÷ (BF + 1) <strong>[Checked]</strong>.</li>
+</ul>
+<hr>
+<h2>12. Sources</h2>
+<p><strong>Papers (algorithms)</strong></p>
+<ul>
+<li>Brown &amp; Sandholm 2019, <em>Solving Imperfect-Information Games via Discounted Regret Minimization</em> (DCFR): https://arxiv.org/pdf/1809.04040</li>
+<li>Tammelin 2014, <em>Solving Large Imperfect Information Games Using CFR+</em>: https://arxiv.org/pdf/1407.5042</li>
+<li>Lanctot et al. 2009, <em>Monte Carlo Sampling for Regret Minimization</em> (MCCFR): https://proceedings.neurips.cc/paper_files/paper/2009/file/00411460f7c92d2124a67ea0f4cb5f85-Paper.pdf</li>
+<li>Brown &amp; Sandholm 2019, <em>Superhuman AI for multiplayer poker</em> (Pluribus): https://par.nsf.gov/servlets/purl/10119653</li>
+<li>Ganzfried &amp; Sandholm 2014, potential-aware abstraction: https://ojs.aaai.org/index.php/AAAI/article/view/8816</li>
+<li>Johanson et al. 2011, accelerated best response (1,755 flops, exploitability): https://www.cs.ualberta.ca/~games/poker/publications/ijcai2011_accelerated_best_response.pdf</li>
+<li>Ganzfried &amp; Sandholm 2008, 3-player jam/fold tournament equilibrium: https://aamas.csc.liv.ac.uk/Proceedings/aamas08/proceedings/pdf/paper/AAMAS08_0313.pdf</li>
+<li>Li &amp; Huang 2026, ICM vs look-ahead values: https://arxiv.org/abs/2608.09586</li>
+<li>Gilbert 2009, fair bets under ICM: https://arxiv.org/abs/0911.3100</li>
+</ul>
+<p><strong>Open-source projects</strong></p>
+<ul>
+<li>TexasSolver: https://github.com/bupticybee/TexasSolver (issues #40, #52, #95, #126, #174, #187, #215, #219, #228, #229, #233)</li>
+<li>TexasSolverGPU (closed-source): https://github.com/bupticybee/TexasSolverGPU</li>
+<li>b-inary postflop-solver: https://github.com/b-inary/postflop-solver (issues #28, #31, #41, #46)</li>
+<li>wasm-postflop (benchmark table): https://github.com/b-inary/wasm-postflop</li>
+<li>b-inary poker-cfr (BSD-2, heads-up push/fold): https://github.com/b-inary/poker-cfr</li>
+<li>robopoker (MIT): https://github.com/krukah/robopoker</li>
+<li>rs-poker (Apache-2.0): https://github.com/elliottneilclark/rs-poker</li>
+<li>OpenSpiel (Apache-2.0): https://github.com/google-deepmind/open_spiel</li>
+<li>Config-file fork of postflop-solver: https://github.com/moritzburghardt/postflop-solver</li>
+</ul>
+<p><strong>Paid tools: how they&#x27;re built</strong></p>
+<ul>
+<li>GTO Wizard AI benchmarks: https://blog.gtowizard.com/gto-wizard-ai-benchmarks/</li>
+<li>GTO Wizard AI explained: https://blog.gtowizard.com/gto-wizard-ai-explained/</li>
+<li>GTO Wizard original solutions: https://blog.gtowizard.com/all-you-need-to-know-about-our-solutions/</li>
+<li>GTO Wizard solution status: https://blog.gtowizard.com/status-and-info-about-our-solutions/</li>
+<li>GTO Wizard subsets: https://blog.gtowizard.com/poker-subsets-and-abstractions/</li>
+<li>GTO Wizard 3-way and 50k ICM final tables: https://blog.gtowizard.com/now_live_3_way_solving_nodelocking_2_0_and_50k_icm_ft_sims/</li>
+<li>GTO Wizard single-size solutions (70,000+ ICM situations): https://blog.gtowizard.com/single-size-solutions-are-live-new-pricing-50x-more-solutions/</li>
+<li>GTO Wizard preflop ICM solving: https://blog.gtowizard.com/preflop-icm-solving/</li>
+<li>PeakGTO: https://peakgto.com/ and https://pokerfuse.com/latest-news/2025/10/introducing-peakgto-ultimate-poker-study-tool/</li>
+<li>PioSolver flop subsets: https://piosolver.com/blog/2015-11-05-flop-subsets/</li>
+<li>PioSolver technical details (memory per tree): https://piosolver.com/docs/technical_details</li>
+<li>PioSolver saving trees: https://piosolver.com/docs/viewer/saving_trees</li>
+<li>MonkerSolver guide: https://monkerware.com/guide.html</li>
+<li>GTOBase: https://gtobase.com/</li>
+</ul>
+<p><strong>Tournament math</strong></p>
+<ul>
+<li>GTO Wizard ICM basics: https://blog.gtowizard.com/icm-basics/</li>
+<li>GTO Wizard ICM algorithm breakthroughs: https://blog.gtowizard.com/theoretical-breakthroughs-in-icm/</li>
+<li>GTO Wizard bubble factor: https://blog.gtowizard.com/what-is-the-bubble-factor-in-poker-tournaments/</li>
+<li>GTO Wizard limits of Nash in ICM: https://blog.gtowizard.com/the-limitations-of-nash-equilibrium-in-icm-spots/</li>
+<li>GTO Wizard intro to Spin &amp; Gos: https://blog.gtowizard.com/an-introduction-to-spin-gos/</li>
+<li>ICMizer FGS: https://www.icmizer.com/en/blog/how-fgs-future-game-simulation-calculator-works/ and https://www.icmizer.com/en/blog/icm-to-fgs-future-game-simulations/</li>
+<li>HRC heads-up Nash tables: https://www.holdemresources.net/hune</li>
+<li>HRC ICM calculators: https://www.holdemresources.net/icmcalculator and https://www.holdemresources.net/mttcalculator</li>
+<li>GGPoker Spin &amp; Gold (prize table): https://ggpoker.com/poker-games/spin-gold/</li>
+</ul>
+<p><strong>Licensing and rules</strong></p>
+<ul>
+<li>AGPL-3.0 text (§2, §7, §13): https://github.com/bupticybee/TexasSolver/blob/master/LICENSE</li>
+<li>FSF GPL FAQ: https://www.gnu.org/licenses/gpl-faq.html</li>
+<li>GTO Wizard Terms: https://gtowizard.com/terms/</li>
+<li>PioSolver licensing: https://piosolver.com/docs/licensing and https://piosolver.com/docs/faq/business/</li>
+<li>US Copyright Office Compendium ch. 300: https://www.copyright.gov/comp3/chap300/ch300-copyrightable-authorship.pdf</li>
+<li>EU Database Directive 96/9/EC: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:31996L0009</li>
+<li>GGPoker Security &amp; Ecology Policy: https://ggpoker.com/network/security-ecology-policy/</li>
+<li>PokerStars prohibited tools: https://www.pokerstars.com/poker/room/prohibited/</li>
+</ul>
+<p><strong>Storage</strong></p>
+<ul>
+<li>GitHub large-file limits: https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github</li>
+<li>Cloudflare R2 pricing: https://developers.cloudflare.com/r2/pricing/</li>
+<li>Cloudflare R2 getting started: https://developers.cloudflare.com/r2/get-started/</li>
+</ul>
+<p><strong>Cloud pricing</strong></p>
+<ul>
+<li>AWS (via Vantage, 2026-10-06): https://instances.vantage.sh</li>
+<li>Oracle price list: https://www.oracle.com/cloud/price-list/</li>
+<li>Hetzner: live price feed (AX102, AX162, CCX53)</li>
+</ul>

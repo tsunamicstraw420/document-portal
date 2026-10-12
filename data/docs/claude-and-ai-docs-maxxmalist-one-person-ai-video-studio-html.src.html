@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How To Build A One-Person AI Video Studio</title>
+<style>
+  :root{
+    --bg:#f7f7f5;
+    --paper:#ffffff;
+    --ink:#1a1a1a;
+    --muted:#5a5a5a;
+    --line:#e6e6e2;
+    --accent:#1d9bf0;
+    --accent-soft:#eaf6fe;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Georgia","Times New Roman",serif;
+    line-height:1.7;
+    font-size:19px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:720px;
+    margin:0 auto;
+    padding:0 22px 90px;
+  }
+  header.masthead{
+    max-width:720px;
+    margin:0 auto;
+    padding:48px 22px 26px;
+  }
+  .source-chip{
+    display:inline-block;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    font-size:12px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--muted);
+    border:1px solid var(--line);
+    background:var(--paper);
+    padding:5px 11px;
+    border-radius:999px;
+  }
+  h1{
+    font-size:38px;
+    line-height:1.18;
+    margin:22px 0 20px;
+    letter-spacing:-0.01em;
+  }
+  .byline{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    padding:16px 0 4px;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+  }
+  .avatar{
+    width:46px;height:46px;border-radius:50%;
+    background:linear-gradient(135deg,#1d9bf0,#0a6bb5);
+    color:#fff;display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:20px;flex:0 0 auto;
+  }
+  .byline .name{font-weight:700;font-size:16px;line-height:1.2;}
+  .byline .handle{color:var(--muted);font-size:14px;}
+  .byline .meta{margin-left:auto;text-align:right;color:var(--muted);font-size:13px;line-height:1.4;}
+  article{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:44px 46px;
+    margin-top:26px;
+  }
+  article > p:first-child{margin-top:0;}
+  p{margin:0 0 20px;}
+  h2{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    font-size:23px;
+    line-height:1.3;
+    margin:44px 0 16px;
+    padding-top:20px;
+    border-top:2px solid var(--accent-soft);
+    letter-spacing:-0.01em;
+  }
+  h3{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    font-size:18px;
+    margin:30px 0 10px;
+  }
+  ul,ol{margin:0 0 22px;padding-left:1.25em;}
+  li{margin:0 0 9px;}
+  a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(29,155,240,.35);}
+  a:hover{border-bottom-color:var(--accent);}
+  code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:15px;background:#f1f1ee;padding:2px 6px;border-radius:5px;}
+  .lead{font-size:21px;color:#2a2a2a;}
+  .callout{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    font-size:15px;
+    background:#fbf7e9;
+    border:1px solid #ecdfae;
+    border-radius:10px;
+    padding:14px 18px;
+    margin:24px 0;
+    color:#5a4a1a;
+  }
+  .ask{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    font-size:15.5px;
+    line-height:1.6;
+    background:var(--accent-soft);
+    border-left:4px solid var(--accent);
+    border-radius:0 8px 8px 0;
+    padding:14px 20px;
+    margin:20px 0 24px;
+    color:#0a3d60;
+  }
+  .ask b.tag{
+    display:block;
+    font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:#0a6bb5;margin-bottom:6px;
+  }
+  .ask ul{margin:6px 0 0;}
+  .ask li{margin:0 0 4px;}
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    font-size:15px;
+    line-height:1.5;
+    margin:6px 0 26px;
+  }
+  th,td{text-align:left;vertical-align:top;padding:9px 10px;border-bottom:1px solid var(--line);}
+  th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;}
+  td:first-child{font-weight:600;white-space:nowrap;}
+  .stats{
+    display:flex;
+    flex-wrap:wrap;
+    gap:22px;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    font-size:14px;
+    color:var(--muted);
+    margin-top:28px;
+    padding-top:18px;
+    border-top:1px solid var(--line);
+  }
+  .stats b{color:var(--ink);}
+  footer.foot{
+    max-width:720px;margin:30px auto 0;padding:0 22px;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    font-size:13px;color:var(--muted);text-align:center;
+  }
+  footer.foot a{color:var(--muted);border:none;text-decoration:underline;}
+  @media (max-width:600px){
+    body{font-size:18px;}
+    h1{font-size:29px;}
+    article{padding:28px 22px;border-radius:10px;}
+    header.masthead{padding:30px 22px 18px;}
+    td:first-child{white-space:normal;}
+    table{display:block;overflow-x:auto;}
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <span class="source-chip">Saved from X · @maxxmalist</span>
+  <h1>How To Build A One-Person AI Video Studio</h1>
+  <div class="byline">
+    <div class="avatar">M</div>
+    <div>
+      <div class="name">MAX</div>
+      <div class="handle">@maxxmalist</div>
+    </div>
+    <div class="meta">
+      Oct 9, 2026<br>
+      23.6K views
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+<article>
+
+  <div class="callout">
+    <b>Reading notes, not a word-for-word copy.</b> This page lays out the article's full method in plain language: every step, number and checklist. The author's exact prompts are described rather than pasted. For the original wording of each prompt, open the <a href="https://x.com/maxxmalist/status/2108585062077714877">original post</a>.
+  </div>
+
+  <p class="lead">The article is a playbook for making video ads on your own with AI. It runs as a loop: learn what customers care about, turn that into ad ideas and scripts, produce the ads, test them, then use the results to make the next batch better.</p>
+
+  <p>The example product is a made-up cold brew concentrate called <b>Brewline</b>. It sells for $29 for 16 cups. The comparison point is a $5.50 coffee-shop cold brew.</p>
+
+  <h2>1. The tool stack</h2>
+
+  <table>
+    <tr><th>Tool</th><th>Its job</th></tr>
+    <tr><td>Claude Project</td><td>The "brain." It holds brand facts, research, ad ideas, scripts and analysis, so you never re-explain the product.</td></tr>
+    <tr><td>Meta Ad Library + TikTok Creative Center</td><td>See which ads are running in your niche.</td></tr>
+    <tr><td>Reviews, support inbox, comments</td><td>The real words customers use.</td></tr>
+    <tr><td>MotionVid</td><td>Produces the animated and explainer ads.</td></tr>
+    <tr><td>Video editor (optional)</td><td>Combine pieces and fine-tune the final cut.</td></tr>
+    <tr><td>Spreadsheet</td><td>Log every ad, its result and the lesson it taught.</td></tr>
+  </table>
+
+  <p>Step one is a Claude Project for the brand. Its standing instructions tell Claude:</p>
+  <ul>
+    <li>Act as the brand's creative strategist.</li>
+    <li>Treat the uploaded files as the only source of truth.</li>
+    <li>Never make up claims, numbers or reviews.</li>
+    <li>Say so and ask when something isn't in the files.</li>
+    <li>Quote customers exactly.</li>
+    <li>Propose a plan first. Write final copy only after approval.</li>
+  </ul>
+
+  <h2>2. Research comes first</h2>
+
+  <p>The order matters: research, then the knowledge base, then prompts. The ads can only be as good as what goes in. Collect four things:</p>
+  <ol>
+    <li><b>Product facts.</b> What it is, how it works, the price, the offer and which claims you're allowed to make. Keep it to one page.</li>
+    <li><b>Reviews.</b> Export them from wherever you sell, including the bad ones. Complaints are some of the best material.</li>
+    <li><b>Comments.</b> Copy the full comment threads from your best posts and ads, and from viral videos in your niche. People describe their problem and their doubts there in their own words.</li>
+    <li><b>Ads in your niche.</b> Save interesting ones from the ad libraries, with a link and a note on why. These libraries show what's <i>running</i>, not what's <i>profitable</i>. Treat everything as a candidate, not a proven winner.</li>
+  </ol>
+
+  <div class="ask">
+    <b class="tag">Ask Claude to mine the research</b>
+    From the reviews and comments, list:
+    <ul>
+      <li>the 10 most common problems, with exact quotes</li>
+      <li>the doubts people have before buying</li>
+      <li>the words they use for the product and the problem</li>
+      <li>what they tried before and why it failed</li>
+      <li>what life looks like once the problem is solved</li>
+    </ul>
+    Quotes must stay word for word. Mark how often each theme shows up.
+  </div>
+
+  <p>Then read the output yourself, and the raw reviews too. AI is good at sorting. The best ideas usually come from one customer sentence that no summary captured well.</p>
+
+  <div class="ask">
+    <b class="tag">Ask Claude to build 3 customer profiles</b>
+    For each one: a name, age and situation. Their main problem and how it shows up in a normal day. The strongest emotions. What they've already tried, with quotes. What they want instead. What would make them distrust an ad. Everything is based on the research, and any assumption is flagged.
+  </div>
+
+  <p>A Brewline example: someone who buys cold brew on the way to work most weekdays. They know it adds up, but they doubt coffee made at home will taste as good.</p>
+
+  <h2>3. Angles, hooks and scripts</h2>
+
+  <p>An <b>angle</b> is the argument of the ad. It is the problem it starts from, the desire it speaks to and the reason to believe it. One product can have ten angles, and they won't perform the same.</p>
+
+  <h3>Start from how much the viewer already knows</h3>
+  <table>
+    <tr><th>Viewer is…</th><th>What they know</th><th>Ad opens with</th></tr>
+    <tr><td>Unaware</td><td>They don't see a problem</td><td>An interesting fact or story</td></tr>
+    <tr><td>Problem aware</td><td>They feel the problem</td><td>Naming the problem clearly</td></tr>
+    <tr><td>Solution aware</td><td>They know the options</td><td>Why this approach is different</td></tr>
+    <tr><td>Product aware</td><td>They know you and competitors</td><td>Why you over them</td></tr>
+    <tr><td>Most aware</td><td>They're deciding on price</td><td>The offer</td></tr>
+  </table>
+  <p>The ad has to walk the viewer up every rung above where they start. An ad aimed at "unaware" people must cover the problem, the solution, the product and the offer.</p>
+
+  <div class="ask">
+    <b class="tag">Ask for 10 angles</b>
+    For each: which profile it targets, the problem or desire, the starting awareness level, a short opening line (under 8 words), one proof point (a review, fact or number), and how to <i>show</i> it on screen rather than just say it. The angles must differ in substance, not just wording.
+  </div>
+
+  <p><b>Why "different in substance" matters:</b> ad platforms now group ads that look and say the same thing. Five versions of one idea count as roughly one ad. Truly different angles give the algorithm different people to find.</p>
+
+  <p>Pick the 3–4 angles you could explain in one sentence. Then write hooks.</p>
+
+  <h3>Hook rules</h3>
+  <ul>
+    <li>Stop the <i>right</i> person, not everyone. A clickbait opener unrelated to the problem attracts people who won't buy.</li>
+    <li>Put the hook text on screen from the very first frame. People decide in about a second, and many watch with the sound off.</li>
+    <li>Specific beats general. A hook like "$5.50. every morning." outperforms a vague "save money on coffee."</li>
+    <li>Intrigue works. Confusion doesn't. The viewer should want to see what's next, not wonder what they're looking at.</li>
+  </ul>
+
+  <div class="ask">
+    <b class="tag">Ask for 10 hooks per angle</b>
+    Mix the types: a number, a question, a callout to the viewer, a customer quote, a before-and-after, a contrarian claim. Each is under 8 words and backed by the research. Claude must name the principle each hook uses.
+  </div>
+
+  <h3>The 30-second script</h3>
+  <ol>
+    <li>Hook (first 0–3 seconds)</li>
+    <li>The problem, in the customer's own words</li>
+    <li>Why the usual fix doesn't work</li>
+    <li>The product as the answer, with one proof point</li>
+    <li>The offer (in the example: 20% off the first bottle with a code)</li>
+  </ol>
+  <p>Ask for it as a table with three columns: time, the voiceover or on-screen text, and what we see. It must make sense with the sound off. Use only numbers from the product facts.</p>
+
+  <p>Expect the first draft to be about 80% right. Revise it two or three times. Ask Claude which principles it used and why. If you don't know why a script is built a certain way, you won't know what to fix when it flops.</p>
+  <p><b>Tip:</b> when you ask for headlines based on reviews, the model tends to copy the reviews too closely. Tell it to use them as inspiration, not as text to rewrite.</p>
+
+  <h2>4. Producing the ads with MotionVid</h2>
+
+  <h3>Connect it to Claude</h3>
+  <p>MotionVid plugs into Claude as a connector (MCP). That means the same Claude Project holding your research can also make the ads.</p>
+  <ol>
+    <li>In Claude, go to <b>Settings → Connectors → Add custom connector</b>.</li>
+    <li>Name it MotionVid and use the address <code>https://motionvid.ai/mcp</code>.</li>
+    <li>Click Connect and sign in. The author says it works on every paid MotionVid plan.</li>
+  </ol>
+  <p>Before generating anything, set up a <b>brand kit</b> in MotionVid with your logo, colors and fonts. If the logo is an SVG file, it can animate the actual logo shapes. That is handy for end cards.</p>
+  <p>The first test prompt only checks the connection. It shows the credit balance, brand kits, animation styles and narration voices, and asks Claude to suggest a style and voice. Nothing gets generated yet.</p>
+  <p>Two more tips:</p>
+  <ul>
+    <li>Put your product page's URL in a prompt. MotionVid reads the page and carries its copy, colors and fonts into the scenes.</li>
+    <li>The in-chat preview shows only one frame per scene. Always watch the finished ad to check motion and audio.</li>
+  </ul>
+
+  <h3>Ad type A: the "Vox-style" explainer (for unaware viewers)</h3>
+  <p>People who don't see a problem won't respond to a direct product ad. What reaches them is something that doesn't look like an ad at first. It explains an interesting fact well and changes how they see something they thought was normal. The product shows up at the end as the logical next step. MotionVid has a Vox editorial style with diagrams, maps, charts, labels and paper cut-out scenes.</p>
+  <p>The author's simplest demo was a Johnny Harris-style mini documentary about a shipping chokepoint in the Strait of Hormuz. For Brewline, the explainer question is: <i>where does the $5.50 for a coffee-shop cold brew actually go?</i></p>
+  <ol>
+    <li><b>Build a claim sheet first.</b> Every claim gets a source, a date and context, and an idea for a visual. Uncertain claims, or ones that only apply to some cafes, get flagged. <b>Check the sources yourself.</b> A slick animation makes a wrong claim look very convincing.</li>
+    <li><b>Write a 45-second script</b> of 90–110 words using only approved claims:
+      <ul>
+        <li>Open with the question and no product.</li>
+        <li>Break the price into its parts, one at a time.</li>
+        <li>The turn: most of what you pay isn't the coffee.</li>
+        <li>Brewline as the answer, then the offer.</li>
+      </ul>
+      Read it aloud. If it feels rushed, cut words rather than adding scenes.</li>
+    <li><b>Send it to MotionVid</b> with detailed direction:
+      <ul>
+        <li>Format: 9:16, Vox-style, warm off-white background, one brand accent color.</li>
+        <li>Visual: a cup that splits into labeled price segments, built up piece by piece. The cup stays on screen the whole time, and only the part being discussed is highlighted.</li>
+        <li>Pacing: give viewers time to read each label, and have motion from the first frame.</li>
+        <li>Ending: the cup turns into the product bottle, then an end card with the offer and the animated logo.</li>
+        <li>Audio: relaxed narration with quiet music.</li>
+      </ul></li>
+  </ol>
+  <p>Check that a viewer can follow the breakdown without pausing. If all the segments appear at once, ask for a staggered reveal. If the labels are too small, put fewer things on screen.</p>
+
+  <h3>Ad type B: the comparison ad (for problem-aware viewers)</h3>
+  <p>For people who already feel the problem, be direct. The example is a 15-second claymation clip. A friendly clay character compares the $5.50 café cup with Brewline at about $1.81 a cup, using cups and coin stacks. It drops the difference into a jar and ends on "$3.69 saved per cup." The look is warm lighting, handmade clay textures, a cream and burnt-orange palette and clear price labels. The author says that because prices render exactly, this format suits comparisons.</p>
+
+  <h3>Revisions and sizes</h3>
+  <ul>
+    <li><b>Be specific when you ask for changes.</b> Name the scene, say exactly what changes, and say what must stay the same. Only the named part gets rebuilt.</li>
+    <li><b>That makes hook tests cheap.</b> Keep the whole ad and swap only the first scene's headline.</li>
+    <li><b>Ask for every placement size once an ad is approved:</b> 9:16, 1:1, 4:5 and 16:9. Keep the product, price and call-to-action big and inside the safe margins. Ask it to flag any scene that needs a different layout.</li>
+    <li><b>Bring your own audio if you like.</b> Upload a creator's voiceover, your own recording or your own music, and the animation gets timed to it.</li>
+  </ul>
+
+  <h2>5. Testing: the numbers that matter</h2>
+
+  <table>
+    <tr><th>Metric</th><th>What it tells you</th></tr>
+    <tr><td>Hook rate</td><td>3-second views ÷ impressions. Does the opening stop people?</td></tr>
+    <tr><td>Hold rate / avg. watch time</td><td>Does the rest of the ad keep them watching?</td></tr>
+    <tr><td>CTR</td><td>Does the ad make people want to learn more?</td></tr>
+    <tr><td>Conversion rate</td><td>Mostly about the landing page, not the ad.</td></tr>
+    <tr><td>Cost per result</td><td>Does the whole thing work?</td></tr>
+  </table>
+
+  <p><b>Rough hook-rate guide (Meta):</b> about 25% is average and 30%+ is strong. Under 20% means fix the first frame. These numbers vary by niche, so your own account is the best yardstick.</p>
+
+  <h3>Reading the results</h3>
+  <table>
+    <tr><th>What you see</th><th>Where to fix</th></tr>
+    <tr><td>Low hook rate</td><td>The opening</td></tr>
+    <tr><td>Good hook, low hold</td><td>The middle loses people after the hook</td></tr>
+    <tr><td>Good watch time, low CTR</td><td>The offer or call-to-action is weak</td></tr>
+    <tr><td>Good CTR, poor sales</td><td>The landing page</td></tr>
+  </table>
+
+  <h3>The tracking sheet</h3>
+  <p>One row per ad, with these columns:</p>
+  <ul>
+    <li>Batch (week number)</li>
+    <li>Angle</li>
+    <li>Profile (who it's for)</li>
+    <li>Awareness level</li>
+    <li>Format (explainer, comparison, product, UGC)</li>
+    <li>The exact hook line</li>
+    <li>What's being tested against what</li>
+    <li>Results: hook rate, hold rate, CTR, cost per result</li>
+    <li>A one-sentence lesson</li>
+  </ul>
+  <p>At the top, track your <b>hit rate</b>: how many ads became winners. Twenty ads with no winner means something in the process is off, and the sheet usually shows where. Every ad should leave a lesson, including the losers.</p>
+
+  <h2>6. Automation</h2>
+
+  <div class="ask">
+    <b class="tag">Weekly review</b>
+    Export the week's results into the sheet and have Claude compare ads with similar spend, placement and format. Claude should keep what was observed separate from guesses about why, and allow for small samples and uneven reach. It reports which angles and hooks work, what the losers share, and a one-line lesson per ad. Then it suggests three tests for next week. Each test changes one main thing and says what it would teach.
+  </div>
+
+  <div class="ask">
+    <b class="tag">Plan the next batch</b>
+    Using the research, the sheet and this week's lessons, plan 5 new ads. Each gets an angle, profile, awareness level, hook, format, short script, needed assets and the metric it should improve. At least 2 must be brand-new angles, not tweaks of old ones. Claude flags any gaps in research or assets. Nothing gets produced yet.
+  </div>
+
+  <p>You approve the strongest ideas. After production, add any useful corrections to the project files so the next batch inherits them.</p>
+
+  <p><b>Fully hands-off production</b> needs a scheduler or backend outside the chat, plus a production tool with an API. The simple version works like this:</p>
+  <ol>
+    <li>Pick up rows marked "Approved."</li>
+    <li>Check that the needed assets exist.</li>
+    <li>Submit one job per row.</li>
+    <li>Save each job ID immediately, so a dropped connection doesn't create duplicate ads.</li>
+    <li>Mark the row "Ready for review" when the file is done.</li>
+  </ol>
+  <p>Keep uploading to the ad account as a separate step you approve yourself.</p>
+
+  <h2>The takeaway</h2>
+  <p>Don't build the whole machine at once. Pick one angle, make one complete ad, run it and log what it taught you. Use that to plan the next one.</p>
+
+  <div class="stats">
+    <span><b>23.6K</b> Views</span>
+    <span><b>8</b> Replies</span>
+    <span><b>28</b> Reposts</span>
+    <span><b>4</b> Quotes</span>
+    <span><b>186</b> Likes</span>
+    <span><b>424</b> Bookmarks</span>
+  </div>
+
+</article>
+</div>
+
+<footer class="foot">
+  Original post by <a href="https://x.com/maxxmalist/status/2108585062077714877">@maxxmalist on X</a> · Posted Oct 9, 2026<br>
+  Saved as reading notes. The article promotes MotionVid and ends with a link to the author's paid Whop community ("AI Ads Mastery"). Evaluate both independently.
+</footer>
+
+</body>
+</html>

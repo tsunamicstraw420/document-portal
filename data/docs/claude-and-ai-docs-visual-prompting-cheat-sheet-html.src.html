@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Visual Prompting Cheat Sheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700&family=Archivo+Narrow:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+  /* Layout: a production call sheet. Clapperboard slate up top, then grouped reference blocks; two columns on wide screens, one on phones. */
+  :root{
+    --bg:#eef0f2; --panel:#ffffff; --ink:#15171c; --muted:#5b616c; --line:#d6dae0;
+    --amber:#a2600c; --amber-soft:#fbefd9; --blue:#2c6584; --blue-soft:#e3eef4;
+    --stop:#b3261e; --stop-soft:#fbe6e4; --code:#f5f6f8;
+    --display:"Archivo Narrow","Arial Narrow",Arial,sans-serif;
+    --body:"Archivo",-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#121417; --panel:#1b1e23; --ink:#e8eaee; --muted:#9ba2ae; --line:#2d323a;
+      --amber:#f0a83a; --amber-soft:#2e2414; --blue:#82bbd8; --blue-soft:#15252e;
+      --stop:#f2857b; --stop-soft:#341a18; --code:#16191d; color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121417; --panel:#1b1e23; --ink:#e8eaee; --muted:#9ba2ae; --line:#2d323a;
+    --amber:#f0a83a; --amber-soft:#2e2414; --blue:#82bbd8; --blue-soft:#15252e;
+    --stop:#f2857b; --stop-soft:#341a18; --code:#16191d; color-scheme:dark;
+  }
+
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--body)}
+  .wrap{max-width:1040px;margin:0 auto;padding-inline:16px;padding-block:28px 72px}
+  @media (min-width:700px){ .wrap{padding-inline:28px} }
+
+  /* Slate header */
+  .slate{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .sticks{height:22px;background:repeating-linear-gradient(-45deg,var(--ink) 0 18px,var(--panel) 18px 36px);border-bottom:2px solid var(--ink)}
+  .slate-body{padding:22px 22px 18px}
+  .eyebrow{font:600 12px/1.2 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--amber)}
+  h1{font:700 clamp(32px,6vw,52px)/1.02 var(--display);letter-spacing:-.005em;margin:.25em 0 .2em;text-wrap:balance}
+  .lede{color:var(--muted);margin:0;max-width:65ch}
+  .fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));border-top:1px solid var(--line);margin-top:18px}
+  .field{padding:10px 0 2px;min-width:0}
+  .field + .field{border-left:0}
+  @media (min-width:760px){ .field{padding:10px 14px 2px} .field:first-child{padding-left:0} .field + .field{border-left:1px solid var(--line)} }
+  .field .k{font:600 11px/1.2 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .field .v{font:700 17px/1.3 var(--display);margin-top:3px}
+  .field .v.zero{color:var(--stop)}
+
+  /* Groups and blocks */
+  .group{margin-top:40px}
+  .group > .eyebrow{display:block;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--ink);color:var(--ink)}
+  .grid{display:grid;gap:18px 28px;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))}
+  .block{min-width:0}
+  h2{font:700 24px/1.15 var(--display);margin:0 0 8px;text-wrap:balance}
+  h3{font:700 15px/1.3 var(--body);margin:16px 0 6px}
+  p{margin:.45em 0}
+  .muted{color:var(--muted)}
+  ul{margin:.3em 0;padding-left:0;list-style:none}
+  li{position:relative;padding-left:18px;margin:.42em 0}
+  li::before{content:"";position:absolute;left:2px;top:.62em;width:7px;height:7px;background:var(--amber)}
+  ol.order{margin:.4em 0;padding-left:0;list-style:none;counter-reset:s}
+  ol.order li{padding-left:34px;margin:.6em 0}
+  ol.order li::before{counter-increment:s;content:counter(s);top:.05em;left:0;width:24px;height:24px;display:grid;place-items:center;
+    background:var(--blue);color:var(--panel);font:700 13px/1 var(--mono);border-radius:50%}
+  b{font-weight:700}
+  q{font-style:italic}
+
+  /* Emphasised box: project rules */
+  .first{background:var(--blue-soft);border:1px solid var(--line);border-left:5px solid var(--blue);border-radius:10px;padding:18px 20px}
+  .first h2{color:var(--blue)}
+
+  /* Tables */
+  .tbl{overflow-x:auto;margin:6px 0 4px}
+  table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:440px}
+  th{font:600 11px/1.2 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:2px solid var(--line)}
+  td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  td.m{font-weight:700;white-space:nowrap}
+  .first table{min-width:520px}
+  .first td,.first th{border-color:color-mix(in srgb,var(--blue) 25%,transparent)}
+
+  /* Formula strip */
+  .formula{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0 10px}
+  .formula span{font:600 13px/1 var(--mono);background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:6px 8px}
+  .formula i{font-style:normal;color:var(--muted);font-family:var(--mono)}
+
+  /* Snippets */
+  .snip{background:var(--code);border:1px solid var(--line);border-radius:8px;margin:10px 0;overflow:hidden}
+  .snip-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px 8px 12px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .snip-head .name{font:700 14px/1.2 var(--body)}
+  .tag{font:600 10.5px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:4px 6px;border-radius:3px;background:var(--amber-soft);color:var(--amber);margin-left:6px;white-space:nowrap}
+  .snip .txt{font:13.5px/1.6 var(--mono);padding:10px 12px;white-space:pre-wrap;word-break:break-word}
+  button.copy{font:600 12px/1 var(--mono);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:7px 10px;cursor:pointer}
+  button.copy:hover{border-color:var(--ink)}
+  button.copy:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+  /* Chips */
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+  .chip{font:500 13.5px/1 var(--body);padding:7px 9px;border-radius:4px;background:var(--panel);border:1px solid var(--line)}
+  .chips.stop .chip{background:var(--stop-soft);border-color:transparent;color:var(--stop);text-decoration:line-through;text-decoration-thickness:1.5px}
+
+  /* Camera moves */
+  .moves{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:8px 0}
+  .move{background:var(--panel);padding:10px 12px;min-width:0}
+  .move b{display:block;font:700 15px/1.2 var(--display)}
+  .move span{font-size:13.5px;color:var(--muted)}
+
+  footer{margin-top:48px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:13.5px}
+
+  @media (prefers-reduced-motion:reduce){ *{transition:none!important} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="slate">
+  <div class="sticks" aria-hidden="true"></div>
+  <div class="slate-body">
+    <div class="eyebrow">Claude skill · visual-prompting</div>
+    <h1>Visual Prompting Cheat Sheet</h1>
+    <p class="lede">The one-page version of the playbook Claude uses to write and fix prompts for AI image and video models. It covers which model to pick, how to word the prompt, and how to keep renders from looking like generic AI slop.</p>
+    <div class="fields">
+      <div class="field"><div class="k">Built</div><div class="v">Aug 5, 2026</div></div>
+      <div class="field"><div class="k">Source</div><div class="v">Magnific Prompting Handbook v1.2</div></div>
+      <div class="field"><div class="k">Times loaded</div><div class="v zero">0 as of Oct 10</div></div>
+      <div class="field"><div class="k">Core idea</div><div class="v">Describe a scene, don't list keywords</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- BEFORE YOU START -->
+<section class="group">
+  <span class="eyebrow">Before you start</span>
+  <div class="grid">
+    <div class="block">
+      <h2>When to reach for it</h2>
+      <ul>
+        <li><b>Still images:</b> keyframes, thumbnails, posters, product shots, character sheets.</li>
+        <li><b>Video clips</b> on Kling, Seedance or Happy Horse: camera moves, dialogue, chaining clips into one sequence.</li>
+        <li><b>Picking a model</b> for a new kind of job.</li>
+        <li><b>A render looks plastic, posed or overly glossy.</b> It names the cause and the words to change.</li>
+        <li><b>An image is almost right.</b> Stop re-rolling and make a targeted edit.</li>
+      </ul>
+    </div>
+    <div class="block">
+      <h2>How to call it</h2>
+      <p>Ask in plain words, for example <q>write a Kling prompt for…</q> or <q>why does this image look fake?</q> Claude loads the skill on its own when the request matches.</p>
+      <p>To be sure it loads, say <b>"use the visual-prompting skill."</b></p>
+      <p class="muted">Until Oct 10 no session had loaded it, because your house rules only pointed to the Video Prompting Guide. Since Oct 10 the house rules tell Claude to load it for all image and video prompt work.</p>
+    </div>
+  </div>
+
+  <div class="first" style="margin-top:22px">
+    <h2>Your projects come first</h2>
+    <p>The skill says it itself: a project's tested rules override it. For your shows, four of its defaults clash with what you've already proven.</p>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>The skill says</th><th>Your tested method says</th></tr></thead>
+        <tbody>
+          <tr><td>Aim for photorealism: film-look wording, visible skin pores</td><td>Graphic-novel painterly illustration, using the Podcast keyframe formula</td></tr>
+          <tr><td>Default video model is Seedance 2.5</td><td>Nano Banana still first, then a Kling 3.0 clip</td></tr>
+          <tr><td>Write the "don't want" words (smiling, jewelry…) into the prompt</td><td>Keyframe prompts state only what you want. "No border" made Nano Banana draw a border. "Don't want" words go in Kling's separate negative box.</td></tr>
+          <tr><td>Write spoken lines into the clip so the model lip-syncs them</td><td>Never animate the mouth. Voiceover is added separately.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Which rules to follow, in order</h3>
+    <ol class="order">
+      <li>The project's own <b>CLAUDE.md</b> and its proven prompt wording.</li>
+      <li>The <b>Video Prompting Guide</b>, for clips.</li>
+      <li><b>This skill</b>, to fill the gaps: picking a model for a new job, camera language, chaining clips, fixing generic-looking renders.</li>
+    </ol>
+    <p class="muted">Where they already agree: one action and one camera move per clip, start and end frames to make characters actually move, and slow camera moves.</p>
+  </div>
+</section>
+
+<!-- ROUTING -->
+<section class="group">
+  <span class="eyebrow">Pick the model by the job</span>
+  <div class="grid">
+    <div class="block">
+      <h2>Images</h2>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>The job</th><th>Model</th></tr></thead>
+          <tbody>
+            <tr><td>Everyday default: editing, product and brand work, fast iterations</td><td class="m">Nano Banana 2</td></tr>
+            <tr><td>Hero and cinematic stills, the hardest prompts (same price as NB 2)</td><td class="m">Nano Banana Pro</td></tr>
+            <tr><td>Posters, packaging, batches that must match. Merges up to 10 references.</td><td class="m">Seedream 5.0</td></tr>
+            <tr><td>Infographics, layouts, text that must be exact</td><td class="m">GPT Image 2</td></tr>
+            <tr><td>Logos, icons, true vector files, the longest text</td><td class="m">Recraft V4.1</td></tr>
+            <tr><td>Exact brand colours, structured shot-list briefs. A vague prompt gets a generic result.</td><td class="m">Flux.2</td></tr>
+            <tr><td>Moodboard looks without the AI polish. Weak at text.</td><td class="m">Krea 2</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="block">
+      <h2>Video</h2>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>The job</th><th>Model</th></tr></thead>
+          <tbody>
+            <tr><td>Default. Best quality, up to 30s at 4K, up to 50 references.</td><td class="m">Seedance 2.5</td></tr>
+            <tr><td>Same character across shots, action, dialogue, on-product text, faithful edits of existing footage (15s)</td><td class="m">Kling 3.0 Omni</td></tr>
+            <tr><td>Fast, cheap short-form and talking heads (15s, 1080p)</td><td class="m">Happy Horse 1.1</td></tr>
+            <tr><td>Edits by conversation, physics-aware. Lower quality (10s, 720p).</td><td class="m">Gemini Omni Flash</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><b>New clip?</b> Use a generation model (Seedance, Happy Horse). <b>Changing existing footage?</b> Use an editing model (Kling, Gemini Omni).</p>
+    </div>
+  </div>
+</section>
+
+<!-- WRITING -->
+<section class="group">
+  <span class="eyebrow">Write the prompt</span>
+  <div class="grid">
+    <div class="block">
+      <h2>Prompt order</h2>
+      <h3>Image</h3>
+      <div class="formula"><span>Subject</span><i>→</i><span>Action</span><i>→</i><span>Setting</span><i>→</i><span>Lighting</span><i>→</i><span>Composition</span><i>→</i><span>Style</span></div>
+      <h3>Video</h3>
+      <div class="formula"><span>Shot</span><i>→</i><span>Camera move</span><i>→</i><span>Subject</span><i>→</i><span>Action</span><i>→</i><span>Setting</span><i>→</i><span>Lighting</span><i>→</i><span>Style</span><i>→</i><span>Audio</span></div>
+      <ul>
+        <li><b>Image-to-video:</b> describe only the motion and the camera. The frame already supplies the subject.</li>
+        <li><b>Put the shot first.</b> The model reads the first line first.</li>
+        <li><b>Repeat product text word-for-word</b> in every image and every clip.</li>
+        <li><b>Explore cheap, deliver sharp:</b> test at low resolution, re-run the keeper at 2K–4K.</li>
+      </ul>
+
+      <h2 style="margin-top:22px">Never write</h2>
+      <p class="muted">These words summon the overprocessed AI look.</p>
+      <div class="chips stop">
+        <span class="chip">ultra sharp</span><span class="chip">hyper detailed</span><span class="chip">crisp</span><span class="chip">razor sharp</span><span class="chip">8K clarity</span><span class="chip">HDR</span><span class="chip">ultra-realistic detail</span><span class="chip">masterpiece</span>
+      </div>
+      <h3>Mood words spread across the whole image</h3>
+      <p>Write "dewy" or "sensual" anywhere, even about the light, and the whole picture shifts: clothing slips and expressions turn pouty. Counter it in plain words, for example <q>straps stay neatly in place; lips closed and relaxed.</q></p>
+      <h3>Standard portrait negatives</h3>
+      <div class="chips"><span class="chip">smiling</span><span class="chip">glamour makeup</span><span class="chip">jewelry</span><span class="chip">plastic smooth skin</span><span class="chip">dramatic rim light</span><span class="chip">colored background</span><span class="chip">soft focus</span></div>
+      <p class="muted">In your pipeline these go in Kling's negative box, never in a Nano Banana keyframe prompt.</p>
+    </div>
+
+    <div class="block">
+      <h2>Paste-in lines</h2>
+      <div class="snip">
+        <div class="snip-head"><span class="name">Film-look line <span class="tag">Photoreal only</span></span><button class="copy" type="button">Copy</button></div>
+        <div class="txt">soft cinematic lens, shallow depth of field with creamy focus roll-off, gentle contrast with soft highlight roll-off, fine uniform film grain, no oversharpening, no digital look</div>
+      </div>
+      <div class="snip">
+        <div class="snip-head"><span class="name">Skin realism <span class="tag">Photoreal only</span></span><button class="copy" type="button">Copy</button></div>
+        <div class="txt">Natural skin texture: realistic pores, fine hairs, subtle veining, a faint highlight. Tactile and real, not retouched plastic.</div>
+      </div>
+      <div class="snip">
+        <div class="snip-head"><span class="name">End of every clip prompt with sound</span><button class="copy" type="button">Copy</button></div>
+        <div class="txt">No music. No subtitles.</div>
+      </div>
+      <div class="snip">
+        <div class="snip-head"><span class="name">Surgical edit: name the change, pin the rest</span><button class="copy" type="button">Copy</button></div>
+        <div class="txt">Change the headline text only, to 'FOCUS'. Keep typeface, size, colour and position.</div>
+      </div>
+      <div class="snip">
+        <div class="snip-head"><span class="name">Beat-by-beat timing</span><button class="copy" type="button">Copy</button></div>
+        <div class="txt">6-second product shot, one continuous take. 00:00 the watch lies flat on black stone, still. 00:02 it rises and rotates slowly to face camera. 00:04 it settles as a rim light sweeps across the dial. SFX: low hum, soft click. No music. No subtitles.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid" style="margin-top:18px">
+    <div class="block">
+      <h2>Words that work</h2>
+      <p class="muted">Use two or three per prompt, never all of them. Stacked style words weaken each other.</p>
+      <h3>Light</h3>
+      <div class="chips"><span class="chip">shadowplay</span><span class="chip">single soft key from upper left</span><span class="chip">hard shaft of light</span><span class="chip">practical light only</span><span class="chip">low-key</span><span class="chip">golden hour</span></div>
+      <h3>Grade and texture</h3>
+      <div class="chips"><span class="chip">muted palette</span><span class="chip">faded blacks</span><span class="chip">gentle contrast</span><span class="chip">fine uniform film grain</span><span class="chip">atmospheric haze</span><span class="chip">soft highlight bloom</span></div>
+      <h3>Composition and focus</h3>
+      <div class="chips"><span class="chip">generous negative space</span><span class="chip">slight three-quarter angle</span><span class="chip">leading lines</span><span class="chip">background melts into soft blur</span><span class="chip">only the label in focus</span></div>
+      <h3>Combos that tested well</h3>
+      <ul>
+        <li>shadowplay + cinematic + fine film grain</li>
+        <li>muted palette + faded blacks + negative space</li>
+        <li>practical light only + atmospheric haze</li>
+      </ul>
+      <p class="muted">"Shadowplay" was the most reliable single word in testing. Lens numbers like "50mm" or "f/1.8" barely register, so always describe the visible effect too.</p>
+    </div>
+    <div class="block">
+      <h2>Text inside images</h2>
+      <ul>
+        <li>Put every word in quotes, exactly as it should read, and say where it goes.</li>
+        <li>Keep it to a few text elements in one or two sizes. Paragraphs turn into squiggles.</li>
+        <li>If a word keeps coming out mangled, spell it out: <q>spelled F, O, C, U, S</q>. Fix it with an edit, not a full re-roll.</li>
+        <li>Best at text: Seedream and GPT Image 2. Longest text: Recraft.</li>
+        <li>Zoom in on the label before you ship.</li>
+      </ul>
+      <h2 style="margin-top:22px">Editing an image</h2>
+      <ul>
+        <li>One plain sentence: what changes, and what stays exactly.</li>
+        <li>Label references and refer to them by name: <q>Keep the product from @image1 and its shadow exactly; replace the background…</q></li>
+        <li>Nano Banana 2 is the everyday editor. Use Pro only when the edit needs extra care.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- MOTION -->
+<section class="group">
+  <span class="eyebrow">Direct the shot</span>
+  <h2>Twelve camera moves</h2>
+  <p><b>One move per clip, always.</b> Add "slow" to almost everything, because slow moves hide what the model can't render cleanly.</p>
+  <div class="moves">
+    <div class="move"><b>Push-in</b><span>Tension, intimacy</span></div>
+    <div class="move"><b>Pull-back</b><span>Reveal, isolation, endings</span></div>
+    <div class="move"><b>Pan</b><span>Suspense in what you haven't shown yet</span></div>
+    <div class="move"><b>Tilt</b><span>Tilting up reads as power</span></div>
+    <div class="move"><b>Tracking</b><span>Travels with the subject; energy</span></div>
+    <div class="move"><b>Arc / orbit</b><span>Full turn for products; under ~30° around people</span></div>
+    <div class="move"><b>Crane / jib</b><span>Grandeur, god's-eye view</span></div>
+    <div class="move"><b>Zoom</b><span>Flatter than a dolly; fast zoom feels like a music video</span></div>
+    <div class="move"><b>Dolly zoom</b><span>Background warps, subject holds; dread</span></div>
+    <div class="move"><b>Whip pan / crash zoom</b><span>Transitions, shock, comedy</span></div>
+    <div class="move"><b>Handheld</b><span>Always add "subtle" or it shakes like an earthquake</span></div>
+    <div class="move"><b>Static + angle</b><span>Low = power · Dutch tilt = unease · bird's-eye = scale</span></div>
+  </div>
+
+  <div class="grid" style="margin-top:18px">
+    <div class="block">
+      <h2>Scene rules</h2>
+      <ul>
+        <li><b>Action is intent plus a named move</b> (<q>spinning back kick connects</q>), not body mechanics.</li>
+        <li><b>Emotion is physical signs</b> (<q>jaw clenches, nostrils flare</q>), not labels like "angry."</li>
+        <li><b>Only what can be seen or heard.</b> Smells and thoughts render as nothing, so show the evidence: <q>cedar shavings on the workbench.</q></li>
+        <li><b>Once someone leaves the frame, they're gone</b> for that take.</li>
+        <li><b>Three tracked characters at most</b> across cuts, or faces start swapping bodies. Keep extras generic.</li>
+        <li><b>Shoot around mirrors, never into them.</b></li>
+        <li><b>After every cut, restate</b> who is where and which way they face. Keep the camera on one side of the action.</li>
+        <li><b>On-screen text:</b> leave a clean area of the frame and add the type in the edit.</li>
+      </ul>
+    </div>
+    <div class="block">
+      <h2>Dialogue</h2>
+      <ul>
+        <li>Quote the line, name the speaker, describe how it's said.</li>
+        <li>One speaker per beat keeps lip-sync clean.</li>
+        <li>End with "No subtitles."</li>
+      </ul>
+      <p class="muted">Your show doesn't animate mouths, so this applies to other projects.</p>
+      <h2 style="margin-top:22px">Characters</h2>
+      <ul>
+        <li><b>Character sheet</b> before anyone appears twice: three panels on white (front head-and-shoulders, side profile, full body). Every later prompt carries it.</li>
+        <li><b>Changing the look?</b> New wardrobe or haircut means a new sheet first. Keep only one current sheet per character.</li>
+        <li><b>Audition</b> a talking character: 2–3 short self-tape takes, a voice recipe of three qualities at most (<q>controlled, hurt, almost warm</q>). Attach the winner to every later scene.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- CONTINUITY -->
+<section class="group">
+  <span class="eyebrow">Join clips together</span>
+  <div class="grid">
+    <div class="block">
+      <h2>Five ways to join two clips</h2>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Join</th><th>What it is</th><th>Use when the brief says</th></tr></thead>
+          <tbody>
+            <tr><td class="m">Hard cut</td><td>A clean break. The default.</td><td>"cut to," "meanwhile," or nothing at all</td></tr>
+            <tr><td class="m">Frozen handoff</td><td>Clip 1's last frame becomes clip 2's first frame</td><td>"seamless," "one take," "it should flow"</td></tr>
+            <tr><td class="m">Action bridge</td><td>A motion starts at the end of one clip and finishes at the start of the next, from a new angle</td><td>Continuous action across angles</td></tr>
+            <tr><td class="m">Match cut</td><td>Two frames share a shape, position or colour while the scene changes</td><td>"morphs into," "becomes"</td></tr>
+            <tr><td class="m">Portal</td><td>Camera pushes into something and comes out somewhere else</td><td>Once per film at most</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="block">
+      <h2>Continuity habits</h2>
+      <ul>
+        <li><b>Work from what actually rendered</b>, not the plan. Grab the real last frame and write the next opening to match it.</li>
+        <li><b>Repeat the product description word-for-word</b> in every clip.</li>
+        <li><b>Keep each clip to 30 seconds or less.</b></li>
+        <li><b>Start/end frames control the moment</b>: where one shot opens and lands. <b>References control identity</b>: who and what appears. Use both together.</li>
+        <li><b>Rewrite the first frame:</b> take frame one of a clip and edit it in Nano Banana Pro. Then re-render in Seedance with that frame as the start and the original clip attached as the motion reference.</li>
+        <li><b>Cover a location:</b> start from one still and ask for a slow fly-through that stops for a beat at each named angle. Every stop becomes a usable frame with matching light.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Condensed from Claude's visual-prompting skill, which was built from Magnific's Prompting Handbook v1.2 (July 2026). Sheet made Oct 10, 2026.
+</footer>
+
+</div>
+<script>
+  document.querySelectorAll('button.copy').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var txt = btn.closest('.snip').querySelector('.txt');
+      var reset = function (ms) { setTimeout(function () { btn.textContent = 'Copy'; }, ms); };
+      var fallback = function () {
+        var r = document.createRange(); r.selectNodeContents(txt);
+        var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+        btn.textContent = 'Selected, press ⌘C'; reset(2400);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(txt.innerText.trim()).then(function () { btn.textContent = 'Copied'; reset(1400); }, fallback);
+      } else { fallback(); }
+    });
+  });
+</script>
+</body>
+</html>

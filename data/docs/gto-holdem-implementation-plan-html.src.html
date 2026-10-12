@@ -1,0 +1,967 @@
+<meta charset="utf-8">
+<title>GTO Holdem Build Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<style>
+/* Layout: sticky table of contents on the left, one reading column on the right; stacks to one column on phones.
+   Colors: PeakGTO's dark palette (values read from peakgto.com's stylesheet, 6 Oct 2026). Deliberately dark-only.
+   Red-orange = accent, green = good/verified/ours, gold = caution (AGPL, risks, rules). */
+:root {
+  --bg: #0a0f18;
+  --surface: #111827;
+  --ink: #edf0f5;
+  --muted: #8a9ab0;
+  --rule: rgba(255, 255, 255, 0.08);
+  --accent: #f4714a;
+  --accent-solid: #dc3c28;
+  --accent-soft: rgba(220, 60, 40, 0.12);
+  --good: #00b87a;
+  --good-soft: rgba(0, 184, 122, 0.13);
+  --caution: #fbbf24;
+  --caution-soft: rgba(251, 191, 36, 0.10);
+  --checked: #8ab4e8;
+  --checked-soft: rgba(138, 180, 232, 0.12);
+  --estimate: #b4c0d0;
+  --estimate-soft: rgba(255, 255, 255, 0.07);
+  --code-bg: #0d1420;
+  --on-accent: #ffffff;
+  --display: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--body); font-size: 17px; line-height: 1.6;
+  padding-inline: 16px; padding-block: 0 64px; margin: 0;
+}
+table { font-size: inherit; }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+strong { font-weight: 600; }
+h1, h2, h3, h4 { font-family: var(--display); line-height: 1.2; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2rem, 4.5vw, 2.9rem); font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 1.6rem; font-weight: 700; }
+h3 { font-size: 1.2rem; font-weight: 600; }
+h4 { font-size: 1rem; font-weight: 600; }
+p { margin: 0; }
+ul, ol { margin: 0; padding-left: 1.25em; display: grid; gap: 6px; }
+code { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+
+.page { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 48px; }
+@media (max-width: 900px) { .page { grid-template-columns: minmax(0, 1fr); gap: 0; } }
+
+/* Table of contents */
+.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; padding-block: 40px 0; font-family: var(--display); }
+.toc p { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+.toc ol { list-style: none; padding: 0; gap: 2px; border-left: 1px solid var(--rule); }
+.toc a { display: block; padding: 3px 0 3px 14px; color: var(--muted); text-decoration: none; font-size: 0.92rem; }
+.toc a:hover { color: var(--accent); }
+@media (max-width: 900px) {
+  .toc { position: static; padding-block: 20px 0; }
+  .toc ol { display: flex; flex-wrap: wrap; gap: 6px; border: 0; }
+  .toc a { padding: 4px 10px; border: 1px solid var(--rule); border-radius: 999px; font-size: 0.82rem; background: var(--surface); }
+}
+
+main { min-width: 0; max-width: 780px; display: grid; gap: 64px; padding-block: 40px 0; }
+section { display: grid; gap: 18px; min-width: 0; scroll-margin-top: 24px; }
+.sec-head { display: grid; gap: 4px; border-top: 2px solid var(--ink); padding-top: 14px; }
+.sec-num { font-family: var(--mono); font-size: 0.78rem; color: var(--muted); letter-spacing: 0.04em; }
+.lede { font-size: 1.15rem; color: var(--ink); }
+.muted { color: var(--muted); }
+.small { font-size: 0.92rem; }
+
+/* Header */
+.masthead { display: grid; gap: 16px; }
+.eyebrow { font-family: var(--display); font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.legend { display: grid; gap: 8px; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 14px 16px; font-size: 0.93rem; }
+.legend-row { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 12px; align-items: baseline; }
+
+/* Confidence badges */
+.b { font-family: var(--display); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; padding: 1px 7px; border-radius: 4px; white-space: nowrap; vertical-align: 1px; }
+.b-v { color: var(--good); background: var(--good-soft); }
+.b-c { color: var(--checked); background: var(--checked-soft); }
+.b-e { color: var(--estimate); background: var(--estimate-soft); }
+.legend .b { justify-self: start; }
+
+/* Idea cards */
+.ideas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 640px) { .ideas { grid-template-columns: minmax(0, 1fr); } }
+.idea { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 18px; display: grid; gap: 8px; align-content: start; font-size: 0.97rem; }
+.idea h3 { font-size: 1.05rem; }
+.note { font-size: 0.9rem; color: var(--muted); font-style: italic; }
+
+/* Milestones (a real sequence) */
+.milestones { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; background: var(--surface); }
+@media (max-width: 640px) { .milestones { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.ms { padding: 14px 16px; display: grid; gap: 4px; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); margin: 0 -1px -1px 0; }
+.ms-when { font-family: var(--mono); font-size: 1.05rem; color: var(--accent); font-weight: 500; }
+.ms-what { font-family: var(--display); font-size: 0.92rem; line-height: 1.35; }
+
+/* Tables */
+.tbl { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+table { width: 100%; border-collapse: collapse; font-family: var(--display); font-size: 0.9rem; line-height: 1.45; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+th { font-size: 0.74rem; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); font-weight: 600; background: var(--bg); }
+tr:last-child td { border-bottom: 0; }
+td.num, th.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; font-size: 0.85rem; }
+td.hl { font-weight: 600; }
+.tbl-wide table { min-width: 680px; }
+
+/* Architecture diagram */
+.arch { display: grid; grid-template-columns: minmax(0, 1.25fr) auto minmax(0, 1fr); gap: 12px; align-items: stretch; }
+@media (max-width: 720px) { .arch { grid-template-columns: minmax(0, 1fr); } }
+.zone { border: 1.5px solid var(--rule); border-radius: 12px; padding: 14px; background: var(--surface); display: grid; gap: 10px; align-content: start; }
+.zone-title { font-family: var(--display); font-size: 0.74rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.chain { display: grid; gap: 6px; }
+.node { font-family: var(--display); border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; background: var(--bg); font-size: 0.92rem; line-height: 1.3; }
+.node small { display: block; color: var(--muted); font-size: 0.8rem; }
+.node.agpl { border-color: var(--caution); background: var(--caution-soft); }
+.node.agpl small { color: var(--caution); }
+.down { text-align: center; color: var(--muted); font-size: 0.8rem; line-height: 1; }
+.handoff { display: grid; place-items: center; font-family: var(--display); text-align: center; color: var(--accent); font-weight: 600; font-size: 0.85rem; gap: 2px; padding: 0 4px; }
+.handoff span { font-size: 1.6rem; line-height: 1; }
+@media (max-width: 720px) { .handoff span { transform: rotate(90deg); } }
+
+.zone-tag { font-family: var(--display); font-size: 0.72rem; font-weight: 600; padding: 2px 7px; border-radius: 4px; white-space: nowrap; }
+.zone-ours { color: var(--good); background: var(--good-soft); }
+.zone-agpl { color: var(--caution); background: var(--caution-soft); }
+
+pre { margin: 0; overflow-x: auto; background: var(--code-bg); border-radius: 10px; padding: 14px 16px; font-family: var(--mono); font-size: 0.82rem; line-height: 1.55; }
+pre .c { color: var(--muted); }
+pre .warn { color: var(--caution); }
+
+/* Phase roadmap */
+.road { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.road a { text-decoration: none; color: inherit; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; display: grid; gap: 4px; align-content: start; }
+.road a:hover { border-color: var(--accent); }
+.road .p { font-family: var(--mono); font-size: 0.74rem; color: var(--muted); }
+.road .n { font-family: var(--display); font-size: 0.92rem; font-weight: 600; line-height: 1.25; }
+.road .flag { font-family: var(--display); font-size: 0.74rem; color: var(--accent); font-weight: 600; }
+.road .risk { color: var(--caution); }
+.size { font-family: var(--mono); font-size: 0.72rem; border: 1px solid var(--rule); border-radius: 4px; padding: 0 5px; color: var(--muted); justify-self: start; }
+
+.phase { background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 20px; display: grid; gap: 14px; scroll-margin-top: 24px; }
+.phase-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 12px; }
+.phase-head .p { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); }
+.phase-head h3 { flex: 1 1 260px; }
+.phase.hard { border-color: var(--caution); }
+.get { font-size: 1rem; border-left: 3px solid var(--accent); padding-left: 12px; }
+.get b { font-family: var(--display); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); display: block; }
+.phase-body { display: grid; gap: 10px; font-size: 0.97rem; }
+.done { background: var(--good-soft); border-radius: 8px; padding: 12px 14px; display: grid; gap: 6px; font-size: 0.94rem; }
+.done h4 { font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--good); }
+.rule-box { background: var(--caution-soft); border-radius: 8px; padding: 10px 14px; font-size: 0.92rem; }
+.rule-box b { color: var(--caution); font-family: var(--display); }
+
+/* Budget paths */
+.paths { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 640px) { .paths { grid-template-columns: minmax(0, 1fr); } }
+.path { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 16px; display: grid; gap: 6px; align-content: start; }
+.path .name { font-family: var(--display); font-weight: 600; }
+.path .amt { font-family: var(--mono); font-size: 1.6rem; color: var(--accent); font-variant-numeric: tabular-nums; }
+.path p { font-size: 0.9rem; color: var(--muted); }
+.path.chosen { border-color: var(--good); box-shadow: inset 0 0 0 1px var(--good); }
+
+.callout { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 14px 16px; display: grid; gap: 6px; font-size: 0.97rem; }
+
+.decisions { list-style: none; padding: 0; counter-reset: d; gap: 12px; }
+.decisions li { counter-increment: d; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 14px 16px 14px 52px; position: relative; }
+.decisions li::before { content: counter(d); position: absolute; left: 16px; top: 13px; width: 24px; height: 24px; border-radius: 50%; background: var(--accent-solid); color: var(--on-accent); font-family: var(--display); font-weight: 700; font-size: 0.85rem; display: grid; place-items: center; }
+
+dl { margin: 0; display: grid; gap: 14px; }
+dt { font-family: var(--display); font-weight: 600; }
+dd { margin: 2px 0 0; color: var(--ink); font-size: 0.97rem; }
+
+.sources { display: grid; gap: 18px; }
+.sources h3 { font-size: 0.95rem; }
+.sources ul { font-size: 0.86rem; font-family: var(--display); gap: 4px; }
+.sources a { word-break: break-word; }
+
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<div class="page">
+  <nav class="toc" aria-label="Contents">
+    <p>Contents</p>
+    <ol>
+      <li><a href="#summary">The plan on one page</a></li>
+      <li><a href="#scope">What you'll have</a></li>
+      <li><a href="#architecture">Architecture</a></li>
+      <li><a href="#phases">Build phases</a></li>
+      <li><a href="#library">Library cost</a></li>
+      <li><a href="#hardware">Hardware</a></li>
+      <li><a href="#licensing">Licensing rules</a></li>
+      <li><a href="#validation">How we'll know it's right</a></li>
+      <li><a href="#risks">Risks</a></li>
+      <li><a href="#decisions">Your to-dos</a></li>
+      <li><a href="#glossary">Algorithm cheat sheet</a></li>
+      <li><a href="#sources">Sources</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <header class="masthead">
+      <div class="eyebrow">No-Limit Hold'em · Study &amp; drill system</div>
+      <h1>GTO Holdem Build Plan</h1>
+      <p class="lede">Your own NLHE study and drill system: preflop charts, postflop solutions, push/fold, ICM and a trainer. It covers 6-max cash, MTTs, Spin &amp; Go and live full-ring. It starts as your study tool and is built so it can become a paid web app later.</p>
+      <p class="muted small">Written 6 October 2026 from the deep-research run and three follow-up checks: licensing, tournament math and library cost. Updated the same day with the file layout, GitHub, Cloudflare R2, the fast-track schedule, the AWS account and the table sizes.</p>
+      <div class="legend" role="note" aria-label="How far to trust each number">
+        <div class="legend-row"><span class="b b-v">Verified</span><span>Passed a three-checker fact-check against the source.</span></div>
+        <div class="legend-row"><span class="b b-c">Checked</span><span>One research agent read the primary source (official docs, repo or paper) and quoted it.</span></div>
+        <div class="legend-row"><span class="b b-e">Estimate</span><span>Our own arithmetic or judgment, built on the numbers above. Treat it as a planning guess.</span></div>
+      </div>
+    </header>
+
+    <!-- 1 -->
+    <section id="summary">
+      <div class="sec-head"><span class="sec-num">01</span><h2>The plan on one page</h2></div>
+      <p>The whole plan rests on six ideas.</p>
+      <div class="ideas">
+        <div class="idea">
+          <h3>The library is the product</h3>
+          <p>Drills need instant answers, but a solve takes minutes. So the trainer serves answers that were solved ahead of time and stored. The solver is just the machine that produces them.</p>
+          <p class="small muted">GTO Wizard works the same way. Its stock libraries are pre-computed with standard solvers to ≤0.3% of pot, and rivers are re-solved live. <span class="b b-c">Checked</span></p>
+        </div>
+        <div class="idea">
+          <h3>A license firewall</h3>
+          <p>The best free solvers are AGPL, a "share-alike" license. We run them only offline, on machines you control. The website serves only their output files, which the AGPL doesn't cover (AGPL §2, FSF FAQ). <span class="b b-c">Checked</span></p>
+          <p class="small muted">The paid app itself uses only permissively licensed code (MIT, Apache, BSD) or our own.</p>
+        </div>
+        <div class="idea">
+          <h3>postflop-solver, not TexasSolver</h3>
+          <p>b-inary's postflop-solver was about 5× faster in its author's benchmark: 12–15 s versus 67–96 s, with a quarter to half the RAM. <span class="b b-c">Checked</span></p>
+          <p class="small muted">TexasSolver slightly misweights turn and river cards. That bug has been open since 2022, and a fix was only proposed on 6 Oct 2026. It stays on as a second-opinion cross-check. <span class="b b-c">Checked</span></p>
+        </div>
+        <div class="idea">
+          <h3>Short stacks first</h3>
+          <p>Push/fold and ICM are exact, cheap and checkable against published tables. They also serve three of your four formats. Deep-stack preflop charts need the hardest piece in the plan, a full-game preflop solver, so they come later. Short stacks also become the first paid product.</p>
+          <p class="note">This reverses what I told you earlier, that cash would come first. The research showed deep-stack cash depends on the hardest component.</p>
+        </div>
+        <div class="idea">
+          <h3>Spins are mostly chip-EV</h3>
+          <p>On GGPoker's Spin &amp; Gold 3-max table, 97.6% of games are winner-take-all. <span class="b b-c">Checked</span> In those, ICM equals your share of the chips, so cash-style chip-EV solutions are exactly right.</p>
+          <p class="small muted">ICM only matters on the ×10 wheel and above.</p>
+        </div>
+        <div class="idea">
+          <h3>Rent compute, don't buy it</h3>
+          <p>Every spot is an independent job. A rented 32-core machine costs about $0.60 an hour on AWS spot pricing. <span class="b b-c">Checked</span> A solid cash library comes to roughly $600. <span class="b b-e">Estimate</span></p>
+          <p class="small muted">Your Intel MacBook is for building and testing, not for weeks of nonstop solving.</p>
+        </div>
+      </div>
+
+      <h3>When you get what, on the fast track <span class="b b-e">Estimate</span></h3>
+      <div class="milestones">
+        <div class="ms"><span class="ms-when">~2–3 weeks</span><span class="ms-what">First usable trainer: push/fold and ICM</span></div>
+        <div class="ms"><span class="ms-when">~2–3 months</span><span class="ms-what">First paid product: the short-stack trainer</span></div>
+        <div class="ms"><span class="ms-when">~3–4 months</span><span class="ms-what">GTO-Wizard-style cash drills from your own library</span></div>
+        <div class="ms"><span class="ms-when">~5–6 months</span><span class="ms-what">Full paid product: all formats, own engine</span></div>
+      </div>
+      <p class="small muted">Personal postflop study on your Mac arrives at about 1–1.5 months. These times assume daily working sessions, with me building and you reviewing, and independent pieces built side by side. At a few sessions a week, roughly double them.</p>
+      <p><strong>First step:</strong> <a href="#p0">Phase 0, Foundations</a>.</p>
+    </section>
+
+    <!-- 2 -->
+    <section id="scope">
+      <div class="sec-head"><span class="sec-num">02</span><h2>What you'll have, and what we won't match</h2></div>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Feature</th><th>Paid-tool equivalent</th><th class="num">Phase</th></tr></thead>
+          <tbody>
+            <tr><td>ICM calculator (final tables and big fields)</td><td>HRC / ICMizer / GTO Wizard ICM calc</td><td class="num">1</td></tr>
+            <tr><td>Heads-up push/fold charts, 1–40bb, with and without ante</td><td>HRC Nash tables</td><td class="num">1</td></tr>
+            <tr><td>3-handed push/fold with ICM (Spins, final tables)</td><td>ICMizer / GTO Wizard Spin library</td><td class="num">2</td></tr>
+            <tr><td>Chart viewer and push/fold drills</td><td>GTO Wizard Practice (short stacks)</td><td class="num">1–2</td></tr>
+            <tr><td>Single-spot postflop solving with your own ranges and bet sizes</td><td>PioSolver / GTO+ / GTO Wizard custom solve</td><td class="num">3</td></tr>
+            <tr><td>Preflop charts: cash at 6-max, 7- and 9-handed; MTTs at 7-, 8- and 9-handed; Spin at 25bb</td><td>GTO Wizard / PeakGTO preflop</td><td class="num">4</td></tr>
+            <tr><td>Pre-solved postflop library and postflop drills</td><td>GTO Wizard Study + Practice</td><td class="num">5</td></tr>
+            <tr><td>MTT and Spin postflop libraries (chip-EV), plus a set of ICM spots</td><td>GTO Wizard MTT / Spin libraries</td><td class="num">6</td></tr>
+            <tr><td>Our own postflop engine: on-demand solves, no license strings</td><td>GTO Wizard AI custom solving</td><td class="num">7</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout">
+        <h3>What we won't match</h3>
+        <ul>
+          <li><strong>3-way postflop pots.</strong> No free solver handles them. GTO Wizard says a third player multiplies complexity by about 1,000× or more, and its own 3-way solving relies on proprietary neural networks. <span class="b b-c">Checked</span> This affects limped Spin pots and multiway live pots, so we stay heads-up postflop.</li>
+          <li><strong>Library size.</strong> GTO Wizard reports over 70,000 unique ICM situations (March 2026), and PeakGTO advertises 1M+ solutions. <span class="b b-c">Checked</span> We compete on correctness, drills and price instead.</li>
+          <li><strong>Neural-network instant solving.</strong> GTO Wizard's AI reaches about 0.12% of pot on flops <span class="b b-c">Checked</span>, which is years of R&amp;D. Phase 7 gives us a solid conventional on-demand solver instead.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 3 -->
+    <section id="architecture">
+      <div class="sec-head"><span class="sec-num">03</span><h2>Architecture</h2></div>
+      <p>Two halves. An offline factory solves spots on your Mac or on rented machines. The web app only ever reads the finished answers.</p>
+      <div class="arch" role="img" aria-label="Offline factory feeds answer files to the online app">
+        <div class="zone">
+          <span class="zone-title">Offline factory · your Mac or rented machines</span>
+          <div class="chain">
+            <div class="node">Spot menu<small>What to solve: format, depth, preflop line, flop, bet sizes</small></div>
+            <div class="down">↓</div>
+            <div class="node">Job runner<small>Queues thousands of jobs, resumes after interruptions</small></div>
+            <div class="down">↓</div>
+            <div class="node agpl">Solvers<small>Ours, plus the AGPL zone (offline only)</small></div>
+            <div class="down">↓</div>
+            <div class="node">Accuracy gate<small>Rejects any solve above the target</small></div>
+          </div>
+        </div>
+        <div class="handoff"><span>→</span>answer files only</div>
+        <div class="zone">
+          <span class="zone-title">Online app · the web</span>
+          <div class="chain">
+            <div class="node">Library<small>Stored answers in Cloudflare R2, one compact file per solved flop</small></div>
+            <div class="down">↓</div>
+            <div class="node">Study viewer</div>
+            <div class="node">Drill trainer</div>
+            <div class="node">ICM and push/fold tools</div>
+          </div>
+        </div>
+      </div>
+      <p class="small">No AGPL code ever runs on the website or ships to a user's browser.</p>
+
+      <h3>Components: reuse or build</h3>
+      <div class="tbl tbl-wide">
+        <table>
+          <thead><tr><th>Component</th><th>What it does</th><th>Reuse or build</th><th>Zone</th></tr></thead>
+          <tbody>
+            <tr><td class="hl">Card engine</td><td>Ranks hands, deals boards, reads ranges like "TT+, AKs"</td><td><strong>Reuse</strong> rs-poker (Rust, Apache-2.0, active Aug 2026). It includes a fast evaluator, range parsing, Monte Carlo equity and ICM simulation. <span class="b b-c">Checked</span></td><td><span class="zone-tag zone-ours">Permissive</span></td></tr>
+            <tr><td class="hl">All-in equity tables</td><td>Pre-computed "hand A vs hand B" win rates, so push/fold solves are instant</td><td><strong>Build</strong>, as a one-time computation</td><td><span class="zone-tag zone-ours">Ours</span></td></tr>
+            <tr><td class="hl">ICM calculator</td><td>Turns chip stacks into $ value</td><td><strong>Build.</strong> Exact Malmuth-Harville down to the paid places, plus Monte Carlo for big fields. No well-established open-source ICM library exists. <span class="b b-c">Checked</span></td><td><span class="zone-tag zone-ours">Ours</span></td></tr>
+            <tr><td class="hl">Push/fold solver</td><td>Nash shove and call ranges, heads-up and 3+ handed, chip-EV or ICM</td><td><strong>Build.</strong> BSD-licensed poker-cfr has a heads-up push/fold example to learn from. <span class="b b-c">Checked</span></td><td><span class="zone-tag zone-ours">Ours</span></td></tr>
+            <tr><td class="hl">CFR core</td><td>The equilibrium-finding loop: DCFR for single spots, Monte Carlo CFR for preflop</td><td><strong>Build</strong>, written from the published papers</td><td><span class="zone-tag zone-ours">Ours</span></td></tr>
+            <tr><td class="hl">Preflop solver</td><td>Full-game solve that produces opening, 3-bet and 4-bet charts</td><td><strong>Build</strong> on our CFR core. Option to start from robopoker (MIT), which is promising but still loses −13.1 bb/100 to Slumbot. <span class="b b-v">Verified</span></td><td><span class="zone-tag zone-ours">Ours</span></td></tr>
+            <tr><td class="hl">Postflop solver (factory)</td><td>Solves one flop spot exactly</td><td><strong>Reuse</strong> b-inary postflop-solver (Rust). It has been frozen since Oct 2023 <span class="b b-v">Verified</span>, so we keep our own copy.</td><td><span class="zone-tag zone-agpl">AGPL · offline</span></td></tr>
+            <tr><td class="hl">Cross-check solver</td><td>Second opinion on spot solves</td><td><strong>Reuse</strong> TexasSolver (C++), built from its console branch</td><td><span class="zone-tag zone-agpl">AGPL · offline</span></td></tr>
+            <tr><td class="hl">Job runner</td><td>Turns the spot menu into thousands of jobs, runs them in parallel, resumes after interruptions, rejects inaccurate results</td><td><strong>Build</strong></td><td><span class="zone-tag zone-ours">Ours</span></td></tr>
+            <tr><td class="hl">Library store</td><td>Compact files plus an index to find them, kept in Cloudflare R2</td><td><strong>Build</strong> our file format; <strong>rent</strong> R2 storage</td><td><span class="zone-tag zone-ours">Ours</span></td></tr>
+            <tr><td class="hl">Web app</td><td>Chart viewer, spot browser, drill trainer, ICM tools, progress stats</td><td><strong>Build</strong> (TypeScript + React)</td><td><span class="zone-tag zone-ours">Ours</span></td></tr>
+            <tr><td class="hl">Own postflop engine (later)</td><td>Same job as postflop-solver, but it can run on the server or in the browser</td><td><strong>Build</strong> in Phase 7, from the DCFR paper, never copied from AGPL code</td><td><span class="zone-tag zone-ours">Ours</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Technology choices</h3>
+      <ul>
+        <li><strong>Rust for the number-crunching.</strong> The free poker engines worth borrowing from are already Rust: postflop-solver, robopoker, poker-cfr and rs-poker. Rust can also compile to WebAssembly, so our own solver could later run inside a customer's browser at no server cost. Rust isn't installed on your Mac yet. <span class="b b-c">Checked</span></li>
+        <li><strong>TypeScript and React for the web app.</strong> Node 26 is already installed. <span class="b b-c">Checked</span> Version 1 is a local web page that reads the library files and needs no server. Accounts, payments and hosting come in Phase 8.</li>
+        <li><strong>Store flop strategies only.</strong> That's about 0.1–0.3 MB per solved flop <span class="b b-e">Estimate</span>. A full saved tree including turn and river runs to gigabytes <span class="b b-c">Checked</span>. Turn and river come later through on-demand re-solving in Phase 7.</li>
+        <li><strong>The library's master copy lives in Cloudflare R2</strong>, which is cloud file storage. Rented solving machines upload straight to it, and later the paid app serves files from it.</li>
+      </ul>
+
+      <h3>Where files live</h3>
+      <p>This matches your other projects. The project folder sits on the Desktop, where iCloud backs it up, and GitHub is the source of truth for code, pushed after every change. Only throwaway or huge generated files stay out of iCloud. Your Desktop does sync to iCloud <span class="b b-c">Checked</span>, and the September ghost-file incident shows what thousands of generated files do to it.</p>
+      <div class="tbl tbl-wide">
+        <table>
+          <thead><tr><th>What</th><th>Where</th><th>Backed up by</th></tr></thead>
+          <tbody>
+            <tr><td class="hl">Code and docs<br><span class="muted small">Solver code, app, plan pages</span></td><td><code>Desktop/AI_bots/GTO_Holdem</code>, the only local copy</td><td>iCloud, plus a private GitHub repo pushed after every change</td></tr>
+            <tr><td class="hl">Build output<br><span class="muted small">Thousands of throwaway files</span></td><td><code>~/GTO_Holdem_work/build</code>, local and not synced</td><td>Nothing needed. Building recreates it.</td></tr>
+            <tr><td class="hl">Our copy of the AGPL solvers</td><td><code>~/GTO_Holdem_work/agpl-solvers</code>, kept apart for the license firewall</td><td>Its own private GitHub repo</td></tr>
+            <tr><td class="hl">Library and solver results<br><span class="muted small">Gigabytes</span></td><td><strong>Cloudflare R2</strong>, the single master copy. Rented machines upload straight there.</td><td>R2 itself</td></tr>
+            <tr><td class="hl">Test runs on the Mac</td><td><code>~/GTO_Holdem_work/runs</code>, temporary and deleted after use</td><td>Nothing needed</td></tr>
+          </tbody>
+        </table>
+      </div>
+<pre><span class="c">~/Desktop/AI_bots/GTO_Holdem/      iCloud + GitHub</span>
+    IMPLEMENTATION_PLAN.html / .md
+    engine/       Rust source: cards, equity, ICM, push/fold, CFR, preflop, later postflop
+    factory/      spot menus, job runner, cloud scripts
+    web/          the study and drill app
+    validation/   reference answers and check results
+
+<span class="c">~/GTO_Holdem_work/                 local only, never synced</span>
+    build/        compiler and web build output
+    <span class="warn">agpl-solvers/</span> postflop-solver + TexasSolver (own GitHub repo; offline only, never deployed)
+    runs/         temporary local test runs
+
+<span class="c">Cloudflare R2                      the library</span></pre>
+      <ul class="small">
+        <li><strong>Web app packages</strong> are tens of thousands of files that normally sit inside the project folder. Phase 0 tests a way to keep iCloud from syncing them and reports whether it worked.</li>
+        <li><strong>iCloud has already made " 2" conflict copies</strong> in two of your other projects' version history (<code>Magnific_clone/studio</code> and <code>rru-posting-desk</code>). Both passed git's integrity check on 6 Oct 2026, so no damage was done. Because GitHub is the source of truth, any future damage is fixed by downloading a fresh copy from GitHub.</li>
+      </ul>
+    </section>
+
+    <!-- 4 -->
+    <section id="phases">
+      <div class="sec-head"><span class="sec-num">04</span><h2>Build phases</h2></div>
+      <p>Each phase ends with a <strong>Done when</strong> gate. These are concrete checks I run, and I report the actual numbers before we move on.</p>
+      <p class="small muted">Sizes assume the fast-track pace: daily sessions, with helper agents building independent pieces at the same time. S is under a week, M about 1–2 weeks, L about 2–4 weeks, and XL about 1–1.5+ months.</p>
+      <div class="callout">
+        <h3>Three tracks run side by side after Phase 0</h3>
+        <ul>
+          <li><strong>Track A, short stacks to the first paid product:</strong> Phase 1 → Phase 2 → Launch 1.</li>
+          <li><strong>Track B, postflop and cash:</strong> Phase 3 → Phase 4 → Phase 5 → Phase 6.</li>
+          <li><strong>Track C, our own engine:</strong> Phase 7 starts once Phase 3 gives us a reference solver to check against.</li>
+          <li>All three meet at Phase 8, the full launch.</li>
+        </ul>
+      </div>
+      <nav class="road" aria-label="Phase roadmap">
+        <a href="#p0"><span class="p">Phase 0</span><span class="n">Foundations</span><span class="size">S</span></a>
+        <a href="#p1"><span class="p">Phase 1</span><span class="n">Short-stack toolkit + drill app</span><span class="size">M</span><span class="flag">First trainer</span></a>
+        <a href="#p2"><span class="p">Phase 2</span><span class="n">Spins and final-table push/fold</span><span class="size">M</span></a>
+        <a href="#launch1"><span class="p">Launch 1</span><span class="n">Short-stack trainer goes paid</span><span class="size">M–L</span><span class="flag">First paid product</span></a>
+        <a href="#p3"><span class="p">Phase 3</span><span class="n">Postflop study on your Mac</span><span class="size">M</span><span class="flag">Personal postflop</span></a>
+        <a href="#p4"><span class="p">Phase 4</span><span class="n">Preflop solver, deep stacks</span><span class="size">XL</span><span class="flag risk">Biggest risk</span></a>
+        <a href="#p5"><span class="p">Phase 5</span><span class="n">Library factory + postflop drills</span><span class="size">L</span><span class="flag">Cash drills</span></a>
+        <a href="#p6"><span class="p">Phase 6</span><span class="n">Tournament postflop</span><span class="size">L</span></a>
+        <a href="#p7"><span class="p">Phase 7</span><span class="n">Our own postflop engine</span><span class="size">XL</span></a>
+        <a href="#p8"><span class="p">Phase 8</span><span class="n">Full launch</span><span class="size">M</span><span class="flag">Full product</span></a>
+      </nav>
+
+      <article class="phase" id="p0">
+        <div class="phase-head"><span class="p">Phase 0</span><h3>Foundations</h3><span class="size">S</span></div>
+        <p class="get"><b>You get</b>Nothing visible yet. This proves the base is correct.</p>
+        <div class="phase-body">
+          <ul>
+            <li>Install the Rust toolchain and set up the layout above. Create a private GitHub repo for the project and another for the AGPL solver copy. Push after every change.</li>
+            <li>Point all build output at <code>~/GTO_Holdem_work/build</code>. Test a way to keep the web app's packages from syncing to iCloud.</li>
+            <li>Wire in rs-poker for cards, hands and ranges.</li>
+            <li>Write the CFR core (DCFR, from Brown &amp; Sandholm 2019). Test it on Kuhn poker, a 3-card toy game with a known exact answer.</li>
+            <li>Build postflop-solver in the AGPL zone, then time one sample flop solve on this Mac. That gives us our own measured benchmark instead of guesses.</li>
+          </ul>
+        </div>
+        <div class="done"><h4>Done when</h4>
+          <ol>
+            <li>The hand evaluator reproduces the exact counts for every possible showdown: 2 hole cards + 5 board cards, ranked by the best 5 of the 7. That's 133,784,560 showdowns in total, including 4,047,644 flushes and 41,584 straight flushes.</li>
+            <li>The Kuhn poker solver converges to the first player's value of −1/18 ≈ −0.0556.</li>
+            <li>postflop-solver solves a sample spot on this Mac, and its time and memory use are written into this plan.</li>
+            <li>A full build of the engine and the web app adds no new build files to iCloud.</li>
+          </ol>
+        </div>
+        <div class="done"><h4>Result, 6 Oct 2026: all four gates passed</h4>
+          <ol>
+            <li><strong>Evaluator:</strong> all 133,784,560 showdowns (2 hole + 5 board, best 5 of 7) ranked, and all 9 categories match exactly. It took 0.1 s on 16 threads.</li>
+            <li><strong>Kuhn poker:</strong> value −0.055557 against the exact −0.055556. Exploitability is 0.0013, versus 0.0021 for plain CFR. The strategy matches the textbook equilibrium.</li>
+            <li><strong>This Mac, measured:</strong> a flop spot (T♦9♦6♥, a 60% bet plus all-in) took <strong>8.0 s and 489 MB</strong>, reaching 0.43% of the pot. A turn spot took 0.9 s. Library trees will be bigger, so the cost estimates stay unchanged until the test batch.</li>
+            <li><strong>iCloud:</strong> the first try failed. pnpm 12 ignored its old settings file, and 989 files landed in iCloud before being deleted. After the fix, a build adds 0 files.</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="phase" id="p1">
+        <div class="phase-head"><span class="p">Phase 1</span><h3>Short-stack toolkit and drill app v1</h3><span class="size">M</span></div>
+        <p class="get"><b>You get</b>A working push/fold trainer for the heads-up phase of Spins, HU SNGs and late MTTs, plus an ICM calculator.</p>
+        <div class="phase-body">
+          <ul>
+            <li><strong>ICM calculator.</strong> It uses exact Malmuth-Harville, calculated only down to the paid places. That limit is the big speedup: 16 players with 3 paid took 0.04 s, while 16 players with everyone paid took 12.9 s. <span class="b b-c">Checked</span> Big fields use Monte Carlo, which came within $0.06 on a $100 pool in a test. <span class="b b-c">Checked</span></li>
+            <li><strong>All-in equity table:</strong> every starting hand against every other, computed once.</li>
+            <li><strong>Heads-up push/fold solver:</strong> chip-EV, 1–40bb, with no ante and with a 10% ante.</li>
+            <li><strong>Drill app v1:</strong> a 13×13 chart viewer, a push/fold quiz with random stack depths, and an ICM calculator page. Grading accepts any action the solver mixes at a meaningful frequency.</li>
+          </ul>
+        </div>
+        <div class="done"><h4>Done when</h4>
+          <ol>
+            <li>ICM matches HRC's free calculator to the cent on 10 test cases.</li>
+            <li>Push/fold matches HRC's published heads-up Nash tables (1–200bb in 0.05bb steps) <span class="b b-c">Checked</span> at 20+ sampled depths. Only borderline mixed hands may differ. HRC's tables have no stated license, so we use them only as an answer key and never ship them.</li>
+            <li>A drill session runs from start to finish in your browser.</li>
+          </ol>
+        </div>
+        <div class="done"><h4>Result, 7 Oct 2026: done (one ICM step waiting for your OK)</h4>
+          <ul>
+            <li><strong>Equity table:</strong> identical, number for number, to an independent published table on all 1,624,350 matchups.</li>
+            <li><strong>ICM:</strong> matches a brute-force check, and the app's and engine's versions agree to 13 decimals. The comparison with HRC's online calculator waits for your OK.</li>
+            <li><strong>Push/fold:</strong> 158 charts, 1–40bb, essentially unexploitable (1e-8 bb per hand). With no ante they match HRC's published charts on 168/169 shoves and 169/169 calls.</li>
+            <li><strong>Drill app works:</strong> drill, charts, ICM and postflop screens, graded by EV lost.</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="phase" id="p2">
+        <div class="phase-head"><span class="p">Phase 2</span><h3>Spin &amp; Go and final-table push/fold</h3><span class="size">M</span></div>
+        <p class="get"><b>You get</b>Spin push/fold drills with random uneven stacks, plus short-stacked final-table push/fold with ICM.</p>
+        <div class="phase-body">
+          <ul>
+            <li><strong>3-way all-in equities.</strong> Computed exactly, these were the expensive part in the 2008 research: a month on 16 processors. <span class="b b-c">Checked</span> We use Monte Carlo sampling instead, which should take minutes to hours on rented cores. <span class="b b-e">Estimate</span></li>
+            <li><strong>3-handed push/fold solver:</strong> chip-EV, uneven stacks, roughly a 1–12bb grid, pre-solved offline.</li>
+            <li><strong>ICM payout switch on the same solver.</strong> It covers Spin ×10 first, where 1st and 2nd get paid <span class="b b-c">Checked</span>. Then MTT final tables, 3–6 handed first, then 7-, 8- and 9-handed. Bubble factor and risk premium come straight out of this.</li>
+            <li>Optional later: <strong>FGS</strong> (future game simulation) looks one or two hands ahead. It only matters at 6 or fewer players under about 10bb. <span class="b b-c">Checked</span></li>
+          </ul>
+        </div>
+        <div class="done"><h4>Done when</h4>
+          <ol>
+            <li>The solver reproduces Ganzfried &amp; Sandholm's published 3-player jam/fold results on their test structure. <span class="b b-c">Checked</span></li>
+            <li>ICM charts move in the known direction. Example: a big blind facing two all-ins calls about 9× less often under tournament payouts than in a single cash hand (0.197 vs 0.021). <span class="b b-c">Checked</span></li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="phase" id="launch1">
+        <div class="phase-head"><span class="p">Launch 1</span><h3>First paid product: the short-stack trainer</h3><span class="size">M–L</span></div>
+        <p class="get"><b>You get</b>A product you can charge for. It drills push/fold and ICM for Spin &amp; Go, SNGs and MTT short stacks.</p>
+        <div class="phase-body">
+          <ul>
+            <li>Everything in it is our own code from Phases 1–2. It has no AGPL code and does no on-demand solving, so it doesn't need Phase 7.</li>
+            <li>Accounts, subscriptions (Stripe) and hosting.</li>
+            <li>Our own terms of service (see <a href="#terms">Our own terms</a> in Phase 8).</li>
+            <li>A license audit and a lawyer review before taking any money.</li>
+          </ul>
+        </div>
+        <div class="done"><h4>Done when</h4>
+          <ol>
+            <li>A test customer can sign up, pay with a Stripe test card, and finish a drill session on the hosted site.</li>
+            <li>The license audit finds no GPL or AGPL code.</li>
+            <li>The lawyer has reviewed the terms.</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="phase" id="p3">
+        <div class="phase-head"><span class="p">Phase 3</span><h3>Postflop study on your Mac</h3><span class="size">M</span></div>
+        <p class="get"><b>You get</b>Your own "PioSolver". You enter ranges and bet sizes for one spot, solve it, and browse the strategy hand by hand. This is for your personal study.</p>
+        <div class="phase-body">
+          <ul>
+            <li>A command-line wrapper around postflop-solver in the AGPL zone. A community copy that reads config files and writes JSON already exists. <span class="b b-c">Checked</span></li>
+            <li>A <strong>range editor</strong>, so you can enter ranges by hand for personal study until our own preflop charts exist in Phase 4.</li>
+            <li>A <strong>spot viewer</strong> in the web app showing strategy per hand and per decision point, with EV and equity.</li>
+            <li>A cross-check of 5 reference spots in TexasSolver. On macOS it needs Homebrew LLVM for multithreading. <span class="b b-c">Checked</span></li>
+          </ul>
+        </div>
+        <div class="done"><h4>Done when</h4>
+          <ol>
+            <li>5 reference spots converge to ≤0.5% of pot, the same stopping point postflop-solver's own example uses. <span class="b b-v">Verified</span></li>
+            <li>postflop-solver and TexasSolver agree within expected tolerance. Small gaps are expected from TexasSolver's turn and river bug.</li>
+            <li>Solve times and memory use on your Mac are recorded.</li>
+          </ol>
+        </div>
+        <div class="done"><h4>Result, 7 Oct 2026: partly done</h4>
+          <ul>
+            <li><strong>Works:</strong> solve a spot on your Mac, click through the tree, and see every combo's strategy, EV and equity. TexasSolver builds here without Homebrew.</li>
+            <li><strong>Reference flops:</strong> 4 of 5 solved to ≤0.5% of the pot, at about 11 minutes and 4.8 GB each. A♠7♣2♦ needs 7.65 GB and swapped to a halt with your apps open.</li>
+            <li><strong>Cross-check:</strong> 1 of 5. Both solvers value T♦9♦6♥ the same (within 0.06 chips), but their check/bet mixes differ by about 8%. A lock test will settle whether both mixes are equally good.</li>
+            <li><strong>Remaining:</strong> about 3 hours on an idle Mac, or a rented machine.</li>
+          </ul>
+        </div>
+        <p class="rule-box"><b>Rule:</b> anything solved from hand-entered ranges copied from a training site stays personal. It never goes into the paid library (see <a href="#licensing">Licensing rules</a>).</p>
+      </article>
+
+      <article class="phase hard" id="p4">
+        <div class="phase-head"><span class="p">Phase 4</span><h3>Preflop solver for deep stacks</h3><span class="size">XL</span><span class="zone-tag zone-agpl">Biggest technical risk</span></div>
+        <p class="get"><b>You get</b>Your own preflop charts for cash at 6-max, 7- and 9-handed (100bb); MTTs at 7-, 8- and 9-handed (MTT stack depths, big-blind ante); and Spin, 3-handed at 25bb and below. Every postflop library needs these as its starting ranges.</p>
+        <div class="phase-body">
+          <ul>
+            <li><strong>How paid tools did it.</strong> GTO Wizard's original cash preflop came from MonkerSolver on a very large server. PeakGTO's preflop comes from HRC or MonkerSolver. <span class="b b-c">Checked</span></li>
+            <li><strong>Our approach</strong> is the same family as Monker and Pluribus:
+              <ul>
+                <li>Monte Carlo CFR over the whole hand <span class="b b-v">Verified</span></li>
+                <li>Hand bucketing on later streets; Monker's guide recommends 15–30 buckets per street <span class="b b-c">Checked</span></li>
+                <li>A small bet menu</li>
+              </ul>
+            </li>
+            <li><strong>Table sizes</strong> (decided 6 Oct 2026): cash at 6-max, 7- and 9-handed; MTTs at 7-, 8- and 9-handed. Each table size is its own preflop solve. The postflop solver doesn't change, because almost every postflop pot is heads-up whatever the table size. Table size only changes the preflop ranges going into the pot.</li>
+            <li><strong>Order:</strong>
+              <ol>
+                <li>Heads-up 100bb first, because with two players we can measure exploitability properly.</li>
+                <li>6-max 100bb cash.</li>
+                <li>MTTs at 8-max, the first MTT table size, at the MTT stack depths.</li>
+                <li>Spin, 3-handed at 25bb.</li>
+                <li><strong>Next step, once 6-max is proven:</strong> 7- and 9-handed cash, then 7- and 9-handed MTTs. This needs its own budget approval.</li>
+              </ol>
+            </li>
+            <li><strong>Test to run here: can late seats be shared?</strong> The cutoff, button and blinds have the same number of players left to act at any table size, so their ranges should be close. <span class="b b-e">Estimate</span> If the 6-max and 9-handed solves confirm that within our accuracy target, those postflop spots get reused, and 7- and 9-handed only add early-seat spots. The stakes are real: there are 15 single-raised-pot seat matchups at 6-max, 21 at 7-handed and 36 at 9-handed.</li>
+            <li><strong>Compute:</strong> rented big-memory servers for days. The Pluribus 6-max blueprint took 12,400 core-hours and under 512 GB of RAM. <span class="b b-v">Verified</span> At today's ~$0.019 per core-hour that's about $235 a run, and expect several runs while tuning. <span class="b b-e">Estimate</span> Big-memory machines cost more than the compute machines priced below, and that price hasn't been researched yet.</li>
+            <li><strong>Your part:</strong> create an AWS account with a payment method before this phase. It's the first time we rent machines, and only you can create the account.</li>
+            <li><strong>Caveat:</strong> with 3+ players there is no guarantee of "unexploitable". <span class="b b-v">Verified</span> Multi-way charts are judged by stability and sanity checks, not by one exploitability number.</li>
+          </ul>
+        </div>
+        <div class="done"><h4>Done when</h4>
+          <ol>
+            <li>The heads-up solution's measured exploitability falls steadily as iterations increase.</li>
+            <li>6-max charts are stable across two independent runs. They also pass sanity rules: ranges widen from UTG to BTN, and the blinds defend sensibly.</li>
+            <li>You spot-check them by eye against charts you trust. We compare only and import nothing.</li>
+          </ol>
+        </div>
+        <p class="small"><strong>We build these charts ourselves.</strong> Licensing outside preflop charts is ruled out (your decision, 6 Oct 2026). <strong>If quality stalls,</strong> we spend more compute, use finer hand buckets, and carry over the settings that tested well heads-up. Meanwhile, personal study keeps using hand-entered ranges.</p>
+      </article>
+
+      <article class="phase" id="p5">
+        <div class="phase-head"><span class="p">Phase 5</span><h3>Library factory and postflop drills</h3><span class="size">L</span></div>
+        <p class="get"><b>You get</b>GTO-Wizard-style cash study. You can browse thousands of pre-solved flops and get drilled on them.</p>
+        <div class="phase-body">
+          <ul>
+            <li><strong>Spot menu to job list:</strong> format, stack depth, preflop line, flop and bet menu.</li>
+            <li><strong>Runner:</strong> runs jobs in parallel on rented machines and resumes after interruptions (spot instances can be reclaimed). It rejects any solve above the accuracy target and packs flop strategies into compact files plus an index. Finished files upload straight to Cloudflare R2, so the library never has to pass through your Mac.</li>
+            <li><strong>Your part:</strong> create a Cloudflare account and switch on R2 before this phase. I can't create accounts for you. R2 has a checkout step, and its docs don't say whether that step asks for a card even on the free tier. <span class="b b-c">Checked</span></li>
+            <li><strong>First library, "Cash starter":</strong> 6-max 100bb, about 15 preflop lines, on the 184-flop subset. PioSolver picked that subset to best match all 1,755 flops and says it performs really well. <span class="b b-c">Checked</span> It costs about $65 rented, or 3–5 weeks nonstop on your Mac. <span class="b b-e">Estimate</span></li>
+            <li><strong>How the rented run works:</strong>
+              <ul>
+                <li>The 2,760 solves are independent, and rented machines bill by the hour. So 4 machines finish in about a day for the same ~$65 that 1 machine would cost over 4–5 days. <span class="b b-e">Estimate</span></li>
+                <li>AWS "spot" machines are spare capacity at about a third of the normal price, but AWS can take them back. If it does, their unfinished jobs simply go back on the list.</li>
+                <li>The machines shut themselves down when the list is empty, so billing stops.</li>
+              </ul>
+            </li>
+            <li><strong>Test batch first:</strong> about 20 solves on one rented machine, for under $1. It measures the real per-solve time before we commit to the full run.</li>
+            <li><strong>Postflop drills:</strong> deal spots from the library and grade your action against solver frequencies and EV loss. You can filter by position, board texture and subset, mistakes come back more often, and progress is tracked.</li>
+            <li>Then <strong>expand to all 1,755 flops ("Cash core", about $615)</strong>. Subsets are weaker for studying how bet sizing changes by board texture. <span class="b b-c">Checked</span></li>
+          </ul>
+        </div>
+        <div class="done"><h4>Done when</h4>
+          <ol>
+            <li>A random 1% of library spots, re-solved independently, match.</li>
+            <li>Every stored solve is under the accuracy target.</li>
+            <li>A full drill session runs off the library.</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="phase" id="p6">
+        <div class="phase-head"><span class="p">Phase 6</span><h3>Tournament postflop</h3><span class="size">L</span></div>
+        <p class="get"><b>You get</b>MTT and Spin postflop study, plus a curated set of ICM postflop spots.</p>
+        <div class="phase-body">
+          <ul>
+            <li><strong>Spin postflop library at 25bb and below, chip-EV.</strong> That's correct for the 97.6% of Spins that are winner-take-all. <span class="b b-c">Checked</span></li>
+            <li><strong>MTT postflop library:</strong> a handful of stack depths × about 10 preflop lines, chip-EV first.</li>
+            <li><strong>ICM postflop:</strong> the hand is played in chips, then final stacks are turned into $ with ICM at every point where the hand ends. <span class="b b-c">Checked</span> Each solve costs about the same as chip-EV. <span class="b b-e">Estimate</span> We change the payout code in our offline copy of postflop-solver, which another user has done before. <span class="b b-c">Checked</span></li>
+            <li><strong>A curated ICM set</strong> of common final-table spots, not GTO Wizard's 50,000+.</li>
+          </ul>
+        </div>
+        <div class="done"><h4>Done when</h4>
+          <ol>
+            <li>ICM postflop results move the expected way versus chip-EV: tighter calls for all your chips, and more aggression from big stacks.</li>
+            <li>A sample cross-checks against Phase 2 push/fold in shallow spots, where the two should agree.</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="phase" id="p7">
+        <div class="phase-head"><span class="p">Phase 7</span><h3>Our own postflop engine</h3><span class="size">XL</span></div>
+        <p class="get"><b>You get</b>A solver we fully own. It's needed for the full launch, where customers get custom solves and turn and river study. Launch 1 doesn't need it.</p>
+        <div class="phase-body">
+          <p><strong>Why it's needed:</strong></p>
+          <ul>
+            <li>Storing turn and river data for a whole library runs into terabytes. <span class="b b-e">Estimate</span></li>
+            <li>So paid tools re-solve later streets on demand. GTO Wizard re-solves rivers live. <span class="b b-c">Checked</span></li>
+            <li>Running an AGPL solver on the server for paying users would force you to open-source the app, or buy TexasSolver's commercial license. b-inary sells no license at all. <span class="b b-c">Checked</span></li>
+          </ul>
+          <ul>
+            <li>We write a DCFR postflop solver from the published paper. It's a clean-room build, with no copying from AGPL code.</li>
+            <li>It also compiles to WebAssembly, so solves can run in the customer's browser at no server cost.</li>
+          </ul>
+        </div>
+        <div class="done"><h4>Done when</h4>
+          <ol><li>It matches postflop-solver within tolerance on 50+ spots, at comparable speed.</li></ol>
+        </div>
+      </article>
+
+      <article class="phase" id="p8">
+        <div class="phase-head"><span class="p">Phase 8</span><h3>Full launch</h3><span class="size">M</span></div>
+        <div class="phase-body">
+          <ul>
+            <li>Extend Launch 1's accounts, subscriptions and hosting to the full product: cash, MTT and Spin libraries, postflop drills, and on-demand solving.</li>
+            <li>Library files are served from Cloudflare R2. Downloads are free there, which matters once customers are pulling files all day. <span class="b b-c">Checked</span></li>
+            <li><strong>Our own terms of service.</strong> See "Our own terms, modeled on GTO Wizard's" below.</li>
+            <li><strong>No GGPoker hand-history import.</strong> GG's policy §7.2–7.3 bans third-party import and sharing of hand histories. <span class="b b-c">Checked</span></li>
+            <li><strong>License audit:</strong> every dependency listed with its license, and no GPL or AGPL code in the server or browser bundle.</li>
+            <li><strong>Lawyer review before launch.</strong> This plan is not legal advice.</li>
+            <li><strong>Know your moat.</strong> Machine-generated solver numbers get weak copyright protection. <span class="b b-c">Checked</span> Competitors could copy your charts more easily than you could copy theirs. Our terms and fingerprints (below) are the protection, and your edge has to be quality, drills and price.</li>
+          </ul>
+          <h4 id="terms">Our own terms, modeled on GTO Wizard's</h4>
+          <p>We borrow each protection and write it in our own words; we don't copy their text. A lawyer reviews it before launch. Sources are GTO Wizard's terms and Pio's license page. <span class="b b-c">Checked</span></p>
+          <ol>
+            <li><strong>No commercial use of our content</strong> (from their §7.5). Users can't sell, republish or build products from our charts, ranges, trees or solutions. That includes doing it through third-party apps.</li>
+            <li><strong>Covers every tier, free included</strong> (from §4.1). The terms protect the whole service, so there's no free-tier loophole.</li>
+            <li><strong>No scraping or automation</strong> (from §7.7). No scripts, bots, bulk downloading or automated requests.</li>
+            <li><strong>Study only, never during play</strong> (from §7.1). GGPoker and PokerStars require the same for study tools to be allowed. <span class="b b-c">Checked</span></li>
+            <li><strong>Protections they don't spell out, but we should:</strong>
+              <ul>
+                <li>one person per account, with no sharing;</li>
+                <li>no reselling or redistributing exports;</li>
+                <li>no reverse-engineering our library files;</li>
+                <li>we can suspend accounts that break the rules.</li>
+              </ul>
+            </li>
+            <li><strong>Decide our stance on coaching use.</strong> Pio's personal license lets users put results in coaching materials, books and videos, but not into on-demand services. <span class="b b-c">Checked</span> We need to choose whether students and coaches can show our charts in videos.</li>
+          </ol>
+          <p><strong>Why this matters more for us than for GTO Wizard:</strong></p>
+          <ul>
+            <li>GTO Wizard is in the EU, where database law protects its library even without a contract. <span class="b b-c">Checked</span></li>
+            <li>The US has no equivalent database right, and machine-generated solver numbers get weak copyright protection. The copyright part is checked. The database-right point is general legal background for the lawyer to confirm.</li>
+            <li>So our terms of service are our main legal shield.</li>
+          </ul>
+          <p class="rule-box"><b>Technical add-on: fingerprints.</b> Plant a few harmless, unique quirks in rarely viewed spots. If someone copies our data, we can prove it, the same way GTO Wizard's own quirks would expose anyone copying them. Every quirk stays inside the accuracy target, so drills never teach a worse play and the Phase 5 re-solve check still passes. <em>This is an idea to check with the lawyer. We haven't researched whether it's established practice.</em></p>
+        </div>
+      </article>
+    </section>
+
+    <!-- 5 -->
+    <section id="library">
+      <div class="sec-head"><span class="sec-num">05</span><h2>Library: what to solve, cost and time</h2></div>
+      <p class="small">All figures are <span class="b b-e">Estimate</span>. They assume heads-up postflop solved to about 0.3–0.5% of pot with a postflop-solver-class engine. The machine is a 32-core box at AWS spot pricing of about $0.60/hour <span class="b b-c">Checked</span>. Ranges in brackets show 3× faster or 3× slower.</p>
+      <div class="tbl tbl-wide">
+        <table>
+          <thead><tr><th>Library tier</th><th class="num">Flop solves</th><th class="num">Machine-hours</th><th class="num">Cost (spot)</th><th>On your 16 GB Mac?</th></tr></thead>
+          <tbody>
+            <tr><td class="hl">Cash starter<br><span class="muted small">6-max 100bb, 10 single-raised + 5 3-bet pots, 184 flops</span></td><td class="num">2,760</td><td class="num">107<br><span class="muted">36–322</span></td><td class="num">$65<br><span class="muted">$22–$194</span></td><td>Yes, but about 18–36 days nonstop</td></tr>
+            <tr><td class="hl">Cash core<br><span class="muted small">Same 15 lines, all 1,755 flops</span></td><td class="num">26,325</td><td class="num">1,024<br><span class="muted">341–3,071</span></td><td class="num">$615<br><span class="muted">$205–$1,846</span></td><td>No (6–11 months)</td></tr>
+            <tr><td>Cash broad<br><span class="muted small">15 single-raised + 15 3-bet pots, 1,755 flops</span></td><td class="num">52,650</td><td class="num">1,755</td><td class="num">$1,055<br><span class="muted">$352–$3,164</span></td><td>No</td></tr>
+            <tr><td class="hl">MTT starter<br><span class="muted small">8-max, 4 depths × 10 lines, 184 flops, chip-EV</span></td><td class="num">7,360</td><td class="num">123<br><span class="muted">41–368</span></td><td class="num">$74<br><span class="muted">$25–$221</span></td><td>Yes, about 20–41 days</td></tr>
+            <tr><td>MTT full<br><span class="muted small">8-max, 4 depths × 10 lines, 1,755 flops</span></td><td class="num">70,200</td><td class="num">1,170</td><td class="num">$703<br><span class="muted">$234–$2,110</span></td><td>No</td></tr>
+            <tr><td class="hl">Spin<br><span class="muted small">4 depths ≤25bb × 6 heads-up lines, 1,755 flops</span></td><td class="num">42,120</td><td class="num">351<br><span class="muted">117–1,053</span></td><td class="num">$211<br><span class="muted">$70–$633</span></td><td>No (2–4 months)</td></tr>
+            <tr><td class="hl">Next step: 7-handed cash starter<br><span class="muted small">15 most common lines, 184 flops</span></td><td class="num">2,760</td><td class="num">107<br><span class="muted">36–322</span></td><td class="num">$65<br><span class="muted">$22–$194</span></td><td>Yes, about 18–36 days</td></tr>
+            <tr><td class="hl">Next step: 9-handed cash starter<br><span class="muted small">15 most common lines, 184 flops</span></td><td class="num">2,760</td><td class="num">107<br><span class="muted">36–322</span></td><td class="num">$65<br><span class="muted">$22–$194</span></td><td>Yes, about 18–36 days</td></tr>
+            <tr><td class="hl">Next step: MTT starter at 7- or 9-handed<br><span class="muted small">Each: 4 depths × 10 lines, 184 flops</span></td><td class="num">7,360</td><td class="num">123<br><span class="muted">41–368</span></td><td class="num">$74<br><span class="muted">$25–$221</span></td><td>Yes, about 20–41 days</td></tr>
+            <tr><td>9-handed cash full (live or online)<br><span class="muted small">15 single-raised + 5 3-bet pots, 1,755 flops</span></td><td class="num">35,100</td><td class="num">1,462</td><td class="num">$879<br><span class="muted">$293–$2,637</span></td><td>No</td></tr>
+            <tr><td class="hl">Big bundle<br><span class="muted small">Cash core + MTT full + Spin + 9-handed cash full</span></td><td class="num">173,745</td><td class="num">4,007</td><td class="num">~$2,400<br><span class="muted">on-demand ~$6,600</span></td><td>No</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small muted">The next-step rows come in lower if the late-seat sharing test in Phase 4 passes.</p>
+      <p>On top of that come the <strong>preflop solver runs</strong> from Phase 4. Expect about $250–$1,000 per setup at 100bb. It's the least certain number in this plan. <span class="b b-e">Estimate</span> Every table size and format needs its own run. Shorter stacks make a much smaller game, so the MTT and Spin runs should cost less. <span class="b b-e">Estimate</span> Each run is measured first with a test batch under $1.</p>
+
+      <h3>Three budget paths <span class="b b-e">Estimate</span></h3>
+      <div class="paths">
+        <div class="path chosen"><span class="name">Lean <span class="zone-tag zone-ours">Chosen</span></span><span class="amt">~$400</span><p>6-max cash starter, 8-max MTT starter, Spin on 184 flops, and one 100bb preflop run. MTT and Spin preflop runs are extra, and they get measured and approved first.</p></div>
+        <div class="path"><span class="name">Solid</span><span class="amt">~$1,400</span><p>Cash core, MTT starter, full Spin, and two preflop runs.</p></div>
+        <div class="path"><span class="name">Broad</span><span class="amt">~$3,300</span><p>Everything in the table, plus several preflop runs.</p></div>
+      </div>
+      <p class="small"><strong>Correction, 6 Oct 2026:</strong> Lean's $400 counted only one preflop run, so the MTT and Spin preflop runs are not inside it. They'll be measured and brought to you for approval. <strong>Next step, approved separately once 6-max preflop is proven:</strong> 7- and 9-handed cash starters (about $65 each), 7- and 9-handed MTT starters (about $74 each), and a preflop run for each table size.</p>
+      <ul class="small">
+        <li><strong>Storage is small</strong> for flop-only data: about 0.6 GB for cash starter, 5 GB for cash core, and about 35 GB for everything. <span class="b b-e">Estimate</span> Storing turn data too would push it into terabytes, which is why Phase 7 exists.</li>
+        <li><strong>Storage cost in Cloudflare R2:</strong>
+          <ul>
+            <li>$0.015 per GB per month, with the first 10 GB free and free downloads. <span class="b b-c">Checked</span></li>
+            <li>Cash starter and cash core fit inside the free tier.</li>
+            <li>Everything (~35 GB) comes to about <strong>$0.38 a month</strong>. <span class="b b-e">Estimate</span></li>
+            <li>Uploading about 174,000 files stays well under R2's 1 million free uploads per month. <span class="b b-c">Checked</span></li>
+          </ul>
+        </li>
+        <li><strong>GitHub can't hold the library.</strong> It blocks any single file over 100 MB and strongly recommends keeping a project under 5 GB. <span class="b b-c">Checked</span></li>
+        <li><strong>Calendar time can shrink.</strong> Every spot is independent, so the work splits perfectly across machines. For example, the full bundle on 20 machines takes about 9 days for the same total cost. <span class="b b-e">Estimate</span></li>
+      </ul>
+    </section>
+
+    <!-- 6 -->
+    <section id="hardware">
+      <div class="sec-head"><span class="sec-num">06</span><h2>Hardware</h2></div>
+      <div class="callout">
+        <h3>Your Mac: 2019 16″ MacBook Pro, Intel, 8 cores, 16 GB RAM, 305 GB free <span class="b b-c">Checked</span></h3>
+        <p><strong>Good for:</strong></p>
+        <ul>
+          <li>all of Phases 0–3: development, testing, push/fold and ICM;</li>
+          <li>single postflop spots with 1–2 bet sizes. A one-size single-raised-pot tree needs about 1.2 GB. <span class="b b-c">Checked</span> <strong>Measured here in Phase 0:</strong> a flop spot with one bet size plus all-in solved to 0.43% of the pot in 8.0 s, using 489 MB.</li>
+        </ul>
+        <p><strong>Not good for:</strong></p>
+        <ul>
+          <li>building the library, which means weeks of nonstop running (your house rules say don't pin your machine);</li>
+          <li>big trees. Two sizes everywhere needs about 7.8 GB, and deep-stack trees with a small pot reached 40+ GB in TexasSolver. <span class="b b-c">Checked</span></li>
+          <li>the preflop solver, which needs 128–512 GB of RAM.</li>
+        </ul>
+        <p>It's an Intel Mac, so expect a few extra build steps.</p>
+      </div>
+      <h3>Rent for library builds <span class="b b-c">Checked</span></h3>
+      <p class="small muted">Prices as of 6 October 2026.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Machine</th><th>Cores / RAM</th><th class="num">Price</th></tr></thead>
+          <tbody>
+            <tr><td class="hl">AWS c7a.8xlarge, spot (recommended)</td><td>32 real cores, 64 GB</td><td class="num">$0.60/h</td></tr>
+            <tr><td>Oracle E5 Flex, preemptible</td><td>32 cores, 64 GB</td><td class="num">~$0.27/h</td></tr>
+            <tr><td>Hetzner AX102, dedicated monthly</td><td>16 cores, 128 GB</td><td class="num">€259/mo + €129 setup</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul>
+        <li><strong>Hetzner</strong> is the pick if you want an always-on box with more RAM.</li>
+        <li><strong>For the preflop solver</strong>, rent a big-memory machine (128–512 GB) for days. Prices not researched yet.</li>
+        <li><strong>Don't buy a GPU.</strong> The only GPU poker solver, TexasSolverGPU, is closed-source, Windows-only and NVIDIA-only. <span class="b b-c">Checked</span> It can't run on your Mac or on Linux cloud machines.</li>
+        <li><strong>Buy a desktop only if</strong> you'll be solving continuously for many months. A 16-core machine with 64–128 GB RAM would do. Renting is the default.</li>
+      </ul>
+    </section>
+
+    <!-- 7 -->
+    <section id="licensing">
+      <div class="sec-head"><span class="sec-num">07</span><h2>Licensing rules</h2></div>
+      <p class="small muted">Keep these for the life of the project. General information from the licensing check, not legal advice. <span class="b b-c">Checked</span></p>
+      <ul>
+        <li><strong>AGPL code stays offline.</strong> That means postflop-solver, wasm-postflop, desktop-postflop and TexasSolver. They never run on the web server and never ship in the browser bundle; shipping wasm-postflop to browsers counts as distribution. Only their output files cross into the app.</li>
+        <li><strong>The app uses only permissive code</strong> (MIT, Apache, BSD, ISC) plus our own. Candidates include rs-poker, robopoker, OpenSpiel, phevaluator, OMPEval, eval7 and pokerkit. We avoid GPL ICM calculators and repos with no license.</li>
+        <li><strong>Never import paid-tool content.</strong>
+          <ul>
+            <li>GTO Wizard's terms (§7.5) forbid commercial use of its ranges, trees and charts, free tier included. §7.7 bans scraping.</li>
+            <li>Pio's personal license forbids serving its results on demand. Its business license is €5,000/month.</li>
+            <li>"Free charts" from training sites are personal-use only. Upswing's terms were the example checked.</li>
+          </ul>
+        </li>
+        <li><strong>Every number in the paid product comes from our own runs.</strong> Runs of the offline AGPL tools count, because their output is ours under AGPL §2.</li>
+        <li><strong>TexasSolver's README asks for a commercial license for "internet services"</strong>, even though its LICENSE file is plain AGPL. It's only a cross-check here, so this doesn't touch the product. If that ever changes, get the author's OK in writing.</li>
+      </ul>
+    </section>
+
+    <!-- 8 -->
+    <section id="validation">
+      <div class="sec-head"><span class="sec-num">08</span><h2>How we'll know it's right</h2></div>
+      <p>You won't be reading code, so correctness is shown by checks against known answers. Every phase report gives you the actual numbers from these checks.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>What</th><th>Checked against</th><th class="num">Phase</th></tr></thead>
+          <tbody>
+            <tr><td>Hand evaluator</td><td>Exact published counts for every showdown (2 hole + 5 board, best 5 of 7)</td><td class="num">0</td></tr>
+            <tr><td>CFR engine</td><td>Kuhn poker exact value of −1/18</td><td class="num">0</td></tr>
+            <tr><td>ICM</td><td>HRC and GTO Wizard free ICM calculators, to the cent</td><td class="num">1</td></tr>
+            <tr><td>Heads-up push/fold</td><td>HRC published Nash tables</td><td class="num">1</td></tr>
+            <tr><td>3-handed push/fold</td><td>Ganzfried &amp; Sandholm 2008 published results</td><td class="num">2</td></tr>
+            <tr><td>Postflop spot solves</td><td>Within 0.5% of pot, and postflop-solver agrees with TexasSolver</td><td class="num">3</td></tr>
+            <tr><td>Preflop, heads-up</td><td>Measured exploitability falling over time</td><td class="num">4</td></tr>
+            <tr><td>Preflop, 6-max</td><td>Stable across runs, sanity rules, your spot-check by eye</td><td class="num">4</td></tr>
+            <tr><td>Library</td><td>A random 1% re-solved independently; every file under target</td><td class="num">5</td></tr>
+            <tr><td>Own engine</td><td>Matches postflop-solver on 50+ spots</td><td class="num">7</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 9 -->
+    <section id="risks">
+      <div class="sec-head"><span class="sec-num">09</span><h2>Risks</h2></div>
+      <div class="tbl tbl-wide">
+        <table>
+          <thead><tr><th>Risk</th><th>Why it matters</th><th>What we do about it</th></tr></thead>
+          <tbody>
+            <tr><td class="hl">Preflop solver quality <span class="zone-tag zone-agpl">Biggest</span></td><td>It's the hardest piece, and every postflop library depends on its ranges</td><td>Heads-up first, where it's measurable, then widen. The range editor keeps personal study moving.</td></tr>
+            <tr><td class="hl">postflop-solver is frozen</td><td>No bug fixes since October 2023 <span class="b b-v">Verified</span></td><td>We own our copy, and Phase 7 replaces it.</td></tr>
+            <tr><td class="hl">TexasSolver accuracy bug</td><td>Slightly wrong turn and river results <span class="b b-c">Checked</span></td><td>Used as a cross-check only, never as the library engine.</td></tr>
+            <tr><td class="hl">No free 3-way postflop solver</td><td>Limped Spin pots and multiway live pots aren't covered</td><td>Accepted. We stay heads-up postflop.</td></tr>
+            <tr><td class="hl">ICM spots can have more than one answer</td><td>Drills might mark a reasonable play wrong <span class="b b-c">Checked</span></td><td>Grade by EV loss with tolerance, not exact frequency.</td></tr>
+            <tr><td class="hl">Smaller library than paid tools</td><td>Fewer spots to study</td><td>Compete on correctness, drills and price.</td></tr>
+            <tr><td class="hl">Rented spot machines get reclaimed</td><td>Lost compute mid-run</td><td>The runner saves progress and resumes.</td></tr>
+            <tr><td class="hl">The fast track depends on our pace</td><td>The times assume daily sessions</td><td>If we work less often, times roughly double. Nothing else changes.</td></tr>
+            <tr><td class="hl">iCloud and big files</td><td>Ghost files, sync churn, " 2" conflict copies in version history</td><td>The file layout above: build output stays local, the library lives in R2, and GitHub is the source of truth for code.</td></tr>
+            <tr><td class="hl">Legal and licensing</td><td>A paid product carries real exposure</td><td>The licensing rules, then a license audit and lawyer review in Phase 8.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 10 -->
+    <section id="decisions">
+      <div class="sec-head"><span class="sec-num">10</span><h2>Your to-dos and decisions</h2></div>
+      <h3>Still to do (only you can)</h3>
+      <ol class="decisions">
+        <li><strong>AWS account:</strong> create one with a payment method before Phase 4, the first time we rent machines.</li>
+        <li><strong>Cloudflare account:</strong> create one and switch on R2 before Phase 5.</li>
+      </ol>
+      <div class="callout">
+        <h3>Decided on 6 October 2026</h3>
+        <ul>
+          <li><strong>Fast track:</strong> daily sessions, three parallel tracks, and the short-stack product launches first (Launch 1).</li>
+          <li><strong>Budget: Lean, about $400 of compute.</strong> That covers the 6-max cash starter, the 8-max MTT starter, Spin on 184 flops, and one 100bb preflop run. I'll ask before going over it. The MTT and Spin preflop runs get measured first and approved separately.</li>
+          <li><strong>Table sizes:</strong> cash at 6-max, 7- and 9-handed; MTTs at 7-, 8- and 9-handed. 6-max cash and 8-max MTTs come first. 7- and 9-handed follow once 6-max preflop is proven, with their own budget approval.</li>
+          <li><strong>Preflop charts are built in-house</strong>, never licensed.</li>
+          <li><strong>Files:</strong> code stays on the Desktop (iCloud + GitHub), build output stays local, and the library lives in Cloudflare R2.</li>
+          <li><strong>Project rules file added.</strong> Every future session on this project follows the license firewall, the file layout and these decisions automatically.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 11 -->
+    <section id="glossary">
+      <div class="sec-head"><span class="sec-num">11</span><h2>Algorithm cheat sheet</h2></div>
+      <dl>
+        <div><dt>CFR (counterfactual regret minimization)</dt><dd>The solver plays the spot against itself millions of times. Each time it leans toward the actions it "regrets" not taking. Its average strategy settles on the equilibrium.</dd></div>
+        <div><dt>CFR+</dt><dd>A faster version that never lets regrets go negative. It's typically 10× or more faster than plain CFR. <span class="b b-v">Verified</span></dd></div>
+        <div><dt>DCFR (Discounted CFR)</dt><dd>Gives early, bad iterations less weight. It matched or beat CFR+ everywhere tested, usually reaching 2–3× lower exploitability. <span class="b b-v">Verified</span> This is the right algorithm for single postflop spots, and postflop-solver uses it with its own tweaks.</dd></div>
+        <div><dt>MCCFR (Monte Carlo CFR)</dt><dd>Samples parts of the game instead of walking every branch. It's needed for whole-game and preflop solves, and Pluribus used it. <span class="b b-v">Verified</span></dd></div>
+        <div><dt>Abstraction and bucketing</dt><dd>NLHE has about 10<sup>165</sup> game states <span class="b b-v">Verified</span>. Whole-game solvers therefore group similar hands into buckets and limit bet sizes. Single-spot postflop solvers don't need hand buckets.</dd></div>
+        <div><dt>Bet-size mapping</dt><dd>When a user picks a size that isn't in the tree, it maps to the nearest solved sizes with the pseudoharmonic mapping Pluribus used. <span class="b b-v">Verified</span></dd></div>
+        <div><dt>Exploitability</dt><dd>How much a perfect opponent could win against the strategy. Whole games measure it in mbb per hand, where about 1 means essentially solved. <span class="b b-v">Verified</span> Single spots use % of pot. The practical target is 0.3–0.5%, and GTO Wizard's libraries are at 0.3% or better. <span class="b b-c">Checked</span></dd></div>
+        <div><dt>ICM (Malmuth-Harville)</dt><dd>Your chance of finishing 1st equals your share of the chips. The same rule then applies to who's left for 2nd, and so on. Each finish is multiplied by its prize and the results are added up. It's slightly off from reality: one study found an average error of $0.37 per $100 prize pool. <span class="b b-c">Checked</span></dd></div>
+        <div><dt>FGS (future game simulation)</dt><dd>Looks a hand or two ahead instead of paying out now. It only matters short-handed under about 10bb. <span class="b b-c">Checked</span></dd></div>
+        <div><dt>Bubble factor</dt><dd>$ lost when you lose ÷ $ gained when you win. Required equity = BF ÷ (BF + 1). <span class="b b-c">Checked</span></dd></div>
+      </dl>
+    </section>
+
+    <!-- 12 -->
+    <section id="sources">
+      <div class="sec-head"><span class="sec-num">12</span><h2>Sources</h2></div>
+      <div class="sources">
+        <div><h3>Papers: algorithms</h3>
+          <ul>
+            <li>Brown &amp; Sandholm 2019, Discounted CFR: <a href="https://arxiv.org/pdf/1809.04040">arxiv.org/pdf/1809.04040</a></li>
+            <li>Tammelin 2014, CFR+: <a href="https://arxiv.org/pdf/1407.5042">arxiv.org/pdf/1407.5042</a></li>
+            <li>Lanctot et al. 2009, Monte Carlo CFR: <a href="https://proceedings.neurips.cc/paper_files/paper/2009/file/00411460f7c92d2124a67ea0f4cb5f85-Paper.pdf">NeurIPS 2009</a></li>
+            <li>Brown &amp; Sandholm 2019, Pluribus: <a href="https://par.nsf.gov/servlets/purl/10119653">par.nsf.gov</a></li>
+            <li>Ganzfried &amp; Sandholm 2014, potential-aware abstraction: <a href="https://ojs.aaai.org/index.php/AAAI/article/view/8816">AAAI</a></li>
+            <li>Johanson et al. 2011, accelerated best response (1,755 flops): <a href="https://www.cs.ualberta.ca/~games/poker/publications/ijcai2011_accelerated_best_response.pdf">IJCAI 2011</a></li>
+            <li>Ganzfried &amp; Sandholm 2008, 3-player jam/fold equilibrium: <a href="https://aamas.csc.liv.ac.uk/Proceedings/aamas08/proceedings/pdf/paper/AAMAS08_0313.pdf">AAMAS 2008</a></li>
+            <li>Li &amp; Huang 2026, ICM vs look-ahead values: <a href="https://arxiv.org/abs/2608.09586">arxiv.org/abs/2608.09586</a></li>
+            <li>Gilbert 2009, fair bets under ICM: <a href="https://arxiv.org/abs/0911.3100">arxiv.org/abs/0911.3100</a></li>
+          </ul>
+        </div>
+        <div><h3>Open-source projects</h3>
+          <ul>
+            <li>TexasSolver (issues #40, #52, #95, #126, #174, #187, #215, #219, #228, #229, #233): <a href="https://github.com/bupticybee/TexasSolver">github.com/bupticybee/TexasSolver</a></li>
+            <li>TexasSolverGPU (closed-source): <a href="https://github.com/bupticybee/TexasSolverGPU">github.com/bupticybee/TexasSolverGPU</a></li>
+            <li>b-inary postflop-solver (issues #28, #31, #41, #46): <a href="https://github.com/b-inary/postflop-solver">github.com/b-inary/postflop-solver</a></li>
+            <li>wasm-postflop benchmark: <a href="https://github.com/b-inary/wasm-postflop">github.com/b-inary/wasm-postflop</a></li>
+            <li>poker-cfr (BSD-2): <a href="https://github.com/b-inary/poker-cfr">github.com/b-inary/poker-cfr</a></li>
+            <li>robopoker (MIT): <a href="https://github.com/krukah/robopoker">github.com/krukah/robopoker</a></li>
+            <li>rs-poker (Apache-2.0): <a href="https://github.com/elliottneilclark/rs-poker">github.com/elliottneilclark/rs-poker</a></li>
+            <li>OpenSpiel (Apache-2.0): <a href="https://github.com/google-deepmind/open_spiel">github.com/google-deepmind/open_spiel</a></li>
+            <li>postflop-solver config-file fork: <a href="https://github.com/moritzburghardt/postflop-solver">github.com/moritzburghardt/postflop-solver</a></li>
+          </ul>
+        </div>
+        <div><h3>Paid tools: how they're built</h3>
+          <ul>
+            <li>GTO Wizard AI benchmarks: <a href="https://blog.gtowizard.com/gto-wizard-ai-benchmarks/">blog.gtowizard.com</a></li>
+            <li>GTO Wizard AI explained: <a href="https://blog.gtowizard.com/gto-wizard-ai-explained/">blog.gtowizard.com</a></li>
+            <li>GTO Wizard original solutions: <a href="https://blog.gtowizard.com/all-you-need-to-know-about-our-solutions/">blog.gtowizard.com</a></li>
+            <li>GTO Wizard solution status: <a href="https://blog.gtowizard.com/status-and-info-about-our-solutions/">blog.gtowizard.com</a></li>
+            <li>GTO Wizard subsets: <a href="https://blog.gtowizard.com/poker-subsets-and-abstractions/">blog.gtowizard.com</a></li>
+            <li>GTO Wizard 3-way and 50k ICM final tables: <a href="https://blog.gtowizard.com/now_live_3_way_solving_nodelocking_2_0_and_50k_icm_ft_sims/">blog.gtowizard.com</a></li>
+            <li>GTO Wizard single-size solutions (70,000+ ICM spots): <a href="https://blog.gtowizard.com/single-size-solutions-are-live-new-pricing-50x-more-solutions/">blog.gtowizard.com</a></li>
+            <li>GTO Wizard preflop ICM solving: <a href="https://blog.gtowizard.com/preflop-icm-solving/">blog.gtowizard.com</a></li>
+            <li>PeakGTO: <a href="https://peakgto.com/">peakgto.com</a> and <a href="https://pokerfuse.com/latest-news/2025/10/introducing-peakgto-ultimate-poker-study-tool/">pokerfuse launch article</a></li>
+            <li>PioSolver flop subsets: <a href="https://piosolver.com/blog/2015-11-05-flop-subsets/">piosolver.com</a></li>
+            <li>PioSolver technical details: <a href="https://piosolver.com/docs/technical_details">piosolver.com/docs</a></li>
+            <li>PioSolver saving trees: <a href="https://piosolver.com/docs/viewer/saving_trees">piosolver.com/docs</a></li>
+            <li>MonkerSolver guide: <a href="https://monkerware.com/guide.html">monkerware.com</a></li>
+            <li>GTOBase: <a href="https://gtobase.com/">gtobase.com</a></li>
+          </ul>
+        </div>
+        <div><h3>Tournament math</h3>
+          <ul>
+            <li>GTO Wizard ICM basics: <a href="https://blog.gtowizard.com/icm-basics/">blog.gtowizard.com</a></li>
+            <li>GTO Wizard ICM algorithm breakthroughs: <a href="https://blog.gtowizard.com/theoretical-breakthroughs-in-icm/">blog.gtowizard.com</a></li>
+            <li>GTO Wizard bubble factor: <a href="https://blog.gtowizard.com/what-is-the-bubble-factor-in-poker-tournaments/">blog.gtowizard.com</a></li>
+            <li>GTO Wizard limits of Nash in ICM: <a href="https://blog.gtowizard.com/the-limitations-of-nash-equilibrium-in-icm-spots/">blog.gtowizard.com</a></li>
+            <li>GTO Wizard intro to Spin &amp; Gos: <a href="https://blog.gtowizard.com/an-introduction-to-spin-gos/">blog.gtowizard.com</a></li>
+            <li>ICMizer FGS: <a href="https://www.icmizer.com/en/blog/how-fgs-future-game-simulation-calculator-works/">how FGS works</a> and <a href="https://www.icmizer.com/en/blog/icm-to-fgs-future-game-simulations/">ICM to FGS</a></li>
+            <li>HRC heads-up Nash tables: <a href="https://www.holdemresources.net/hune">holdemresources.net/hune</a></li>
+            <li>HRC ICM calculators: <a href="https://www.holdemresources.net/icmcalculator">ICM</a> and <a href="https://www.holdemresources.net/mttcalculator">MTT</a></li>
+            <li>GGPoker Spin &amp; Gold prize table: <a href="https://ggpoker.com/poker-games/spin-gold/">ggpoker.com</a></li>
+          </ul>
+        </div>
+        <div><h3>Licensing and site rules</h3>
+          <ul>
+            <li>AGPL-3.0 text (§2, §7, §13): <a href="https://github.com/bupticybee/TexasSolver/blob/master/LICENSE">TexasSolver LICENSE</a></li>
+            <li>FSF GPL FAQ: <a href="https://www.gnu.org/licenses/gpl-faq.html">gnu.org</a></li>
+            <li>GTO Wizard Terms: <a href="https://gtowizard.com/terms/">gtowizard.com/terms</a></li>
+            <li>PioSolver licensing: <a href="https://piosolver.com/docs/licensing">licensing</a> and <a href="https://piosolver.com/docs/faq/business/">business FAQ</a></li>
+            <li>US Copyright Office Compendium ch. 300: <a href="https://www.copyright.gov/comp3/chap300/ch300-copyrightable-authorship.pdf">copyright.gov</a></li>
+            <li>EU Database Directive 96/9/EC: <a href="https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:31996L0009">eur-lex.europa.eu</a></li>
+            <li>GGPoker Security &amp; Ecology Policy: <a href="https://ggpoker.com/network/security-ecology-policy/">ggpoker.com</a></li>
+            <li>PokerStars prohibited tools: <a href="https://www.pokerstars.com/poker/room/prohibited/">pokerstars.com</a></li>
+          </ul>
+        </div>
+        <div><h3>Storage</h3>
+          <ul>
+            <li>GitHub large-file limits: <a href="https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github">docs.github.com</a></li>
+            <li>Cloudflare R2 pricing: <a href="https://developers.cloudflare.com/r2/pricing/">developers.cloudflare.com</a></li>
+            <li>Cloudflare R2 getting started: <a href="https://developers.cloudflare.com/r2/get-started/">developers.cloudflare.com</a></li>
+          </ul>
+        </div>
+        <div><h3>Cloud pricing</h3>
+          <ul>
+            <li>AWS, via Vantage (6 Oct 2026): <a href="https://instances.vantage.sh">instances.vantage.sh</a></li>
+            <li>Oracle price list: <a href="https://www.oracle.com/cloud/price-list/">oracle.com</a></li>
+            <li>Hetzner: live price feed for AX102, AX162 and CCX53</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>

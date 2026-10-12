@@ -1,6 +1,7 @@
 <h1>AI_bots — House Rules</h1>
 <p>This folder holds all of Eddie&#x27;s ongoing projects, each in its own subfolder. New projects get new subfolders. <code>Claude_and_AI_Docs/</code> holds finished general documentation.</p>
 <p><strong>AI video / animation prompting — ANY project.</strong> Before writing any AI video/clip prompt (Kling, Runway, image-to-video, etc.), read <code>Claude_and_AI_Docs/VIDEO_PROMPTING_GUIDE.md</code>. It is the reusable playbook for making generated clips actually move: ground the keyframe, spell out the full beat-by-beat motion arc with foot-to-floor contact, use a START+END keyframe pair to force locomotion (a leaping/mid-stride pose held static &quot;flies in place&quot;), paste a camera move from the library, and put anti-float terms in the negative-prompt field. Terse motion prompts freeze or hover and waste paid credits.</p>
+<p><strong>AI image / video prompting — ANY project.</strong> For any image or video prompt work (writing, fixing, picking a model, character sheets, camera moves, chaining clips), also load the <code>visual-prompting</code> skill. <strong>Project rules win:</strong> the project&#x27;s own CLAUDE.md and proven prompt formula come first, then <code>VIDEO_PROMPTING_GUIDE.md</code> for clips, then the skill fills the gaps.</p>
 <h2>READ THIS FIRST — every session, before the first tool call</h2>
 <p>Cowork does <strong>not</strong> auto-load this file the way terminal Claude Code does. So:</p>
 <ol>
@@ -84,6 +85,58 @@
 <li>**2026-10-04: sent Eddie to the IRS EIN online application on a Sunday, promising it was open</li>
 </ul>
 <p>3–9 pm Pacific because the irs.gov info page listed weekend hours.<strong> The live application said &quot;System Unavailable … Monday to Friday 7 a.m. – 10:00 p.m. Eastern time.&quot; </strong>Rule: before telling Eddie when or how a government or third-party portal works, open the portal&#x27;s own entry point and trust what IT says over the agency&#x27;s info page. If you can&#x27;t reach it, say the hours are unconfirmed instead of stating them as fact.**</p>
+<ul>
+<li>**2026-10-06: handed Eddie a Markdown file (<code>GTO_Holdem/IMPLEMENTATION_PLAN.md</code>) as his</li>
+</ul>
+<p>deliverable — linked it in chat and sent it to his device.<strong> His words: &quot;stop showing me md files.. those r for u.. html for me.&quot; </strong>Rule: anything Eddie is meant to read (plans, reports, research write-ups, summaries) is delivered as a designed HTML page — never send, link, or point him at a <code>.md</code> file. Markdown is only for Claude&#x27;s own working files (CLAUDE.md, memory, plan sources). If a <code>.md</code> source exists, keep an HTML version alongside it, regenerate the HTML whenever the <code>.md</code> changes, and link/send only the HTML.**</p>
+<ul>
+<li>**2026-10-06: ran a paid test of MiniMax Speech 2.8 for solorender and reported only numbers</li>
+</ul>
+<p>(wait time, credits, a transcript check) without letting Eddie hear the voice.<strong> His words: &quot;show me the end result every time u do a test.&quot; </strong>Rule: every test that produces an output (an image, video, voice, music, a rendered clip, a page) ends with that output sent to Eddie via SendUserFile (download a URL result to the scratchpad first), captioned with what was tested. Measurements go alongside the result, never instead of it. For a batch, send the results or a contact sheet of them — not just a pass/fail table.<strong> Same test, second mistake: from a transcript (the word &quot;laughs&quot; not spoken) plus a loudness reading, I put &quot;acts out (laughs)&quot; into the live site description. Eddie listened: &quot;almost sounds like he&#x27;s taking a breath.&quot; </strong>A measurement can rule a claim out, but it can&#x27;t prove a quality (a laugh, a style, a likeness). No quality claim goes on a customer-facing page until a person has seen or heard the result.**</p>
+<ul>
+<li>**2026-10-06: tested solorender&#x27;s new negative-prompt (&quot;Avoid&quot;) box on Qwen Image — picked</li>
+</ul>
+<p>only because it was the cheapest model with the box — and it ignored the words, so the new feature looked broken.<strong> Eddie: &quot;why Qwen first? its not a top model.&quot; Ideogram 3 obeyed the same words on its first run. </strong>Rule: test a new feature first on a top model customers actually choose for that job, where a failure means the feature is broken and not the model being weak. Use cheap models to save money only after the feature is proven on a good one.**</p>
+<ul>
+<li>**2026-10-08: asked Eddie to write a TypeScript function (a <code>TODO(human)</code> &quot;Learn by Doing&quot;</li>
+</ul>
+<p>request from the Learning output style) to settle a billing-rounding choice in solorender.<strong> His words: &quot;why woul i edit code?&quot; </strong>Rule: Eddie is not a programmer — never hand him code to write, fill in, or edit, whatever an output style says. When a choice is his (a pricing rule, a policy), ask it in plain words with the options&#x27; real effect on customers and money, recommend one, and write the code yourself.**</p>
+<ul>
+<li>**2026-10-09: rewrote Eddie&#x27;s fal support email and dropped his &quot;what does it take to go above</li>
+</ul>
+<p>40 concurrent jobs&quot; question, telling him fal sales had already answered it.<strong> Sami&#x27;s &quot;$60k a year / about 3% / better past $120k&quot; figures were DISCOUNT terms; concurrency was only named as something a commitment can include, with no numbers. Eddie: &quot;thats refering to discounts not concurency.&quot; </strong>Rule: never mark a question &quot;already answered&quot; because a source answered a neighboring one (price vs. capacity, discount vs. limit). Before dropping or closing a question, quote the exact sentence that answers it; if no single sentence does, keep the question.**</p>
+<ul>
+<li>**2026-10-09: told Eddie &quot;Veo blocks your 90 Day cast… for real cast members, use Kling&quot; after</li>
+</ul>
+<p>ONE solorender Veo 3.1 Fast run came back blocked.<strong> fal&#x27;s error gave no reason (&quot;content checker&quot;, <code>model_moderated</code>); the cause was my guess. Google&#x27;s own Veo docs allow reference images &quot;of a single person, character, or product&quot; and say blocks can also come from audio processing. Eddie: &quot;its the first time i ever heard of that.&quot; </strong>Rule: one failure with no stated reason is one data point, not a rule. Report the exact error text, say what it does NOT tell us, list the possible causes, and give no advice (&quot;use X instead&quot;) until a test has isolated the cause. Check the provider&#x27;s own docs before naming a policy as the reason.**</p>
+<ul>
+<li>**2026-10-09: tested solorender&#x27;s new Entities feature on Eddie&#x27;s 90 Day cast with my own</li>
+</ul>
+<p>generic prompts (&quot;…palm trees, photo&quot;) and showed him the results.<strong> They came out as realistic people who didn&#x27;t look like Jenny. Eddie: &quot;it shows a real person not the animation one.&quot; The show&#x27;s look comes from its proven keyframe formula in <code>Podcast/Podcast/CLAUDE.md</code> (&quot;Graphic-novel semi-real painterly illustration, crisp inked linework, clean cel shading… jewel-tone teal-blue, amber, magenta&quot;). With that text, the same pictures gave the illustrated look first try. </strong>Rule: when a test uses Eddie&#x27;s own characters or brand, copy that project&#x27;s proven prompt formula and style text (grep Podcast first) and judge the result against what his show actually looks like. A generic prompt only proves the model works, not that the feature works for him.**</p>
+<ul>
+<li>**2026-10-10: told Eddie to open solorender.com/admin/models and look for the new &quot;Live</li>
+</ul>
+<p>prices&quot; box — without having confirmed my deploy went out.<strong> It hadn&#x27;t: my <code>vercel deploy</code> ended on a &quot;Promote to production&quot; notice I didn&#x27;t read, and that deployment 404&#x27;d the new route. Eddie found no box. Same change: I touched the admin model list (100 rows) and left it unsortable. Eddie: &quot;why would u not make sorting criteria available for the list.. thats basic feature for lists.&quot; </strong>Rule: (1) after every deploy, prove the new code is live yourself — probe a new route or marker on the production URL and read the deploy output to the end — before telling Eddie it&#x27;s there; if you can&#x27;t prove it, say &quot;not confirmed live&quot; and never send him to check. (2) Any list or table Eddie will use gets sortable column headers (click to sort, click again to flip) and a search box from the first version.**</p>
+<ul>
+<li>**2026-10-10: on solorender&#x27;s live-prices feature I improvised at every blocked step instead of</li>
+</ul>
+<p>following the recipes already in memory.<strong> I invented a new scheduler (Supabase pg_cron) without asking; when adding a password was blocked I redesigned the hourly check to run without one; I deployed from the shared folder instead of the clean-worktree recipe in <code>memory/parallel-session-git-deploy.md</code>; then I counted on other sessions&#x27; deploys to ship my work. Eddie: &quot;Stop improvising… Why must we go through this every other day?&quot; </strong>Rule: before each step (schedule, deploy, verify, secrets), open the matching memory/CLAUDE.md recipe and follow it exactly. If a step is blocked, retry that same recipe or tell Eddie it&#x27;s blocked — never redesign the feature around the block. A mechanism this project has never used (a new scheduler, host, or auth scheme) needs Eddie&#x27;s yes BEFORE it&#x27;s built.**</p>
+<ul>
+<li>**2026-10-10: asked Eddie to choose between &quot;the database scheduler&quot; and &quot;the GitHub method&quot;</li>
+</ul>
+<p>without ever explaining what the database scheduler was.<strong> He picked GitHub, then had to stop me and ask how the other one worked — and once explained, chose it. Eddie: &quot;It would have helped if you would have told me about it ahead of time instead of just asking me as if I really know wtf you&#x27;re talking about.&quot; </strong>Rule: before asking Eddie to choose, explain each option in plain words — what it is, where it runs, what it costs, what changes for him — in the same message as the question. Never offer a choice between things he hasn&#x27;t been told about.**</p>
+<ul>
+<li>**2026-10-10: told Eddie &quot;I can see your Chrome but can&#x27;t click or scroll in it&quot; while</li>
+</ul>
+<p>reporting the solorender Editor test.<strong> The Claude-in-Chrome extension had said &quot;not connected&quot; twice earlier in the session; it connected ~40 minutes later and I never re-checked. Eddie: &quot;yes u can.&quot; </strong>Rule: a &quot;not connected&quot; from earlier in a session is stale. Before telling Eddie a browser action can&#x27;t be done, re-run <code>mcp<strong>claude-in-chrome</strong>list_connected_browsers</code> (then <code>tabs_context_mcp</code>) at that moment, and say &quot;can&#x27;t&quot; only with that fresh result in hand.**</p>
+<ul>
+<li>**2026-10-10: called solorender&#x27;s recipe research &quot;deep&quot; competitor research when only ONE</li>
+</ul>
+<p>competitor&#x27;s template catalog (Magnific&#x27;s) had actually been read in full.<strong> The ~15 others got a revenue number and a handful of example names each. Eddie: &quot;thats just one competitor... how about the other 20-30 that are out there?&quot; </strong>Rule: competitor research means reading each competitor&#x27;s own catalog/feature list, not citing its revenue. Before reporting, count how many competitors were covered in depth vs. only mentioned, and state both numbers in the report. If Eddie names a scale (&quot;20-30 competitors&quot;), meet it or say exactly how far short you fell and why.**</p>
+<ul>
+<li><strong>2026-10-11: Eddie had to ask a second time for solorender&#x27;s price tags to show &quot;% off&quot;.</strong> The</li>
+</ul>
+<p>2026-10-10 fix changed only the &quot;Sale&quot; tag on one picker row; the &quot;Discounted&quot; tag beside it, the selected-model button and Flow&#x27;s model menus were left as they were. Eddie: &quot;We already addressed this issue, but here we go again.&quot; <strong>Rule: when Eddie asks for a display change, grep the whole app for every place that shows the same thing (the label text AND the field behind it, e.g. <code>saleFrom</code>, <code>isDiscounted</code>) and change all of them in one go, through one shared helper. List each place you changed in the report.</strong></p>
 <hr>
 <h2>Where the automated hooks do apply</h2>
 <p><code>.claude/settings.json</code> hooks only run in <strong>terminal Claude Code</strong>, launched from inside that project folder. They do nothing in Cowork. Projects that have them:</p>

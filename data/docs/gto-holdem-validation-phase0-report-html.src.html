@@ -1,0 +1,206 @@
+<meta charset="utf-8">
+<title>Phase 0 Results</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+/* Layout: one reading column; gate cards, then the evidence for each gate. Same visual family as the build plan.
+   Colors: PeakGTO's dark palette (read from peakgto.com's stylesheet, 6 Oct 2026). Deliberately dark-only.
+   Red-orange = accent, green = pass, gold = highlight numbers and caution. Chart: green check, red bet, deep red all-in. */
+:root {
+  --bg: #0a0f18; --surface: #111827; --ink: #edf0f5; --muted: #8a9ab0; --rule: rgba(255, 255, 255, 0.08);
+  --accent: #f4714a; --good: #00b87a; --good-soft: rgba(0, 184, 122, 0.13);
+  --gold: #fbbf24; --caution: #fbbf24; --caution-soft: rgba(251, 191, 36, 0.10);
+  --check: #00b87a; --bet: #dc3c28; --allin: #7f1d1d; --empty: #d1d5db; --empty-text: #374151; --th-bg: #0d1420;
+  --display: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --body: "Source Serif 4", Georgia, serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.6; margin: 0; padding-inline: 16px; padding-block: 0 64px; }
+table { font-size: inherit; }
+main { max-width: 820px; margin: 0 auto; display: grid; gap: 48px; padding-block: 40px 0; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.2; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(1.9rem, 4.5vw, 2.6rem); font-weight: 700; }
+h2 { font-size: 1.45rem; }
+h3 { font-size: 1.05rem; }
+p { margin: 0; }
+ul { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+section { display: grid; gap: 14px; min-width: 0; }
+.eyebrow { font-family: var(--display); font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.muted { color: var(--muted); } .small { font-size: 0.92rem; }
+.sec-head { border-top: 2px solid var(--ink); padding-top: 12px; display: grid; gap: 2px; }
+.sec-num { font-family: var(--mono); font-size: 0.78rem; color: var(--muted); }
+.gates { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 640px) { .gates { grid-template-columns: minmax(0, 1fr); } }
+.gate { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 14px 16px; display: grid; gap: 6px; align-content: start; }
+.gate-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.gate-top h3 { font-size: 1rem; }
+.pass { font-family: var(--display); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; color: var(--good); background: var(--good-soft); padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
+.big { font-family: var(--mono); font-size: 1.35rem; color: var(--gold); font-variant-numeric: tabular-nums; }
+.gate p { font-size: 0.92rem; }
+.tbl { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+.tbl table { width: 100%; border-collapse: collapse; font-family: var(--display); font-size: 0.88rem; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-size: 0.72rem; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); background: var(--th-bg); }
+tr:last-child td { border-bottom: 0; }
+.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ok { color: var(--good); font-weight: 600; }
+.callout { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 14px 16px; display: grid; gap: 8px; font-size: 0.97rem; }
+.callout.warn { border-color: var(--caution); background: var(--caution-soft); }
+.chart-wrap { overflow-x: auto; }
+.grid { display: grid; grid-template-columns: repeat(13, minmax(34px, 1fr)); gap: 2px; min-width: 470px; }
+.cell { aspect-ratio: 1 / 1; border-radius: 3px; position: relative; overflow: hidden; background: var(--empty); font-family: var(--mono); font-size: 0.62rem; }
+.cell .bar { position: absolute; inset: 0; display: flex; }
+.cell .bar span { height: 100%; }
+.cell b { position: absolute; left: 3px; top: 2px; font-weight: 500; color: #fff; text-shadow: 0 0 2px rgba(0,0,0,0.6); }
+.cell.out b { color: var(--empty-text); text-shadow: none; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-family: var(--display); font-size: 0.85rem; }
+.sw { display: inline-block; width: 12px; height: 12px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+</style>
+
+<main>
+  <header style="display:grid;gap:12px">
+    <div class="eyebrow">GTO Holdem · Build plan Phase 0</div>
+    <h1>Phase 0 Results</h1>
+    <p>The foundations are in and checked. Four pass/fail gates, all passed, with the actual numbers from runs on your Mac on 6 October 2026.</p>
+  </header>
+
+  <section>
+    <div class="gates">
+      <div class="gate"><div class="gate-top"><h3>1 · Hand evaluator</h3><span class="pass">PASS</span></div>
+        <span class="big">9 / 9 exact</span>
+        <p>Checked every possible showdown: all 133,784,560 ways to deal 2 hole cards plus a 5-card board. Each time it picked the best 5 of the 7 cards, and every category count matches the published numbers exactly.</p></div>
+      <div class="gate"><div class="gate-top"><h3>2 · Solver math (Kuhn poker)</h3><span class="pass">PASS</span></div>
+        <span class="big">−0.055557</span>
+        <p>Exact answer is −1/18 = −0.055556. The strategy landed on the textbook equilibrium.</p></div>
+      <div class="gate"><div class="gate-top"><h3>3 · First solve on your Mac</h3><span class="pass">PASS</span></div>
+        <span class="big">8.0 s · 489 MB</span>
+        <p>A full flop spot solved to 0.43% of the pot. A turn spot took 0.9 s.</p></div>
+      <div class="gate"><div class="gate-top"><h3>4 · Nothing heavy in iCloud</h3><span class="pass">PASS</span></div>
+        <span class="big">0 new files</span>
+        <p>Per build. Installing packages leaves 11 tiny links (28 KB). Failed on the first try, then fixed.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">GATE 3</span><h2>Your first solved flop</h2></div>
+    <p>Out-of-position player's first decision on <strong>T♦ 9♦ 6♥</strong>, with 200 in the pot and 900 behind. They can check, bet 60% of the pot, or shove. Each square is one hand, and its colors show how often the solver takes each action.</p>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--check)"></span>Check</span>
+      <span><span class="sw" style="background:var(--bet)"></span>Bet 60% pot</span>
+      <span><span class="sw" style="background:var(--allin)"></span>All-in</span>
+      <span><span class="sw" style="background:var(--empty)"></span>Not in range</span>
+    </div>
+    <div class="chart-wrap"><div class="grid" id="grid" role="img" aria-label="13 by 13 hand chart of check and bet frequencies"></div></div>
+    <p class="small muted">The ranges are the solver's own built-in example, used here only as a speed test. They are not our charts; ours come from Phase 4. The solver never shoves at this depth, because a 4.5× pot shove is too big to be worth it here.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Test spot</th><th class="num">Time</th><th class="num">Peak memory</th><th class="num">Accuracy</th></tr></thead>
+      <tbody>
+        <tr><td>Turn spot (solver's example), 3 bet sizes</td><td class="num">0.9 s</td><td class="num">17 MB</td><td class="num">0.46% of pot</td></tr>
+        <tr><td>Flop spot above, 60% bet + all-in, 2.5× raises</td><td class="num">8.0 s</td><td class="num">489 MB</td><td class="num">0.43% of pot</td></tr>
+      </tbody>
+    </table></div>
+    <p class="small">The plan's cost estimates assumed about <strong>3 minutes per flop</strong>. This simple tree took 8 seconds, but library trees will have more bet sizes and deeper stacks, and those grow fast. So I'm <strong>not</strong> lowering the cost estimates yet. The under-$1 test batch before the first rented run will give the real number.</p>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">GATE 2</span><h2>The solver math works</h2></div>
+    <p>Kuhn poker is a 3-card game with a known exact answer, so it's the standard test for solver code. Our DCFR engine was run for 10,000 rounds, with plain CFR alongside as a baseline.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Rounds</th><th class="num">Value found</th><th class="num">DCFR exploitability</th><th class="num">Plain CFR</th></tr></thead>
+      <tbody id="curve"></tbody>
+    </table></div>
+    <p class="small">Exploitability means how much a perfect opponent could win against the strategy; 0 means unbeatable. DCFR beats plain CFR at every checkpoint, as the research predicted.</p>
+    <h3>Strategy found vs. the textbook answer</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>Spot</th><th class="num">Solver bets/calls</th><th class="num">Theory</th></tr></thead>
+      <tbody>
+        <tr><td>1st player opens with J (a bluff)</td><td class="num">0.235</td><td class="num">any α from 0 to ⅓</td></tr>
+        <tr><td>1st player opens with K</td><td class="num">0.697</td><td class="num">3α = 0.706</td></tr>
+        <tr><td>1st player opens with Q</td><td class="num">0.000</td><td class="num">0</td></tr>
+        <tr><td>1st player, Q, checked then faces a bet (calls)</td><td class="num">0.569</td><td class="num">α + ⅓ = 0.569</td></tr>
+        <tr><td>2nd player, Q, faces a bet (calls)</td><td class="num">0.337</td><td class="num">⅓</td></tr>
+        <tr><td>2nd player, J, after a check (bluffs)</td><td class="num">0.336</td><td class="num">⅓</td></tr>
+        <tr><td>Kings always bet or call; jacks never call</td><td class="num">1.000 / 0.000</td><td class="num">1 / 0</td></tr>
+      </tbody>
+    </table></div>
+    <p class="small muted">I also checked the exploitability measurement itself. Fed the exact textbook strategy, it returns 0.</p>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">GATE 1</span><h2>Every hand ranked correctly</h2></div>
+    <div class="tbl"><table>
+      <thead><tr><th>Best hand</th><th class="num">Counted</th><th class="num">Published</th><th></th></tr></thead>
+      <tbody id="evalrows"></tbody>
+    </table></div>
+    <p class="small muted">Each row counts showdowns by their best 5-card hand out of 7 cards (2 hole cards + 5 board cards). All 133,784,560 showdowns took 0.1 s across 16 threads, using rs-poker (Apache-2.0). Testing 7 cards rather than 5 also covers the tricky cases: playing the board, a counterfeited two pair, and A-5 wheel straights.</p>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">GATE 4</span><h2>Keeping iCloud clean</h2></div>
+    <div class="callout warn">
+      <h3>First try failed, and the gate caught it</h3>
+      <p>The web package tool (pnpm 12) silently ignored the setting that keeps packages out of the project folder. <strong>989 files (73 MB)</strong> landed in the iCloud-synced Desktop. I deleted them within minutes. Then I moved the setting to the file pnpm 12 actually reads, and reran the test.</p>
+    </div>
+    <ul>
+      <li><strong>After the fix:</strong> a full engine and web build adds <strong>0 files</strong> to the project folder. Installing packages leaves 11 small links (28 KB) pointing to the work folder.</li>
+      <li><strong>In the work folder</strong>, which doesn't sync: 938 package files (73 MB) and the Rust build (34 MB).</li>
+      <li>The lesson is written into the project rules, so future sessions check for it.</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">ALSO DONE</span><h2>Setup and fixes</h2></div>
+    <ul>
+      <li><strong>Rust 1.99</strong> installed with the official installer. Its fingerprint was checked against rust-lang.org, and your shell settings were left alone.</li>
+      <li><strong>Homebrew stopped.</strong> It was compiling tools from source on this Intel Mac, which can take hours. Nothing half-installed was left behind.</li>
+      <li><strong>The solver needed three repairs</strong> to build on today's Rust, because it has been frozen since 2023:
+        <ul>
+          <li>two file-saving libraries pinned to their 2023 versions;</li>
+          <li>three one-line fixes the compiler itself suggested. They don't change what the solver does, and its built-in correctness checks still pass.</li>
+        </ul>
+      </li>
+      <li><strong>GitHub:</strong> two private repos, one for the project and one for our offline solver copy. GitHub confirms both are PRIVATE.</li>
+      <li><strong>License check</strong> of every library: all permissive. One build-only tool (lightningcss, MPL-2.0) never ships in the app and is flagged for the lawyer review.</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">NEXT</span><h2>What starts now</h2></div>
+    <p>On the fast track, two tracks start in parallel:</p>
+    <ul>
+      <li><strong>Phase 1:</strong> the ICM calculator, push/fold charts and the first drill app.</li>
+      <li><strong>Phase 3:</strong> postflop study on your Mac.</li>
+    </ul>
+  </section>
+</main>
+
+<script>
+const flop = {"cells":[["AA",0,0,[0.1235,0.8765,0]],["AKs",0,1,[0.5346,0.4654,0]],["AQs",0,2,[0.5312,0.4688,0]],["AJs",0,3,[0.5055,0.4945,0]],["ATs",0,4,[0.0015,0.9985,0]],["A9s",0,5,[0.6909,0.3091,0]],["A8s",0,6,[0,1,0]],["A5s",0,9,[0.7502,0.2498,0]],["A4s",0,10,[0.7503,0.2497,0]],["AKo",1,0,[0.4627,0.5373,0]],["KK",1,1,[0.0724,0.9276,0]],["KQs",1,2,[0.1129,0.8871,0]],["KJs",1,3,[0.2498,0.7502,0]],["KTs",1,4,[0.054,0.946,0]],["K9s",1,5,[0.4592,0.5408,0]],["AQo",2,0,[0.5622,0.4378,0]],["KQo",2,1,[0.1606,0.8394,0]],["QQ",2,2,[0.1559,0.8441,0]],["QJs",2,3,[0.0815,0.9185,0]],["QTs",2,4,[0.3622,0.6378,0]],["AJo",3,0,[0.5736,0.4264,0]],["JJ",3,3,[0.0082,0.9918,0]],["JTs",3,4,[0.6371,0.3629,0]],["TT",4,4,[0.3002,0.6998,0]],["99",5,5,[0.3093,0.6907,0]],["98s",5,6,[0.3227,0.6773,0]],["97s",5,7,[0.2174,0.7826,0]],["96s",5,8,[0.3197,0.6803,0]],["88",6,6,[0.566,0.434,0]],["87s",6,7,[0.2146,0.7854,0]],["86s",6,8,[0.3954,0.6046,0]],["85s",6,9,[0.3874,0.6126,0]],["77",7,7,[0.5459,0.4541,0]],["76s",7,8,[0.3614,0.6386,0]],["75s",7,9,[0.3386,0.6614,0]],["66",8,8,[0.4294,0.5706,0]],["65s",8,9,[0.7464,0.2536,0]],["54s",9,10,[0.7646,0.2354,0]]]};
+const ranks = "AKQJT98765432";
+const byPos = {}; flop.cells.forEach(([h, r, c, f]) => byPos[r + "," + c] = { h, f });
+const grid = document.getElementById("grid");
+const colors = ["var(--check)", "var(--bet)", "var(--allin)"];
+const names = ["Check", "Bet 60%", "All-in"];
+for (let r = 0; r < 13; r++) for (let c = 0; c < 13; c++) {
+  const name = r === c ? ranks[r] + ranks[c] : r < c ? ranks[r] + ranks[c] + "s" : ranks[c] + ranks[r] + "o";
+  const cell = document.createElement("div"); cell.className = "cell";
+  const hit = byPos[r + "," + c];
+  if (hit) {
+    const bar = document.createElement("div"); bar.className = "bar";
+    hit.f.forEach((v, i) => { if (v > 0) { const s = document.createElement("span"); s.style.width = (v * 100) + "%"; s.style.background = colors[i]; bar.appendChild(s); } });
+    cell.appendChild(bar);
+    cell.title = name + ": " + hit.f.map((v, i) => names[i] + " " + Math.round(v * 100) + "%").join(", ");
+  } else { cell.classList.add("out"); cell.title = name + ": not in range"; }
+  const label = document.createElement("b"); label.textContent = name; cell.appendChild(label);
+  grid.appendChild(cell);
+}
+const curve = [[10,-0.0883,0.059233,0.093683],[100,-0.055712,0.015028,0.018852],[1000,-0.055569,0.004358,0.00656],[10000,-0.055557,0.001329,0.002139]];
+document.getElementById("curve").innerHTML = curve.map(([t, v, d, p]) =>
+  `<tr><td>${t.toLocaleString()}</td><td class="num">${v.toFixed(6)}</td><td class="num">${d.toFixed(4)}</td><td class="num">${p.toFixed(4)}</td></tr>`).join("");
+const evalRows = [["High card",23294460],["One pair",58627800],["Two pair",31433400],["Three of a kind",6461620],["Straight",6180020],["Flush",4047644],["Full house",3473184],["Four of a kind",224848],["Straight flush",41584]];
+document.getElementById("evalrows").innerHTML = evalRows.map(([n, v]) =>
+  `<tr><td>${n}</td><td class="num">${v.toLocaleString()}</td><td class="num">${v.toLocaleString()}</td><td class="ok">✓</td></tr>`).join("");
+</script>
