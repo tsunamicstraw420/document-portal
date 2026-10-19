@@ -1,0 +1,294 @@
+<title>solorender SEO Audit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one reading column, verdict first, then evidence tables that scroll on their own at phone width. Always-dark solorender palette. */
+:root{
+  --bg:#0a0a0a; --panel:#141414; --line:#2a2a2a;
+  --ink:#ffffff; --green:#6ee05a; --red:#ff6b5b; --amber:#f2c14e;
+  --display:"Syne",system-ui,sans-serif; --body:"Manrope",system-ui,-apple-system,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;margin:0}
+.wrap{max-width:980px;margin:0 auto;padding-inline:20px;padding-block:40px 80px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(32px,6vw,52px);font-weight:800;letter-spacing:-.01em}
+h2{font-size:clamp(24px,4vw,32px);font-weight:700;margin-top:56px;margin-bottom:14px}
+h3{font-size:20px;font-weight:700;margin:26px 0 8px}
+p{margin:0 0 14px;max-width:68ch}
+a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--green);text-underline-offset:3px}
+.eyebrow{color:var(--green);font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px}
+.meta{font-size:15px;margin-top:10px}
+.verdict{margin-top:28px;border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:22px 24px}
+.verdict p:last-child{margin-bottom:0}
+.scores{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:22px}
+.score{border:1px solid var(--line);border-radius:12px;padding:16px}
+.score b{display:block;font-family:var(--display);font-size:34px;font-variant-numeric:tabular-nums;line-height:1.1}
+.score span{font-size:14px}
+.score.bad b{color:var(--red)} .score.ok b{color:var(--green)} .score.mid b{color:var(--amber)}
+ol.top{padding-left:0;list-style:none;counter-reset:t;display:grid;gap:12px;margin:0}
+ol.top li{counter-increment:t;display:grid;grid-template-columns:44px 1fr;gap:12px;border:1px solid var(--line);border-radius:12px;padding:16px}
+ol.top li::before{content:counter(t);font-family:var(--display);font-weight:800;font-size:26px;color:var(--green)}
+ol.top li p{margin:4px 0 0}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:12px;margin:12px 0 8px}
+table{border-collapse:collapse;width:100%;font-size:15px;min-width:640px}
+th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--green);font-weight:700;background:var(--panel);cursor:pointer;user-select:none;white-space:nowrap}
+th:hover{text-decoration:underline}
+th[aria-sort=ascending]::after{content:" ▲"} th[aria-sort=descending]::after{content:" ▼"}
+tr:last-child td{border-bottom:0}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.pill{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 9px;border-radius:999px;border:1px solid;white-space:nowrap}
+.pill.fail,.pill.critical{color:var(--red);border-color:var(--red)}
+.pill.warn,.pill.high{color:var(--amber);border-color:var(--amber)}
+.pill.pass,.pill.easy{color:var(--green);border-color:var(--green)}
+.pill.medium,.pill.moderate,.pill.low,.pill.hard{color:var(--ink);border-color:var(--ink)}
+.search{width:100%;max-width:360px;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:9px 12px;font:inherit;font-size:15px}
+.search:focus,th:focus{outline:2px solid var(--green);outline-offset:2px}
+.hidden-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:14px}
+.hidden-grid div{border:1px solid var(--line);border-radius:12px;padding:16px}
+.hidden-grid b{display:block;font-family:var(--display);font-size:30px;font-variant-numeric:tabular-nums}
+.hidden-grid .seen b{color:var(--green)} .hidden-grid .unseen b{color:var(--red)}
+.plan{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.plan section{border:1px solid var(--line);border-radius:14px;padding:18px 20px;min-width:0}
+.plan ul{margin:8px 0 0;padding-left:20px;display:grid;gap:12px}
+.plan li small{display:block;font-size:14px;margin-top:2px}
+.note{border-left:3px solid var(--green);padding:4px 0 4px 14px;margin:16px 0}
+footer{margin-top:60px;border-top:1px solid var(--line);padding-top:18px;font-size:15px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<div class="eyebrow">SEO audit · solorender.com · checked 14 Oct 2026</div>
+<h1>Google has found 3 of your pages.</h1>
+<p class="meta">Full site audit: technical health, every public page, speed, keywords and three competitors.</p>
+
+<div class="verdict">
+<p><b>Verdict: needs work, but the fixes are mostly cheap.</b> The pages Google can reach are well built. Every page has a proper title, one main headline, a description and real text that loads without the app running. Google's own checker gives the homepage 100/100 for SEO basics.</p>
+<p>The problem is reach. Google has indexed only <b>3 pages</b> of solorender.com. Your best material is the recipes, the styles and the help center, and all of it sits behind the login screen, so search engines can't see it. Rivals each publish 1,000–2,300 pages built for search. You publish 15.</p>
+</div>
+
+<div class="scores">
+  <div class="score bad"><b>3</b><span>pages in Google today (Google <code>site:</code> search)</span></div>
+  <div class="score mid"><b>15</b><span>pages in your sitemap</span></div>
+  <div class="score bad"><b>34</b><span>homepage speed on phones, out of 100</span></div>
+  <div class="score ok"><b>90</b><span>homepage speed on computers, out of 100</span></div>
+</div>
+
+<h2>Done on 14 Oct (evening)</h2>
+<div class="verdict">
+<p><b>All the quick wins are live on solorender.com</b>, checked on the live site after each deploy.</p>
+<ul style="margin:0;padding-left:20px;display:grid;gap:8px">
+<li><b>www fixed.</b> www.solorender.com now forwards to solorender.com with a valid certificate. No more security warning.</li>
+<li><b>Google Search Console set up</b> under eddie.barna@gmail.com, next to swagspree.com. Ownership is verified through a DNS record at Cloudflare. The sitemap is submitted, and re-crawls were requested for the homepage, /learn, the FLUX vs Nano Banana comparison and the Veo 3.1 guide. The other five guides are queued through the sitemap.</li>
+<li><b>Share pictures</b> on every page. Each Learn article shows its own title and its model's real result.</li>
+<li><b>New titles</b> for home, pricing and Learn. The home description is now 150 characters.</li>
+<li><b>Canonical tags</b> on every public page. Login and password pages are hidden from Google.</li>
+<li><b>Site name and logo markup</b> on the homepage. This is how you tell Google your name is "solorender" and which logo to show.</li>
+<li><b>Picture descriptions</b> on the recipe cards and Learn examples.</li>
+</ul>
+<p style="margin-top:12px"><b>Correction:</b> this report first recommended FAQ markup "to surface your answers in Google." That was wrong. Google's documentation says FAQ results stopped showing for every site on 15 June 2026, so the site-name markup replaced it.</p>
+</div>
+
+<h2>The three things that matter most</h2>
+<ol class="top">
+  <li><div><b>Fix www.solorender.com. It shows a security warning today.</b><p>The site's security certificate covers only <code>solorender.com</code>. Anyone who types <code>www.solorender.com</code> gets a "your connection is not private" page instead of the site. Google also keeps an old www copy as a duplicate. The fix is adding www to the domain on Vercel and pointing it at the main address. It takes about 10 minutes.</p></div></li>
+  <li><div><b>Tell Google the site exists, then open up what's locked.</b><p>Your 7 Learn articles are in the sitemap, but Google hasn't indexed any of them. Google showed a "Try Search Console" prompt, so the site is probably not registered there yet. Register it, submit the sitemap, then make public, read-only versions of Recipes (47), Styles (197) and the help center (37 pages). Visitors can browse, and the "Use this" button asks them to sign in.</p></div></li>
+  <li><div><b>Build the pages your rivals win with.</b><p>Higgsfield, OpenArt and Krea all use the same pattern: a page per model ("Kling 3.0", "Seedance 2.0") with prices and FAQs, "AI ___ generator" use-case pages, "X vs Y" comparisons and "alternative to X" pages. The "alternative" and "credits never expire" searches are won today by tiny startups. A new site like yours can win them too.</p></div></li>
+</ol>
+
+<h2>What Google can see today</h2>
+<p>The green box is what's public. The red boxes are content you already have that Google can't see, because each one redirects to the login screen (checked live: <code>/help</code>, <code>/recipes</code> and <code>/styles</code> each return a redirect to <code>/login</code>).</p>
+<div class="hidden-grid">
+  <div class="seen"><b>15</b>public pages: home, pricing, affiliates, Learn (7 articles), support, legal</div>
+  <div class="unseen"><b>47</b>recipes, each a ready-made "AI short film / product ad" page waiting to happen</div>
+  <div class="unseen"><b>197</b>styles, each a "___ style AI image" page with real example pictures</div>
+  <div class="unseen"><b>37</b>help pages with screenshots and how-tos</div>
+  <div class="unseen"><b>~100</b>models with no page of their own. Rivals rank with exactly these pages.</div>
+</div>
+<p class="note">Your homepage also links to <code>/recipes</code> 20 times, <code>/styles</code> 25 times and <code>/plans</code> 30 times. For a visitor or for Google, every one of those clicks lands on the login screen.</p>
+
+<h2>Technical checklist</h2>
+<p>Click a column heading to sort. Type to filter.</p>
+<input class="search" id="q-tech" type="search" placeholder="Filter checks…" aria-label="Filter technical checks">
+<div class="tbl"><table data-filter="q-tech">
+<thead><tr><th>Check</th><th>Status</th><th>What I found</th></tr></thead>
+<tbody>
+<tr><td>www address works</td><td><span class="pill pass">Fixed</span></td><td>Was failing: the certificate covered only solorender.com. Since 14 Oct, www forwards to solorender.com with a valid certificate (checked with openssl).</td></tr>
+<tr><td>Pages indexed by Google</td><td><span class="pill fail">Fail</span></td><td>3 results for <code>site:solorender.com</code>: home, the www duplicate and pricing. No Learn articles.</td></tr>
+<tr><td>Main content reachable</td><td><span class="pill fail">Fail</span></td><td>Help, recipes and styles all redirect to login.</td></tr>
+<tr><td>Social share previews</td><td><span class="pill pass">Fixed</span></td><td>No page has a preview picture (og:image) or Twitter card. Links shared in iMessage, X, Discord or by affiliates show a blank box. That hurts most on a visual product.</td></tr>
+<tr><td>Structured data (schema)</td><td><span class="pill fail">Fail</span></td><td>None on any page. <b>Fixed 14 Oct:</b> the homepage now carries site-name and logo markup. FAQ markup no longer shows in Google (dropped 15 June 2026).</td></tr>
+<tr><td>Mobile speed</td><td><span class="pill fail">Fail</span></td><td>Homepage 34/100. The headline appears after 9.1 s. 92% of that wait comes after the page has arrived, while the phone is busy playing the clip wall and decoding full-size style pictures (Lighthouse, simulated mid-range phone).</td></tr>
+<tr><td>Search Console</td><td><span class="pill pass">Fixed</span></td><td>It was not set up. Since 14 Oct it is verified, with the sitemap submitted.</td></tr>
+<tr><td>Canonical tags</td><td><span class="pill pass">Fixed</span></td><td>None on any page. Add them so www, tracking links (<code>?via=</code> affiliate links) and the bare domain all count as one page.</td></tr>
+<tr><td>Sitemap</td><td><span class="pill warn">Warning</span></td><td>Present and valid, but lists only 15 pages. It will need to grow as public pages are added.</td></tr>
+<tr><td>Image descriptions (alt text)</td><td><span class="pill warn">Warning</span></td><td>38 of 63 homepage pictures and 13 of 13 Learn-index pictures have no description, so Google Images can't index your recipe and style examples.</td></tr>
+<tr><td>Image caching</td><td><span class="pill warn">Warning</span></td><td>Style pictures load straight from Supabase storage at full size (up to 368 KB each) and are re-downloaded on every visit.</td></tr>
+<tr><td>Desktop speed</td><td><span class="pill pass">Pass</span></td><td>90/100, headline in 2.0 s, no layout jumping.</td></tr>
+<tr><td>robots.txt</td><td><span class="pill pass">Pass</span></td><td>Correct. It blocks the app and API and points to the sitemap.</td></tr>
+<tr><td>HTTPS + redirects</td><td><span class="pill pass">Pass</span></td><td>http goes to https with a permanent (308) redirect. Security headers are on.</td></tr>
+<tr><td>Broken links</td><td><span class="pill pass">Pass</span></td><td>All 50 internal links on the public pages work. None return a 404.</td></tr>
+<tr><td>Real 404 page</td><td><span class="pill pass">Pass</span></td><td>Unknown addresses correctly return "not found".</td></tr>
+<tr><td>Server speed</td><td><span class="pill pass">Pass</span></td><td>Vercel serves the homepage from cache. The first byte arrives in ~20 ms.</td></tr>
+<tr><td>Text in the page source</td><td><span class="pill pass">Pass</span></td><td>Pages are pre-built, and Google gets the full text (1,100–1,750 words per page) without running the app.</td></tr>
+<tr><td>Mobile layout, accessibility, best practices</td><td><span class="pill pass">Pass</span></td><td>Lighthouse gives 100/100 on each, mobile and desktop.</td></tr>
+</tbody></table></div>
+
+<h2>Page-by-page issues</h2>
+<input class="search" id="q-page" type="search" placeholder="Filter pages or issues…" aria-label="Filter page issues">
+<div class="tbl"><table data-filter="q-page">
+<thead><tr><th>Page</th><th>Issue</th><th>Severity</th><th>Fix</th></tr></thead>
+<tbody>
+<tr><td>Every page</td><td>No preview picture when the link is shared</td><td><span class="pill critical">Critical</span></td><td>Add one branded preview image site-wide, plus a page-specific one for Learn, recipes and styles</td></tr>
+<tr><td>/ (home)</td><td>The title "solorender — every top AI model, one studio" contains no words people search for</td><td><span class="pill high">High</span></td><td>"AI Image &amp; Video Generator — Kling, Veo, Seedance in one studio | solorender" (about 60 characters)</td></tr>
+<tr><td>/ (home)</td><td>The headline "Say what you want to make. Watch it happen." has no search words</td><td><span class="pill medium">Medium</span></td><td>Keep the line, and add a small headline above it, such as "AI image and video generator"</td></tr>
+<tr><td>/ (home)</td><td>The description is 176 characters, so Google cuts it off</td><td><span class="pill low">Low</span></td><td>Trim to about 155. Keep "credits never expire". It is your best search hook.</td></tr>
+<tr><td>/ (home)</td><td>38 recipe and style pictures have no description</td><td><span class="pill medium">Medium</span></td><td>Use each card's own headline as its description, e.g. "A clean 360° spin, studio-ready"</td></tr>
+<tr><td>/ (home)</td><td>The FAQ ("Good to know") has no FAQ schema</td><td><span class="pill medium">Medium</span></td><td>Not needed. Google stopped showing FAQ results on 15 June 2026.</td></tr>
+<tr><td>/pricing</td><td>The title "Pricing — solorender" is generic</td><td><span class="pill high">High</span></td><td>"AI Video Generator Pricing — Credits Never Expire | solorender"</td></tr>
+<tr><td>/pricing</td><td>The Questions section has no FAQ schema</td><td><span class="pill medium">Medium</span></td><td>Skip the markup (Google no longer shows it). Do answer "Do AI credits expire?" in those exact words.</td></tr>
+<tr><td>/learn</td><td>13 pictures have no description. The page is titled "Learn — model guides for solorender"</td><td><span class="pill medium">Medium</span></td><td>Retitle it "AI Model Guides: Kling, Veo, FLUX, Nano Banana Prompts", and describe each picture</td></tr>
+<tr><td>/learn/* (7 articles)</td><td>Not indexed by Google</td><td><span class="pill critical">Critical</span></td><td>Submit each one in Search Console after verifying the site</td></tr>
+<tr><td>/learn/* (7 articles)</td><td>No example pictures or clips inside the articles, even though they're about visual models</td><td><span class="pill high">High</span></td><td>Add 3–6 real outputs per article, with descriptions. Rival model pages lead with outputs.</td></tr>
+<tr><td>/learn/* (7 articles)</td><td>No prices or FAQ blocks, though "veo 3.1 price"-style searches rank third-party price pages</td><td><span class="pill high">High</span></td><td>Add a "What it costs" box (dollars per clip or picture) and 4–5 FAQs from Google's "People also ask"</td></tr>
+<tr><td>/learn/flux-2-pro, kling-2-5-turbo, nano-banana-2, ideogram-character, veo-3-1, kling-v3</td><td>Descriptions run 168–203 characters, so Google cuts them off</td><td><span class="pill low">Low</span></td><td>Trim each to about 155</td></tr>
+<tr><td>/support, /terms, /privacy, /affiliates/terms</td><td>Short descriptions (45–64 characters)</td><td><span class="pill low">Low</span></td><td>Fine for legal pages. Lengthen /support only.</td></tr>
+<tr><td>/login</td><td>It is indexable and shares the site's default title</td><td><span class="pill low">Low</span></td><td>Mark it "noindex" so it never competes with the homepage</td></tr>
+</tbody></table></div>
+
+<h2>Keyword opportunities</h2>
+<p>No SEO tool (Ahrefs or Semrush) is connected, so there are no exact search volumes. Difficulty is judged from who actually holds Google's first page today, checked with live US Google searches. Rows marked <b>estimate</b> were not searched.</p>
+<input class="search" id="q-kw" type="search" placeholder="Filter keywords…" aria-label="Filter keywords">
+<div class="tbl"><table data-filter="q-kw">
+<thead><tr><th>Keyword</th><th>Difficulty</th><th>Opportunity</th><th>Your rank</th><th>Intent</th><th>Who's on page 1</th><th>Page to build</th></tr></thead>
+<tbody>
+<tr><td>ai image generator credits never expire</td><td><span class="pill easy">Easy</span></td><td>High</td><td>—</td><td>Commercial</td><td>Tiny sites: rexai, fiddl.art, ZenCreator, Reddit</td><td>Landing page built around your rollover promise</td></tr>
+<tr><td>do ai credits expire</td><td><span class="pill easy">Easy</span></td><td>High</td><td>—</td><td>Question</td><td>A "People also ask" question (estimate)</td><td>FAQ answer + short article</td></tr>
+<tr><td>openart alternative</td><td><span class="pill easy">Easy–moderate</span></td><td>High</td><td>—</td><td>Commercial</td><td>Small startups: Morphic, Crreo, GenTube, Krater</td><td>"solorender vs OpenArt" page</td></tr>
+<tr><td>higgsfield alternative</td><td><span class="pill moderate">Moderate</span></td><td>High</td><td>—</td><td>Commercial</td><td>Blotato, Hedra, PicX ("Credits Never Expire" in its title)</td><td>"solorender vs Higgsfield" page</td></tr>
+<tr><td>magnific alternative</td><td><span class="pill moderate">Moderate</span></td><td>High</td><td>—</td><td>Commercial</td><td>Upscaler tools (Upsampler, LetsEnhance); the video angle is open</td><td>"Magnific alternative for video" page</td></tr>
+<tr><td>krea / topview / freepik ai alternative</td><td><span class="pill moderate">Moderate</span></td><td>Medium</td><td>—</td><td>Commercial</td><td>Estimate, similar to the above</td><td>One vs page each</td></tr>
+<tr><td>flux 2 pro vs nano banana 2</td><td><span class="pill easy">Easy–moderate</span></td><td>High</td><td>Not indexed</td><td>Info</td><td>Reddit, Vidguru, YouTube, Medium</td><td>Already written. Get it indexed.</td></tr>
+<tr><td>seedance 2.0 vs veo 3.1</td><td><span class="pill easy">Easy–moderate</span></td><td>High</td><td>—</td><td>Info</td><td>YouTube, Reddit, MindStudio, Vidguru</td><td>Comparison article with side-by-side clips</td></tr>
+<tr><td>kling vs veo</td><td><span class="pill moderate">Moderate</span></td><td>High</td><td>—</td><td>Info</td><td>Reddit, YouTube, Curious Refuge, artlist</td><td>Comparison article</td></tr>
+<tr><td>higgsfield vs openart</td><td><span class="pill easy">Easy–moderate</span></td><td>Medium</td><td>—</td><td>Commercial</td><td>YouTube, Reddit, EcomStation</td><td>Three-way comparison including solorender</td></tr>
+<tr><td>kling 2.5 turbo price per second</td><td><span class="pill easy">Easy–moderate</span></td><td>High</td><td>—</td><td>Commercial</td><td>Small sites: kie.ai, versely, Opper, Atlas Cloud</td><td>Price box on the Kling 2.5 page</td></tr>
+<tr><td>veo 3.1 price</td><td><span class="pill moderate">Moderate</span></td><td>High</td><td>—</td><td>Commercial</td><td>Google, then third-party price pages</td><td>Price box on the Veo 3.1 page</td></tr>
+<tr><td>seedance 2.0 price / nano banana 2 price</td><td><span class="pill easy">Easy–moderate</span></td><td>High</td><td>—</td><td>Commercial</td><td>Estimate, same pattern as Kling price</td><td>Per-model price pages</td></tr>
+<tr><td>veo 3.1 prompt guide / kling 3 prompt examples</td><td><span class="pill easy">Easy–moderate</span></td><td>Medium</td><td>—</td><td>Info</td><td>Estimate. Higgsfield runs prompt-guide pages.</td><td>Expand the Learn articles</td></tr>
+<tr><td>ai short film generator</td><td><span class="pill moderate">Moderate</span></td><td>High</td><td>—</td><td>Transactional</td><td>Morphic, Magiclight, Runway, invideo, Canva</td><td>Public Recipes gallery page</td></tr>
+<tr><td>ai music video generator</td><td><span class="pill moderate">Moderate</span></td><td>Medium</td><td>—</td><td>Transactional</td><td>Niche sites: freebeat, Neural Frames, OpenArt</td><td>Use-case page + recipe</td></tr>
+<tr><td>ai lip sync video generator</td><td><span class="pill moderate">Moderate</span></td><td>Medium</td><td>—</td><td>Transactional</td><td>freelipsync, Kling, Magic Hour, Vozo</td><td>Use-case page for your Lip Sync tool</td></tr>
+<tr><td>all in one ai video generator subscription</td><td><span class="pill moderate">Moderate</span></td><td>Medium</td><td>—</td><td>Commercial</td><td>Zapier list, YouTube reviews of Higgsfield and OpenArt</td><td>Get onto YouTube reviewers' lists (affiliates)</td></tr>
+<tr><td>is there an ai video generator without subscription</td><td><span class="pill easy">Easy</span></td><td>Medium</td><td>—</td><td>Question</td><td>Estimate, from "People also ask"</td><td>FAQ answer about pay-as-you-go top-ups</td></tr>
+<tr><td>how much does it cost to generate one ai video</td><td><span class="pill moderate">Moderate</span></td><td>Medium</td><td>—</td><td>Question</td><td>A "People also ask" question</td><td>Price explainer using your real per-clip prices</td></tr>
+<tr><td>how to make ai video with sound</td><td><span class="pill moderate">Moderate</span></td><td>Medium</td><td>—</td><td>Question</td><td>Mostly YouTube</td><td>Article + short video (Veo 3.1 / Kling v3 audio)</td></tr>
+<tr><td>ai product video generator</td><td><span class="pill hard">Hard</span></td><td>Medium</td><td>—</td><td>Transactional</td><td>Canva, TopView (AI Overview), invideo, Adobe</td><td>Use-case page; long-term</td></tr>
+<tr><td>kling 3.0</td><td><span class="pill hard">Hard</span></td><td>Low</td><td>—</td><td>Info</td><td>kling.ai, Higgsfield, artlist</td><td>Model page, for long-tail spill-over</td></tr>
+<tr><td>seedance 2.0</td><td><span class="pill hard">Hard</span></td><td>Low</td><td>—</td><td>Info</td><td>Higgsfield #1, ByteDance, Runway</td><td>Model page</td></tr>
+<tr><td>ai video generator</td><td><span class="pill hard">Hard</span></td><td>Low</td><td>—</td><td>Commercial</td><td>Higgsfield, Canva, Runway, Adobe, CapCut</td><td>Homepage title only. Don't chase it yet.</td></tr>
+<tr><td>image to video ai free</td><td><span class="pill hard">Hard</span></td><td>Low</td><td>—</td><td>Transactional</td><td>Canva, Adobe, HeyGen</td><td>Skip for now</td></tr>
+</tbody></table></div>
+<p class="note">A competitor named made.app runs Google ads for "higgsfield alternative" with the line "Every Top AI Model… credits roll over". That is almost your exact pitch. Someone else is already paying to own your positioning.</p>
+
+<h2>You vs the competition</h2>
+<p>Page counts come from each rival's own sitemap (English pages only).</p>
+<div class="tbl"><table>
+<thead><tr><th>What they have</th><th>solorender</th><th>Higgsfield</th><th>OpenArt</th><th>Krea</th></tr></thead>
+<tbody>
+<tr><td>Pages built for search</td><td class="num">15</td><td class="num">~2,300</td><td class="num">~1,780</td><td class="num">~1,230</td></tr>
+<tr><td>Per-model pages</td><td class="num">6 (Learn)</td><td class="num">~30</td><td class="num">36</td><td class="num">77</td></tr>
+<tr><td>"AI ___ generator" use-case pages</td><td class="num">0</td><td class="num">~67</td><td class="num">472 + 446</td><td class="num">8</td></tr>
+<tr><td>"vs" / "alternative" pages</td><td class="num">1</td><td>Many blog posts</td><td class="num">5 + ~100 posts</td><td class="num">4 + posts</td></tr>
+<tr><td>Blog / articles</td><td class="num">7</td><td class="num">271</td><td class="num">606</td><td class="num">381</td></tr>
+<tr><td>Public gallery of user creations</td><td>No (owner-only)</td><td>Yes (community pages)</td><td>Yes (/discovery)</td><td>Yes (955 public workflow pages)</td></tr>
+<tr><td>FAQ schema (no longer shown by Google)</td><td>No</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+<tr><td>Other languages</td><td>No</td><td>es, ja, ko, de</td><td>11 languages</td><td>Some</td></tr>
+<tr><td>Ranks for its own brand</td><td>#2, behind your Pinterest page</td><td>#1</td><td>#1</td><td>#1</td></tr>
+</tbody></table></div>
+<p>The closest match to your product is Krea's 955 public workflow pages. Each is a node workflow a user made, open to Google. Your Recipes and Flow could do the same thing.</p>
+
+<h2>Content gaps</h2>
+<div class="tbl"><table>
+<thead><tr><th>Topic</th><th>Why it matters</th><th>Format</th><th>Priority</th><th>Effort</th></tr></thead>
+<tbody>
+<tr><td>Public Recipes gallery</td><td>You already made 47 recipes with example clips. "AI short film generator" is a moderate search, and only big brands rank for it.</td><td>One public page per recipe</td><td><span class="pill high">High</span></td><td>Moderate: build the page once, it repeats 47×</td></tr>
+<tr><td>Public Styles gallery</td><td>197 looks with real pictures. Each can target "___ style AI image".</td><td>One public page per style</td><td><span class="pill high">High</span></td><td>Moderate (same template idea)</td></tr>
+<tr><td>Public help center</td><td>37 how-to pages with screenshots. They also answer pre-sale questions.</td><td>Move to a public address</td><td><span class="pill high">High</span></td><td>Quick to moderate</td></tr>
+<tr><td>"solorender vs ___" pages</td><td>Tiny sites win these searches today. Your rollover + no-subscription story is the hook.</td><td>Comparison pages (Higgsfield, OpenArt, Magnific, Krea, TopView)</td><td><span class="pill high">High</span></td><td>Half a day each</td></tr>
+<tr><td>"Credits never expire" landing page</td><td>Your clearest difference, and an easy search to win</td><td>Landing page + FAQ</td><td><span class="pill high">High</span></td><td>Quick win</td></tr>
+<tr><td>Per-model pages for the top 20 models</td><td>Every rival has them. Price searches are winnable.</td><td>Model page: outputs, price, prompts, FAQ</td><td><span class="pill medium">Medium</span></td><td>Substantial (multi-day)</td></tr>
+<tr><td>More model-vs-model articles</td><td>Seedance vs Veo, Kling vs Veo and others. Small sites win these.</td><td>Learn article with side-by-side clips</td><td><span class="pill medium">Medium</span></td><td>Half a day each</td></tr>
+<tr><td>Use-case pages (lip sync, music video, product video)</td><td>Rivals' biggest page type</td><td>"AI ___ generator" landing pages</td><td><span class="pill medium">Medium</span></td><td>Moderate each</td></tr>
+<tr><td>Shareable public creation pages</td><td>Every share a customer makes becomes a page Google can find, plus a link back. Rivals all do this.</td><td>Opt-in public share link</td><td><span class="pill low">Low (later)</span></td><td>Substantial; needs your yes on privacy</td></tr>
+</tbody></table></div>
+
+<h2>Action plan</h2>
+<div class="plan">
+<section>
+<div class="eyebrow">Quick wins · all done 14 Oct</div>
+<ul>
+<li><b>Fix the www security warning</b><small>Impact: high (customers hit it today). About 10 minutes. Needs nothing from you.</small></li>
+<li><b>Register solorender.com in Google Search Console and submit the sitemap</b><small>Impact: high. About 15 minutes. Needs your Google login once. I can add the verification record through Cloudflare.</small></li>
+<li><b>Add a preview picture for shared links</b><small>Impact: high, for affiliates and social shares. About 1 hour.</small></li>
+<li><b>Rewrite the homepage, pricing and Learn titles and descriptions</b><small>Impact: medium. About 1 hour. The suggested wording is in the table above.</small></li>
+<li><b>Site-name markup and canonical tags everywhere</b><small>Impact: medium. Replaces the FAQ markup first suggested.</small></li>
+<li><b>Describe the recipe and style pictures (alt text) using each card's headline</b><small>Impact: low to medium. Under 1 hour.</small></li>
+<li><b>Hide /login from Google</b><small>Impact: low. 5 minutes.</small></li>
+</ul>
+</section>
+<section>
+<div class="eyebrow">Strategic · this quarter</div>
+<ul>
+<li><b>Public, read-only Recipes, Styles and Help</b><small>Impact: high. 15 pages becomes about 300. Several days. Your call on how much of each recipe is shown to visitors.</small></li>
+<li><b>Five "solorender vs ___" pages + one "credits never expire" page</b><small>Impact: high. 2–3 days. Copy must follow your rule: our own words, no copying.</small></li>
+<li><b>Fix mobile speed</b><small>Impact: medium to high. Start the clip wall only when it scrolls into view, and serve resized, cached style pictures. 1–2 days. Google ranks on phone speed.</small></li>
+<li><b>Model pages for the top 20 models</b><small>Impact: medium. Example outputs, the price in dollars, prompts and FAQ. About 1 week.</small></li>
+<li><b>Grow Learn to 30+ articles</b><small>Impact: medium. Mainly model-vs-model and "how to" pieces. Ongoing, 1–2 a week.</small></li>
+<li><b>Get onto YouTube reviewers' lists</b><small>Impact: medium. "All-in-one" searches are dominated by YouTube reviews. That's your affiliate outreach, aimed at reviewers.</small></li>
+</ul>
+</section>
+</div>
+
+<h2>Two things to know</h2>
+<p><b>Your brand search.</b> A Google search for "solorender" shows your Pinterest page first and the site second. Third is a YouTube video about a different product with the same name, an After Effects plugin called "SoloRender". Sixth is a Bizapedia business-registry listing for SOLORENDER, INC. that shows the founder's name and an address. That listing comes from public state filings. If the address is a home address, a registered-agent address on future filings would replace it.</p>
+<p><b>What I couldn't measure.</b> There are no search volumes or backlink counts, because that needs Ahrefs or Semrush. The Ahrefs connector is installed but not signed in. Real-visitor speed data from Chrome doesn't exist yet, because the site is too new.</p>
+
+<footer>
+<p><b>How this was checked:</b> live fetches of all 15 sitemap pages plus <code>/login</code> (titles, descriptions, headings, pictures, schema), robots.txt and the sitemap, a check of all 50 internal links, Lighthouse 12.8.2 in headless Chrome (mobile and desktop homepage, mobile Learn article), openssl on the www certificate, the site's own code (the sitemap list and the login gate), live US Google searches for indexing, keywords and competitors, and the sitemaps of higgsfield.ai, openart.ai and krea.ai. Magnific's sitemap blocked automated reads.</p>
+</footer>
+</div>
+
+<script>
+document.querySelectorAll("table").forEach(function(t){
+  var ths=t.querySelectorAll("th");
+  ths.forEach(function(th,i){
+    th.tabIndex=0;
+    function sort(){
+      var dir=th.getAttribute("aria-sort")==="ascending"?-1:1;
+      ths.forEach(function(o){o.removeAttribute("aria-sort")});
+      th.setAttribute("aria-sort",dir===1?"ascending":"descending");
+      var tb=t.tBodies[0], rows=Array.prototype.slice.call(tb.rows);
+      rows.sort(function(a,b){
+        var x=a.cells[i].innerText.trim(), y=b.cells[i].innerText.trim();
+        var nx=parseFloat(x.replace(/[^0-9.]/g,"")), ny=parseFloat(y.replace(/[^0-9.]/g,""));
+        if(!isNaN(nx)&&!isNaN(ny)&&/^[~0-9]/.test(x)&&/^[~0-9]/.test(y)) return (nx-ny)*dir;
+        return x.localeCompare(y)*dir;
+      });
+      rows.forEach(function(r){tb.appendChild(r)});
+    }
+    th.addEventListener("click",sort);
+    th.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();sort()}});
+  });
+  var fid=t.getAttribute("data-filter");
+  if(fid){
+    var box=document.getElementById(fid);
+    box.addEventListener("input",function(){
+      var q=box.value.toLowerCase();
+      Array.prototype.forEach.call(t.tBodies[0].rows,function(r){r.hidden=q&&r.innerText.toLowerCase().indexOf(q)<0});
+    });
+  }
+});
+</script>

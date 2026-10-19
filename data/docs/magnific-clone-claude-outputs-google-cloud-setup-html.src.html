@@ -1,0 +1,148 @@
+<title>Google Cloud Setup</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one reading column — the news, the savings table, two decisions, then the click-by-click steps in the order Google needs them. Always dark (solorender palette, white text, green for labels only). */
+:root{
+  --bg:#0a0a0a; --surface:#141412; --surface-2:#1c1b18; --line:#2e2c27;
+  --ink:#ffffff; --green:#6ee05a; --gold:#e0b45c;
+  --display:"Syne",ui-sans-serif,system-ui,sans-serif;
+  --body:"Manrope",ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;margin:0;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));padding-block:40px 80px}
+.wrap{max-width:880px;margin:0 auto;display:flex;flex-direction:column;gap:44px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.15;text-wrap:balance}
+h1{font-size:clamp(2rem,5vw,2.8rem);font-weight:800}
+h2{font-size:1.4rem;font-weight:700}
+h3{font-size:1.08rem;font-weight:700}
+p{margin:0;max-width:68ch}
+a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--green);text-underline-offset:3px;overflow-wrap:anywhere}
+.eyebrow{font-family:var(--mono);font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
+header,section{display:flex;flex-direction:column;gap:14px;min-width:0}
+ul,ol{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px}
+blockquote{margin:0;padding:10px 14px;background:var(--surface);border-radius:8px;border:1px solid var(--line)}
+.note{border-left:3px solid var(--gold);padding:4px 0 4px 16px;display:flex;flex-direction:column;gap:10px}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:.95rem}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--green);font-weight:500}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.steps{display:flex;flex-direction:column;gap:14px;list-style:none;padding:0;counter-reset:s}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:8px;counter-increment:s;min-width:0}
+.step h3::before{content:"Step " counter(s) " · ";font-family:var(--mono);font-size:.78rem;letter-spacing:.06em;color:var(--green);font-weight:500}
+.who{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--green)}
+.choice{font-family:var(--mono);font-size:.88rem;border:1px solid var(--line);border-radius:6px;padding:1px 7px;background:var(--surface-2);white-space:nowrap}
+.opt{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">solorender · step 1 of the price plan · 18 Oct 2026</div>
+  <h1>Google Cloud Setup</h1>
+  <p>What you click to let solorender buy Google's models straight from Google instead of through fal. It takes about 20 minutes. You do the parts that involve your card, your login and Google's terms. I do everything after that.</p>
+</header>
+
+<section class="note">
+  <h2>News that changed the plan</h2>
+  <p><b>Google is switching off Veo on its simple developer service (the "Gemini API") on October 22, four days from now.</b> Google's own shutdown list, updated Oct 12, shows <i>veo-3.1-fast-generate-preview</i> with shutdown date "October 22, 2026".</p>
+  <p>Veo keeps running on <b>Google Cloud's business service</b>. Google renamed it from Vertex AI to "Gemini Enterprise Agent Platform". It charges the same $0.10 a second for Veo 3.1 Fast. It also sells every other model on our list at the same prices. So everything goes through one Google Cloud account. That's also the account the $2,000 startup credits pay into.</p>
+  <p>Google Cloud also has no prepay and no $250 monthly ceiling. The simple service has both, and that ceiling would have stopped customers' runs after about 300 Veo clips a month.</p>
+</section>
+
+<section>
+  <h2>What customers would save</h2>
+  <p>These are price-list numbers. Each model only moves after a real Google bill on the same test as fal, and you set every final price. My proposal is Google's real bill × 2.5, the same rule as every other model.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Model</th><th>fal today</th><th>Google list price</th><th>Customer price now → proposed</th></tr></thead>
+    <tbody>
+      <tr><td>Veo 3.1 Fast, 8 s with sound (picture start, prompt only, and Entities)</td><td class="num">$1.20</td><td class="num">$0.80</td><td class="num">300 → 200 credits</td></tr>
+      <tr><td>Nano Banana 2 and its Edit</td><td class="num">$0.08</td><td class="num">$0.067</td><td class="num">20 → 17</td></tr>
+      <tr><td>Nano Banana 2.1 and its Edit</td><td class="num">$0.040 / $0.049</td><td class="num">$0.034 + "thinking"</td><td class="num">10 / 13 → the real bill decides</td></tr>
+      <tr><td>Nano Banana Pro</td><td class="num">$0.15</td><td class="num">$0.134</td><td class="num">38 → 34</td></tr>
+      <tr><td>Lyria 2 music (30 s)</td><td class="num">$0.10</td><td class="num">$0.06</td><td class="num">25 → 15</td></tr>
+      <tr><td>Gemini 3.8 Voice, per 1,000 characters</td><td class="num">$0.045</td><td class="num">about $0.015*</td><td class="num">12 → about 4*</td></tr>
+    </tbody>
+  </table></div>
+  <p>* Google charges the voice by sound length, so this is my estimate until a real bill comes in. <b>Google doubles its voice price on January 1, 2027.</b> On that date our price would go to about 8 credits, still under fal's 12.</p>
+  <h3>Staying on fal, and why</h3>
+  <ul>
+    <li><b>Lyria 3.5.</b> Google Cloud doesn't sell it. Only the simple service does, at $0.08 against fal's $0.10. That would mean a second Google setup with its own prepay to save 5 credits a song. I suggest we leave it for later.</li>
+    <li><b>Veo 3.1 (full), Veo 3.1 Lite, Gemini Omni Flash.</b> Google charges the same as fal, so moving them saves nothing.</li>
+    <li><b>The original Nano Banana.</b> Google's price page says it "will be shut down on October 2, 2026". fal still sells it, and nothing changes on our side. Google's own shutdown list gives a later date (March 15, 2027), so its future is unclear. I haven't touched it.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Two decisions for you</h2>
+
+  <h3>1. An 18+ check at sign-up</h3>
+  <p>Google's terms require it, both for the simple service and for Google Cloud. The Google Cloud wording, section 20(d) of its service terms:</p>
+  <blockquote>"Customer will not, and will not allow End Users to, use a Generative AI Service as part of a website, Customer Application, or other online service that is directed towards or is likely to be accessed by individuals under the age of 18."</blockquote>
+  <p>What solorender has today: section 2 of our Terms says "You must be at least 18 years old". The Privacy page says the service "is not directed to children under 18". The sign-up box itself doesn't mention age or the Terms at all.</p>
+  <div class="opts">
+    <div class="opt"><span class="who">Option A · smallest</span><p>One line under the "Create account" and "Continue with Google" buttons: <i>"By creating an account you confirm you're 18 or older and agree to the Terms and Privacy Policy."</i> No extra click for anyone.</p></div>
+    <div class="opt"><span class="who">Option B · my pick</span><p>A tick box on sign-up, <i>"I'm 18 or older and agree to the Terms"</i>, that must be ticked before "Create account" works. Google sign-ins get the line from option A. It costs new customers one click. In return you have a clear record that each person confirmed their age, which is what Google's rule is about.</p></div>
+  </div>
+  <p>This is a business and legal call, so it's yours. A lawyer can tell you whether either one is enough.</p>
+
+  <h3>2. Test now, or wait for the credits?</h3>
+  <p>Google takes 5 to 7 days to answer the credit application. All the side-by-side tests together cost about $3 at Google's prices: three Veo clips, a few pictures, one voice and one song. My suggestion is not to wait. I'll still ask you before each test, with its exact dollar cost.</p>
+</section>
+
+<section>
+  <h2>Your steps</h2>
+  <p>Do these on your Mac, signed in to Google as <b>eddie@solorender.com</b>. Your Gmail won't work, because the credits only go to a billing account owned by a solorender.com login. Wherever Google asks you to accept terms or enter a card, that part is yours.</p>
+  <ol class="steps">
+    <li class="step"><h3>Sign in to Google Cloud</h3>
+      <p>Open <a href="https://console.cloud.google.com/">console.cloud.google.com</a>. Check that the round picture at the top right is your solorender account, not your Gmail. Accept Google Cloud's terms when asked.</p></li>
+
+    <li class="step"><h3>Make a billing account</h3>
+      <p>Open <a href="https://console.cloud.google.com/billing/create">console.cloud.google.com/billing/create</a>. Name it <span class="choice">Solorender, Inc.</span>, country <span class="choice">United States</span>, account type <span class="choice">Business</span>, and add the company card.</p>
+      <p>If Google offers the <b>$300 free trial</b>, take it. Then click <b>Activate full account</b> on the banner at the top. That keeps the unused trial money for 90 days and lifts the trial's limits, so customer runs never stop because of the trial. The startup program says applicants must not have had Google Cloud credits "beyond free trial", so the trial doesn't count against you.</p></li>
+
+    <li class="step"><h3>Make a project</h3>
+      <p>Open <a href="https://console.cloud.google.com/projectcreate">console.cloud.google.com/projectcreate</a>. Name it <span class="choice">solorender-ai</span>, pick the Solorender billing account, and click Create. Under the name, Google shows a <b>Project ID</b>, usually the name plus a few numbers. Keep it; I'll need it.</p></li>
+
+    <li class="step"><h3>Copy the billing account ID</h3>
+      <p>Open <a href="https://console.cloud.google.com/billing">console.cloud.google.com/billing</a> and click the Solorender account. The <b>Billing account ID</b> is 18 characters, like 01AB23-45CD67-89EF01.</p></li>
+
+    <li class="step"><h3>Apply for the $2,000 startup credits</h3>
+      <p>Open <a href="https://cloud.google.com/startup/apply">cloud.google.com/startup/apply</a> and fill it in from the <a href="https://claude.ai/artifact/XsWuR9Y9hxsRYty9z1wMXF">answers page</a>, which has a Copy button for each field. Read its "Before you submit" box first. It explains two things Google checks on the website. You submit it. Google answers by email in about a week, and the credits go straight into this billing account.</p></li>
+
+    <li class="step"><h3>Turn on Google's AI service</h3>
+      <p>Open <a href="https://console.cloud.google.com/apis/library/aiplatform.googleapis.com">console.cloud.google.com/apis/library/aiplatform.googleapis.com</a>. Make sure the project picker at the top says solorender-ai, then click <b>Enable</b>. Google may call it "Vertex AI API" or "Gemini Enterprise Agent Platform API". They're the same thing.</p></li>
+
+    <li class="step"><h3>Make solorender's own login for Google</h3>
+      <p>solorender's server needs its own Google login to ask for pictures and clips. Google calls this a <i>service account</i>.</p>
+      <ol>
+        <li>Open <a href="https://console.cloud.google.com/iam-admin/serviceaccounts/create">console.cloud.google.com/iam-admin/serviceaccounts/create</a>. Name it <span class="choice">solorender-generate</span>, then click <b>Create and continue</b>.</li>
+        <li>Under role, type <span class="choice">Vertex AI User</span>. Google may show it as "Agent Platform User". Pick it, then click <b>Done</b>.</li>
+        <li>Click the new account, open the <b>Keys</b> tab, then <b>Add key → Create new key → JSON → Create</b>. A small file lands in your Downloads folder. Don't open it, send it or attach it anywhere. It's a password.</li>
+      </ol>
+      <p><b>If Google says key creation is turned off:</b> new company accounts block this by default. Open <a href="https://console.cloud.google.com/iam-admin/orgpolicies">console.cloud.google.com/iam-admin/orgpolicies</a> and pick the solorender-ai project at the top. Search <span class="choice">Disable service account key creation</span> and click it. Then click <b>Manage policy → Override parent's policy → Add a rule</b>, set Enforcement to <b>Off</b>, and click <b>Set policy</b>. Wait 15 minutes, then do the key part again. This switch only affects this one project.</p></li>
+
+    <li class="step"><h3>Tell me, and I'll take it from there</h3>
+      <p>Send me two things: <b>"key downloaded"</b> and the <b>Project ID</b>. I'll start a short command in your Terminal panel. It saves the key into your Mac's Keychain and into solorender's Vercel settings without ever showing it on screen. Then it deletes the downloaded file. That's the same way the Runware key was stored.</p></li>
+  </ol>
+</section>
+
+<section class="note">
+  <h2>What happens after that</h2>
+  <ul>
+    <li>Google goes first for the moved models. If Google turns a run away before starting it, the run goes to fal and you get a Telegram note. If a run fails after starting, the customer is refunded and offered Try again, never re-run on fal. Same rules as Runware.</li>
+    <li>Every Google run records what it cost us, and <code>/admin/models</code> gets a Google on/off switch per model.</li>
+    <li>Before each paid test I tell you the exact dollar amount and wait for your yes. You get every test result, with fal's bill and Google's bill side by side.</li>
+    <li>Things I never do for you: enter a card, type a password, accept Google's terms, or submit the credit form.</li>
+  </ul>
+</section>
+
+<section>
+  <div class="eyebrow">Sources, read 18 Oct 2026</div>
+  <p>Gemini API shutdown list: ai.google.dev/gemini-api/docs/deprecations. Prices: ai.google.dev/gemini-api/docs/pricing and cloud.google.com/vertex-ai/generative-ai/pricing. Age rule: ai.google.dev/gemini-api/terms ("Age Requirements") and cloud.google.com/terms/service-terms §20(d). Startup program: cloud.google.com/startup, /startup/pre-funded, /startup/faq. fal prices: solorender's own price list.</p>
+</section>
+</div>

@@ -1,0 +1,349 @@
+<title>solorender Road to $1M a Month</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one reading column; a ladder of four phases, each phase a block with goal, moves, and a pass/fail gate. Always dark (Eddie's rule). */
+:root{
+  --bg:#0a0a0a; --panel:#141412; --line:#2a2a26;
+  --ink:#ffffff; --green:#6ee05a; --orange:#f7931a; --red:#ff6b5a;
+  --display:"Syne","Avenir Next","Segoe UI",sans-serif;
+  --body:"Manrope","Helvetica Neue",Arial,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.65;margin:0}
+.wrap{max-width:860px;margin:0 auto;padding-inline:20px;padding-block:48px 96px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(34px,6vw,56px);font-weight:800;letter-spacing:-.01em}
+h2{font-size:clamp(26px,4vw,34px);font-weight:700;margin-bottom:14px}
+h3{font-size:21px;font-weight:700;margin-bottom:8px}
+p{margin:0 0 14px;max-width:68ch}
+a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--green);text-underline-offset:3px}
+a:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin-bottom:10px;display:block}
+section{padding-block:44px;border-top:1px solid var(--line)}
+section:first-of-type{border-top:0}
+ul{margin:0 0 14px;padding-left:22px}
+li{margin-bottom:8px;max-width:68ch}
+strong{font-weight:700}
+.hi{color:var(--orange);font-weight:700}
+.lede{font-size:20px;margin-top:18px}
+.tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green);border:1px solid var(--green);border-radius:4px;padding:1px 7px;margin-right:6px;vertical-align:2px}
+.tag.warn{color:var(--orange);border-color:var(--orange)}
+.tag.bad{color:var(--red);border-color:var(--red)}
+
+/* Verdict box */
+.verdict{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--orange);padding:22px 24px;margin-top:28px;border-radius:6px}
+.verdict p:last-child{margin-bottom:0}
+
+/* Ladder */
+.ladder{display:grid;gap:12px;margin-top:22px}
+.rung{display:grid;grid-template-columns:150px 1fr;gap:14px;align-items:center}
+.rung .when{font-weight:700;font-size:15px}
+.bar{height:34px;background:var(--panel);border:1px solid var(--line);border-radius:4px;position:relative;overflow:hidden}
+.bar span{position:absolute;inset:0 auto 0 0;background:var(--green);display:flex;align-items:center;justify-content:flex-end;padding-right:10px;color:#0a0a0a;font-weight:800;font-family:var(--display);font-size:15px;white-space:nowrap}
+.bar.now span{background:var(--line);color:var(--ink);justify-content:flex-start;padding-left:10px}
+.note{font-size:15px;margin-top:10px}
+
+/* Tables */
+.tbl{overflow-x:auto;margin:18px 0 8px;border:1px solid var(--line);border-radius:6px}
+table{border-collapse:collapse;width:100%;font-size:15px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--green);font-weight:700;background:var(--panel)}
+tr:last-child td{border-bottom:0}
+td.num{text-align:right;white-space:nowrap}
+tr.total td{font-weight:800;background:var(--panel)}
+
+/* Phases */
+.phase{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:26px 24px;margin-top:22px}
+.phase-head{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline;margin-bottom:14px}
+.phase-head .n{font-family:var(--display);font-size:15px;font-weight:800;color:var(--green);letter-spacing:.08em}
+.phase-head h3{margin:0;flex:1 1 300px}
+.phase-head .target{font-family:var(--display);font-weight:800;font-size:22px;color:var(--orange)}
+.gate{border-top:1px dashed var(--line);margin-top:16px;padding-top:14px}
+.gate b{color:var(--green);font-size:13px;letter-spacing:.12em;text-transform:uppercase;display:block;margin-bottom:6px}
+
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-top:18px}
+.two > div{min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:18px 20px}
+.card h3{font-size:18px}
+
+.decide{counter-reset:d;list-style:none;padding:0}
+.decide li{counter-increment:d;position:relative;padding-left:44px;margin-bottom:20px}
+.decide li::before{content:counter(d);position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;border:1px solid var(--green);color:var(--green);font-weight:800;display:flex;align-items:center;justify-content:center;font-size:15px}
+
+.sources{font-size:15px}
+.sources li{margin-bottom:6px}
+footer{font-size:14px;margin-top:40px;border-top:1px solid var(--line);padding-top:18px}
+
+@media (max-width:560px){
+  body{font-size:16px}
+  .rung{grid-template-columns:1fr;gap:4px}
+  .phase{padding:20px 16px}
+  .wrap{padding-inline:16px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .bar span{transition:width .6s ease}
+}
+</style>
+
+<div class="wrap">
+
+<section>
+  <span class="eyebrow">solorender · growth plan · written 16 Oct 2026</span>
+  <h1>The road from $0 to $1,000,000 a month</h1>
+  <p class="lede">solorender is built and live, but it has not made money yet. This plan shows which customers $1M a month has to come from, how many of them it takes, and the four phases to get there. Each phase has a test it must pass before the next one starts.</p>
+
+  <div class="verdict">
+    <span class="eyebrow" style="color:var(--orange)">The short answer</span>
+    <p><strong>$1M a month is reachable, but probably not by selling $20–$80 plans to hobby creators.</strong> Every company in this market that got there sold to people who make <em>ads</em>: online brands, and the agencies that make their ads. To those buyers, solorender's higher price per clip doesn't matter much. They compare it with a human creator who charges $80–200 per video.</p>
+    <p>Realistic timing: <span class="hi">late 2028 if every phase passes its test on time.</span> Small teams that grew fast took 12–24 months to go from $1M a year to $1M a month, after they already had a product people paid for. Most solo AI-video apps never get past $10,000 a month.</p>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">Where we stand today</span>
+  <h2>Starting point: built, live, $0 revenue</h2>
+  <p>Read from solorender's live database today:</p>
+  <ul>
+    <li><strong>8 accounts.</strong> Only 2 signed up in the last 30 days.</li>
+    <li><strong>0 paying customers.</strong> Every purchase on record is your own test, a house account, or a test you refunded.</li>
+    <li><strong>0 active subscriptions.</strong></li>
+    <li><strong>$0 spent on marketing.</strong> The 303-person outreach list and the 58 DMs are written. Your Gmail and DMs would show whether any were sent.</li>
+  </ul>
+  <p>What is already finished and does not need building: about 100 models, 54 recipes, 197 styles, Flow, characters (Entities), the video editor, the MCP server, the course, real Stripe checkout, a 25% affiliate program, and 350 pages Google can index.</p>
+  <p><strong>The product is not what's missing. Customers are.</strong> So Phase 1 builds almost nothing.</p>
+
+  <div class="ladder" aria-label="Revenue milestones, log scale">
+    <div class="rung"><div class="when">Today</div><div class="bar now"><span style="width:100%">$0 a month</span></div></div>
+    <div class="rung"><div class="when">Phase 1 · Dec 2026</div><div class="bar"><span style="width:17.5%">$500</span></div></div>
+    <div class="rung"><div class="when">Phase 2 · Mar 2027</div><div class="bar"><span style="width:50%">$10,000</span></div></div>
+    <div class="rung"><div class="when">Phase 3 · Sep 2027</div><div class="bar"><span style="width:75%">$100,000</span></div></div>
+    <div class="rung"><div class="when">Phase 4 · late 2028</div><div class="bar"><span style="width:100%">$1,000,000 a month</span></div></div>
+  </div>
+  <p class="note">Bars use a log scale, so each step to the right is about 10 times the money. The dates are targets, not forecasts. If a phase fails its test, the later dates move.</p>
+</section>
+
+<section>
+  <span class="eyebrow">The math</span>
+  <h2>What $1M a month is made of</h2>
+  <p><strong>Path A: hobby creators only.</strong> At today's average plan of about $30, you'd need <strong>33,000 paying customers</strong>.</p>
+  <p>The average AI app keeps only 6% of monthly subscribers for a full year. That works out to losing about 21% a month. So just to stand still, you'd need about <strong>7,000 new payers every month</strong>.</p>
+  <p>Using normal conversion rates, that means roughly 900,000 visitors a month. That is OpenArt-level traffic, and OpenArt has a five-year head start.</p>
+
+  <p><strong>Path B: mostly business customers.</strong> This is the mix that matches how Arcads got to $10M a year with 6,000 customers.</p>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Customer</th><th>What they buy</th><th>Price a month</th><th>Customers</th><th>Monthly revenue</th></tr></thead>
+      <tbody>
+        <tr><td>Ad agencies &amp; studios</td><td>Team plan: seats, client folders, brand kits</td><td class="num">$600</td><td class="num">800</td><td class="num">$480,000</td></tr>
+        <tr><td>Online brands (Shopify, Amazon, DTC)</td><td>Ad Studio plan: batches of ad videos</td><td class="num">$150</td><td class="num">2,500</td><td class="num">$375,000</td></tr>
+        <tr><td>Creators &amp; filmmakers</td><td>Today's Solo / Studio / Max plans</td><td class="num">$32</td><td class="num">4,500</td><td class="num">$144,000</td></tr>
+        <tr class="total"><td>Total</td><td></td><td class="num">avg $128</td><td class="num">7,800</td><td class="num">≈ $1,000,000</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Path B needs about 7,800 customers instead of 33,000. Business customers also cancel much less often. If agencies cancel at 4% a month, brands at 8% and creators at 18%, you'd replace about <strong>1,000 customers a month</strong> instead of 7,000. <span class="tag warn">my assumption</span> Business cancel rates are not published by any rival, so check them against our own numbers in Phase 2.</p>
+
+  <h3 style="margin-top:26px">What we keep from each dollar</h3>
+  <ul>
+    <li>Every model costs customers 2.5× what we pay for it. When customers use all their credits, the model costs us 40¢ of each dollar.</li>
+    <li>Discounts cost us more per dollar. Super Max ($300 for 42,750 credits) costs us about $171, or 57¢ per dollar.</li>
+    <li>Stripe takes about 3¢ per dollar. Affiliates get 25¢ on sales they refer, for one year.</li>
+    <li><strong>The result: we keep roughly 35–55¢ of each dollar</strong>, so $1M a month leaves roughly $400,000–500,000 before staff.</li>
+    <li>For comparison, Higgsfield says it keeps only 20–30% on models it buys from other companies, and over 80% on models it runs itself.</li>
+    <li>So our markup isn't the problem. The problem is that we charge more per clip than rivals. That is why the plan aims at buyers who don't shop by price per clip.</li>
+  </ul>
+</section>
+
+<section>
+  <span class="eyebrow">What the winners did</span>
+  <h2>How comparable companies got there</h2>
+  <p>I researched 26 companies. 15 have real revenue numbers from the company or a reputable outlet. 5 have only outside estimates, and 6 have no number I could confirm. These are the most relevant ones:</p>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Company</th><th>What it is</th><th>Path</th><th>How it grew</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Arcads</strong></td><td>AI UGC ads</td><td>~$5k in Jan 2024 → $10M a year in Nov 2025. 8 people, 6,000+ customers, no investors (founder's claim)</td><td>Product-led, ads made with its own tool, influencers. A 2-person sales team added at ~$6M</td></tr>
+        <tr><td><strong>OpenArt</strong></td><td>Model aggregator, like us</td><td>~$1M a year at end of 2023 → $12M (Feb 2025) → $70M (Jan 2026) with 20 staff</td><td>12,000 SEO pages, one-click story templates, trends</td></tr>
+        <tr><td><strong>Higgsfield</strong></td><td>Model aggregator with presets</td><td>Launched Mar 2025 → $1B a year (Sep 2026, company claim). About 70% from agencies</td><td>Paid creator program (10,000 creators), viral presets, first with new models. No paid ads</td></tr>
+        <tr><td><strong>Creatify</strong></td><td>AI video ads</td><td>$9M a year, 18 months after launch</td><td>Self-serve for marketers, then teams</td></tr>
+        <tr><td><strong>Pollo AI</strong></td><td>Model aggregator</td><td>Launched Sep 2024 → ~$20M a year, broke even in 7 months (outside estimate)</td><td>SEO, effect templates. SEO weakened as rivals copied it</td></tr>
+        <tr><td><strong>Magnific</strong> (Freepik)</td><td>Model aggregator</td><td>$230M a year, 1M+ paying, profitable, no investors (Apr 2026)</td><td>Already had about 100M stock-photo users</td></tr>
+        <tr><td><strong>Photo AI</strong></td><td>Solo founder app</td><td>$0 → ~$132k a month in about 18 months (outside estimate)</td><td>Founder's big X audience, building in public</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p><strong>What every winner had in common: at least two of these three.</strong></p>
+  <ul>
+    <li>Pages people find on Google, or ready-made templates.</li>
+    <li>One viral format, or a paid army of creators.</li>
+    <li>A move into ad-making for brands and agencies.</li>
+  </ul>
+  <p>None reached $1M a month on hobby subscriptions plus free traffic alone.</p>
+  <p><span class="tag bad">warning signs</span></p>
+  <ul>
+    <li>Lensa's revenue fell 58% the year after its viral hit.</li>
+    <li>Higgsfield had to refund $1.35M after its "unlimited" plan.</li>
+    <li>Arcads' launch broke and it refunded everyone.</li>
+    <li>OpenArt's SEO pages drew about 1M visits a month but only "over 1,100" paid subscriptions in all of 2025.</li>
+  </ul>
+  <p>Google traffic helps, but on its own it won't carry us.</p>
+</section>
+
+<section>
+  <span class="eyebrow">The plan</span>
+  <h2>Four phases, each with a pass/fail test</h2>
+  <p>Each phase ends with a test. Don't spend money on the next phase until the current one passes. This keeps to your shoestring rule: spending follows income.</p>
+
+  <div class="phase">
+    <div class="phase-head"><span class="n">PHASE 1 · NOW → 31 DEC 2026</span><h3>Prove strangers will pay</h3><span class="target">$500 a month</span></div>
+    <p>Spend no money and build almost nothing. The job is to find 10 people you don't know who pay.</p>
+    <ul>
+      <li><strong>Send the outreach that's already written.</strong> That's 50 personal emails and 58 DMs, then the rest of the 303-person list, at 10–15 a day. Start with AI-ad and UGC creators and agency owners, not general AI hobbyists.</li>
+      <li><strong>Recruit 20 affiliates.</strong> Give each 5,000 free credits. It costs us about $17–25 per person, and only if they actually use the credits.</li>
+      <li><strong>Watch every new account by hand.</strong> Did they make something in the first day? Where did they get stuck? Email each one personally.</li>
+      <li><strong>Close the free-credit loophole first.</strong> Stripe reports that people opening many accounts at AI startups rose 40% this year. Right now the 100 free signup credits can be farmed with throwaway emails.</li>
+      <li><strong>Ask every payer one question:</strong> "What were you making, and what would you have used otherwise?" Their answers decide Phase 2.</li>
+    </ul>
+    <div class="gate"><b>Pass test</b>
+      <ul>
+        <li>10 paying strangers by 31 Dec.</li>
+        <li>At least 3 of them buy a second time.</li>
+        <li>At least 3 say they make ads, or content they get paid for.</li>
+      </ul>
+      If fewer than 10 pay, the problem is the offer or the first-day experience, not traffic. Fix that before spending anything.
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="n">PHASE 2 · JAN → MAR 2027</span><h3>Pick the paying customer and package for them</h3><span class="target">$10,000 a month</span></div>
+    <p>Aim for about 100 customers. Turn what we already have into one product a brand or agency understands in five seconds.</p>
+    <ul>
+      <li><strong>"Ad Studio" package.</strong> One product photo and one brief go in. Out comes a batch of 10–20 ad videos with the same face and voice, in 9:16, 1:1 and 4:5. It is built from existing recipes, Entities and Flow.
+        <ul>
+          <li>Price it around $99–$299 a month.</li>
+          <li>The selling point is credits that never expire. Arcads' credits on its cheaper plans expire every month.</li>
+        </ul>
+      </li>
+      <li><strong>Make solorender's own ads with solorender.</strong> Arcads did this. Every ad we post shows the product working.</li>
+      <li><strong>Post three social clips a week</strong> with the clip recorder that is already built. Use the "Which model?" and "One prompt, one shot" series that are already planned.</li>
+      <li><strong>Creator Partner program.</strong> Copy only the format of Higgsfield's: a free plan in return for tagging solorender, with no posting quota. Add the 25% affiliate cut on top.</li>
+      <li><strong>Launch-day speed.</strong> When a big new model comes out, add it the same day and post about it. Higgsfield grew this way repeatedly.</li>
+      <li><strong>Apply for the Runware grant</strong> (up to $30k in credits, allowed for companies without investors). Your EIN now exists, so it's possible.</li>
+    </ul>
+    <div class="gate"><b>Pass test</b>
+      <ul>
+        <li>$10,000 a month by 31 March.</li>
+        <li>At least 60% of revenue comes from business customers.</li>
+        <li>Fewer than 10% of business customers cancel each month.</li>
+        <li>Disputes stay under 0.5% of charges.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="n">PHASE 3 · APR → SEP 2027</span><h3>Make growth repeatable</h3><span class="target">$100,000 a month</span></div>
+    <p>Aim for about 1,000 customers. From here, money starts going into marketing, but only as fast as it pays back.</p>
+    <ul>
+      <li><strong>Agency plan.</strong> Seats for a team, one folder and brand kit per client, exports without our name on them, and monthly invoicing. Price it at $499–$1,500 a month. Agencies charge their clients $2,000–15,000 a month, so this is a small cost to them.</li>
+      <li><strong>Cheaper suppliers.</strong> Switch to Runware, Google and the other suppliers in the switch plan you already have. Seedance alone drops from $1.52 to about $0.80 per clip. Under your rule, the savings go to customers as lower prices, which closes the price gap with rivals.</li>
+      <li><strong>Paid ads, carefully.</strong> Run them only after Phase 2 shows what a customer is worth. Start at a few hundred dollars a month. Keep a channel only if its ad spend comes back as gross profit within 3 months.</li>
+      <li><strong>Pages people search for.</strong> Pages like "AI product ad generator", "UGC ad maker" and "talking product video". Use OpenArt's playbook, but expect modest results.</li>
+      <li><strong>First helper.</strong> A part-time contractor for support and checking quality. You can't personally check every customer's ads at 1,000 customers.</li>
+    </ul>
+    <div class="gate"><b>Pass test</b>
+      <ul>
+        <li>$100,000 a month.</li>
+        <li>Each customer earns back what it cost to win them within 3 months.</li>
+        <li>Revenue from existing customers grows as they buy more.</li>
+        <li>Disputes stay under 0.5% of charges.</li>
+      </ul>
+      If you pass, a small raise becomes easy and optional. Stripe Capital, Hustle Fund and angel SAFEs all want to see exactly these numbers.
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="n">PHASE 4 · OCT 2027 → LATE 2028</span><h3>Scale to $1M a month</h3><span class="target">$1,000,000 a month</span></div>
+    <p>Aim for about 7,800 customers. This is the mix from the table above.</p>
+    <ul>
+      <li><strong>Sales help for big accounts.</strong> One or two people who close $10k+ a year deals with agencies and brands. Arcads added this at about $6M a year.</li>
+      <li><strong>Our own servers for open models.</strong> Higgsfield keeps over 80% on models it runs itself. Run the busiest open models on rented GPUs, and keep paying suppliers for the closed ones.</li>
+      <li><strong>Agents as customers.</strong> List the MCP server in the Claude and ChatGPT directories and sell usage plans. One example: an agency's AI agent makes "10 new ads every Monday". No rival has shown real revenue from this yet, so treat it as a bonus, not the plan.</li>
+      <li><strong>Yearly contracts</strong> for agencies, so revenue holds steady even if some customers leave.</li>
+      <li><strong>Small team.</strong> Comparable companies ran at $10M a year with 8 people (Arcads) and 8–20 people (OpenArt). Plan for about 8–12 people, with AI agents doing the building.</li>
+    </ul>
+    <div class="gate"><b>Pass test</b>
+      <ul>
+        <li>$1M a month.</li>
+        <li>At least half the revenue comes from business accounts.</li>
+        <li>Profitable, or close to it.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">What could stop this</span>
+  <h2>The biggest risks</h2>
+  <div class="two">
+    <div class="card"><h3>We cost more per clip</h3><p>We're 2–3× OpenArt, Magnific and Higgsfield per generation. Supplier switches shrink the gap. Selling finished ads to businesses makes it matter less.</p></div>
+    <div class="card"><h3>Model makers go direct</h3><p>Veo is free inside YouTube Shorts. Google sells 1,000 Flow credits for $19.99. Kling's own app makes about $500M a year. Hobby creators will drift to these. Agencies need a finished, organized workflow, which those apps don't offer.</p></div>
+    <div class="card"><h3>Free ad makers</h3><p>Amazon already gives sellers a free AI video tool. Meta is working toward making ads automatically from one product photo. Simple product ads will get cheap. Multi-scene ads with a consistent face and voice, organized per client, are the safer ground.</p></div>
+    <div class="card"><h3>Customers leave fast</h3><p>AI apps lose subscribers about 30% faster than other apps. Only 6% of monthly AI subscribers last a year. That's why the plan leans on business buyers, who earn money from what they make.</p></div>
+    <div class="card"><h3>Fraud and chargebacks</h3><p>Visa flags a seller at a 0.5% dispute rate. At $1M a month, that's only about 143 disputes. Credits that never expire and can be resold attract stolen-card buyers. Hold commissions, and add checks before the first big charge.</p></div>
+    <div class="card"><h3>One founder</h3><p>Today everything runs through you. Every phase above adds work you can't do alone. Hire for support and quality checking first, and sales second.</p></div>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">Your calls</span>
+  <h2>Four decisions only you can make</h2>
+  <ol class="decide">
+    <li><strong>Who solorender is for.</strong> Keep selling to everyone, or lead with ad makers (brands and agencies) and keep creators as the second audience?<br><span class="tag">recommend</span> Lead with ad makers. It's the only route that worked for every comparable company. The decision isn't final until Phase 1's payers tell us what they're making.</li>
+    <li><strong>A business plan priced well above $80.</strong> Add a $99–$299 Ad Studio plan and a $499–$1,500 agency plan, both still 2.5× cost, with the same kind of plan discounts we have today?<br><span class="tag">recommend</span> Yes, in Phase 2. Today our top monthly plan is $80, so business buyers have nothing made for them.</li>
+    <li><strong>A marketing budget once money comes in.</strong> Today it's $0.<br><span class="tag">recommend</span> From Phase 3, put up to half of each month's gross profit into channels that pay back within 3 months. Spend nothing before that.</li>
+    <li><strong>Outside money.</strong> Stay self-funded, or raise once Phase 3's numbers exist?<br><span class="tag">recommend</span> Stay self-funded through Phase 2. Decide at $100,000 a month, when you can raise on better terms. Magnific and Arcads both got big without investors.</li>
+  </ol>
+</section>
+
+<section>
+  <span class="eyebrow">Keep score</span>
+  <h2>Numbers to check every Monday</h2>
+  <ul>
+    <li><strong>New signups,</strong> and how many made something on day one.</li>
+    <li><strong>New paying customers.</strong> Split them into business and creator.</li>
+    <li><strong>Monthly revenue,</strong> and how much of it came from customers who paid before.</li>
+    <li><strong>Customers who cancelled or stopped buying.</strong></li>
+    <li><strong>Refunds and disputes as a % of charges.</strong> Alarm at 0.5%.</li>
+    <li><strong>What we keep per dollar</strong> after supplier, Stripe and affiliate costs.</li>
+  </ul>
+  <p>Most of these already exist on <a href="https://solorender.com/admin">/admin</a>. A one-page weekly scorecard there would be the only new build Phase 1 needs.</p>
+</section>
+
+<section>
+  <span class="eyebrow">Sources</span>
+  <h2>Where the numbers come from</h2>
+  <p>Every outside number was read on 16 Oct 2026. I checked the most important ones myself on the original page: Arcads, Magnific, Higgsfield's margins and revenue mix, OpenArt's SEO results, and RevenueCat's retention figures. Revenue figures are mostly company claims or analyst estimates, not audited accounts.</p>
+  <ul class="sources">
+    <li><a href="https://founderpath.com/resources/romain-torres-arcads-10m-arr-ai-video-ads-sales">Arcads $10M a year, 8 people, 6,000+ customers (Founderpath)</a></li>
+    <li><a href="https://thenextweb.com/news/freepik-rebrands-as-magnific">Magnific $230M a year, 1M+ paying, profitable (The Next Web, 28 Apr 2026)</a></li>
+    <li><a href="https://officechai.com/ai/ai-video-platform-higgsfield-says-it-has-gone-from-1-million-arr-to-1-billion-arr-faster-than-anthropic-or-openai/">Higgsfield $1B a year, ~70% from agencies (OfficeChai, Sep 2026)</a></li>
+    <li><a href="https://dealroom.co/news/talk-jszn8rFtxm4-burning-4m-a-month-inside-higgsfields-dash-to-a-1b-arr/">Higgsfield margins 80%+ own models vs 20–30% bought models, no paid ads (Dealroom / 20VC)</a></li>
+    <li><a href="https://shortyawards.com/18th/daydream-openart-198m-clicks-with-programmatic-seo-across-google-and-ai-platforms">OpenArt SEO: 12,000 pages, 1M visits a month, 1,100+ paid subscriptions in 2025 (Shorty Awards)</a></li>
+    <li><a href="https://sacra.com/research/openart-at-12m-arr">OpenArt $12M a year (Sacra)</a> · <a href="https://basisset.com/insights/">OpenArt $70M with 20 staff (Basis Set)</a></li>
+    <li><a href="https://www.revenuecat.com/blog/growth/ai-app-retention-study">AI app retention: 6.1% of monthly subscribers last a year (RevenueCat, Aug 2026)</a></li>
+    <li><a href="https://techcrunch.com/2026/03/10/ai-powered-apps-struggle-with-long-term-retention-new-report-shows">AI apps cancel ~30% faster, refund rate 4.2% (TechCrunch on RevenueCat 2026)</a></li>
+    <li><a href="https://www.businesswire.com/news/home/20250528506486/en/">Creatify $9M a year in 18 months (BusinessWire)</a></li>
+    <li><a href="https://36kr.jp/449403/">Pollo AI growth (36Kr Japan)</a></li>
+    <li><a href="https://www.heygen.com/blog/heygen-surpasses-200m-arr">HeyGen $200M+ a year (HeyGen)</a></li>
+    <li><a href="https://docs.stripe.com/disputes/monitoring-programs">Visa and Mastercard dispute limits (Stripe docs)</a> · <a href="https://stripe.com/blog/what-stripe-data-shows-about-fraud-at-ai-startups">Fraud at AI startups (Stripe blog, Sep 2026)</a></li>
+    <li><a href="https://www.indiehackers.com/post/photo-ai-by-pieter-levels-complete-deep-dive-case-study-0-to-132k-mrr-in-18-months-3a9a2b1579">Photo AI $0 → $132k a month (Indie Hackers, outside estimate)</a></li>
+    <li><a href="https://motionbox.io/blog/how-much-to-charge-clients-for-ai-ugc-ads">What AI UGC agencies charge clients (Motionbox)</a></li>
+    <li>Our own numbers: solorender's live database (16 Oct 2026), and the earlier price-comparison and supplier pages.</li>
+  </ul>
+  <footer>Assumptions I made, not taken from a source: the customer mix in the $1M table, business cancel rates (4% and 8% a month), and the phase dates. Replace them with our real numbers as each phase finishes.</footer>
+</section>
+
+</div>

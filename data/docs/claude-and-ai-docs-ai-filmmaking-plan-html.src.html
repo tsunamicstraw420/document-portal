@@ -1,0 +1,1389 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Filmmaking Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+/* solorender design tokens (from studio/src/app/globals.css) */
+:root {
+  --bg: #f6f4ec;
+  --surface: #fffdf7;
+  --surface-2: #efece0;
+  --border: #e5e1d2;
+  --ink: #22281e;
+  --muted: #6b7263;
+  --accent: #3e6b3f;
+  --accent-ink: #f6f4ec;
+  --accent-soft: #e3ead9;
+  --accent-2: #9a6d15;
+  --accent-2-soft: #f2e8cf;
+  --bar-bg: #0b0a07;
+  --bar-ink: #f1eee3;
+  --bar-muted: #8f897c;
+  --bar-border: #272319;
+  --code-bg: #f1eee3;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0a0a0a; --surface: #151412; --surface-2: #201e1a; --border: #2f2b25;
+    --ink: #f2efe6; --muted: #9a948a; --accent: #6ee05a; --accent-ink: #0a0a0a;
+    --accent-soft: #13230f; --accent-2: #e0b45c; --accent-2-soft: #2a2114; --code-bg: #11100e;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0a0a0a; --surface: #151412; --surface-2: #201e1a; --border: #2f2b25;
+  --ink: #f2efe6; --muted: #9a948a; --accent: #6ee05a; --accent-ink: #0a0a0a;
+  --accent-soft: #13230f; --accent-2: #e0b45c; --accent-2-soft: #2a2114; --code-bg: #11100e;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 84px; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: Manrope, system-ui, -apple-system, sans-serif;
+  font-size: 17px; line-height: 1.65; -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+::selection { background: color-mix(in srgb, var(--accent) 30%, transparent); }
+a { color: var(--accent); }
+
+/* top bar */
+.bar {
+  position: sticky; top: 0; z-index: 20; background: #0a0a0a; /* matches the logo image's own background */ color: var(--bar-ink);
+  border-bottom: 1px solid var(--bar-border);
+}
+.bar-in { max-width: 1240px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; gap: 16px; }
+.bar img { height: 26px; width: auto; display: block; }
+.bar .tag { color: var(--bar-muted); font-size: 14px; border-left: 1px solid var(--bar-border); padding-left: 14px; }
+.bar .grow { flex: 1; }
+.prog { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--bar-muted); }
+.prog .track { width: 120px; height: 6px; border-radius: 99px; background: var(--bar-border); overflow: hidden; }
+.prog .fill { height: 100%; width: 0; background: #6ee05a; transition: width .3s; }
+.icon-btn {
+  background: transparent; color: var(--bar-ink); border: 1px solid var(--bar-border);
+  border-radius: 10px; padding: 6px 10px; font: inherit; font-size: 14px; cursor: pointer;
+}
+.icon-btn:hover { border-color: var(--bar-muted); }
+
+/* layout */
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 16px; display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 40px; }
+nav.toc { position: sticky; top: 72px; align-self: start; max-height: calc(100vh - 88px); overflow: auto; padding: 28px 0 40px; font-size: 15px; }
+nav.toc .m { font-weight: 700; margin: 18px 0 6px; color: var(--ink); text-decoration: none; display: block; }
+nav.toc .m small { display: block; color: var(--accent-2); font-weight: 700; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+nav.toc a.l { display: flex; gap: 8px; align-items: baseline; color: var(--muted); text-decoration: none; padding: 3px 0 3px 10px; border-left: 2px solid var(--border); }
+nav.toc a.l:hover { color: var(--ink); border-left-color: var(--accent); }
+nav.toc a.l.done { color: var(--accent); }
+nav.toc a.l.done::after { content: "✓"; margin-left: auto; padding-right: 6px; }
+main { padding: 28px 0 80px; min-width: 0; }
+
+/* hero */
+.hero { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 32px; position: relative; overflow: hidden; }
+.hero::before { content: ""; position: absolute; inset: -40% -10% auto auto; width: 420px; height: 420px; border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 18%, transparent), transparent 70%); pointer-events: none; }
+.kicker { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-2); }
+h1 { font-family: Syne, Manrope, sans-serif; font-size: clamp(32px, 5vw, 48px); line-height: 1.05; margin: 8px 0 14px; letter-spacing: -.01em; }
+.hero p.lead { font-size: 19px; color: var(--muted); max-width: 720px; margin: 0 0 20px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.chip { background: var(--accent-soft); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent); border-radius: 99px; padding: 4px 12px; font-size: 14px; font-weight: 600; }
+.chip.gold { background: var(--accent-2-soft); color: var(--accent-2); border-color: color-mix(in srgb, var(--accent-2) 25%, transparent); }
+
+.pipeline { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 24px 0 0; }
+.stage { background: var(--surface-2); border-radius: 14px; padding: 14px 16px; }
+.stage b { display: block; font-size: 15px; }
+.stage span { font-size: 14px; color: var(--muted); }
+.stage .t { font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: .06em; text-transform: uppercase; }
+
+/* tools row */
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 24px 0 8px; }
+.search { flex: 1; min-width: 200px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; font: inherit; color: var(--ink); }
+.search:focus { outline: 2px solid color-mix(in srgb, var(--accent) 45%, transparent); border-color: transparent; }
+.btn { border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent); background: color-mix(in srgb, var(--accent-soft) 60%, transparent);
+  color: var(--accent); border-radius: 12px; padding: 9px 14px; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; }
+.btn:hover { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 46%, transparent); }
+.empty { display: none; color: var(--muted); padding: 20px 0; }
+
+/* module */
+section.module { margin-top: 44px; }
+.mod-head { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 14px; }
+.mod-num { flex: none; width: 46px; height: 46px; border-radius: 14px; background: var(--bar-bg); border: 1px solid color-mix(in srgb, #6ee05a 35%, var(--bar-border)); color: #6ee05a; display: grid; place-items: center; font-family: Syne, sans-serif; font-weight: 800; font-size: 20px; }
+h2 { font-family: Syne, Manrope, sans-serif; font-size: 28px; line-height: 1.15; margin: 0 0 4px; }
+.mod-head p { margin: 0; color: var(--muted); }
+.cert { margin-top: 8px; font-size: 14px; color: var(--accent-2); font-weight: 600; }
+
+/* lesson */
+details.lesson { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; margin: 12px 0; }
+details.lesson[open] { box-shadow: 0 10px 30px -18px rgba(0,0,0,.35); }
+details.lesson > summary { list-style: none; cursor: pointer; padding: 18px 20px; display: flex; gap: 14px; align-items: center; }
+details.lesson > summary::-webkit-details-marker { display: none; }
+.ln { flex: none; font-size: 13px; font-weight: 700; color: var(--muted); width: 34px; }
+.lt { flex: 1; min-width: 0; }
+.lt b { display: block; font-size: 18px; line-height: 1.3; }
+.lt span { display: block; color: var(--muted); font-size: 15px; }
+.badge { flex: none; font-size: 12px; font-weight: 700; border-radius: 99px; padding: 3px 10px; background: var(--surface-2); color: var(--muted); }
+.badge.done { background: var(--accent-soft); color: var(--accent); }
+.chev { flex: none; color: var(--muted); transition: transform .2s; }
+details[open] > summary .chev { transform: rotate(90deg); }
+.body { padding: 0 20px 22px 68px; }
+.body h3 { font-size: 17px; margin: 22px 0 6px; color: var(--ink); }
+.body h3:first-child { margin-top: 0; }
+.body p { margin: 8px 0; }
+.body ul, .body ol { margin: 8px 0; padding-left: 22px; }
+.body li { margin: 4px 0; }
+.goal { background: var(--accent-soft); border-radius: 12px; padding: 12px 16px; margin-bottom: 14px; }
+.goal b { color: var(--accent); }
+.note { border-left: 3px solid var(--accent-2); background: var(--accent-2-soft); border-radius: 0 12px 12px 0; padding: 10px 14px; margin: 14px 0; }
+.sr { border: 1px dashed color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 12px; padding: 10px 14px; margin: 16px 0 0; font-size: 15px; }
+.sr b { color: var(--accent); }
+
+table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 15px; display: block; overflow-x: auto; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+th { font-weight: 700; color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+
+.prompt { position: relative; background: var(--code-bg); border: 1px solid var(--border); border-radius: 12px; margin: 12px 0; }
+.prompt .ph { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px 8px 14px; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 700; color: var(--accent-2); text-transform: uppercase; letter-spacing: .05em; }
+.prompt pre { margin: 0; padding: 12px 14px; white-space: pre-wrap; word-wrap: break-word; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 14.5px; line-height: 1.55; color: var(--ink); }
+.copy { border: 1px solid var(--border); background: var(--surface); color: var(--ink); border-radius: 8px; padding: 3px 10px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; text-transform: none; letter-spacing: 0; }
+.copy.ok { color: var(--accent); border-color: var(--accent); }
+
+.check { list-style: none; padding-left: 0 !important; }
+.check li { margin: 6px 0; }
+.check label { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; }
+.check input { margin-top: 5px; width: 18px; height: 18px; accent-color: var(--accent); flex: none; }
+.check input:checked + span { color: var(--muted); text-decoration: line-through; }
+
+.done-row { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border); }
+.done-row label { display: inline-flex; gap: 10px; align-items: center; font-weight: 700; cursor: pointer; }
+.done-row input { width: 20px; height: 20px; accent-color: var(--accent); }
+
+footer { color: var(--muted); font-size: 14px; border-top: 1px solid var(--border); margin-top: 60px; padding-top: 18px; }
+
+@media (max-width: 900px) {
+  .wrap { grid-template-columns: 1fr; gap: 0; }
+  nav.toc { display: none; }
+  .body { padding: 0 16px 20px 16px; }
+  .bar .tag { display: none; }
+  .prog .track { width: 64px; }
+  .pipeline { grid-template-columns: 1fr; }
+  .hero { padding: 22px; }
+}
+@media (max-width: 520px) {
+  .prog .txt { display: none; }
+  details.lesson > summary { padding: 16px 14px; gap: 10px; }
+  .ln { width: 26px; }
+  .badge { display: none; }
+}
+@media print {
+  .bar, nav.toc, .toolbar, .copy, .done-row { display: none !important; }
+  .wrap { display: block; }
+  details.lesson { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="bar-in">
+    <img src="data:image/png;base64,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" alt="solorender">
+    <span class="tag">AI Filmmaking — follow-along plan</span>
+    <span class="grow"></span>
+    <div class="prog" title="Lessons marked done">
+      <span class="txt"><span id="pcount">0</span>/<span id="ptotal">0</span> done</span>
+      <div class="track"><div class="fill" id="pfill"></div></div>
+    </div>
+    <button class="icon-btn" id="theme" type="button" aria-label="Switch light or dark">◐</button>
+  </div>
+</header>
+
+<div class="wrap">
+<nav class="toc" id="toc" aria-label="Contents"></nav>
+
+<main>
+  <div class="hero">
+    <div class="kicker">7-day plan · 5 modules · 23 lessons + 2 projects</div>
+    <h1>AI Filmmaking, start to finish</h1>
+    <p class="lead">Go from one idea to a finished, published short film and trailer. Claude writes the plan and the prompts, an AI studio makes the pictures and clips, and a video editor puts it together. Work through it at your own pace. Tick lessons off as you go.</p>
+    <div class="stats">
+      <span class="chip">Claude — writing</span>
+      <span class="chip">AI studio — pictures, video, voice</span>
+      <span class="chip">CapCut — editing</span>
+      <span class="chip gold">Finished beats perfect</span>
+    </div>
+    <div class="pipeline">
+      <div class="stage"><span class="t">Stage 1</span><b>Pre-production</b><span>Plan it: idea, script, look, shot list, prompts. Nothing is generated yet.</span></div>
+      <div class="stage"><span class="t">Stage 2</span><b>Production</b><span>Make it: character, key pictures, then video clips from those pictures.</span></div>
+      <div class="stage"><span class="t">Stage 3</span><b>Post-production</b><span>Finish it: trim, cut, sound, music, export, publish.</span></div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <input class="search" id="q" type="search" placeholder="Search lessons, e.g. lipsync, trailer, credits">
+    <button class="btn" id="openall" type="button">Open all</button>
+    <button class="btn" id="closeall" type="button">Close all</button>
+  </div>
+  <p class="empty" id="empty">No lesson matches that search.</p>
+
+  <!-- ============ MODULE 1 ============ -->
+  <section class="module" id="m1" data-title="Module 1" data-sub="Understand AI filmmaking">
+    <div class="mod-head"><div class="mod-num">1</div><div>
+      <h2>Understand AI filmmaking</h2>
+      <p>Plan the film and write production-ready prompts before you generate anything.</p>
+      <div class="cert">Level 1 · Bronze — "AI Screenwriter"</div>
+    </div></div>
+
+    <details class="lesson" id="l01"><summary><span class="ln">01</span><span class="lt"><b>What you'll build in 7 days</b><span>The three stages every film goes through</span></span><span class="badge">To do</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="goal"><b>Goal:</b> understand why a film is built in stages, not with one button.</div>
+      <h3>The big idea</h3>
+      <ul>
+        <li>One sentence typed into an AI tool gives you one okay clip. It does not give you a film.</li>
+        <li>A film needs a plan, a character who looks the same in every shot, and shots that connect.</li>
+        <li>Every film goes through the same three stages, always in this order: <b>pre-production</b> (plan), <b>production</b> (make), <b>post-production</b> (finish).</li>
+        <li>Beginners skip planning and jump to generating. That is why their results feel random. <b>The quality is decided while planning.</b></li>
+      </ul>
+      <h3>How AI video really works</h3>
+      <p>The AI doesn't film anything. It has learned from millions of real videos how faces move, how light falls and how cameras move. It then makes new frames that follow those patterns. A clear instruction gets an intentional result. A vague one gets a random result.</p>
+      <p>A sharp, well-lit, front-facing starting picture gives the AI clear information. A blurry one makes faces flicker and shift.</p>
+      <h3>What you finish with</h3>
+      <ul>
+        <li>A finished short film you can post or show a client.</li>
+        <li>A repeatable workflow, so the second film is faster.</li>
+        <li>A trailer, which is your best portfolio piece.</li>
+      </ul>
+      <div class="note">The goal this week is <b>finished</b>, not perfect.</div>
+      <div class="done-row"><label><input type="checkbox" class="done"> Mark lesson done</label></div>
+    </div></details>
+
+    <details class="lesson" id="l02"><summary><span class="ln">02</span><span class="lt"><b>Your basic tools</b><span>Claude writes, the studio generates, CapCut edits</span></span><span class="badge">To do</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="goal"><b>Goal:</b> know which tool does which job, and see Claude write a script.</div>
+      <h3>One clear split</h3>
+      <table>
+        <tr><th>Tool</th><th>Its job</th></tr>
+        <tr><td><b>Claude</b></td><td>Everything written: scripts, plans, prompts, captions. The free plan is enough.</td></tr>
+        <tr><td><b>AI studio</b> (the course uses 7ART)</td><td>Everything visual: pictures, video, voice, music. Many models under one login and one credit balance.</td></tr>
+        <tr><td><b>CapCut</b></td><td>Putting it together: trimming, music, sound, transitions, titles, export. Free.</td></tr>
+      </table>
+      <p>Rule of thumb: if the task is text, open Claude. If it's a picture or clip, open the studio.</p>
+      <p>Other tools exist, such as Runway (clips and effects) and HeyGen (talking avatars). They each cover one part of the job. The course sticks to one small toolkit that covers all of it.</p>
+      <h3>Try it: Claude writes a short script</h3>
+      <div class="prompt"><div class="ph">Script starter <button class="copy" type="button">Copy</button></div><pre>Act as a scriptwriter for short cinematic videos. Write a script about: [YOUR TOPIC].
+
+Give me:
+1. A hook — one striking image that grabs attention in the first 3 seconds.
+2. Two or three beats — each beat is one scene with a clear setting, action and mood.
+3. A closing image that stays with the viewer.
+
+Describe only what the camera can see. No narration and no dialogue.</pre></div>
+      <p>Example topic to test with: <i>a lone hiker reaching a summit at sunrise.</i> You should get back a hook, labelled beats (setting, action, mood) and a closing shot.</p>
+      <h3>Tasks</h3>
+      <ul class="check">
+        <li><label><input type="checkbox" data-k="l02-1"><span>Make a free Claude account at claude.ai</span></label></li>
+        <li><label><input type="checkbox" data-k="l02-2"><span>Run the script starter with your own topic</span></label></li>
+      </ul>
+      <div class="done-row"><label><input type="checkbox" class="done"> Mark lesson done</label></div>
+    </div></details>
+
+    <details class="lesson" id="l03"><summary><span class="ln">03</span><span class="lt"><b>Master prompt</b><span>The five-element formula and your Prompt Bank</span></span><span class="badge">To do</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="goal"><b>Goal:</b> stop writing one-line prompts. Write a structured brief with five parts.</div>
+      <h3>Why one line fails</h3>
+      <p>"A woman walking in an office" only names a subject. The AI has to invent the look, the camera, the light and the mood. When the AI guesses, the result looks like nobody's.</p>
+      <h3>The five elements</h3>
+      <table>
+        <tr><th>Element</th><th>Answers</th><th>Vague → specific</th></tr>
+        <tr><td><b>Subject</b></td><td>Who or what is in frame?</td><td>"a woman" → "a woman in her late 30s in a dark green coat"</td></tr>
+        <tr><td><b>Action</b></td><td>What are they doing, and where?</td><td>"some action" → "walks slowly through frame, head down"</td></tr>
+        <tr><td><b>Style</b></td><td>What's the overall look? One word is enough.</td><td>"cool style" → "noir, high contrast, desaturated"</td></tr>
+        <tr><td><b>Camera</b></td><td>How is it framed, and does it move?</td><td>"interesting angle" → "low angle looking up, slow push-in"</td></tr>
+        <tr><td><b>Light</b></td><td>What quality, direction and mood?</td><td>"nice lighting" → "soft golden-hour light from the left"</td></tr>
+      </table>
+      <p>Four or five short sentences is plenty. Aim for one element per sentence.</p>
+      <div class="prompt"><div class="ph">Five-element skeleton <button class="copy" type="button">Copy</button></div><pre>[Subject — specific: age, look, clothing]. [Action — what they do and where]. Look: [one style word]. Camera: [shot type and movement]. Light: [quality, direction and mood].</pre></div>
+      <h3>Practice: spot what's missing</h3>
+      <ul>
+        <li>"A man in a grey suit crosses a rooftop. Wide shot, slow drift left. Film noir." → missing <b>Light</b>.</li>
+        <li>"A harbour village at golden hour, boats drifting in. Documentary style." → missing <b>Camera</b>.</li>
+        <li>"Hands kneading dough, window light from the left, extreme close-up pulling back." → missing <b>Style</b>.</li>
+      </ul>
+      <h3>Build your Prompt Bank</h3>
+      <p>Write one prompt by hand first. Then let Claude turn your whole script into prompts, one per scene.</p>
+      <div class="prompt"><div class="ph">Prompt Bank <button class="copy" type="button">Copy</button></div><pre>Below are my short film script and its visual style. Write one image prompt for each scene or beat.
+
+Each prompt is one paragraph, cinematic and photorealistic, and must cover all five:
+- Subject: age, appearance, clothing
+- Action: what they are doing
+- Environment: place, atmosphere, details
+- Light: type, direction, mood
+- Camera: shot type and movement
+
+Use the same visual style in every prompt.
+
+Visual style:
+[PASTE YOUR VISUAL STYLE]
+
+Script:
+[PASTE YOUR SCRIPT]</pre></div>
+      <h3>Day 1 checklist</h3>
+      <ul class="check">
+        <li><label><input type="checkbox" data-k="l03-1"><span>Ran the script starter with your own topic</span></label></li>
+        <li><label><input type="checkbox" data-k="l03-2"><span>Improved the script with at least one follow-up instruction (next lesson)</span></label></li>
+        <li><label><input type="checkbox" data-k="l03-3"><span>Defined the film's visual style with Claude (next lesson)</span></label></li>
+        <li><label><input type="checkbox" data-k="l03-4"><span>Wrote at least one five-element prompt by hand</span></label></li>
+        <li><label><input type="checkbox" data-k="l03-5"><span>Generated and saved your Prompt Bank</span></label></li>
+      </ul>
+      <div class="done-row"><label><input type="checkbox" class="done"> Mark lesson done</label></div>
+    </div></details>
+
+    <details class="lesson" id="l04"><summary><span class="ln">04</span><span class="lt"><b>Pre-production</b><span>Refine the script and lock the visual style</span></span><span class="badge">To do</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="goal"><b>Goal:</b> leave this lesson with a final script, a visual style description and a full set of prompts.</div>
+      <h3>The planning pipeline</h3>
+      <ol>
+        <li>Pick a topic and run the script starter.</li>
+        <li>Shape the script: scene descriptions and any voiceover written together.</li>
+        <li>Define the visual style: colours, light, texture and references. This is the "DNA" that keeps every shot consistent.</li>
+        <li>Use the five-element formula.</li>
+        <li>Have Claude turn script + style into one prompt per scene (your Prompt Bank).</li>
+      </ol>
+      <p>Each step's output is the next step's input.</p>
+      <h3>Direct Claude like a director</h3>
+      <p>Change one thing at a time. Stay in the same chat so Claude remembers the script. Run at least one of these:</p>
+      <div class="prompt"><div class="ph">Sharper hook <button class="copy" type="button">Copy</button></div><pre>The opening hook is too slow. Rewrite only the hook so a single frame would stop someone scrolling. Leave everything else as it is.</pre></div>
+      <div class="prompt"><div class="ph">Change one scene's mood <button class="copy" type="button">Copy</button></div><pre>Make Beat 2 feel tense and uneasy instead of calm. Keep the same place and the same action — change only the emotional tone.</pre></div>
+      <div class="prompt"><div class="ph">One voiceover line <button class="copy" type="button">Copy</button></div><pre>Add a single voiceover line to the closing shot that captures what the whole video is about. Make it poetic, not explanatory.</pre></div>
+      <h3>Define the visual style</h3>
+      <div class="prompt"><div class="ph">Visual style <button class="copy" type="button">Copy</button></div><pre>Using the script above, define the visual style of this film:
+1. Colour palette — the 3 or 4 main colours across all scenes
+2. Light — warm or cool, soft or hard, natural or artificial
+3. Texture — clean and sharp, or grainy and organic
+4. References — 2 or 3 real films, photographers or styles it should feel like
+5. One sentence that sums up the look
+
+Be specific. I will use this to keep every generated frame consistent.</pre></div>
+      <div class="note">Save the final script and the style description. Every later lesson uses them.</div>
+      <div class="done-row"><label><input type="checkbox" class="done"> Mark lesson done</label></div>
+    </div></details>
+
+    <details class="lesson" id="l05"><summary><span class="ln">05</span><span class="lt"><b>Shot language</b><span>Lenses, camera moves, light and one style anchor</span></span><span class="badge">To do</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="goal"><b>Goal:</b> write each shot like a director's note to a camera operator, not "make it look good."</div>
+      <h3>The five parts of a shot (in this order)</h3>
+      <ol>
+        <li><b>Subject and action</b> — who's in frame and what they do.</li>
+        <li><b>Camera spec</b> — lens, angle, framing, how blurry the background is.</li>
+        <li><b>Camera motion</b> — how the camera moves, and for how long.</li>
+        <li><b>Light and atmosphere</b> — time of day, quality of light, what's in the air.</li>
+        <li><b>Style anchor</b> — one reference that fixes the overall look.</li>
+      </ol>
+      <p>Beginners describe the subject and stop. Camera motion and light are what make a clip look filmed rather than generated.</p>
+      <h3>Lenses</h3>
+      <table>
+        <tr><th>Lens</th><th>Effect</th><th>Use for</th></tr>
+        <tr><td>24mm wide</td><td>Lots in frame, exaggerated depth</td><td>Establishing shots, landscapes, dramatic low angles</td></tr>
+        <tr><td>35mm</td><td>Natural, slightly wide, documentary</td><td>Walk-and-talks, handheld street scenes</td></tr>
+        <tr><td>35mm anamorphic</td><td>Widescreen, horizontal flares</td><td>Anything that should feel like a feature film</td></tr>
+        <tr><td>50mm</td><td>Close to the human eye</td><td>Character close-ups, dialogue</td></tr>
+        <tr><td>80mm telephoto</td><td>Flattened depth, isolated subject</td><td>Sport, action, a lonely figure</td></tr>
+        <tr><td>90–100mm macro</td><td>Extreme detail</td><td>Objects, textures, product shots</td></tr>
+      </table>
+      <p>Add "shallow depth of field" or "f/1.8" to blur the background. Add "deep focus" to keep it sharp.</p>
+      <h3>Camera moves (name the move and its length)</h3>
+      <ul>
+        <li>Tracking from behind — follows the subject, builds momentum.</li>
+        <li>Slow dolly forward over 5 seconds — pulls the viewer in.</li>
+        <li>Drone push forward — opens up a landscape.</li>
+        <li>Top-down push-in — hands and objects.</li>
+        <li>Focus pull from background to subject — shifts attention.</li>
+        <li>Slight handheld — feels human and real.</li>
+        <li>Crane up — reveals scale at the end.</li>
+        <li>Static with small facial movements — for faces. Stillness is a choice.</li>
+      </ul>
+      <p>Always give a lens and a move. Add an angle (low, top-down, over-the-shoulder, side) only when it matters to the story.</p>
+      <h3>Light</h3>
+      <ul>
+        <li><b>Always name the time of day.</b> Without it you get flat midday light, the least cinematic option.</li>
+        <li>Warm and nostalgic: golden hour, amber, soft tungsten.</li>
+        <li>Tense: low-key light, hard side light, deep shadows, high contrast.</li>
+        <li>Clean and commercial: soft diffused studio light, no harsh shadows.</li>
+        <li>Intimate: soft window light.</li>
+        <li>Cold: cool blue tones, teal shadows.</li>
+        <li>Give the light something to travel through: mist, rain, steam, dust in a beam, lens flare, film grain.</li>
+        <li>In a cool scene, one warm accent (a single street lamp) keeps it from looking dead.</li>
+      </ul>
+      <div class="note"><b>One style anchor, not three.</b> "Cinematic, anime, photorealistic" asks for three films at once, and the model picks one at random.</div>
+      <h3>Example shot, all five parts</h3>
+      <div class="prompt"><div class="ph">Example <button class="copy" type="button">Copy</button></div><pre>A tired delivery rider in a yellow rain jacket pushes his bike up a steep wet street at night. Tracking shot from behind, 35mm lens, eye-level, slight handheld. Low-key light, cool blue tones, one warm shop sign glowing on the right, light rain catching the light. Slow dolly forward over 5 seconds. Cinematic, 24fps, film grain.</pre></div>
+      <div class="done-row"><label><input type="checkbox" class="done"> Mark lesson done</label></div>
+    </div></details>
+
+    <details class="lesson" id="p1"><summary><span class="ln">P1</span><span class="lt"><b>Script project</b><span>Hand in your plan</span></span><span class="badge">To do</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="goal"><b>Goal:</b> package Module 1's work as one document.</div>
+      <p>On Jobescape this is a PDF upload (one file, up to 10 MB) reviewed by a mentor. Following along on your own, make a PDF with:</p>
+      <ul class="check">
+        <li><label><input type="checkbox" data-k="p1-1"><span>Final script (hook, beats, closing shot)</span></label></li>
+        <li><label><input type="checkbox" data-k="p1-2"><span>Visual style description</span></label></li>
+        <li><label><input type="checkbox" data-k="p1-3"><span>Prompt Bank — one five-element prompt per scene</span></label></li>
+      </ul>
+      <div class="done-row"><label><input type="checkbox" class="done"> Mark project done</label></div>
+    </div></details>
+  </section>
+
+  <!-- ============ MODULE 2 ============ -->
+  <section class="module" id="m2" data-title="Module 2" data-sub="Production in the studio">
+    <div class="mod-head"><div class="mod-num">2</div><div>
+      <h2>Production in the studio</h2>
+      <p>Build a consistent character, make clean key pictures and spend credits wisely.</p>
+      <div class="cert">Level 2 · Silver — "AI Cinematographer"</div>
+    </div></div>
+
+    <details class="lesson" id="l06"><summary><span class="ln">06</span><span class="lt"><b>Production</b><span>The studio, the models, and picture-first</span></span><span class="badge">To do</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="goal"><b>Goal:</b> know your way around the studio and learn the picture-first habit.</div>
+      <h3>What production is</h3>
+      <p>Planning is done. Now you make characters, places, key pictures for each scene, and then video from those pictures.</p>
+      <h3>The studio (the course uses 7ART)</h3>
+      <p>7ART resells many companies' models (Veo, Kling, Seedance and more) under one subscription and one credit balance. Its main areas are:</p>
+      <ul>
+        <li><b>Apps:</b> one-tap presets.</li>
+        <li><b>Super Agent:</b> describe a result, approve a costed plan, and it runs it.</li>
+        <li><b>Image:</b> stills.</li>
+        <li><b>Video:</b> clips. This is where most of the course happens.</li>
+        <li><b>Music.</b></li>
+        <li><b>Community:</b> other people's work, reopenable with its original prompt.</li>
+        <li><b>Also:</b> Artist (reusable characters), Motion, Voice, Lipsync, Sound Design and more.</li>
+      </ul>
+      <h3>Parts of the video screen</h3>
+      <ul>
+        <li><b>Start and end frame:</b> the clip must begin or end on these exact pictures.</li>
+        <li><b>Prompt box.</b></li>
+        <li><b>Elements:</b> saved characters or looks, called in a prompt with <code>@name</code>.</li>
+        <li><b>Model picker.</b></li>
+        <li><b>Reference uploads:</b> images, video or audio.</li>
+        <li><b>Settings:</b> length, shape and resolution.</li>
+        <li><b>Generate button:</b> shows the cost before you spend. Check it every time.</li>
+        <li><b>History.</b></li>
+      </ul>
+      <h3>Picture models (per the course)</h3>
+      <table>
+        <tr><th>Model</th><th>Best for</th></tr>
+        <tr><td>Nano Banana Pro</td><td>Readable text in images. Also the course's choice for characters: it holds a face steady.</td></tr>
+        <tr><td>Seedream 5 Lite / 4.5</td><td>Realistic materials: fabric, glass, water, reflections</td></tr>
+        <tr><td>GPT Image 2</td><td>Illustration and concept art</td></tr>
+        <tr><td>FLUX.2 Pro</td><td>Fast, reliable all-rounder</td></tr>
+      </table>
+      <h3>Video models (per the course)</h3>
+      <table>
+        <tr><th>Model</th><th>Best for</th></tr>
+        <tr><td>Veo 3.1</td><td>Photorealism</td></tr>
+        <tr><td>Seedance 2.5</td><td>Talking characters and long scenes (up to 30 s, sound included)</td></tr>
+        <tr><td>Wan 2.6 / 2.7, Grok Imagine</td><td>Cheap drafts to test an idea</td></tr>
+        <tr><td>Kling 3.0</td><td>Everyday social clips, reusable characters, 4K</td></tr>
+        <tr><td>Gemini Omni / MiniMax H3 Max</td><td>Long, story-driven clips with sound and many references</td></tr>
+      </table>
+      <h3>Picture first, then video</h3>
+      <p>Typing a scene straight into a video model makes the AI invent everything at once. Every retry costs video credits. In the course's example, it produced the wrong character entirely.</p>
+      <p>The professional way takes two steps:</p>
+      <ol>
+        <li><b>Make a still picture.</b> It's cheap and fast. Check the face, light and framing. Fix the prompt and remake until it's right.</li>
+        <li><b>Animate that picture.</b> Upload it to video. The prompt now only describes motion and camera, e.g. <code>@image1 walks forward cautiously, slow push-in, quiet forest sounds.</code></li>
+      </ol>
+      <div class="done-row"><label><input type="checkbox" class="done"> Mark lesson done</label></div>
+    </div></details>
+
+    <details class="lesson" id="l07"><summary><span class="ln">07</span><span class="lt"><b>Save credits, get results</b><span>Three rules and what things cost</span></span><span class="badge">To do</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="goal"><b>Goal:</b> get the same output for roughly a third of the credits.</div>
+      <h3>Three rules</h3>
+      <ol>
+        <li><b>Two variations at most.</b> Pick the better one, then improve the prompt. Don't fire off five and hope.</li>
+        <li><b>Test video at 6 seconds.</b> That's enough to judge a shot, at about half the cost of 10 seconds. Make the full length only once it works.</li>
+        <li><b>Keep everything.</b> Rejected takes become filler shots, transitions and backgrounds later.</li>
+      </ol>
+      <h3>What things cost on 7ART (per the course, August 2026)</h3>
+      <table>
+        <tr><th>Item</th><th>Credits</th></tr>
+        <tr><td>Image, 1K</td><td>2</td></tr>
+        <tr><td>Image, 4K</td><td>8</td></tr>
+        <tr><td>Video, 5 s at 1080p</td><td>45</td></tr>
+        <tr><td>Video, 10 s at 1080p</td><td>90</td></tr>
+        <tr><td>Music, full track</td><td>12</td></tr>
+        <tr><td>Lipsync, 10 s at 720p</td><td>80</td></tr>
+        <tr><td>Text-to-speech, 1,000 characters</td><td>10</td></tr>
+        <tr><td>Motion Control, 5 s</td><td>100</td></tr>
+      </table>
+      <p>Video is where the money goes. One 10-second 1080p clip costs as much as 45 small images. That's the reason for picture-first.</p>
+      <div class="note">The course quotes other numbers elsewhere that don't match this table: a 2K Nano Banana image at 24 credits, and a 7-second 720p Kling clip at 98. Trust the number on the Generate button.</div>
+      <h3>7ART plans (per the course — check current prices)</h3>
+      <ul>
+        <li><b>4 weeks:</b> $15.19 for the first period, then $38.95. 4,000 credits. Best for the course.</li>
+        <li><b>12 weeks:</b> $25.99, then $66.65. 6,000 credits.</li>
+        <li><b>Year:</b> $58.49, then $149.99. 10,000 credits.</li>
+      </ul>
+      <p>Plan credits expire at the end of each period. Top-up credits roll over. Downloading finished files needs a paid plan.</p>
+      <h3>First-session checklist</h3>
+      <ul class="check">
+        <li><label><input type="checkbox" data-k="l07-1"><span>Make one image on a cheap model</span></label></li>
+        <li><label><input type="checkbox" data-k="l07-2"><span>Remake it with a reference picture attached and compare</span></label></li>
+        <li><label><input type="checkbox" data-k="l07-3"><span>Animate that image into a short clip (the biggest spend)</span></label></li>
+        <li><label><input type="checkbox" data-k="l07-4"><span>Spend a few credits trying music and voice</span></label></li>
+        <li><label><input type="checkbox" data-k="l07-5"><span>Find your library and your remaining balance</span></label></li>
+      </ul>
+      <div class="done-row"><label><input type="checkbox" class="done"> Mark lesson done</label></div>
+    </div></details>
+
+    <details class="lesson" id="l08"><summary><span class="ln">08</span><span class="lt"><b>Create your hero</b><span>Character prompt, portrait and reference sheet</span></span><span class="badge">To do</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="goal"><b>Goal:</b> one character who looks the same in every shot of the film.</div>
+      <h3>1 · Write the character with Claude</h3>
+      <p>The image model forgets everything between runs. Your written description is the only thing that ties the runs to one person, so make it exact.</p>
+      <div class="prompt"><div class="ph">Character portrait prompt <button class="copy" type="button">Copy</button></div><pre>I'm making a character for a cinematic AI short film. Write one detailed portrait prompt for an AI image model (Nano Banana Pro).
+
+My character: [1–2 sentences — age, gender, overall vibe]
+
+Cover all of these in one flowing paragraph, with no bullet points or headings:
+- Face: age, skin detail (freckles, pores, texture), expression, eye colour
+- Hair: colour, length, texture, style
+- Clothing: the full outfit — fabrics, colours, wear and tear, accessories
+- Camera: 50mm lens, shallow depth of field, facing the camera
+- Style: photorealistic, highly detailed skin and hair
+- Background: plain studio backdrop, soft even light</pre></div>
+      <h3>2 · Make the portrait</h3>
+      <ul>
+        <li>Image studio, Nano Banana Pro. 2K, 16:9, 2 variations.</li>
+        <li>Check everything against the prompt: face, every piece of clothing, real-looking skin (not waxy) and even light.</li>
+        <li>Fix <b>one</b> thing at a time, or you won't know what helped.</li>
+      </ul>
+      <table>
+        <tr><th>Problem</th><th>Add to the prompt</th></tr>
+        <tr><td>Too dark</td><td>soft golden-hour light from the left</td></tr>
+        <tr><td>Blown out</td><td>overcast, diffused light, no harsh shadows</td></tr>
+        <tr><td>Wrong angle</td><td>low angle looking up / eye-level medium shot / wide establishing shot</td></tr>
+        <tr><td>Empty background</td><td>"dense misty pine forest with morning fog" instead of "forest"</td></tr>
+      </table>
+      <h3>3 · Build a reference sheet</h3>
+      <p>Don't write "same character, now from the side." The model treats that as a new person. Instead, attach your approved portrait as a reference and ask for every angle in one picture.</p>
+      <div class="prompt"><div class="ph">Reference sheet (attach your portrait first) <button class="copy" type="button">Copy</button></div><pre>Character reference sheet of the exact person in the reference image, on a plain white background.
+
+Top row: four equal head shots side by side — front, left profile, right profile, back of the head.
+Bottom row: three equal full-body shots — front, three-quarter view, back.
+
+Keep every detail identical in every panel: face shape, skin tone and marks, skin texture, hair colour and style, eye colour, and the exact same outfit. Flat, soft, even studio light in every panel, no shadows or colour cast, nothing in the background. Photorealistic, very sharp detail, turnaround / model sheet.</pre></div>
+      <p>Save the sheet as an <b>Element</b> (a saved character). From then on, call your hero with <code>@name</code> in pictures and video.</p>
+      <h3>Save to your project folder</h3>
+      <div class="prompt"><div class="ph">Folder layout <button class="copy" type="button">Copy</button></div><pre>[Project] / Day2 / Character
+  hero_portrait_base.jpg
+  hero_angles_sheet.jpg
+  character_prompt.txt</pre></div>
+      <div class="done-row"><label><input type="checkbox" class="done"> Mark lesson done</label></div>
+    </div></details>
+
+    <details class="lesson" id="l09"><summary><span class="ln">09</span><span class="lt"><b>Defeat the AI look</b><span>Texture, imperfection and a pre-animation check</span></span><span class="badge">To do</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="goal"><b>Goal:</b> pictures that look photographed, not like wax figures.</div>
+      <h3>Why AI looks fake</h3>
+      <p>AI makes everything too perfect. Real photos have pores, small asymmetries and texture. Viewers sense the difference even when they can't name it.</p>
+      <h3>Five habits (mostly before you generate)</h3>
+      <ol>
+        <li><b>Ask for texture, not beauty.</b> "Light freckles, visible pores, a slightly uneven smile" makes a person. "Beautiful woman" makes wax.</li>
+        <li><b>Break the symmetry.</b> A strand of hair on one side, one eyebrow higher, weight on one leg.</li>
+        <li><b>Light like a photographer.</b> Name a direction and quality: "soft window light from camera left, deep shadow on the far cheek." Flat front light reads as AI.</li>
+        <li><b>Pick the model for the actual failure.</b> Faces: Nano Banana. Materials (fabric, glass, water, skin under light): Seedream.</li>
+        <li><b>Check at full size.</b> Hands, eyes and background artifacts hide in thumbnails.</li>
+      </ol>
+      <h3>Fixing tools in 7ART (per the course)</h3>
+      <table>
+        <tr><th>Tool</th><th>Does</th></tr>
+        <tr><td>IC-Light v2</td><td>Re-lights an existing picture without changing it otherwise</td></tr>
+        <tr><td>Clarity Upscaler</td><td>Rebuilds detail at 2× before you use a frame as a reference</td></tr>
+        <tr><td>Elements</td><td>Locks a face, outfit or look across runs</td></tr>
+        <tr><td>AI Photoshoot</td><td>New shots of a saved character without re-prompting</td></tr>
+        <tr><td>Hairstyle Changer / Re-Dress</td><td>Changes hair or clothes, keeps the face</td></tr>
+      </table>
+      <h3>References and a saved "look"</h3>
+      <ul>
+        <li>Attaching a reference picture is free and steers composition, colour and mood. Limits per the course: Nano Banana 14, GPT Image 2 16, MiniMax H3 Max 9 images plus 3 video/audio.</li>
+        <li>Make the first key frame from text. Use it as the reference for every other shot in that scene.</li>
+        <li>Save a frame you love as a <b>style Element</b> and apply it to every shot. That's what makes separate pictures feel like one film.</li>
+      </ul>
+      <h3>Ready-to-animate checklist (every frame)</h3>
+      <ul class="check">
+        <li><label><input type="checkbox" data-k="l09-1"><span>Face matches the character reference, no drift</span></label></li>
+        <li><label><input type="checkbox" data-k="l09-2"><span>Light checked (re-lit if it looked flat)</span></label></li>
+        <li><label><input type="checkbox" data-k="l09-3"><span>All five elements visible: subject, action, place, light, camera</span></label></li>
+        <li><label><input type="checkbox" data-k="l09-4"><span>Light matches the film's style description</span></label></li>
+        <li><label><input type="checkbox" data-k="l09-5"><span>No artifacts on hands, eyes or background up close</span></label></li>
+        <li><label><input type="checkbox" data-k="l09-6"><span>Saved at 2K in the project folder</span></label></li>
+      </ul>
+      <div class="note">Fix it in the picture, not later. A remade still costs a few credits. A bad frame that reaches video costs you the clip too.</div>
+      <div class="done-row"><label><input type="checkbox" class="done"> Mark lesson done</label></div>
+    </div></details>
+
+    <details class="lesson" id="l10"><summary><span class="ln">10</span><span class="lt"><b>A fast-produced short drama</b><span>The five-minute, let-the-studio-do-it version</span></span><span class="badge">To do</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="goal"><b>Goal:</b> see the fully automatic route once, before building a film by hand.</div>
+      <p>7ART's <b>Short Dramas</b> studio takes a story and returns a finished episode: script, cast, locations and rendered scenes. You approve each stage. It's fast but generic, so write the script yourself.</p>
+      <h3>1 · Write a 2-minute episode with Claude</h3>
+      <div class="prompt"><div class="ph">Two-minute episode <button class="copy" type="button">Copy</button></div><pre>Write the full script for ONE two-minute vertical short-drama episode that I will make with AI video.
+
+Premise: [YOUR PREMISE]
+Tone and visual reference: [a film or genre it should feel like]
+
+Look: [palette], [setting details], [camera behaviour — e.g. mostly slow and patient, one sudden burst at the turn], [mood].
+
+Characters (exactly two who speak — name them). For each, write one continuous physical description I can paste straight into an image model as a character reference: [brief notes for each].
+
+Rules:
+- 2 minutes, vertical 9:16, one location only
+- A hook in the first 5 seconds, one turn in the middle, a cliffhanger at the end
+- 8 to 10 scenes; for each give scene number, length in seconds, what the camera sees, and the dialogue
+- Only what the camera can see — no inner thoughts or backstory
+- Every line of dialogue under 12 words
+- End on a question that isn't answered</pre></div>
+      <p>The course example uses two monks in a mountain monastery. Keep it this tight: every extra character or location is one more thing to keep consistent.</p>
+      <h3>2 · Run it in Short Dramas (9 steps)</h3>
+      <ol>
+        <li><b>Story:</b> paste or upload the script (up to 24,000 characters).</li>
+        <li><b>Look:</b> pick a preset by its light and texture, not its genre name.</li>
+        <li><b>Cast:</b> the studio pulls characters from your script. Render each one (11 credits) to check the face.</li>
+        <li><b>Locations:</b> same thing, 11 credits each.</li>
+        <li><b>Props:</b> same, 11 credits each. Worth it for the object the story turns on.</li>
+        <li><b>Format:</b> one video or episodes, length, aspect ratio.</li>
+        <li><b>Script:</b> use the paid "enhance" pass. It ties every line to your cast, places and props.</li>
+        <li><b>Shoot:</b> MiniMax H3 Max with audio on.</li>
+        <li><b>Poster:</b> optional key art for the thumbnail.</li>
+      </ol>
+      <h3>Tasks</h3>
+      <ul class="check">
+        <li><label><input type="checkbox" data-k="l10-1"><span>Write the episode with Claude</span></label></li>
+        <li><label><input type="checkbox" data-k="l10-2"><span>Run it end to end. Read the estimate before rendering.</span></label></li>
+        <li><label><input type="checkbox" data-k="l10-3"><span>Re-run the logline stage once and note what changed</span></label></li>
+        <li><label><input type="checkbox" data-k="l10-4"><span>Write down one thing you'd shoot differently. It's the first line of your next shot plan.</span></label></li>
+      </ul>
+      <div class="done-row"><label><input type="checkbox" class="done"> Mark lesson done</label></div>
+    </div></details>
+  </section>
+
+  <!-- ============ MODULE 3 ============ -->
+  <section class="module" id="m3" data-title="Module 3" data-sub="Assemble your film">
+    <div class="mod-head"><div class="mod-num">3</div><div>
+      <h2>Assemble your film</h2>
+      <p>Turn stills into directed clips, chain them, and make your character talk.</p>
+    </div></div>
+
+    <details class="lesson" id="l11"><summary><span class="ln">11</span><span class="lt"><b>Your digital film set</b><span>Load references before you shoot</span></span><span class="badge">To do</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="goal"><b>Goal:</b> set up the video screen with your character and location before any generation.</div>
+      <h3>The model sets the rules</h3>
+      <table>
+        <tr><th>You need</th><th>Reach for</th></tr>
+        <tr><td>A cheap draft</td><td>Grok Imagine, Wan 2.7 (about 1.6–16 credits/second)</td></tr>
+        <tr><td>A long scene with sound</td><td>MiniMax H3 Max or Gemini Omni Flash (4–30 s, many references)</td></tr>
+        <tr><td>Your recurring character, multi-shot, 4K</td><td>Kling 3.0 (Elements with @name)</td></tr>
+        <tr><td>Photorealism above all</td><td>Veo 3.1</td></tr>
+      </table>
+      <h3>The reference panel</h3>
+      <ul>
+        <li><b>Images (up to 9):</b> character, character sheet, location, props, mood.</li>
+        <li><b>Videos (up to 3):</b> motion you want copied.</li>
+        <li><b>Audio:</b> a voice track for lipsync.</li>
+      </ul>
+      <p>2–3 images is enough for most scenes: character, location and maybe one mood picture. Loading the <b>character sheet</b> is the single best thing you can do for a face that stays the same while moving.</p>
+      <h3>Settings</h3>
+      <ul>
+        <li>Start at 5–6 seconds.</li>
+        <li>16:9 for film, 9:16 for TikTok, Reels and Shorts.</li>
+        <li>720p while testing.</li>
+        <li>Read the cost on Generate every time.</li>
+      </ul>
+      <h3>Think in shots</h3>
+      <p>One generation tops out at 30 seconds, so a 60-second film is 4–10 clips joined together. Real films work the same way.</p>
+      <h3>Task</h3>
+      <ul class="check">
+        <li><label><input type="checkbox" data-k="l11-1"><span>Character (or sheet) in image slot 1, location in slot 2</span></label></li>
+        <li><label><input type="checkbox" data-k="l11-2"><span>6 seconds, 16:9</span></label></li>
+      </ul>
+      <div class="done-row"><label><input type="checkbox" class="done"> Mark lesson done</label></div>
+    </div></details>
+
+    <details class="lesson" id="l12"><summary><span class="ln">12</span><span class="lt"><b>Your first video</b><span>Timeline prompts and @tags</span></span><span class="badge">To do</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="goal"><b>Goal:</b> direct a clip second by second instead of describing one moment.</div>
+      <h3>Timeline prompt = set-up + timed beats</h3>
+      <div class="prompt"><div class="ph">6-second template <button class="copy" type="button">Copy</button></div><pre>[Set-up: @image1 as the character, the place from @image2, light and mood]
+
+0–2 s: [what happens] — [what the camera does]
+2–4 s: [what happens next] — [camera]
+4–6 s: [how it ends, character in a clear still pose] — [camera holds]
+
+Ambient sound: [e.g. quiet forest, wind, no dialogue]</pre></div>
+      <p>For 15 seconds, use five 3-second beats: opening, development, key moment, build or resolution, final pose.</p>
+      <h3>Tags</h3>
+      <table>
+        <tr><th>Tag</th><th>Means</th></tr>
+        <tr><td><code>@image1</code></td><td>First uploaded image (usually your character)</td></tr>
+        <tr><td><code>@image2</code></td><td>Second image (usually the location)</td></tr>
+        <tr><td><code>@image3</code></td><td>A second character or a prop</td></tr>
+        <tr><td><code>@video1</code></td><td>Motion reference</td></tr>
+        <tr><td><code>@audio1</code></td><td>Voice for lipsync</td></tr>
+      </table>
+      <div class="note">Always include the tag, even if you also describe the character in words. Text alone doesn't keep a face consistent.</div>
+      <h3>Let Claude write them</h3>
+      <div class="prompt"><div class="ph">Shot plan → timeline prompts <button class="copy" type="button">Copy</button></div><pre>Turn my shot plan into timeline prompts for an AI video model. One generation can be at most 30 seconds — split anything longer.
+
+For each shot:
+[Set-up: @image1 is the character, the location is from @image2, plus light and mood]
+0–2 s: [visible action, camera move]
+2–4 s: [visible action, camera move]
+(continue in 2–3 second steps to the clip length)
+
+Rules:
+- Character is always @image1, location always @image2
+- Only what the camera can see — no thoughts or feelings without a visible sign
+- A camera instruction in every time step (holds, pans, tracks, pushes in)
+- If someone speaks, note it but don't write the words (audio is separate)
+- End every clip on a clear, still pose — that last frame starts the next clip
+- Keep it tight: about 300–500 characters for 6 seconds
+
+My shot plan:
+[PASTE SHOT PLAN]</pre></div>
+      <div class="prompt"><div class="ph">If it's too long <button class="copy" type="button">Copy</button></div><pre>This prompt is too long. Cut it by about a third. Keep every time step and every @ tag. Remove decorative adjectives first, then merge steps.</pre></div>
+      <h3>Common mistakes</h3>
+      <table>
+        <tr><th>Mistake</th><th>Fix</th></tr>
+        <tr><td>No @image tag</td><td>Always tag the character</td></tr>
+        <tr><td>Several actions in one step</td><td>One action per 2-second step</td></tr>
+        <tr><td>"She feels sad"</td><td>Show it: "lowers her eyes, shoulders drop"</td></tr>
+        <tr><td>No camera direction</td><td>Say what the camera does in every step</td></tr>
+        <tr><td>Too many adjectives</td><td>The model starts ignoring later instructions — trim</td></tr>
+        <tr><td>A whole scene in one clip</td><td>Split into 2–3 clips and chain them (next lesson)</td></tr>
+      </table>
+      <h3>Judge every clip in three watches</h3>
+      <ol>
+        <li><b>Feel:</b> cinematic, right mood?</li>
+        <li><b>Character:</b> same face, natural body movement?</li>
+        <li><b>Timing:</b> did things happen when you asked, and did the camera behave?</li>
+      </ol>
+      <p>Then fix the one step that failed and generate again. Change one thing at a time.</p>
+      <h3>Task</h3>
+      <ul class="check">
+        <li><label><input type="checkbox" data-k="l12-1"><span>Claude turns your first 2 shots into timeline prompts</span></label></li>
+        <li><label><input type="checkbox" data-k="l12-2"><span>Generate a 6-second clip and watch it three times</span></label></li>
+        <li><label><input type="checkbox" data-k="l12-3"><span>Note what worked, adjust once, regenerate, keep both</span></label></li>
+      </ul>
+      <div class="done-row"><label><input type="checkbox" class="done"> Mark lesson done</label></div>
+    </div></details>
+
+    <details class="lesson" id="l13"><summary><span class="ln">13</span><span class="lt"><b>Advanced control</b><span>Start/end frames and seamless chaining</span></span><span class="badge">To do</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="goal"><b>Goal:</b> join clips so the viewer never sees where one ends and the next begins.</div>
+      <h3>Start and end frames</h3>
+      <ul>
+        <li><b>Start frame:</b> the clip opens on exactly this picture.</li>
+        <li><b>End frame:</b> the clip has to arrive at this picture. The model works out the path.</li>
+        <li><b>Both:</b> the most control. Good for walking across a room, a wide-to-close move, or calm turning to alarmed.</li>
+      </ul>
+      <p>These are different from reference images. References say what someone looks like. Start and end frames say exactly how the clip begins and ends.</p>
+      <h3>Seamless chaining: the most important production skill</h3>
+      <p>The last frame of clip A becomes the start frame of clip B.</p>
+      <ol>
+        <li>Make clip A.</li>
+        <li>Grab its last frame (pause at the end and screenshot it).</li>
+        <li>Put that frame in clip B's start-frame slot.</li>
+        <li>Write clip B's prompt starting from that exact pose.</li>
+        <li>Generate, then play A and B back to back.</li>
+      </ol>
+      <div class="prompt"><div class="ph">Clip B template <button class="copy" type="button">Copy</button></div><pre>@image1 continues from the pose in the start frame. Location from @image2.
+
+0–1 s: Character holds the exact pose from the start frame. No movement. Camera matches the start frame's angle.
+1–4 s: [next action]. [camera move].
+4–6 s: [action, ending on a still pose]. Camera holds.</pre></div>
+      <h3>Four habits for clean joins</h3>
+      <ul>
+        <li>End every clip on a still moment (seated, standing, looking), never mid-step.</li>
+        <li>Keep the camera still at the join. Start moving again after a beat.</li>
+        <li>Load the last frame as the start frame, and the whole of clip A as a video reference.</li>
+        <li>Write the one-second hold into the prompt. Don't assume the model will do it.</li>
+      </ul>
+      <div class="note">The start frame gets you about 90% of the way. Making 2–3 takes and picking the smoothest closes the rest. That's normal practice, not a workaround.</div>
+      <h3>Task</h3>
+      <ul class="check">
+        <li><label><input type="checkbox" data-k="l13-1"><span>Clip A (6 s) → grab last frame → clip B with a 1-second hold</span></label></li>
+        <li><label><input type="checkbox" data-k="l13-2"><span>Play A then B. If the join shows, make 2 more takes of B.</span></label></li>
+        <li><label><input type="checkbox" data-k="l13-3"><span>Optional: film yourself doing a gesture and copy it with Motion Control</span></label></li>
+      </ul>
+      <div class="done-row"><label><input type="checkbox" class="done"> Mark lesson done</label></div>
+    </div></details>
+
+    <details class="lesson" id="l14"><summary><span class="ln">14</span><span class="lt"><b>Make your character speak</b><span>Lipsync, voices, emotion and sound direction</span></span><span class="badge">To do</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="goal"><b>Goal:</b> a talking clip where lips, voice and expression match.</div>
+      <h3>Who does what</h3>
+      <p>The <b>audio file carries the words</b>. The <b>prompt carries the performance</b>: posture, gestures, camera. Don't type the dialogue into the prompt. Refer to <code>@audio1</code> instead. The model matches mouth shapes to sounds and reads the emotion in the voice.</p>
+      <h3>Get a voice track</h3>
+      <ul>
+        <li><b>Record yourself:</b> quiet room, natural pace, a one-second pause at each end, .mp3 or .wav.</li>
+        <li><b>Studio text-to-speech</b> (7ART uses ElevenLabs): about 10 credits per 1,000 characters, so it's very cheap.</li>
+        <li><b>The model's own voice:</b> some models (e.g. Seedance) speak dialogue you give as text.</li>
+      </ul>
+      <h3>Dialogue clip</h3>
+      <div class="prompt"><div class="ph">Talking-clip template <button class="copy" type="button">Copy</button></div><pre>@image1 sits at a table in the place from @image2, speaking to camera, synced to @audio1.
+
+0–3 s: Neutral look into the lens, then starts speaking. Slight head tilt. Medium close-up, camera holds.
+3–6 s: Speaks with growing intensity, leans in a little, one hand gesture on the table. Slow push-in.</pre></div>
+      <p>Check the result for:</p>
+      <ul>
+        <li><b>Lips:</b> especially on m, b and p sounds.</li>
+        <li><b>Emotion:</b> a tense voice should get a tense face.</li>
+        <li><b>Life:</b> small head moves and blinks, not frozen from the neck down.</li>
+      </ul>
+      <h3>Automatic emotion, and when to override</h3>
+      <p>The model reads tone from the voice:</p>
+      <ul>
+        <li><b>Tension:</b> furrowed brow, tight jaw.</li>
+        <li><b>Excitement:</b> raised eyebrows, more movement.</li>
+        <li><b>Sadness:</b> lowered gaze, slower movement.</li>
+        <li><b>Anger:</b> narrowed eyes, sharp movements.</li>
+      </ul>
+      <p>For a specific beat ("calm, then shocked at 4 s") or a wrong guess, write it in that time step, e.g. "serious, no smile, tight jaw." What you write beats what the model guesses.</p>
+      <h3>Clips without dialogue still need sound direction</h3>
+      <div class="prompt"><div class="ph">Ambient sound lines <button class="copy" type="button">Copy</button></div><pre>Ambient sound: distant city traffic, soft wind, no dialogue.
+Ambient sound: quiet forest, birdsong, footsteps on dry leaves.
+Ambient sound: busy café, cups clinking, low murmur, no clear voices.</pre></div>
+      <p>Without one, models (Veo in particular) may invent random noise or speech.</p>
+      <h3>Current limits</h3>
+      <ul>
+        <li>Lip accuracy drops after 10–12 seconds. Split monologues into 6–8 second pieces.</li>
+        <li>Radio, echo or phone effects go on in the edit. Generate clean dialogue.</li>
+        <li>Never put music in the voice file. Music goes on in the edit.</li>
+        <li>One speaker per clip. For a conversation, shoot each person's lines separately and cut between them.</li>
+        <li>Singing is less reliable. Test early.</li>
+      </ul>
+      <div class="done-row"><label><input type="checkbox" class="done"> Mark lesson done</label></div>
+    </div></details>
+  </section>
+
+  <!-- ============ MODULE 4 ============ -->
+  <section class="module" id="m4" data-title="Module 4" data-sub="Post-production">
+    <div class="mod-head"><div class="mod-num">4</div><div>
+      <h2>Post-production</h2>
+      <p>Edit, mix and export a finished film in CapCut.</p>
+      <div class="cert">Level 3 · Gold — "AI Editor"</div>
+    </div></div>
+
+    <details class="lesson" id="l15"><summary><span class="ln">15</span><span class="lt"><b>Video editing</b><span>CapCut basics, splicing and five editing rules</span></span><span class="badge">To do</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="goal"><b>Goal:</b> get set up in CapCut and learn how editors think.</div>
+      <h3>Set up</h3>
+      <ul>
+        <li>Install the free CapCut <b>desktop</b> app from capcut.com (the web version works too). Start a New Project.</li>
+        <li><b>Three areas:</b> media panel (top left), preview (top right), timeline (bottom).</li>
+        <li><b>Shortcuts:</b> Space = play/pause. Cmd+B = split at the playhead. Cmd+Z = undo. Cmd+scroll = zoom the timeline.</li>
+        <li>Import your final clips, music, ambient sound and voice files.</li>
+      </ul>
+      <h3>Splicing two chained clips</h3>
+      <p>Put clip B right after clip A with no gap and play across the join. If you can see a jump, try these in order:</p>
+      <ol>
+        <li><b>Trim to the best match:</b> go frame by frame and cut both clips where the pose matches best.</li>
+        <li><b>Tiny dissolve:</b> 3–5 frames (about 0.1–0.2 s). Too short to notice, but it hides small jumps.</li>
+        <li><b>Cutaway:</b> slip in 1–2 seconds of hands, a detail or a reaction to cover the join.</li>
+      </ol>
+      <h3>Five editing rules</h3>
+      <ul>
+        <li><b>Every cut is a decision.</b> If you can't say why you're cutting, don't.</li>
+        <li><b>Clip length sets the mood:</b> 4–6 s gives space, 2–4 s carries dialogue and story, 1–2 s creates urgency. Move in a wave: slow → medium → fast → medium → slow.</li>
+        <li><b>Start late, end early.</b> Drop the still frames at each end.</li>
+        <li><b>Sound leads the cut:</b> a J-cut starts the next scene's sound 0.5–1 s before its picture. An L-cut lets this scene's sound run over the next picture.</li>
+        <li><b>180° rule:</b> keep the camera on one side of the action. If someone faces right, they keep facing right.</li>
+      </ul>
+      <div class="done-row"><label><input type="checkbox" class="done"> Mark lesson done</label></div>
+    </div></details>
+
+    <details class="lesson" id="l16"><summary><span class="ln">16</span><span class="lt"><b>Full edit</b><span>Trim, transitions, three audio layers, export</span></span><span class="badge">To do</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="goal"><b>Goal:</b> a tight cut with clean sound, exported at full quality.</div>
+      <h3>Trim every clip</h3>
+      <table>
+        <tr><th>Clip type</th><th>Keep in the edit</th></tr>
+        <tr><td>Establishing wide</td><td>3–5 s</td></tr>
+        <tr><td>Character intro</td><td>2–4 s</td></tr>
+        <tr><td>Dialogue</td><td>The speech + 0.5 s</td></tr>
+        <tr><td>Reaction close-up</td><td>1.5–2.5 s</td></tr>
+        <tr><td>Filler / transition</td><td>2–3 s</td></tr>
+        <tr><td>Final shot</td><td>3–5 s</td></tr>
+      </table>
+      <p>Use split (Cmd+B) for precise cuts. CapCut never touches your original files, so cut boldly.</p>
+      <h3>Only three transitions</h3>
+      <ul>
+        <li><b>Hard cut:</b> about 90% of cuts.</li>
+        <li><b>Cross-dissolve</b> (0.5–1 s): only when time passes or the place changes. Never between two shots of the same scene.</li>
+        <li><b>Fade to black</b> (1–2 s): the end, or after a heavy moment.</li>
+      </ul>
+      <p>Transitions on every cut make a film look like a slideshow.</p>
+      <h3>Three sound layers</h3>
+      <ol>
+        <li><b>Dialogue:</b> loudest. Use Noise reduction if it's rough.</li>
+        <li><b>Ambient sound:</b> about 20–30% of dialogue volume.</li>
+        <li><b>Music:</b> about 10–20%. Fade in 1 s before the start and out over the last 2–3 s.</li>
+      </ol>
+      <p>If you can't hear the words over the music, the music is too loud. Try one J-cut: unlink the audio and drag it 0.5–1 s earlier.</p>
+      <h3>Export</h3>
+      <ul>
+        <li>The highest resolution your clips support:
+          <ul>
+            <li>YouTube: 1080p or 4K.</li>
+            <li>Vertical: 1080×1920.</li>
+            <li>Client or portfolio: 4K.</li>
+          </ul>
+        </li>
+        <li>MP4.</li>
+        <li><b>Frame rate:</b> 24 fps for story and drama, 30 fps for ads and tutorials.</li>
+        <li>Highest quality setting, and leave the audio settings alone.</li>
+        <li>Watch the exported file once before uploading anywhere.</li>
+      </ul>
+      <p>CapCut also has templates, auto-captions, text-to-speech, background removal and colour correction.</p>
+      <div class="done-row"><label><input type="checkbox" class="done"> Mark lesson done</label></div>
+    </div></details>
+
+    <details class="lesson" id="l17"><summary><span class="ln">17</span><span class="lt"><b>Post-production tips</b><span>Habits that save the edit</span></span><span class="badge">To do</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="goal"><b>Goal:</b> rescue near-misses cheaply and know when to reshoot.</div>
+      <h3>Habits</h3>
+      <ul>
+        <li><b>Trim about half a second off both ends of every clip.</b> AI drifts most at the edges.</li>
+        <li><b>Cut on movement</b> (a blink, a head turn), never on a held still frame.</li>
+        <li><b>If a clip feels cheap, check the sound first:</b> room tone, one layer of sound effects on the main action, music at 20–30% of dialogue.</li>
+        <li><b>Generate big, crop later:</b> a 4K clip can be cropped into a second, tighter 1080p angle for free.</li>
+        <li><b>Keep every take.</b></li>
+      </ul>
+      <h3>Salvage before you reshoot</h3>
+      <table>
+        <tr><th>Problem</th><th>Try first</th><th>Reshoot if</th></tr>
+        <tr><td>Drift at the end</td><td>Cut before it</td><td>It's in the middle of the action</td></tr>
+        <tr><td>Shot drags</td><td>Speed to 105–115%</td><td>The performance itself is slow</td></tr>
+        <tr><td>Framing too loose</td><td>Crop in (if above 1080p)</td><td>You need a different angle</td></tr>
+        <tr><td>Small artifact in a corner</td><td>Crop, or cover with a title or cutaway</td><td>It's on a face or hands</td></tr>
+        <tr><td>Colours don't match</td><td>Same style Element, then match in CapCut</td><td>One clip has a different look entirely</td></tr>
+        <tr><td>Face drifts briefly</td><td>Cut around those frames</td><td>It drifts for most of the shot</td></tr>
+      </table>
+      <h3>Two-pass review</h3>
+      <ol>
+        <li><b>Watch with the sound off:</b> pacing, continuity, framing.</li>
+        <li><b>Listen with your eyes closed:</b> gaps in sound, music fighting dialogue, accidental silence.</li>
+      </ol>
+      <p>Only problems that survive both passes are worth spending credits on.</p>
+      <h3>Staying current</h3>
+      <p>Models change every few weeks. When a new one appears:</p>
+      <ul>
+        <li>Read its write-up first (7ART blog, Model Insights section).</li>
+        <li>Check the models price page.</li>
+        <li>Then test it.</li>
+      </ul>
+      <div class="done-row"><label><input type="checkbox" class="done"> Mark lesson done</label></div>
+    </div></details>
+  </section>
+
+  <!-- ============ MODULE 5 ============ -->
+  <section class="module" id="m5" data-title="Module 5" data-sub="Publishing &amp; portfolio">
+    <div class="mod-head"><div class="mod-num">5</div><div>
+      <h2>Publishing &amp; portfolio</h2>
+      <p>Make a trailer, publish everything, earn from it, and grow it into a series.</p>
+      <div class="cert">Final level · Platinum — "AI Filmmaker"</div>
+    </div></div>
+
+    <details class="lesson" id="l18"><summary><span class="ln">18</span><span class="lt"><b>The cheat sheet</b><span>One-page reference, plus how trailers work</span></span><span class="badge">To do</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="goal"><b>Goal:</b> keep the whole pipeline on one page, then plan a 20-second trailer.</div>
+      <h3>Cheat sheet</h3>
+      <table>
+        <tr><th>Step</th><th>Tool</th></tr>
+        <tr><td>Script, shot plan, prompts, trailer script</td><td>Claude</td></tr>
+        <tr><td>Still pictures and characters</td><td>Nano Banana</td></tr>
+        <tr><td>Video clips (up to 30 s)</td><td>MiniMax H3 Max / Gemini Omni Flash</td></tr>
+        <tr><td>Edit, sound, export</td><td>CapCut</td></tr>
+      </table>
+      <ul>
+        <li><b>Pictures:</b> subject + action + place + light + camera.</li>
+        <li><b>Video:</b> @tags + set-up + 2-second steps + an ambient sound line.</li>
+        <li><b>Credits:</b>
+          <ul>
+            <li>Two variations at most.</li>
+            <li>6-second test clips.</li>
+            <li>New angles come from your saved character, not new prompts.</li>
+            <li>Draft on cheap models first.</li>
+          </ul>
+        </li>
+        <li><b>Sound in CapCut:</b> mute the AI-generated audio. Use three continuous tracks: voice, ambient, music.</li>
+      </ul>
+      <table>
+        <tr><th>Problem</th><th>Fix</th></tr>
+        <tr><td>Face changes between shots</td><td>Call the saved character with @name</td></tr>
+        <tr><td>Flicker</td><td>Make another take, pick the cleaner one</td></tr>
+        <tr><td>Skin looks AI</td><td>Ask for texture, re-light</td></tr>
+        <tr><td>Random noise or speech</td><td>Add an ambient sound line</td></tr>
+        <tr><td>Lipsync off</td><td>Clean the audio, regenerate</td></tr>
+        <tr><td>Shots don't match</td><td>Same style Element on all</td></tr>
+      </table>
+      <h3>Why a trailer</h3>
+      <p>Few people watch a stranger's 60-second film. Almost everyone watches 20 seconds. A trailer proves you can hook an audience, and that's what clients pay for. It isn't a shortened film. Its job is to create desire, not to explain.</p>
+      <h3>Trailer shape</h3>
+      <ul>
+        <li><b>0–3 s, hook:</b> one image that interrupts the scroll.</li>
+        <li><b>3–12 s, tension:</b> fragments, faster cuts, rising music.</li>
+        <li><b>12–18 s, reveal:</b> one peak moment, line or image.</li>
+        <li><b>18–22 s, title card:</b> clean and bold.</li>
+      </ul>
+      <p>No explaining, no introductions. Leave them with questions.</p>
+      <h3>Three formulas</h3>
+      <ul>
+        <li><b>The Question:</b> open on a provocative question and never answer it. Good for sci-fi and thriller.</li>
+        <li><b>The Countdown:</b> each cut is shorter than the last. The easiest first trailer.</li>
+        <li><b>The Mood Piece:</b> no dialogue, slow cuts, music carries it. Good for nature, travel and emotional stories.</li>
+      </ul>
+      <div class="prompt"><div class="ph">20-second trailer + all prompts <button class="copy" type="button">Copy</button></div><pre>Here is the full script of my short AI film:
+[PASTE SCRIPT]
+
+Write a 20-second trailer using the Countdown formula (start slow, every cut shorter than the last):
+Shot 1 (0–4 s), Shot 2 (4–7 s), Shot 3 (7–9 s), Shot 4 (9–10.5 s), Shot 5 (10.5–11.5 s), Shot 6 (11.5–12 s), Shot 7 (12–15 s: title on black).
+For each: what's on screen and what the camera does.
+
+Rules: never give away the ending; shot 1 must stop a stranger scrolling with no context; no dialogue except at most one line under 8 words; only what the camera sees.
+
+Then for each shot give:
+1. An image prompt (subject, action, place, light, camera)
+2. A timeline video prompt using @image1 if it moves — or mark it [STILL] if it works better as a held frame under music</pre></div>
+      <p>Save the answer as your <b>Trailer Prompt Bank</b>. If one part is off, give one targeted note ("hook more visual, no dialogue") rather than re-running.</p>
+      <div class="done-row"><label><input type="checkbox" class="done"> Mark lesson done</label></div>
+    </div></details>
+
+    <details class="lesson" id="l19"><summary><span class="ln">19</span><span class="lt"><b>Build your trailer</b><span>Solo run: frames, clips, music-first edit</span></span><span class="badge">To do</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="goal"><b>Goal:</b> a finished trailer in 16:9 and 9:16, using only skills you already have.</div>
+      <h3>1 · Pictures (about 10 min)</h3>
+      <ul class="check">
+        <li><label><input type="checkbox" data-k="l19-1"><span>2 variations per key shot at 2K, best one kept</span></label></li>
+        <li><label><input type="checkbox" data-k="l19-2"><span>Every face checked at full size</span></label></li>
+        <li><label><input type="checkbox" data-k="l19-3"><span>Hero shots call the saved character with @name</span></label></li>
+        <li><label><input type="checkbox" data-k="l19-4"><span>Saved in [Project] / Trailer / Frames</span></label></li>
+      </ul>
+      <h3>2 · Clips (about 15 min)</h3>
+      <ul class="check">
+        <li><label><input type="checkbox" data-k="l19-5"><span>2–3 takes per moving shot, at final resolution</span></label></li>
+        <li><label><input type="checkbox" data-k="l19-6"><span>Same style Element as the film</span></label></li>
+        <li><label><input type="checkbox" data-k="l19-7"><span>Saved in [Project] / Trailer / Clips</span></label></li>
+      </ul>
+      <h3>3 · Edit music-first</h3>
+      <p>Choose the music before you open CapCut. The music is the structure.</p>
+      <ol>
+        <li>Music goes on the timeline first.</li>
+        <li>Mark the beats (hits, builds, drops).</li>
+        <li>Cut each shot on a beat.</li>
+        <li>Mute all AI-generated audio. Use music plus, at most, one quiet ambient layer.</li>
+        <li>End on a 2–3 s title card (dark background, white text, fade in).</li>
+        <li>Nothing over 4 s except the hook. The last 3–4 shots should be 1 s or less.</li>
+        <li>Optional: one killer line, under 8 words, at the peak.</li>
+      </ol>
+      <p>For the vertical version, start a second CapCut project and re-frame each shot. Don't just crop the wide export.</p>
+      <h3>4 · Export and judge</h3>
+      <ul class="check">
+        <li><label><input type="checkbox" data-k="l19-8"><span>trailer_16x9.mp4 and trailer_9x16.mp4 (MP4, 24 fps, 1080p or 4K) in [Project] / FINAL</span></label></li>
+        <li><label><input type="checkbox" data-k="l19-9"><span>Scroll test: sound off — does shot 1 stop you?</span></label></li>
+        <li><label><input type="checkbox" data-k="l19-10"><span>Beat test: do cuts land on the music?</span></label></li>
+        <li><label><input type="checkbox" data-k="l19-11"><span>"Want more" test: if it gives too much away, remove the most revealing shot</span></label></li>
+        <li><label><input type="checkbox" data-k="l19-12"><span>Fixed the top 3 issues, re-exported, saved a thumbnail frame</span></label></li>
+      </ul>
+      <p>Under 20 seconds suits TikTok and Reels. Up to about 28 seconds is fine for a portfolio.</p>
+      <div class="done-row"><label><input type="checkbox" class="done"> Mark lesson done</label></div>
+    </div></details>
+
+    <details class="lesson" id="l20"><summary><span class="ln">20</span><span class="lt"><b>Publish your film</b><span>YouTube, Shorts, TikTok, Reels, LinkedIn</span></span><span class="badge">To do</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="goal"><b>Goal:</b> one home for the full film, with every short post pointing to it.</div>
+      <h3>YouTube settings that matter</h3>
+      <ul>
+        <li><b>Title:</b> specific and searchable, not "My AI film."</li>
+        <li><b>Description:</b> the first two lines show before "more," so lead with what the film is.</li>
+        <li><b>Thumbnail:</b> always upload your own.</li>
+        <li><b>Tags:</b> broad plus genre.</li>
+        <li><b>Quality:</b> upload the highest quality you have.</li>
+      </ul>
+      <p>Post the vertical trailer as a separate Short. Shorts reach people based on how many watch to the end, not on subscriber count.</p>
+      <h3>TikTok and Reels</h3>
+      <p><b>TikTok:</b></p>
+      <ul>
+        <li>The first frame decides everything.</li>
+        <li>Turn on auto-captions.</li>
+        <li>Use 3–5 hashtags.</li>
+        <li>Post at 7–9 pm local time.</li>
+        <li>Reply to the first 10 comments within an hour.</li>
+      </ul>
+      <p><b>Instagram:</b></p>
+      <ul>
+        <li>Write a 2–4 sentence caption.</li>
+        <li>Pick the cover image yourself.</li>
+        <li>Also share to Stories.</li>
+      </ul>
+      <p>Post when you can stick around to reply.</p>
+      <h3>Order (about 15 min)</h3>
+      <ol>
+        <li>Full film on YouTube (16:9).</li>
+        <li>Vertical trailer as a YouTube Short.</li>
+        <li>Trailer on TikTok.</li>
+        <li>Trailer on Instagram Reels.</li>
+        <li>Trailer on LinkedIn, in under four sentences.</li>
+        <li>Paste the YouTube link into every description or first comment.</li>
+      </ol>
+      <div class="done-row"><label><input type="checkbox" class="done"> Mark lesson done</label></div>
+    </div></details>
+
+    <details class="lesson" id="l21"><summary><span class="ln">21</span><span class="lt"><b>Earn money</b><span>Freelance, channel, or digital products</span></span><span class="badge">To do</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="goal"><b>Goal:</b> pick an income path and land a first paid job.</div>
+      <h3>Path A · Freelance video (course's price ranges)</h3>
+      <table>
+        <tr><th>Job</th><th>Price</th><th>Time</th></tr>
+        <tr><td>Product ad, 15–30 s</td><td>$200–$500</td><td>2–3 days</td></tr>
+        <tr><td>Brand explainer, 30–60 s</td><td>$300–$800</td><td>3–5 days</td></tr>
+        <tr><td>Social package, 4–8 videos/month</td><td>$500–$1,500/mo</td><td>Retainer</td></tr>
+        <tr><td>Property tour</td><td>$150–$400</td><td>1–2 days</td></tr>
+        <tr><td>Restaurant / hotel promo</td><td>$200–$600</td><td>2–3 days</td></tr>
+      </table>
+      <p>Find clients on Upwork, on Fiverr (start around $150–$250), or with cold outreach. For outreach, make a 15-second sample in a local business's own branding and send it.</p>
+      <div class="prompt"><div class="ph">Outreach message <button class="copy" type="button">Copy</button></div><pre>Hi [Name] — I made this short video for [Business] using AI production tools. It took about a day.
+
+[link]
+
+If you'd like videos like this for your social media, I can deliver 4 a month starting at $[price]. No film crew, no scheduling — just posts ready to go.</pre></div>
+      <p>Retainers are where income compounds: one client at $800/month is $9,600/year. Over-deliver on the first job, then offer a monthly package. Price by the deliverable, not by the hour.</p>
+      <h3>Path B · Channel</h3>
+      <p>Your saved character becomes the recurring host. Content ideas:</p>
+      <ul>
+        <li>A series of short films.</li>
+        <li>"Made in 24 hours" challenges.</li>
+        <li>Mood pieces.</li>
+        <li>Process breakdowns.</li>
+        <li>Famous scenes recreated.</li>
+      </ul>
+      <p>Batch the work:</p>
+      <ul>
+        <li>Script 5 episodes in 1 hour.</li>
+        <li>Make all the visuals in 2–3 hours.</li>
+        <li>Edit all of them in 3–4 hours.</li>
+        <li>Schedule them over 2–3 weeks.</li>
+      </ul>
+      <p>Milestones:</p>
+      <ul>
+        <li><b>1,000 subscribers and 4,000 watch hours:</b> YouTube pays for ads (about $1–$5 per 1,000 views).</li>
+        <li><b>5,000+ subscribers:</b> sponsors.</li>
+        <li><b>10,000+ subscribers:</b> your own products.</li>
+      </ul>
+      <h3>Path C · Digital products</h3>
+      <ul>
+        <li>Prompt packs: $9–$29.</li>
+        <li>CapCut presets: $7–$19.</li>
+        <li>Workflow guides: $19–$49.</li>
+        <li>Genre script templates: $9–$19.</li>
+      </ul>
+      <p>Sell on Gumroad (10% fee), Payhip (5%), Etsy (6.5% plus listing fee) or your own site. Start with one product.</p>
+      <h3>First $500 in 14 days</h3>
+      <ul class="check">
+        <li><label><input type="checkbox" data-k="l21-1"><span>Days 1–3: two spec samples for two real local businesses, in their branding</span></label></li>
+        <li><label><input type="checkbox" data-k="l21-2"><span>Day 4: send them, free sample plus your offer</span></label></li>
+        <li><label><input type="checkbox" data-k="l21-3"><span>Day 5: Fiverr gig and Upwork profile, with trailer and samples</span></label></li>
+        <li><label><input type="checkbox" data-k="l21-4"><span>Days 6–7: apply to 10 Upwork jobs</span></label></li>
+        <li><label><input type="checkbox" data-k="l21-5"><span>Days 8–14: follow up, 10 more applications, trailer on LinkedIn</span></label></li>
+      </ul>
+      <p>Pricing ladder:</p>
+      <ul>
+        <li><b>First jobs:</b> about 50% of market rate.</li>
+        <li><b>After 3 jobs:</b> about 80%.</li>
+        <li><b>After 10 jobs with testimonials:</b> 100–120%.</li>
+        <li><b>20+ jobs and retainers:</b> 150–200%.</li>
+      </ul>
+      <p>A free sample is fine. Ongoing free work is a trap.</p>
+      <div class="done-row"><label><input type="checkbox" class="done"> Mark lesson done</label></div>
+    </div></details>
+
+    <details class="lesson" id="l22"><summary><span class="ln">22</span><span class="lt"><b>Turn your film into a series</b><span>Short drama: one story across many episodes</span></span><span class="badge">To do</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="goal"><b>Goal:</b> reuse your character, places and look to make a series instead of starting over.</div>
+      <h3>Why a series</h3>
+      <table>
+        <tr><th>Another short film</th><th>A series</th></tr>
+        <tr><td>New idea, character, places</td><td>Reuses everything you already built</td></tr>
+        <tr><td>One post, one chance</td><td>Ten posts, ten chances</td></tr>
+        <tr><td>Viewer leaves</td><td>Cliffhangers bring them back</td></tr>
+        <tr><td>Nothing carries over</td><td>Each episode is cheaper than the last</td></tr>
+      </table>
+      <p>Vertical short drama means episodes of 60–90 seconds, each with one turn and ending on a cliffhanger.</p>
+      <h3>How the series studio works (7ART Short Drama Generator)</h3>
+      <ol>
+        <li><b>Give it something to start from:</b> a one-line premise, an existing script, or up to 24,000 characters of text.</li>
+        <li><b>Answer up to 6 questions</b> about genre, setting and situation, or let the AI decide.</li>
+        <li><b>You get back:</b>
+          <ul>
+            <li>A logline for the whole series.</li>
+            <li>An outline: a goal and an emotional beat per episode.</li>
+            <li>A cliffhanger chain.</li>
+            <li>Full scripts.</li>
+          </ul>
+        </li>
+        <li><b>Re-run the outline and cliffhangers until they're right.</b> They're cheap. The renders are where the money goes.</li>
+        <li><b>Cast and world:</b> up to 12 characters, 30 places and 30 props. Each is locked for the whole season once approved.</li>
+        <li><b>Each scene renders as one generation</b> with its own internal cuts. You can edit the scene prompt before rendering.</li>
+        <li><b>Autopilot</b> scripts and shoots one episode at a time. It pauses when credits run out and picks up where it left off.</li>
+      </ol>
+      <h3>Costs and limits (per the course)</h3>
+      <ul>
+        <li>A look image on Nano Banana 2 at 2K: 24 credits.</li>
+        <li>A Seedance 2.5 scene: 37 credits per second at 480p, 79 at 720p.</li>
+        <li>Up to 12 episodes × 8 scenes. A 6-episode series is 48 renders.</li>
+        <li>Start with 3–4 episodes and check the series estimate first.</li>
+        <li>Sound is off by default. Add voice, music, sound effects and lipsync afterwards.</li>
+      </ul>
+      <p>You can export the series bible, the scripts, the prompts and the character, place and prop sheets. That package is a strong portfolio piece, and it can also be sold as a template.</p>
+      <div class="done-row"><label><input type="checkbox" class="done"> Mark lesson done</label></div>
+    </div></details>
+
+    <details class="lesson" id="l23"><summary><span class="ln">23</span><span class="lt"><b>Final project</b><span>Submit your film or trailer</span></span><span class="badge">To do</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="goal"><b>Goal:</b> one finished, public video that shows the whole process.</div>
+      <p>Submit either the <b>trailer</b> (15–25 s, music-driven) or the <b>short film</b> (30–120 s, full story). Pick your best work.</p>
+      <h3>How it's judged</h3>
+      <ul>
+        <li><b>Visual quality (weighted most):</b> looks filmed, not obviously AI. Light and texture are deliberate.</li>
+        <li><b>Character consistency:</b> same face, clothes and build in every shot.</li>
+        <li><b>Story or hook:</b> beginning, middle and end, or hook, tension and reveal.</li>
+        <li><b>Edit:</b> deliberate cuts, clear dialogue, music that doesn't overpower, no accidental silence.</li>
+        <li><b>Complete:</b> has a title, plays through, ends on purpose.</li>
+      </ul>
+      <h3>Before you submit</h3>
+      <ul class="check">
+        <li><label><input type="checkbox" data-k="l23-1"><span>Uploaded to YouTube as Public or Unlisted, with title and thumbnail</span></label></li>
+        <li><label><input type="checkbox" data-k="l23-2"><span>Link plays in a private/incognito window without login</span></label></li>
+        <li><label><input type="checkbox" data-k="l23-3"><span>Character consistent, audio clean, plays start to finish</span></label></li>
+      </ul>
+      <h3>Afterwards</h3>
+      <ul class="check">
+        <li><label><input type="checkbox" data-k="l23-4"><span>Add the certificate to LinkedIn (Licenses &amp; Certifications)</span></label></li>
+        <li><label><input type="checkbox" data-k="l23-5"><span>Post the video with a short caption</span></label></li>
+        <li><label><input type="checkbox" data-k="l23-6"><span>30-day challenge: one short AI video a week for four weeks</span></label></li>
+      </ul>
+      <div class="done-row"><label><input type="checkbox" class="done"> Mark lesson done</label></div>
+    </div></details>
+
+    <details class="lesson" id="p2"><summary><span class="ln">P2</span><span class="lt"><b>Video submission</b><span>Final assessment</span></span><span class="badge">To do</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="goal"><b>Goal:</b> hand in the YouTube link from lesson 23.</div>
+      <p>On Jobescape this is the final assessment that awards the Platinum "AI Filmmaker" certificate. On your own, it's the moment the film is public and linked from every platform.</p>
+      <div class="done-row"><label><input type="checkbox" class="done"> Mark project done</label></div>
+    </div></details>
+  </section>
+
+  <footer>
+    Rewritten in plain language from the Jobescape "AI Filmmaking" personal plan, read 15 Oct 2026. 7ART model names, credit costs and plan prices are as the course stated them and change often, so check the studio before relying on them. Your ticks are saved in this browser only.
+  </footer>
+</main>
+</div>
+
+<script>
+(function () {
+  var store = {
+    get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  };
+  var P = 'aifilm:';
+
+  // theme toggle
+  var root = document.documentElement;
+  var saved = store.get(P + 'theme');
+  if (saved) root.setAttribute('data-theme', saved);
+  document.getElementById('theme').addEventListener('click', function () {
+    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    store.set(P + 'theme', next);
+  });
+
+  var lessons = Array.prototype.slice.call(document.querySelectorAll('details.lesson'));
+
+  // table of contents
+  var toc = document.getElementById('toc');
+  document.querySelectorAll('section.module').forEach(function (sec) {
+    var m = document.createElement('a');
+    m.className = 'm'; m.href = '#' + sec.id;
+    m.innerHTML = '<small>' + sec.dataset.title + '</small>' + sec.dataset.sub;
+    toc.appendChild(m);
+    sec.querySelectorAll('details.lesson').forEach(function (d) {
+      var a = document.createElement('a');
+      a.className = 'l'; a.href = '#' + d.id; a.dataset.for = d.id;
+      a.textContent = d.querySelector('.lt b').textContent;
+      a.addEventListener('click', function () { d.open = true; });
+      toc.appendChild(a);
+    });
+  });
+
+  // progress
+  function refresh() {
+    var n = 0;
+    lessons.forEach(function (d) {
+      var on = d.querySelector('input.done').checked;
+      if (on) n++;
+      var b = d.querySelector('.badge');
+      b.textContent = on ? 'Done' : 'To do';
+      b.classList.toggle('done', on);
+      var link = toc.querySelector('a.l[data-for="' + d.id + '"]');
+      if (link) link.classList.toggle('done', on);
+    });
+    document.getElementById('pcount').textContent = n;
+    document.getElementById('ptotal').textContent = lessons.length;
+    document.getElementById('pfill').style.width = (100 * n / lessons.length) + '%';
+  }
+  lessons.forEach(function (d) {
+    var box = d.querySelector('input.done');
+    box.checked = store.get(P + 'done:' + d.id) === '1';
+    box.addEventListener('change', function () { store.set(P + 'done:' + d.id, box.checked ? '1' : '0'); refresh(); });
+  });
+  document.querySelectorAll('input[data-k]').forEach(function (c) {
+    c.checked = store.get(P + 'k:' + c.dataset.k) === '1';
+    c.addEventListener('change', function () { store.set(P + 'k:' + c.dataset.k, c.checked ? '1' : '0'); });
+  });
+  refresh();
+
+  // copy buttons
+  document.querySelectorAll('.copy').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      var text = btn.closest('.prompt').querySelector('pre').innerText;
+      var done = function () { btn.textContent = 'Copied'; btn.classList.add('ok'); setTimeout(function () { btn.textContent = 'Copy'; btn.classList.remove('ok'); }, 1400); };
+      if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, function () {});
+      else { var t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); done(); } catch (x) {} t.remove(); }
+    });
+  });
+
+  // open / close all
+  document.getElementById('openall').addEventListener('click', function () { lessons.forEach(function (d) { if (!d.hidden) d.open = true; }); });
+  document.getElementById('closeall').addEventListener('click', function () { lessons.forEach(function (d) { d.open = false; }); });
+
+  // search
+  var q = document.getElementById('q');
+  q.addEventListener('input', function () {
+    var term = q.value.trim().toLowerCase(), shown = 0;
+    lessons.forEach(function (d) {
+      var hit = !term || d.textContent.toLowerCase().indexOf(term) !== -1;
+      d.hidden = !hit; if (hit) shown++;
+      if (term && hit) d.open = true;
+    });
+    document.querySelectorAll('section.module').forEach(function (s) {
+      s.hidden = !s.querySelector('details.lesson:not([hidden])');
+    });
+    document.getElementById('empty').style.display = shown ? 'none' : 'block';
+  });
+})();
+</script>
+</body>
+</html>

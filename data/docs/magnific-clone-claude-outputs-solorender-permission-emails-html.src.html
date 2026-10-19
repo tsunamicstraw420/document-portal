@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Supplier Permission Emails</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: one reading column. Ranked table first (sortable + search), then one card per email with copy buttons. Always dark: solorender palette, all reading text white, green labels, orange highlights. */
+:root{
+  --bg:#0a0a0a; --panel:#131312; --panel-2:#1b1a18; --line:#2c2a26;
+  --ink:#ffffff; --green:#6ee05a; --orange:#f7931a;
+  --display:"Syne","Avenir Next","Segoe UI",sans-serif;
+  --body:"Manrope","Helvetica Neue",Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+:root[data-theme="light"],:root[data-theme="dark"]{--bg:#0a0a0a}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.62;margin:0;padding:40px 16px 96px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:52px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.15;text-wrap:balance}
+h1{font-size:clamp(2rem,5vw,3rem);font-weight:800}
+h2{font-size:clamp(1.4rem,3.2vw,1.8rem);font-weight:700}
+h3{font-size:1.3rem;font-weight:700}
+p{margin:0;max-width:70ch}
+a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--green);text-underline-offset:3px;overflow-wrap:anywhere}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+header,section{display:flex;flex-direction:column;gap:16px;min-width:0}
+.eyebrow{font-family:var(--mono);font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
+.hi{color:var(--orange);font-weight:800}
+ul.plain{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px}
+.note{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--orange);border-radius:8px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+/* table */
+.tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.tools input{flex:1 1 240px;min-width:0;font:500 .95rem var(--body);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 13px}
+.count{font-family:var(--mono);font-size:.8rem;color:var(--green)}
+.tablebox{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+th{background:var(--panel-2);text-align:left;vertical-align:bottom}
+th button{all:unset;cursor:pointer;display:block;padding:11px 12px;font:700 .72rem var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--green);white-space:nowrap}
+th button::after{content:" ↕";opacity:.55}
+th[aria-sort="ascending"] button::after{content:" ↑";opacity:1}
+th[aria-sort="descending"] button::after{content:" ↓";opacity:1}
+td{padding:11px 12px;border-top:1px solid var(--line);vertical-align:top}
+td.n{font-family:var(--mono);white-space:nowrap}
+td a{font-weight:700}
+.status{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--green);color:var(--ink);border-radius:4px;padding:1px 7px;white-space:nowrap}
+.status.parked{border-color:var(--orange)}
+/* cards */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:16px;scroll-margin-top:16px;min-width:0}
+.card.parked{border-color:var(--orange)}
+.card .top{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline}
+.card .unlock{color:var(--orange);font-weight:700}
+.field{background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:grid;grid-template-columns:1fr auto;gap:8px 14px;align-items:start;min-width:0}
+.field .label{grid-column:1/-1;font-family:var(--mono);font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--green)}
+.val{min-width:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.val.short{font-weight:600}
+button.copy{all:unset;cursor:pointer;font-family:var(--mono);font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--green);color:var(--ink);border-radius:6px;padding:6px 12px;white-space:nowrap}
+button.copy:hover{background:var(--bg)}
+.clause{border-left:3px solid var(--green);padding:4px 0 4px 16px;display:flex;flex-direction:column;gap:8px}
+.clause q{font-style:italic}
+.clause q::before{content:"“"} .clause q::after{content:"”"}
+.blank{color:var(--orange);font-weight:700}
+.where{font-size:.95rem}
+footer{display:flex;flex-direction:column;gap:10px;font-size:.95rem}
+@media (max-width:560px){.field{grid-template-columns:1fr}button.copy{justify-self:start}.card{padding:18px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">solorender · supplier permission emails · drafts · every clause re-read live 18 Oct 2026</div>
+  <h1>Supplier Permission Emails</h1>
+  <p>Nine short emails that ask a supplier for a written "yes, your use is allowed." Each yes unlocks a cheaper source. Our price is always real cost × 2.5, so every saving goes straight to customers. A tenth email, to Runware, is parked at the bottom, as you asked.</p>
+  <p><b>Nothing has been sent.</b> No form was filled and no account was made. You send each one yourself from eddie@solorender.com. Press <b>Copy</b> on To, Subject and Body, then paste them into your email.</p>
+</header>
+
+<section class="note">
+  <h2>Before you send</h2>
+  <ul class="plain">
+    <li><b>Orange blanks</b> like <span class="blank">[EDDIE: …]</span> are for numbers only you can give, such as how much you expect to use. I left them blank on purpose rather than invent anything. Fill them in, or delete the line.</li>
+    <li>Every email says the site is live but in final testing, with the affiliate rollout coming shortly. None says "launched in September."</li>
+    <li>Every email mentions the MCP connector honestly, because several of these terms talk about "API access" or "integrating into third-party apps."</li>
+    <li><b>Three clauses read differently from our notes</b>, so I quote what's live today: Atlas, Topaz and Segmind. Each card says what changed.</li>
+    <li><b>Atlas's Veo saving is small next to a free step.</b> Google direct already gives Veo 3.1 Fast at $0.80 a clip with no permission needed. Atlas would be $0.768. Atlas is still worth asking for its Kling and Wan prices.</li>
+    <li><b>Topaz may not save anything.</b> At 1080p, Runware already sells it below Topaz's own price. The 20% saving is a 4K figure from the research page, and I didn't re-check 4K prices today.</li>
+  </ul>
+</section>
+
+<section>
+  <div class="eyebrow">Ranked by what a customer saves on one typical run</div>
+  <h2>The emails at a glance</h2>
+  <p>"Customer saves" is today's customer price minus the new one (cost × 2.5), for the unit shown. Click any column to sort, or search.</p>
+  <div class="tools"><input id="q" type="search" placeholder="Search, e.g. Veo, form, Kling" aria-label="Search the emails"><span class="count" id="c"></span></div>
+  <div class="tablebox"><table id="t"></table></div>
+</section>
+
+<section id="cards" aria-label="Email drafts"></section>
+
+<footer>
+  <div class="eyebrow">How this was checked</div>
+  <p>Every clause was re-read on the supplier's own live page on 18 Oct 2026 and copied word for word. Pages that need a browser (Atlas, Decart, PixVerse, Alibaba) were read in one. Topaz's EULA is a PDF their site links to. Each card names the page's own "last updated" date.</p>
+  <p>Contact addresses come from each supplier's own site, and each card says where. Prices come from the 18 Oct research page ("Lowering solorender Prices"), not from a real bill. Each switch still needs one real paid run, with your yes for the cost, before any price changes.</p>
+  <p>Brandon's email address at Runware isn't in the Gmail this session can read. It's probably in your eddie@solorender.com inbox. Reply in that thread.</p>
+</footer>
+</div>
+
+<script>
+const SIG = "Thanks,\nEddie Barna\nCEO, Solorender, Inc. (California)\neddie@solorender.com\nsolorender.com";
+const INTRO = "I'm Eddie Barna, CEO of Solorender, Inc. solorender.com is a web app where paying customers make pictures, video, voice and music. The site is live but still in final testing, and we're rolling it out to our first customers through an affiliate program shortly.";
+const USE = (who) => "How we would use " + who + ":\n- We call your API only from our own servers.\n- Customers never get API access or API keys. They work in our app and receive only the finished files, inside their solorender account.\n- We also run an MCP connector, so a customer can ask their own AI assistant (for example Claude) to make something in solorender. It connects to solorender's servers with the customer's solorender login. Every request still goes through our app, our checks and our billing. It never exposes your API, an endpoint to your models, or our keys.";
+
+const E = [
+{ id:"decart", rank:1, supplier:"Decart", unlock:"Lucy 2.5 video editing at $0.04 a second, against $0.15 for Lucy Edit Pro today (−73%)", unit:"5-second edit", now:1.88, next:0.50,
+  to:"contact@decart.ai", where:"The Support email on docs.platform.decart.ai. It is the only address on their developer site; I found no separate sales or legal address there.",
+  subject:"Written consent request: offering Lucy 2.5 inside solorender (API Terms §3.6)",
+  body:"Hi Decart team,\n\n"+INTRO+"\n\nWe'd like to offer Lucy 2.5 as a video-editing tool in solorender. Your API Terms (last updated July 26, 2026), §3.6(c), say developers may not \"sell, sublicense, or otherwise provide the API, Decart.ai Models or Output to third parties without Decart.ai's prior written consent.\" So before we build anything, I'm asking for that consent in writing.\n\n"+USE("Lucy 2.5")+" I believe that fits §3.6(f), but I'd like you to confirm it too.\n\nExpected volume to start: [EDDIE: e.g. about ___ seconds of edited video a month]\n\nCould you confirm in writing that this use is allowed, and let me know if anything else is needed, such as a separate agreement or attribution?\n\n"+SIG,
+  clause:[{ref:"API Terms of Service §3.6(c)", q:"sell, sublicense, or otherwise provide the API, Decart.ai Models or Output to third parties without Decart.ai’s prior written consent"},
+          {ref:"§3.6(f), relevant to the MCP connector", q:"you may not host (or authorize or direct a third party to host) an API endpoint to any Decart.ai Models that allows third parties to integrate or otherwise use the Decart.ai Models in or with their own products or services"}],
+  src:"https://docs.platform.decart.ai/resources/api-terms", srcdate:"Last Updated: July 26, 2026", diff:"Matches our notes. §3.6(f) was added to the email because of the MCP connector.",
+  extra:"Lucy 2.5 is a newer model than the Lucy Edit Pro we sell. Even with a yes, it needs one quality test you approve before it replaces anything." },
+{ id:"atlas", rank:6, supplier:"Atlas Cloud", unlock:"Kling 2.5 Turbo −15% ($0.35 → $0.2975), Wan 3.0 Prime −10%, Veo 3.1 Fast −36%", unit:"5 s Kling 2.5 clip", now:0.88, next:0.74,
+  to:"sales@atlascloud.ai", where:"Listed on atlascloud.ai/contact. That page also has a form with these fields: First Name*, Last Name*, Email Address*, Country/Region*, Slack Info, Company, Role, User needs*. If you use the form, paste the Body into \"User needs\".",
+  subject:"Question before we buy: is solorender a \"competitive product\"?",
+  body:"Hi Atlas Cloud team,\n\n"+INTRO+"\n\nWe'd like to buy Kling, Wan and Veo through Atlas. Your Acceptable Use Policy §2 allows customers to \"allow End Users to access the Services through the Customer Solution\", which is exactly our setup. But §7 says customers will not \"Use the Services to build a competitive product\", and your Privacy & Terms §7 says not to \"use the Services to compete with us\". You also run creator tools such as Generator and Marketing Studio, so I want to ask before we start rather than guess.\n\n"+USE("Atlas")+"\n- solorender isn't an API platform or a reseller of model access. It's a studio: one-click recipes, a canvas for multi-step projects, a video editor, styles and saved characters. So I don't believe it's a \"thin wrapper\" under §2.\n\nExpected volume to start: [EDDIE: e.g. about ___ clips a month]\n\nCould you confirm in writing that (1) solorender is not a \"competitive product\" under §7, and (2) the MCP connector fits §2? If you'd rather sign a short partner agreement, I'm open to that.\n\n"+SIG,
+  clause:[{ref:"Acceptable Use Policy §7 Prohibited Uses", q:"Use the Services to build a competitive product;"},
+          {ref:"Privacy & Terms §7 Prohibited Activities", q:"use the Services to compete with us."},
+          {ref:"Acceptable Use Policy §2 API Access and Integration", q:"allow End Users to access the Services through the Customer Solution. Prohibited Exposure: Client will not expose any of the Services APIs directly to any End Users. Value-Add Requirement: Partners must provide substantial added value. Using the Services to create a \"thin wrapper\" for raw resale is strictly prohibited."}],
+  src:"https://www.atlascloud.ai/acceptable-use", srcdate:"AUP: Last Updated: October 2026 · Privacy & Terms (atlascloud.ai/privacy): Last updated October 8, 2026",
+  diff:"Differs from our notes. I couldn't find the \"competing software service or product\" wording in any agreement on atlascloud.ai today. The live Privacy & Terms §7 says \"use the Services to compete with us\" instead, so that's what the email quotes.",
+  extra:"Also on the live page: Atlas credits expire 365 days after purchase (AUP §4), and §7 bans publishing benchmark or comparison results about Atlas without their OK." },
+{ id:"alibaba", rank:2, supplier:"Alibaba Cloud (Model Studio)", unlock:"Wan 3.0 Prime: $0.70 → $0.64 a clip (US region, −9%), or $0.53 with a 3-month savings plan (−25%)", unit:"5 s Wan 3.0 clip", now:1.75, next:1.32,
+  to:"Contact Sales form: https://www.alibabacloud.com/en/contact-sales", where:"Alibaba's own Contact Sales page. Fields: First Name, Last Name, E-Mail, Mobile Phone, Company Industry, Company Size, Company Name, Job Title, a use-case choice, How can we help?, Country/Region, and an optional call time. Paste the Body into \"How can we help?\". The same page also shows contact.us@alibabacloud.com if you'd rather email.",
+  subject:"Model Studio: confirming our use isn't \"reselling\" under Product Terms §4.48.1(d)(v)",
+  body:"Hello Alibaba Cloud team,\n\n"+INTRO+"\n\nWe'd like to use Wan 3.0 through Model Studio in the US (Virginia) region, possibly with the AI General-purpose Savings Plan. Your International Product Terms §4.48.1(b) say \"you and your end users may provide input to Model Studio\" and receive the output, which matches our app. But §4.48.1(d)(v) says customers shall not \"resell Model Studio or AI models provided through Model Studio … unless expressly authorised by us\". I'd like to confirm we're on the right side of that line before we start.\n\n"+USE("Model Studio")+"\n- We don't resell Model Studio or access to it. Customers pay us per finished picture or clip made inside our own product.\n\nExpected volume to start: [EDDIE: e.g. about ___ clips a month]\n\nCould you confirm in writing that this use is allowed? Could you also tell me whether the savings plan applies to Wan 3.0 in the US region?\n\n"+SIG,
+  clause:[{ref:"International Product Terms §4.48.1(d)(v)", q:"resell Model Studio or AI models provided through Model Studio, or use Model Studio, AI models provided through Model Studio (including any Output of such AI models) to train or develop products or services that compete with Alibaba Cloud and/or its affiliates’ products and services, unless expressly authorised by us."},
+          {ref:"§4.48.1(b)", q:"you and your end users may provide input to Model Studio (“Input”), and receive generated content from the AI models and applications based on the Input (“Output”)."},
+          {ref:"§4.48.1(e)", q:"You may use the Input and Output, provided your use complies with applicable laws"}],
+  src:"https://www.alibabacloud.com/help/en/legal/latest/alibaba-cloud-international-website-product-terms-of-service-v-3-8-0", srcdate:"Updated at: 2026-09-22",
+  diff:"Matches our notes. The live (d)(v) also bars using output to build competing products. We don't train models, so that part doesn't touch us.",
+  extra:"The research page said up to −30%. The ledger row behind it gives $0.53 against $0.70 (−25%), so this page uses −25%." },
+{ id:"replicate", rank:5, supplier:"Replicate", unlock:"GPT Image 2 (high quality) at $0.128 a picture, against $0.211 today (−39%)", unit:"1 GPT Image 2 picture", now:0.53, next:0.32,
+  to:"legal@replicate.com", where:"Named in Replicate's Terms §12.6: \"Customers may send us any material notice via email to legal@replicate.com.\" For a pricing talk instead, replicate.com/enterprise has a sales form.",
+  subject:"Does Terms §2.7(c)(iii) allow an end-user app like solorender?",
+  body:"Hi Replicate team,\n\n"+INTRO+"\n\nWe'd like to buy GPT Image 2 through Replicate. Your Terms of Service §2.7(c)(iii) say customers shall not \"rent, lease, lend, sell, sublicense, assign, distribute, publish, transfer, or otherwise make available any Services to any person, including on or in connection with … software as a service\". I couldn't find anything that clearly allows an end-user app, so I'm asking before we start.\n\n"+USE("Replicate")+"\n- We aren't making Replicate's Services available to anyone. We sell finished pictures made inside our own product.\n\nCould you confirm in writing that this use is allowed under your Terms?\n\n"+SIG,
+  clause:[{ref:"Terms of Service §2.7(c)(iii)", q:"rent, lease, lend, sell, sublicense, assign, distribute, publish, transfer, or otherwise make available any Services to any person, including on or in connection with the internet or any time-sharing, service bureau, software as a service, cloud, or other technology or service;"}],
+  src:"https://replicate.com/terms", srcdate:"Last Update: April 1, 2026", diff:"Matches our notes.", extra:"" },
+{ id:"ltx", rank:3, supplier:"Lightricks (LTX-2.x)", unlock:"A new, very cheap video model on our own rented servers: about $0.008–0.017 a clip, against $0.16 for Grok Video 1.5 Lite today", unit:"5 s clip, vs Grok Lite", now:0.40, next:0.04,
+  to:"licensing@ltx.io", where:"Named in the LTX-2.x Community License itself (§2.1): \"Commercial Entities interested in such a commercial license are required to contact Licensor (licensing@ltx.io).\"",
+  subject:"LTX-2.x licence question for solorender (Attachment A, item 20)",
+  body:"Hi LTX team,\n\n"+INTRO+"\n\nWe'd like to run LTX-2.x on our own rented GPU servers to make short video clips for our customers. We're well under the $10,000,000 annual revenue line in §2.1, so I understand the paid Commercial Use Agreement doesn't apply to us yet.\n\nMy question is Attachment A, item 20: no use \"in any product, service, or application that directly competes with Licensor's commercial products or services\" without a separate commercial licence. solorender is a creative studio and LTX Studio is too, so I'd rather ask than guess.\n\nHow we would use LTX-2.x:\n- We'd run it on our own servers. We wouldn't redistribute the weights, and we'd keep every Attachment A use rule.\n- Customers never get the model or an API. They receive only the finished clips inside their solorender account.\n- We also run an MCP connector, so a customer's own AI assistant can ask solorender to make something. It goes through our servers and our checks the same way.\n\nExpected volume to start: [EDDIE: e.g. about ___ clips a month]\n\nCould you tell me in writing (1) whether item 20 applies to solorender, and (2) if it does, what the separate commercial licence costs and how to get one?\n\n"+SIG,
+  clause:[{ref:"LTX-2.x Community License, Attachment A, item 20", q:"To use LTX-2.x or Derivatives of LTX-2.x in any product, service, or application that directly competes with Licensor's commercial products or services, or is designed to replace or substitute Licensor's offerings in the market, without obtaining a separate commercial license from Licensor."},
+          {ref:"§2.1 (the revenue line)", q:"Entities with annual revenues of at least $10,000,000 (the \"Commercial Entities\") are required to obtain a paid license"}],
+  src:"https://github.com/Lightricks/LTX-2/blob/main/LICENSE-2_x", srcdate:"License date: August 11, 2026",
+  diff:"Matches our notes. Good news on the live text: the paid licence in §2.1 only kicks in at $10M a year in revenue. Item 20 is the only open question.",
+  extra:"Running our own servers is a bigger project, and it needs a quality test you approve first. This email only asks whether we'd be allowed." },
+{ id:"eleven", rank:4, supplier:"ElevenLabs", unlock:"33 million free characters from the Startup Grant, worth about $3,300 of voice at our $0.10 per 1,000 cost", unit:"1,000 characters (v2)", now:0.25, next:0.00,
+  to:"sales@elevenlabs.io", where:"Named on elevenlabs.io/startup-grants (FAQ): \"reach out to a team member at sales@elevenlabs.io\".",
+  subject:"Startup Grant question: can grant characters voice our customers' scripts?",
+  body:"Hi ElevenLabs team,\n\n"+INTRO+"\n\nWe're thinking about applying for the ElevenLabs Startup Grant, and I'd like to check one thing first. The grant page says \"You cannot exchange or resell your text characters.\" Your OEM Terms §2.B(f) also say customers on Free, Starter, Creator or Pro plans may not make the Services available inside their own product.\n\nIn solorender, a customer types a script and gets back a finished voiceover in their account. "+USE("ElevenLabs").replace("How we would use ElevenLabs:\n","").replace(/^- /,"How we'd use it:\n- ")+"\n\nCould you tell me in writing (1) whether grant characters may be used for voiceovers our customers make in solorender, and (2) which plan the grant counts as under the OEM Terms? If the grant can't cover that, it would still help with our own marketing voiceovers, and I'd like to know which plan you'd recommend for the customer side.\n\n"+SIG,
+  clause:[{ref:"Startup Grants page, FAQ \"Can I resell or exchange my grants for cash?\"", q:"You cannot exchange or resell your text characters. Reselling your text characters would be a violation of the ElevenLabs Grant program conditions and your grant plan will be terminated immediately."},
+          {ref:"OEM Terms §2.B(f)", q:"Make Available the Services or Bundled Service if Customer is not accessing the Services as a Business Entity. For the avoidance of doubt, if you are a Customer accessing the Services under a Free, Starter, Creator, or Pro tier plan, you are expressly prohibited from Making Available the Services or any Bundled Service."}],
+  src:"https://elevenlabs.io/startup-grants", srcdate:"Grant page has no date · OEM Terms (elevenlabs.io/oem-terms): Last Updated: 28 February 2025",
+  diff:"Matches our notes.", extra:"Our notes say the grant application hasn't been sent yet, so the email asks before applying. The $3,300 value is 33M characters at our $0.10 per 1,000 v2 cost. Customer saving per 1,000 characters would be the full $0.25 while the grant lasts." },
+{ id:"segmind", rank:7, supplier:"Segmind", unlock:"Seedance 2.0 at $0.756 a clip, against our Runware cost of $0.795 (−5%)", unit:"5 s Seedance 2.0 clip", now:1.99, next:1.89,
+  to:"contact@segmind.com", where:"The address named in Segmind's Terms. segmind.com/contact also has a \"Talk to sales\" form (it books a 30-minute call). Their page says work-email enquiries get priority, so send from eddie@solorender.com.",
+  subject:"Written authorization request under Master Agreement §2.3: Seedance 2.0 in solorender",
+  body:"Hi Segmind team,\n\n"+INTRO+"\n\nWe'd like to buy Seedance 2.0 through Segmind. Your agreement allows use \"solely for Customer's internal business purposes\" (§2.1.1), and §2.3 bars providing access to third parties \"except to the extent explicitly authorized in writing by Segmind\". So I'm asking for that written authorization.\n\n"+USE("Segmind")+"\n- We aren't offering Segmind's platform or a substitute for it. We sell finished clips made inside our own studio app.\n\nExpected volume to start: [EDDIE: e.g. about ___ clips a month]\n\nCould you confirm in writing that this use is authorized, or tell me which plan or agreement covers it?\n\n"+SIG,
+  clause:[{ref:"Master agreement §2.1.1 Use Authorization", q:"access and use the Segmind Platform Services on any permitted Cloud Service Provider solely for Customer’s internal business purposes."},
+          {ref:"§2.3 Usage Limits", q:"sell, resell, license, sublicense, distribute, rent, lease, or otherwise provide access to the Platform Services to any third party except to the extent explicitly authorized in writing by Segmind; use the Platform Services to develop or offer a service made available to any third party that could reasonably be seen to serve as a substitute for such third party’s possible purchase of any Segmind product or service;"}],
+  src:"https://www.segmind.com/terms", srcdate:"Last updated 4 August 2026",
+  diff:"Matches our notes, plus one more line in §2.3 our notes missed: no service that \"could reasonably be seen to serve as a substitute\" for buying from Segmind. The email answers it.", extra:"Only 4¢ a clip cheaper than Runware. Worth one email, not more effort." },
+{ id:"pixverse", rank:8, supplier:"PixVerse", unlock:"PixVerse V6 at $0.20 a clip direct, against $0.225 today (−11%)", unit:"5 s V6 clip, 720p", now:0.56, next:0.50,
+  to:"api_business@pixverse.ai", where:"PixVerse's API docs, Contact Us page: \"For PixVerse API integration, account access, billing, or technical support, contact: Email: api_business@pixverse.ai\".",
+  subject:"Written consent request (Platform Terms §1.4 and §3.1): PixVerse V6 in solorender",
+  body:"Hi PixVerse team,\n\n"+INTRO+"\n\nWe'd like to buy PixVerse V6 directly from your platform. Your Platform Terms of Service §3.1 say users shall not \"provide the API to third parties without the written consent of the platform\". §1.4 says that without written authorization the API can't be used \"for any commercial profit-making activities\". So I'm asking for that written consent.\n\n"+USE("PixVerse")+"\n- We don't sell API calls. Customers pay us for finished clips made inside our own product.\n\nExpected volume to start: [EDDIE: e.g. about ___ clips a month]\n\nCould you confirm in writing that this use is allowed, and tell me if a business agreement is needed?\n\n"+SIG,
+  clause:[{ref:"Platform Terms of Service §3.1", q:"Users can only use the API for their own legal business or project development and shall not provide the API to third parties without the written consent of the platform and compliance with relevant regulations. For example, users shall not integrate the API into third-party applications for resale or sharing, nor use the API to provide video generation services for other unauthorized users."},
+          {ref:"§1.4", q:"Without the written authorization of the platform, it is prohibited to use the API for any commercial profit-making activities, such as directly selling API invocation services or using the API to generate videos for advertising without legal authorization."}],
+  src:"https://pixverse.ai/en/pixverse-platform-terms-of-service", srcdate:"Updated on Sep 4, 2026", diff:"Matches our notes.", extra:"" },
+{ id:"topaz", rank:9, supplier:"Topaz Labs", unlock:"Video upscaling direct from Topaz: about −20% at 4K on the Scale plan (unconfirmed today). At 1080p, Runware is already cheaper.", unit:"4K upscale (not re-checked)", now:null, next:null,
+  to:"enterprise@topazlabs.com", where:"developer.topazlabs.com: \"For enterprise inquiries, contact enterprise@topazlabs.com\".",
+  subject:"Consent request under the EULA's \"Restriction on Live Resale and Integration\": video upscaling in solorender",
+  body:"Hi Topaz team,\n\n"+INTRO+"\n\nWe'd like to offer Topaz video upscaling, mainly at 4K, using your API on the Scale plan. Your EULA (February 2026), \"Restriction on Live Resale and Integration\", says customers may not \"provide live, automated processing services to third parties … integrate the Services into any third-party application or service … without the express prior written consent of Topaz\", and that consent comes with a separate commercial agreement. So I'm asking what that would take.\n\n"+USE("Topaz")+"\n- solorender is our own product, not a third party's. We're happy to follow your co-branding and attribution guidelines.\n\nExpected volume to start: [EDDIE: e.g. about ___ minutes of upscaled video a month]\n\nCould you tell me in writing whether you'd give consent for this use, and what the commercial agreement and pricing would look like?\n\n"+SIG,
+  clause:[{ref:"EULA, \"Restriction on Live Resale and Integration\" (numbered 3.4 in the PDF)", q:"You may not use the API or an On-Premise Deployment to provide live, automated processing services to third parties (i.e., act as a \"Model-as-a-Service\" provider), integrate the Services into any third-party application or service, or otherwise make the Services available to third parties, whether directly or indirectly, without the express prior written consent of Topaz. Such consent, if granted, will be subject to a separate commercial agreement and will require strict adherence to Topaz's co-branding and attribution guidelines"}],
+  src:"https://downloads.topazlabs.com/web-assets/Topaz+-+EULA+-+Feburary+2026.pdf", srcdate:"EULA dated February 2026 (topazlabs.com/eula links to this PDF)",
+  diff:"Differs from our notes. The section is numbered 3.4 in the live PDF, not 3.4.4. It's also broader: it bans integrating Topaz \"into any third-party application or service\", and any consent comes with a separate agreement and co-branding.",
+  extra:"Hold this one unless you want 4K. Today Runware bills $0.0428 for a 5-second 1080p upscale, about $0.009 a second. Topaz direct is $0.016–0.02 a second. The research page's −20% was a 4K / Scale-plan figure, and I didn't re-check 4K prices." },
+{ id:"runware", rank:10, supplier:"Runware (parked)", parked:true, unlock:"No price change. It settles whether FLUX.1 [dev], FLUX Krea and FLUX.2 Klein 9B on Runware are licensed for commercial use. We already buy them there, at the cheapest price.", unit:"licence question only", now:null, next:null,
+  to:"Brandon Neustadter, Enterprise Lead, Runware (reply in his existing thread)", where:"Brandon is already in touch with you (his reply of 16 Oct). His address isn't in the Gmail this session can read; it's likely in your eddie@solorender.com inbox.",
+  subject:"Re: solorender — licence question on three FLUX models",
+  body:"Hi Brandon,\n\nOne licence question as we keep building on Runware. We serve FLUX.1 [dev], FLUX.1 Krea [dev] and FLUX.2 Klein 9B to our customers from Runware. Black Forest Labs releases these under a non-commercial licence, whose §4(a) bars use \"for any commercial or production purposes\". Your terms say the model's own licence applies.\n\nIs Runware's hosting of these three models commercially licensed from Black Forest Labs, so that our paying customers can use the results? If not, which FLUX models on Runware are?\n\n"+SIG,
+  clause:[{ref:"FLUX.1 [dev] Non-Commercial License v1.1.1 §4(a)", q:"use, modify, copy, reproduce, create Derivatives of, or Distribute the FLUX.1 [dev] Model (or any Derivative thereof, or any data produced by the FLUX.1 [dev] Model), in whole or in part, (i) for any commercial or production purposes"}],
+  src:"https://github.com/black-forest-labs/flux/blob/main/model_licenses/LICENSE-FLUX1-dev", srcdate:"Licence v1.1.1 (no date on the file)",
+  diff:"Matches our notes. I re-read the FLUX.1 [dev] licence only, not the Krea or Klein 9B licence files.", extra:"Parked: you said \"not now\" on 18 Oct. It's kept here so it's ready when you want it." }
+];
+
+const fmt = v => v==null ? "—" : "$"+v.toFixed(2);
+const save = e => (e.now==null||e.next==null) ? null : +(e.now-e.next).toFixed(2);
+const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const hlBlanks = s => esc(s).replace(/\[EDDIE:[^\]]*\]/g, m => '<span class="blank">'+m+'</span>');
+
+E.sort((a,b)=>a.rank-b.rank);
+// cards
+const cards = document.getElementById("cards");
+cards.innerHTML = '<div class="eyebrow">The drafts</div><h2>One card per email</h2>' + E.map(e => `
+<article class="card${e.parked?' parked':''}" id="${e.id}">
+  <div class="top"><h3>${e.rank}. ${esc(e.supplier)}</h3><span class="status${e.parked?' parked':''}">${e.parked?'parked':'draft'}</span></div>
+  <p><span class="eyebrow">What a yes unlocks</span><br><span class="unlock">${esc(e.unlock)}</span></p>
+  <div class="field"><div class="label">To</div><div class="val short" id="${e.id}-to">${esc(e.to)}</div><button class="copy" data-for="${e.id}-to">Copy</button></div>
+  <p class="where"><b>Where I found it:</b> ${esc(e.where)}</p>
+  <div class="field"><div class="label">Subject</div><div class="val short" id="${e.id}-subject">${esc(e.subject)}</div><button class="copy" data-for="${e.id}-subject">Copy</button></div>
+  <div class="field"><div class="label">Body</div><div class="val" id="${e.id}-body">${hlBlanks(e.body)}</div><button class="copy" data-for="${e.id}-body">Copy</button></div>
+  <div class="clause">
+    <div class="eyebrow">The clause, word for word · read live 18 Oct 2026</div>
+    ${e.clause.map(c=>`<p><b>${esc(c.ref)}:</b> <q>${esc(c.q)}</q></p>`).join("")}
+    <p><a href="${e.src}">${esc(e.src)}</a> · ${esc(e.srcdate)}</p>
+    <p><b>Against our notes:</b> ${esc(e.diff)}</p>
+    ${e.extra?`<p><b>Good to know:</b> ${esc(e.extra)}</p>`:""}
+  </div>
+</article>`).join("");
+
+document.querySelectorAll("button.copy").forEach(b => b.addEventListener("click", () => {
+  const el = document.getElementById(b.dataset.for), text = el.innerText.trim();
+  const done = () => { b.textContent = "Copied"; setTimeout(() => b.textContent = "Copy", 1600); };
+  const select = () => { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = "Press Cmd+C"; };
+  try { navigator.clipboard.writeText(text).then(done, select); } catch (err) { select(); }
+}));
+
+// table
+const COLS = [
+  {k:"rank", h:"#", v:e=>e.rank, n:true},
+  {k:"supplier", h:"Supplier", v:e=>e.supplier},
+  {k:"unlock", h:"What it unlocks", v:e=>e.unlock},
+  {k:"unit", h:"Per", v:e=>e.unit},
+  {k:"now", h:"Customer pays now", v:e=>e.now, n:true, f:fmt},
+  {k:"next", h:"With a yes", v:e=>e.next, n:true, f:fmt},
+  {k:"save", h:"Customer saves", v:save, n:true, f:fmt},
+  {k:"to", h:"Where to send", v:e=>e.to},
+  {k:"status", h:"Status", v:e=>e.parked?"parked":"draft"}
+];
+let sortK = "rank", dir = 1;
+const t = document.getElementById("t"), q = document.getElementById("q"), c = document.getElementById("c");
+function draw(){
+  const term = q.value.trim().toLowerCase();
+  const col = COLS.find(x=>x.k===sortK);
+  const rows = E.filter(e => !term || JSON.stringify(e).toLowerCase().includes(term))
+    .sort((a,b) => { const x=col.v(a), y=col.v(b); if (x==null) return 1; if (y==null) return -1; return (col.n ? x-y : String(x).localeCompare(String(y))) * dir; });
+  t.innerHTML = "<thead><tr>" + COLS.map(x=>`<th${x.k===sortK?` aria-sort="${dir>0?'ascending':'descending'}"`:''}><button type="button" data-k="${x.k}">${x.h}</button></th>`).join("") + "</tr></thead><tbody>" +
+    rows.map(e => "<tr>" + COLS.map(x => {
+      const v = x.v(e), out = x.f ? x.f(v) : esc(String(v));
+      if (x.k==="supplier") return `<td><a href="#${e.id}">${out}</a></td>`;
+      if (x.k==="status") return `<td><span class="status${e.parked?' parked':''}">${out}</span></td>`;
+      return `<td${x.n?' class="n"':''}>${out}</td>`; }).join("") + "</tr>").join("") + "</tbody>";
+  c.textContent = rows.length + " of " + E.length + " emails";
+  t.querySelectorAll("th button").forEach(b => b.onclick = () => { if (sortK===b.dataset.k) dir=-dir; else { sortK=b.dataset.k; dir = (b.dataset.k==="save")?-1:1; } draw(); });
+}
+q.addEventListener("input", draw); draw();
+</script>
+</body>
+</html>

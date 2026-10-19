@@ -1,0 +1,314 @@
+<title>Public Pages Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Manrope:wght@400;600;700&display=swap">
+<style>
+/* Layout: one reading column. Verdict and decisions up top, then one block per section (Help, Recipes, Styles), then phases. Always-dark solorender palette, all reading text white. */
+:root{
+  --bg:#0a0a0a; --panel:#141414; --line:#2a2a2a;
+  --ink:#ffffff; --green:#6ee05a; --amber:#f2c14e;
+  --display:"Syne",system-ui,sans-serif; --body:"Manrope",system-ui,-apple-system,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;margin:0}
+.wrap{max-width:960px;margin:0 auto;padding-inline:20px;padding-block:40px 80px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(32px,6vw,50px);font-weight:800}
+h2{font-size:clamp(24px,4vw,32px);font-weight:700;margin:56px 0 14px}
+h3{font-size:20px;font-weight:700;margin:0 0 8px}
+p{margin:0 0 14px;max-width:68ch}
+.eyebrow{color:var(--green);font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px}
+.box{border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:20px 22px}
+.box p:last-child{margin-bottom:0}
+.count{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:20px}
+.count div{border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.count b{display:block;font-family:var(--display);font-size:32px;font-variant-numeric:tabular-nums;color:var(--green)}
+.count .now b{color:var(--amber)}
+.decision{border:1px solid var(--green);border-radius:14px;padding:20px 22px;margin-top:16px}
+.opts{display:grid;gap:10px;margin-top:12px}
+.opt{border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.opt.rec{border-color:var(--green)}
+.tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--green);border:1px solid var(--green);border-radius:999px;padding:1px 9px;margin-left:6px;vertical-align:2px}
+.section{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px}
+.section > div{min-width:0}
+@media (max-width:720px){.section{grid-template-columns:1fr}}
+ul{margin:6px 0 0;padding-left:20px;display:grid;gap:6px}
+ol.phases{list-style:none;padding:0;margin:0;display:grid;gap:14px;counter-reset:p}
+ol.phases li{counter-increment:p;display:grid;grid-template-columns:48px 1fr;gap:12px;border:1px solid var(--line);border-radius:12px;padding:16px}
+ol.phases li::before{content:counter(p);font-family:var(--display);font-weight:800;font-size:28px;color:var(--green)}
+.mock{border:1px dashed var(--line);border-radius:12px;padding:14px 16px;font-size:15px}
+.mock .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.mock .chip{border:1px solid var(--line);border-radius:8px;padding:4px 10px}
+.mock .btn{background:var(--green);color:#0a0a0a;border-radius:8px;padding:4px 12px;font-weight:700}
+.note{border-left:3px solid var(--green);padding:4px 0 4px 14px;margin:16px 0}
+footer{margin-top:56px;border-top:1px solid var(--line);padding-top:16px;font-size:15px}
+</style>
+
+<div class="wrap">
+<div class="eyebrow">Plan · solorender.com · 14 Oct 2026</div>
+<h1>Open Recipes, Styles and Help to Google</h1>
+<p style="margin-top:12px">Today, a visitor or Google who clicks any of these lands on the login screen. After this, anyone can browse them, and only <b>using</b> one asks you to sign in. Customers who are logged in keep the app exactly as it is now.</p>
+
+<div class="count">
+  <div class="now"><b>15</b>pages Google can see today</div>
+  <div><b>37</b>help articles</div>
+  <div><b>47</b>recipe pages</div>
+  <div><b>197</b>style pages</div>
+  <div><b>~310</b>total after all three phases</div>
+</div>
+
+<h2>Status · 14 Oct, late</h2>
+<div class="box">
+<p><b>Part 1 is live on solorender.com</b>, checked as a visitor (desktop and phone) and as a signed-in customer:</p>
+<ul>
+<li><b>Help:</b> all 37 articles are public.</li>
+<li><b>Recipes:</b> a public gallery plus 54 recipe pages. Each shows its example, what you bring and get, the price, the steps and the models used, with no prompts. Each has its own share picture.</li>
+<li><b>Styles:</b> 197 style pages plus 16 family pages. Each has 4 pictures, our own description and "good for" uses. The working style text stays private. Every cover was checked against its description, and 2 were reworded.</li>
+<li>The sitemap now lists <b>322 pages</b> (it was 15).</li>
+<li>Signed-in customers see the same Recipes tool and Styles gallery as before.</li>
+</ul>
+<p><b>Your decisions:</b> my recommendations on Choices 1 and 2. No "alternative to X" pages and no "credits never expire" page. <b>No spending.</b> So Part 2 uses only results that already exist, and comparison pages are made only where the same prompt was already run on both models.</p>
+</div>
+
+<h2>Status · Part 2</h2>
+<div class="box">
+<p><b>Part 2 is live</b>, built only from results already on your account, with no new spending:</p>
+<ul>
+<li><b>Comparisons:</b> "14 AI image generators, one prompt" (/learn/ai-image-generators-compared) and "AI photo and video editors compared" (/learn/ai-photo-and-video-editors-compared). These are first runs only, with notes that describe each picture, including the misspelled sign and the melted robot.</li>
+<li><b>12 tool pages</b> at /tools, such as "AI product video generator" and "AI talking photo maker". Each is backed by real recipes, and every recipe claim was checked against the recipe's own settings.</li>
+<li><b>3 new model guides:</b> Seedream, Grok Imagine and Grok Video, and GPT Image. All 9 guides now have a "Real results" gallery, and the new ones have questions.</li>
+<li><b>Fixed:</b> video price chips on Learn showed a per-second rate as if it were the clip price.</li>
+<li>The sitemap now lists <b>340 pages</b>.</li>
+</ul>
+<p><b>Waiting on you:</b> a music comparison. Four music models already made the same track, but no one has listened to them yet. <b>Not possible without spending:</b> guides for Seedance, Hailuo, Wan and PixVerse, which have almost no existing results.</p>
+</div>
+
+<h2>Two choices for you</h2>
+<p>Everything else follows how the site already works. These two change what a stranger, including a competitor, can see.</p>
+
+<div class="decision">
+<div class="eyebrow">Choice 1 · Recipes</div>
+<h3>How much of a recipe does a visitor see?</h3>
+<div class="opts">
+  <div class="opt"><b>A. Just the showcase.</b> The finished example (clip or pictures), the headline, what you bring, what you get, and the price. Nothing about how it's made.</div>
+  <div class="opt rec"><b>B. Showcase plus "how it's made."</b><span class="tag">Recommended</span> Everything in A, plus the steps in plain words and the model names. For example: "a Seedream picture of your product → three Kling clips → an ElevenLabs voiceover → stitched into one film." Model names are words people search ("Kling product ad"). It also shows buyers what they're paying for. The prompts stay private.</div>
+  <div class="opt"><b>C. Everything, prompts included.</b> Not recommended. Anyone could paste the prompts into a cheaper tool, and the prompts are the work you've tested.</div>
+</div>
+</div>
+
+<div class="decision">
+<div class="eyebrow">Choice 2 · Styles</div>
+<h3>Does a visitor see the style's own wording?</h3>
+<p style="margin-top:8px">Each style is four example pictures plus one sentence, for example "Psychedelic cartoon illustration: exaggerated forms, bold black outlines…". That sentence is what makes the look, so anyone who reads it could use it in another tool.</p>
+<div class="opts">
+  <div class="opt"><b>A. Show the sentence.</b> Fastest, about half a day less work. But each page is only one sentence long, and Google tends to ignore pages that thin.</div>
+  <div class="opt rec"><b>B. Keep the sentence for members, and write each style a short public description.</b><span class="tag">Recommended</span> That's 2–3 sentences in our own words: what the look is, and what it's good for ("good for kids' book covers, cereal-box mascots"). It also shows a "Use @acid-pop in any prompt" button. Pages become long enough to rank, and the working text stays a member perk. I write all 197 in batches and check each against its pictures.</div>
+</div>
+</div>
+
+<p class="note">Help has no real choice. All 37 articles are how-tos with screenshots, none show customer data, and none are owner-only. I'd open all of them.</p>
+
+<h2>What a visitor will see</h2>
+
+<div class="box">
+<div class="eyebrow">Recipe page · e.g. solorender.com/recipes/product-ad</div>
+<div class="section">
+<div class="mock">
+<b>Your product, starring in its own ad</b>
+<div class="row"><span class="chip">▶ example film plays</span><span class="chip">your photo → result</span></div>
+<div class="row"><span class="chip">You bring: 1 product photo + a line of script</span></div>
+<div class="row"><span class="chip">You get: 3-shot ad with voiceover</span><span class="chip">≈ credits, shown live</span></div>
+<div class="row"><span class="btn">Use this recipe →</span></div>
+</div>
+<div>
+<ul>
+<li><b>Use this recipe</b> sends visitors to sign in, then opens that recipe ready to fill. Logged-in customers go straight in.</li>
+<li>Each recipe gets its own share picture made from its own example result. Affiliates can link to one recipe instead of the homepage.</li>
+<li>"More recipes like this" links at the bottom keep Google moving between pages.</li>
+<li>/recipes becomes a public gallery for visitors. Logged-in customers still get the full Recipes page they have now.</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div class="box" style="margin-top:14px">
+<div class="eyebrow">Style page · e.g. solorender.com/styles/acid-pop</div>
+<div class="section">
+<div class="mock">
+<b>Acid Pop</b>
+<div class="row"><span class="chip">4 example pictures</span></div>
+<div class="row"><span class="chip">What it is + good for (our words)</span></div>
+<div class="row"><span class="chip">Family: Cartoon &amp; comic</span><span class="chip">Similar looks →</span></div>
+<div class="row"><span class="btn">Use this style →</span></div>
+</div>
+<div>
+<ul>
+<li>I'll sort the styles into about 12 families (anime, painting, 3D, photo, retro, cartoon…). Each family gets its own page, such as "Anime art styles", for broader searches. Today styles have no families at all.</li>
+<li>The pictures are served resized and cached. Today they load at full size from storage, which is one reason phones load slowly.</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div class="box" style="margin-top:14px">
+<div class="eyebrow">Help article · e.g. solorender.com/help/lip-sync</div>
+<p>The same article and screenshots as today, with the public header (like the Learn pages) instead of the app sidebar. The address stays the same, so links people already have keep working.</p>
+</div>
+
+<h2>Order of work</h2>
+<ol class="phases">
+<li><div><b>Help center: 37 pages.</b> This is the smallest job, about half a day. The articles are already fixed pages, so they just move outside the login wall. It needs no decision from you, so I can start it right away.</div></li>
+<li><div><b>Recipes: 47 pages plus a public gallery.</b> About 1–1.5 days after you pick Choice 1. That includes share pictures and the "sign in, then open this recipe" step. I'll check every recipe page on the live site at phone and desktop width before calling it done.</div></li>
+<li><div><b>Styles: 197 pages plus ~12 family pages.</b> About 2 days after you pick Choice 2, most of it writing and checking the descriptions. That includes resizing and caching the pictures.</div></li>
+<li><div><b>Hand everything to Google.</b> Add all new pages to the sitemap, resubmit it in Search Console, and point the homepage links at the public pages. That fixes the "75 links into the login screen" problem from the audit.</div></li>
+</ol>
+
+<h2>Costs and risks</h2>
+<ul>
+<li><b>Money:</b> no new services. Resizing pictures uses the Vercel image service you already chose on 8 Oct. If that bill passes about $10/month, the plan you agreed then (moving thumbnails to R2) applies.</li>
+<li><b>Copying:</b> with B and B, the prompts and style wording stay private. Competitors can see what you offer and your prices, which they can already see by signing up for free.</li>
+<li><b>Timing:</b> Google usually takes 2–6 weeks to index a few hundred new pages from a young site. I'll check the Search Console "Pages" count after two weeks and report the real number.</li>
+<li><b>Nothing changes for logged-in customers.</b> I'll check that on the live site after each phase.</li>
+</ul>
+
+<h2 id="part2">Part 2: the pages your rivals win with</h2>
+<p>Part 1 opens what you already have. Part 2 builds new pages aimed at what people type into Google. Rivals use four kinds, plus one only you can make. These are about <b>47 pages</b>, fewer than Part 1, but each one targets a search someone is actually making.</p>
+
+<div class="box">
+<div class="eyebrow">Type 1 · Model pages · ~20 pages</div>
+<h3>"Kling 3.0", "Seedance 2.0", "Veo 3.1"…</h3>
+<div class="section">
+<div class="mock">
+<b>Kling 3.0 on solorender</b>
+<div class="row"><span class="chip">3–6 real clips we made with it</span></div>
+<div class="row"><span class="chip">Price: Pro 210 credits ($2.10) per 5-sec clip · Turbo 140 ($1.40)</span></div>
+<div class="row"><span class="chip">Best for / where it struggles</span><span class="chip">Prompts that work</span></div>
+<div class="row"><span class="chip">FAQ: "Is Kling worth the money?" "Which Kling model is best?"</span></div>
+<div class="row"><span class="btn">Try Kling 3.0 →</span></div>
+</div>
+<div>
+<ul>
+<li>One page per model <b>family</b>, not per variant, so Kling v3 Turbo, Standard and Pro share one page. Your 106 models come down to about 20 families. Those include Kling, Veo, Seedance, Hailuo, Wan, PixVerse, Grok, Luma, Nano Banana, GPT Image, FLUX, Seedream, Ideogram and ElevenLabs.</li>
+<li>Your 6 Learn guides already are model pages. I'd <b>grow those</b> instead of making duplicates, because two pages about the same model compete with each other in Google.</li>
+<li>Prices come straight from the price list the app charges from, so they update themselves when you change prices or a sale runs.</li>
+<li>The FAQ answers are the real questions Google shows under "People also ask". They're written as normal text on the page (Google no longer shows FAQ markup).</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div class="box" style="margin-top:14px">
+<div class="eyebrow">Type 2 · "AI ___ generator" pages · ~12 pages</div>
+<h3>"AI product video generator", "AI lip sync video", "AI short film generator"…</h3>
+<div class="section">
+<div class="mock">
+<b>AI product video generator</b>
+<div class="row"><span class="chip">Hero: a finished product film from your recipes</span></div>
+<div class="row"><span class="chip">How it works: 1 photo → 3 shots → film</span></div>
+<div class="row"><span class="chip">Recipes that do this: Product Ad · Product Spin · Torture Test…</span></div>
+<div class="row"><span class="btn">Make a product video →</span></div>
+</div>
+<div>
+<ul>
+<li>Each page is built around a job, and every one is backed by recipes and tools you already have. The list:
+<ul>
+<li>Product video</li>
+<li>Ad / UGC</li>
+<li>Lip sync / talking photo</li>
+<li>Music video</li>
+<li>Short film</li>
+<li>Headshots</li>
+<li>Image to video</li>
+<li>Voiceover</li>
+<li>Anime portrait</li>
+<li>Thumbnails</li>
+<li>Real-estate walkthrough</li>
+<li>Logo mockups</li>
+</ul></li>
+<li>This is where Part 1 pays off. Each page links to the public recipe pages, so the examples are your real results.</li>
+<li>Rivals have hundreds of these. Twelve real ones beat a hundred thin ones.</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div class="box" style="margin-top:14px">
+<div class="eyebrow">Type 3 · Model vs model · ~8 pages</div>
+<h3>"Seedance 2.0 vs Veo 3.1", "Kling vs Veo", "Nano Banana vs GPT Image"…</h3>
+<div class="section">
+<div class="mock">
+<b>Seedance 2.0 vs Veo 3.1</b>
+<div class="row"><span class="chip">Same prompt, both models, side by side</span></div>
+<div class="row"><span class="chip">Job-by-job table: who wins and why</span></div>
+<div class="row"><span class="chip">Price: 200 cr ($2.00) / 5 s vs 800 cr ($8.00) / 8 s</span></div>
+<div class="row"><span class="btn">Run both →</span></div>
+</div>
+<div>
+<ul>
+<li>Same format as your live FLUX 2 Pro vs Nano Banana 2 page. Small sites win these searches today (Reddit, YouTube, small blogs).</li>
+<li>Only you can say "run both in one place", because you carry both models.</li>
+<li>These need <b>real side-by-side clips</b>, which means paying for test runs. See Choice 4.</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div class="box" style="margin-top:14px">
+<div class="eyebrow">Type 4 · "Alternative to X" · 6 pages + 1</div>
+<h3>"Higgsfield alternative", "OpenArt alternative", "Magnific alternative"…</h3>
+<div class="section">
+<div class="mock">
+<b>Looking for a Higgsfield alternative?</b>
+<div class="row"><span class="chip">Credits never expire vs reset monthly</span></div>
+<div class="row"><span class="chip">Buy credits with no plan vs plan required</span></div>
+<div class="row"><span class="chip">Every model on every plan vs tier-locked</span></div>
+<div class="row"><span class="chip">"Prices checked 14 Oct 2026"</span></div>
+<div class="row"><span class="btn">Start with 1,100 credits for $8 →</span></div>
+</div>
+<div>
+<ul>
+<li>Pages for Higgsfield, OpenArt, Magnific, Krea, TopView and Freepik. Plus one page only you can make: <b>"AI credits that never expire"</b>. Tiny sites win that search today, and it's your clearest difference. On 12 Oct none of 5 rivals rolled credits over or sold credits without a plan.</li>
+<li><b>Honesty rule:</b> per clip, these rivals are usually cheaper on their bigger plans. For example, Seedance 2.0 is $2.00 with you and $1.13 at Higgsfield Plus (12 Oct check). So these pages must not say "cheaper". They win on terms: nothing expires, no subscription needed, cancel without losing credits. See Choice 3.</li>
+<li>Every rival fact gets a date and is rechecked before publishing, because their prices change.</li>
+<li>Our own words and layout only. Nothing copied from their pages.</li>
+</ul>
+</div>
+</div>
+</div>
+
+<h2>Two more choices for Part 2</h2>
+
+<div class="decision">
+<div class="eyebrow">Choice 3 · Alternative pages</div>
+<h3>Do these pages show price per clip?</h3>
+<div class="opts">
+  <div class="opt rec"><b>A. Compare on terms only.</b><span class="tag">Recommended</span> The table covers expiry, subscription, cancellation and model access. Plus one honest sentence: "On their biggest plans some rivals charge less per clip. Here, credits you buy never vanish." It's true, it can't be called misleading, and it plays to your strength.</div>
+  <div class="opt"><b>B. Full price table, per model.</b> The most transparent. But it shows a visitor that you're more expensive on most models, right at the moment they're comparing.</div>
+  <div class="opt"><b>C. Leave price out entirely.</b> Simplest. But comparison shoppers look for price first, and saying nothing reads as hiding something.</div>
+</div>
+</div>
+
+<div class="decision">
+<div class="eyebrow">Choice 4 · Spending on comparison clips</div>
+<h3>OK to spend about $40–60 at our cost on side-by-side test runs?</h3>
+<p style="margin-top:8px">The 8 vs pages need each model run on the same 2–3 prompts. That comes to about 36 video clips plus some pictures. Veo 3.1 alone is about $3.20 per 8-second clip at our cost. I'd look at every result before it goes on a page, and drop any run that came out wrong.</p>
+<div class="opts">
+  <div class="opt rec"><b>Yes, run them all</b><span class="tag">Recommended</span> Real results are what make these pages trustworthy and rank.</div>
+  <div class="opt"><b>Start with 3 pages (about $15–20)</b>, and see how they do in Search Console before making the rest.</div>
+</div>
+</div>
+
+<h2>Order for Part 2</h2>
+<ol class="phases">
+<li><div><b>The "credits never expire" page + 6 alternative pages.</b> About 1–1.5 days. These are the easiest searches to win and need no test spending. Every rival fact is rechecked live first.</div></li>
+<li><div><b>Grow the 6 Learn guides into model pages, then add ~14 more families.</b> About 3–4 days. Uses examples from your Library and recipes where they exist, with prices read live from the app.</div></li>
+<li><div><b>8 model-vs-model pages.</b> About 2 days plus the test runs (Choice 4).</div></li>
+<li><div><b>12 "AI ___ generator" pages.</b> About 2–3 days, after Part 1's public recipe pages exist, since these link to them.</div></li>
+</ol>
+<p class="note">All of Part 2 comes to roughly 9–11 working days. Part 1 (Help, Recipes, Styles) is about 4 days. My suggestion: Help first, then the "never expire" and alternative pages, then the rest in the order above. That way the easiest wins go live this week.</p>
+
+<footer>
+<p><b>Part 2 sources:</b> the app's own price list (106 models, read 14 Oct), the 12–13 Oct competitor price check (Higgsfield, OpenArt, Magnific, VEED, Artlist), and this week's SEO research (rival page counts from their sitemaps, live Google results for each search).</p>
+<p><b>Checked for this plan:</b> the live redirects (/help, /recipes and /styles all go to /login today), the app code for each section (the recipes list, card copy, the 37 help articles), and the database (197 built-in styles, each with 4 pictures and one description sentence of 82–261 characters). No style families exist yet.</p>
+</footer>
+</div>

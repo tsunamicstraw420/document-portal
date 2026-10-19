@@ -1,0 +1,347 @@
+<title>solorender Investor Letter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a single letter column on black letterhead, with fact panels, a use-of-funds
+   block and a dated milestone ledger set into the letter where the story needs them. */
+:root {
+  color-scheme: dark;
+  --bg: #0a0a0a;
+  --surface: #151412;
+  --line: #2a2823;
+  --ink: #ffffff;
+  --leaf: #6ee05a;
+  --orange: #f7931a;
+  --display: "Syne", "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+  --body: "Manrope", "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+  --measure: 40rem;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  padding-inline: 20px;
+  padding-block: 0 72px;
+  -webkit-font-smoothing: antialiased;
+}
+.sheet { max-width: var(--measure); margin-inline: auto; }
+a { color: var(--leaf); text-underline-offset: 3px; }
+a:focus-visible { outline: 2px solid var(--leaf); outline-offset: 3px; border-radius: 2px; }
+
+/* letterhead */
+.letterhead {
+  display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
+  gap: 12px 24px; padding-block: 48px 22px; border-bottom: 1px solid var(--line);
+}
+.wordmark { font-family: var(--display); font-size: 2rem; line-height: 1; white-space: nowrap; letter-spacing: .02em; }
+.wordmark .light { font-weight: 500; }
+.wordmark .heavy { font-weight: 800; }
+.wordmark svg { height: .82em; width: .82em; vertical-align: -.10em; margin-inline: .02em; color: var(--leaf); }
+.meta { font-size: .8125rem; line-height: 1.5; text-align: right; }
+.meta b { display: block; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--leaf); font-size: .75rem; }
+
+/* headings */
+h1 {
+  font-family: var(--display); font-weight: 800; font-size: clamp(1rem, 3vw, 1.45rem);
+  line-height: 1.08; letter-spacing: -.01em; margin: 44px 0 0; text-wrap: balance;
+}
+h1 em { font-style: normal; color: var(--orange); }
+h2 {
+  font-family: var(--display); font-weight: 700; font-size: 1.5rem; line-height: 1.2;
+  margin: 56px 0 6px; text-wrap: balance;
+}
+.label { font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--leaf); }
+p { margin: 14px 0 0; }
+.salute { margin-top: 36px; }
+strong { font-weight: 700; }
+
+/* the numbers panel */
+.numbers {
+  margin-top: 36px; display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  border: 1px solid var(--line); border-radius: 6px; background: var(--surface);
+}
+.num { padding: 18px 18px 16px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); min-width: 0; }
+.num .v { font-family: var(--display); font-weight: 800; font-size: 2rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.num .k { margin-top: 8px; font-size: .8125rem; line-height: 1.4; }
+.num .k::before { content: ""; display: block; width: 18px; height: 2px; background: var(--leaf); margin-bottom: 8px; }
+.note { font-size: .8125rem; line-height: 1.5; margin-top: 10px; }
+
+/* product pieces */
+.pieces { margin-top: 22px; display: grid; border-top: 1px solid var(--line); }
+.piece { display: grid; grid-template-columns: 9.5rem 1fr; gap: 6px 22px; padding-block: 18px; border-bottom: 1px solid var(--line); }
+.piece .label { padding-top: 4px; }
+.piece p { margin: 0; }
+.piece p + p { margin-top: 8px; }
+@media (max-width: 560px) { .piece { grid-template-columns: 1fr; } }
+
+ul.plain { margin: 14px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+ul.plain li { padding-left: 22px; position: relative; }
+ul.plain li::before { content: ""; position: absolute; left: 2px; top: .72em; width: 9px; height: 2px; background: var(--orange); }
+
+/* the raise */
+.raise { margin-top: 22px; border: 1px solid var(--orange); border-radius: 6px; overflow: hidden; }
+.raise-head { padding: 20px 22px; background: var(--surface); display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 20px; }
+.raise-head .amt { font-family: var(--display); font-weight: 800; font-size: 2.2rem; line-height: 1; color: var(--orange); font-variant-numeric: tabular-nums; }
+.raise-head .what { font-size: .9375rem; }
+.uses { display: grid; }
+.use { display: grid; grid-template-columns: 2.25rem 1fr; gap: 4px 14px; padding: 18px 22px; border-top: 1px solid var(--line); }
+.use .n { font-family: var(--display); font-weight: 800; font-size: 1.25rem; line-height: 1.3; color: var(--orange); }
+.use h3 { font-family: var(--display); font-weight: 700; font-size: 1.125rem; line-height: 1.3; margin: 0; }
+.use p { margin: 6px 0 0; }
+.use div { min-width: 0; }
+
+/* stack table */
+.table-wrap { margin-top: 20px; overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; }
+table { width: 100%; border-collapse: collapse; font-size: .9375rem; line-height: 1.5; min-width: 30rem; }
+th, td { text-align: left; vertical-align: top; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+tr:last-child td { border-bottom: 0; }
+th { font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--leaf); background: var(--surface); }
+td:first-child { font-weight: 700; white-space: nowrap; }
+
+/* milestone ledger */
+.ledger { margin-top: 20px; border-left: 2px solid var(--line); display: grid; }
+.mile { display: grid; grid-template-columns: 5.5rem 1fr; gap: 16px; padding: 10px 0 10px 18px; position: relative; }
+.mile::before { content: ""; position: absolute; left: -6px; top: 18px; width: 10px; height: 10px; border-radius: 50%; background: var(--bg); border: 2px solid var(--leaf); }
+.mile.big::before { background: var(--orange); border-color: var(--orange); }
+.mile time { font-size: .8125rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--leaf); padding-top: 3px; font-variant-numeric: tabular-nums; }
+.mile div { min-width: 0; }
+
+/* pull quote */
+.pull {
+  margin: 40px 0 0; padding: 22px 24px; background: var(--surface); border-radius: 6px;
+  font-family: var(--display); font-weight: 700; font-size: 1.3rem; line-height: 1.35; text-wrap: balance;
+}
+.pull span { color: var(--orange); }
+
+/* signature */
+.sign { margin-top: 44px; padding-top: 22px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 18px; }
+.sign .name { font-family: var(--display); font-weight: 800; font-size: 1.35rem; line-height: 1.2; }
+.sign .role { font-size: .9375rem; }
+.contact { font-size: .9375rem; line-height: 1.6; text-align: right; }
+.contact .label { display: block; }
+@media (max-width: 560px) { .contact, .meta { text-align: left; } }
+@media (prefers-reduced-motion: no-preference) { a { transition: opacity .15s; } a:hover { opacity: .8; } }
+</style>
+
+<div class="sheet">
+
+<header class="letterhead">
+  <div class="wordmark" aria-label="solorender"><span class="light">s</span><svg viewBox="12 12 72 72" aria-hidden="true"><path d="M65.2 23.4 A30 30 0 1 0 65.2 72.6" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round"/><path d="M65.2 72.6 A30 30 0 0 0 75.2 35.3" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg><span class="light">lo</span><span class="heavy">render</span></div>
+  <div class="meta"><b>Letter to investors</b>October 18, 2026 · Solorender, Inc.</div>
+</header>
+
+<h1>Two months ago this was a blank page. Today it is <em>a live AI film studio</em> taking real payments.</h1>
+
+<p class="salute">Dear friends and future partners,</p>
+
+<p>I want to tell you what we have built, because the pace surprised even me.</p>
+
+<p>On August 18, 2026, the first line of code for solorender was written. Twenty-three days later, on September 10, the studio went live at <a href="https://solorender.com">solorender.com</a>. Eight days after that it was taking real card payments. Today it is a complete creative studio. It puts the world's best AI image, video, voice and music models in one place, sells them on simple credits, and turns a single product photo into a finished, narrated ad film.</p>
+
+<p>All of it was built by one founder, working with AI coding tools, without outside money and without spending a dollar on advertising. That is the company in one sentence: <strong>a lot of product for very little capital.</strong></p>
+
+<div class="numbers" role="list" aria-label="solorender by the numbers">
+  <div class="num" role="listitem"><div class="v">61</div><div class="k">days from first line of code to today</div></div>
+  <div class="num" role="listitem"><div class="v">113</div><div class="k">AI model options, from more than 20 AI labs</div></div>
+  <div class="num" role="listitem"><div class="v">54</div><div class="k">one-click "recipes" that make finished content</div></div>
+  <div class="num" role="listitem"><div class="v">318</div><div class="k">ready-to-use prompts in our Prompt Library</div></div>
+  <div class="num" role="listitem"><div class="v">197</div><div class="k">built-in visual styles</div></div>
+  <div class="num" role="listitem"><div class="v">475</div><div class="k">code updates saved and shipped</div></div>
+</div>
+<p class="note">Counts read from the live product and its code history on October 18, 2026. Advertising spend to date: $0.</p>
+
+<h2>What solorender is</h2>
+<p>Creators and small businesses today juggle five or six AI subscriptions. One app for pictures, another for video, another for voices, another for music. Each has its own monthly plan, and most of them wipe your unused credits at the end of the month.</p>
+<p>solorender replaces that pile with one studio and one wallet. Customers buy credits and use them on any model we carry: Google's Veo and Nano Banana, OpenAI's GPT Image, Kling, Seedance, ElevenLabs, FLUX and many more. Their credits never expire.</p>
+<p>We checked this against five competitors (OpenArt, Magnific, Higgsfield, VEED and Artlist). <strong>None of them roll unused credits over.</strong> That is the promise we lead with.</p>
+
+<h2>What we have built</h2>
+<p class="label">The product, piece by piece</p>
+
+<div class="pieces">
+  <div class="piece">
+    <div class="label">Pictures</div>
+    <div><p>Create images from a sentence, then edit them by describing the change. Erase objects, enlarge and sharpen, grow a square into a banner, and keep the same person across new scenes. 45 picture models and editors, from one-credit drafts to studio-grade.</p></div>
+  </div>
+  <div class="piece">
+    <div class="label">Video</div>
+    <div><p>Turn a picture into a moving clip, or go straight from a written scene. Clips up to 30 seconds, up to 4K, many with sound built in, and several camera shots in a single clip. Then keep working on them: add seconds, upscale, restyle a whole clip into animation, or change it by typing ("make it winter").</p></div>
+  </div>
+  <div class="piece">
+    <div class="label">Voice &amp; music</div>
+    <div><p>Studio voiceovers in 29 languages, full songs with vocals, and background music, all from the same wallet.</p></div>
+  </div>
+  <div class="piece">
+    <div class="label">Talking photos</div>
+    <div><p>Pick a face and a voice and the person speaks, with matching lip movement. Customers can also upload their own clip and re-sync it to any voice track.</p></div>
+  </div>
+  <div class="piece">
+    <div class="label">Flow &amp; films</div>
+    <div><p>A visual canvas where every step of a project sits side by side. One button, <em>Render film</em>, stitches the clips, voice, captions and sound into a single finished video. We run our own film-assembly server for this, and it evens out the sound levels the way a broadcast editor would.</p></div>
+  </div>
+  <div class="piece">
+    <div class="label">Recipes</div>
+    <div><p>54 ready-made productions. Drop in one product photo and get a three-shot narrated ad, a creator-style testimonial, a two-host podcast clip, a six-picture shop listing set, a professional headshot pack, a mock courtroom drama about your product, and many more. Video recipes come in three price levels (Saver, Standard and Best), so a customer can draft cheaply and finish in top quality.</p><p>Every film recipe is checked the way a customer sees it: the whole finished film, start to end. Recipes that don't pass are not listed.</p></div>
+  </div>
+  <div class="piece">
+    <div class="label">Prompt Library</div>
+    <div><p>318 ready-to-use prompt ideas in 16 categories, each one click away from running. 58 of them come with a real preview clip. It is a perk for paying customers.</p></div>
+  </div>
+  <div class="piece">
+    <div class="label">Characters &amp; products</div>
+    <div><p>Save a person, character or product once, then mention it by name in any prompt. The video models keep that face or product looking the same from shot to shot. This is the hardest problem in AI video, and it is the one brands care about most.</p></div>
+  </div>
+  <div class="piece">
+    <div class="label">Styles</div>
+    <div><p>A library of 197 original visual looks (anime, clay, noir comics, storybook watercolor, pixel art and many more), each with our own example pictures. Customers can also make a style from their own pictures and apply it to images, recipes and whole clips.</p></div>
+  </div>
+  <div class="piece">
+    <div class="label">Direct button</div>
+    <div><p>Not everyone knows how to write a prompt. One click, and our built-in AI director writes it for them, including what the model should avoid.</p></div>
+  </div>
+  <div class="piece">
+    <div class="label">AI-agent access</div>
+    <div><p>Customers can run solorender from inside Claude and other AI assistants. The assistant can generate, build a project and render the film on its own.</p></div>
+  </div>
+  <div class="piece">
+    <div class="label">Learning</div>
+    <div><p>A help center with 47 articles, model-by-model guides, an AI filmmaking course for customers on our larger plans, and a public home page full of example clips and pictures.</p></div>
+  </div>
+  <div class="piece">
+    <div class="label">Plans that scale</div>
+    <div><p>Bigger plans run more jobs at the same time, jump the queue for films, and get more storage, from 5 GB up to 2 TB. The product itself enforces these limits.</p></div>
+  </div>
+</div>
+
+<h2>The business underneath</h2>
+<p>A creative tool is only a company if the money works. We built that side with the same care.</p>
+<ul class="plain">
+  <li><strong>Live payments since September 18.</strong> Monthly and yearly plans, an $8 starter offer for new customers, a one-time bulk credit pack, and top-up packs for plan holders. All run through Stripe and were tested with real money end to end.</li>
+  <li><strong>A simple, fair margin.</strong> Every generation is priced at 2.5 times what it costs us. When our cost drops, the customer's price drops with it. We never quietly keep the difference.</li>
+  <li><strong>Cost already going down.</strong> On October 14 we brought on a second AI supplier, Runware. A five-second clip from Seedance 2.0, one of the leading premium video models, now costs us $0.79 instead of $1.52. If that supplier has a problem, the job is refunded and the customer can try again.</li>
+  <li><strong>Supplier sales passed on automatically.</strong> When our main supplier puts a model on sale, our price follows within hours. A check runs three times a day without anyone touching it.</li>
+  <li><strong>Built-in growth channel.</strong> A creator partner program is live. Partners earn 25% of the plans and offers their referrals buy, for 12 months, tracked automatically.</li>
+  <li><strong>Protected against losses.</strong> Refunds and card disputes take the credits back. Failed jobs refund the customer automatically. Video is billed on the real length of the file, not on what the browser claims.</li>
+  <li><strong>Prices editable without code.</strong> The owner console lets us change plans, offers and packs, give or take credits, pause a model, and see real money in against real supplier cost.</li>
+</ul>
+
+<h2>Built to run without babysitting</h2>
+<ul class="plain">
+  <li>A watchdog checks the live site every 30 minutes around the clock.</li>
+  <li>Every 5 minutes, the system checks for stuck films, supplier refusals and a silent film server, and sends an alert to my phone.</li>
+  <li>Long video jobs finish and save to the customer's library even if they close the browser.</li>
+  <li>Every customer file is kept in our own low-cost cloud storage, so we don't depend on a supplier's short-lived links.</li>
+  <li>We found and fixed a problem early where a slow job could be charged twice. It cannot happen now.</li>
+</ul>
+
+<p class="pull">One founder. No outside money. <span>A full studio, live payments and a company behind it in about two months.</span></p>
+
+<h2>What it is built on</h2>
+<p>We chose proven, pay-as-you-grow services. Our fixed costs stay small while we are small, and each piece has bigger paid plans ready for when customers arrive.</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Piece</th><th>What it does for us</th><th>Provider</th></tr></thead>
+  <tbody>
+    <tr><td>Website &amp; app</td><td>The studio itself, built in Next.js (the framework behind many large web apps) and hosted worldwide</td><td>Vercel</td></tr>
+    <tr><td>Accounts &amp; data</td><td>Logins, the credit ledger and customer libraries</td><td>Supabase</td></tr>
+    <tr><td>Payments</td><td>Checkout, subscriptions, receipts, refunds</td><td>Stripe</td></tr>
+    <tr><td>AI models</td><td>Wholesale access to the image, video, voice and music models we resell</td><td>fal.ai, Runware</td></tr>
+    <tr><td>Film assembly</td><td>Our own server that stitches clips, voice and captions into finished films</td><td>Render</td></tr>
+    <tr><td>Domain &amp; storage</td><td>solorender.com, its security, and storage for every customer file</td><td>Cloudflare</td></tr>
+    <tr><td>Sign-in</td><td>Email login and verified "Sign in with Google"</td><td>Google</td></tr>
+    <tr><td>Email</td><td>Company email with full sender authentication</td><td>Google Workspace</td></tr>
+    <tr><td>Partners</td><td>Referral tracking and commission payouts</td><td>PromoteKit</td></tr>
+    <tr><td>Monitoring</td><td>Round-the-clock checks and instant phone alerts</td><td>GitHub, Telegram</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="note">Because we buy AI wholesale from several suppliers instead of training our own models, we can add a new model within days of its release, and we can move each model to whichever supplier sells it cheapest.</p>
+
+<h2>The company</h2>
+<p>solorender is operated by <strong>Solorender, Inc.</strong>, a California corporation filed on September 30, 2026 and approved on October 2. Founding documents, including the assignment of all technology to the company, were signed on October 4, and the company received its federal tax ID on October 13. It is set up the standard way for a startup that plans to raise money: one class of common stock, held by the founder, with all the technology owned by the company. The last setup steps, such as the business bank account and moving payments under the company name, are under way.</p>
+
+<h2>How we got here</h2>
+<div class="ledger">
+  <div class="mile"><time>Aug 15</time><div>Scope and build plan written.</div></div>
+  <div class="mile"><time>Aug 18</time><div>First line of code.</div></div>
+  <div class="mile"><time>Aug 28</time><div>Accounts, credit system and checkout working.</div></div>
+  <div class="mile big"><time>Sep 10</time><div><strong>Live at solorender.com.</strong></div></div>
+  <div class="mile big"><time>Sep 18</time><div><strong>Real payments switched on.</strong> Plans, offers and top-ups live.</div></div>
+  <div class="mile"><time>Sep 19</time><div>Six pro tools added: expand, video upscale, extend, edit by typing, restyle, talking photos.</div></div>
+  <div class="mile"><time>Sep 21</time><div>AI-agent access goes live.</div></div>
+  <div class="mile big"><time>Sep 30</time><div><strong>Solorender, Inc. filed</strong> (approved October 2).</div></div>
+  <div class="mile"><time>Oct 7</time><div>Google sign-in and the Direct button.</div></div>
+  <div class="mile"><time>Oct 8</time><div>Clip upload. Jobs finish even after the browser closes.</div></div>
+  <div class="mile"><time>Oct 9</time><div>Saved characters and products. Owner console. Partner tracking.</div></div>
+  <div class="mile"><time>Oct 10</time><div>Refund and dispute protection. Automatic supplier sale prices.</div></div>
+  <div class="mile"><time>Oct 11</time><div>24/7 watchdog and phone alerts. Recipe library expanded.</div></div>
+  <div class="mile"><time>Oct 12</time><div>197 built-in styles.</div></div>
+  <div class="mile big"><time>Oct 14</time><div><strong>New home page, search-engine setup, new pricing, and a second AI supplier</strong> cutting our top video cost roughly in half.</div></div>
+  <div class="mile"><time>Oct 15</time><div>Prompt Library. Saver, Standard and Best levels on recipes.</div></div>
+  <div class="mile"><time>Oct 16</time><div>Several camera shots in one clip. All customer files moved to our own storage.</div></div>
+  <div class="mile"><time>Oct 17</time><div>Our own video editor enters private preview.</div></div>
+  <div class="mile"><time>Oct 18</time><div>Plan perks enforced: jobs at once, film priority and storage by plan.</div></div>
+</div>
+
+<h2>What we are raising</h2>
+<p>The product is ready. The next chapter is getting it in front of people at a price they can't ignore. We are raising <strong>up to $150,000</strong> to do four things.</p>
+
+<div class="raise">
+  <div class="raise-head">
+    <div class="amt">Up to $150,000</div>
+    <div class="what">to grow solorender and lower what customers pay</div>
+  </div>
+  <div class="uses">
+    <div class="use">
+      <div class="n">1</div>
+      <div>
+        <h3>Lower prices for customers</h3>
+        <p>The biggest players in our market buy AI at volume rates we can't reach yet. Part of this money goes to closing that gap: prepaid volume deals and direct contracts with the AI makers, and running open-source models on rented servers of our own. Because our price is always 2.5 times our cost, every dollar we save comes straight off the customer's bill.</p>
+      </div>
+    </div>
+    <div class="use">
+      <div class="n">2</div>
+      <div>
+        <h3>Advertising and marketing</h3>
+        <p>Paid ads to reach creators and small businesses, plus short social video series made with solorender itself, so every post doubles as a demo.</p>
+      </div>
+    </div>
+    <div class="use">
+      <div class="n">3</div>
+      <div>
+        <h3>Creator partner program</h3>
+        <p>Bringing creators into the partner program that is already live, so they share solorender with their audiences and earn from it.</p>
+      </div>
+    </div>
+    <div class="use">
+      <div class="n">4</div>
+      <div>
+        <h3>Founder runway</h3>
+        <p>Time to work on solorender full time while it grows, including finishing our own video editor, so a customer can go from idea to finished, edited video without leaving the studio.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p>I would welcome the chance to show you the studio live. Give me fifteen minutes and one photo of a product you like, and I will turn it into a finished ad film in front of you.</p>
+
+<p>Thank you for reading.</p>
+
+<div class="sign">
+  <div>
+    <div class="name">Edmond "Eddie" Barna</div>
+    <div class="role">Founder &amp; CEO, Solorender, Inc.</div>
+  </div>
+  <div class="contact">
+    <span class="label">Get in touch</span>
+    eddie@solorender.com<br>
+    <a href="https://solorender.com">solorender.com</a>
+  </div>
+</div>
+
+</div>
