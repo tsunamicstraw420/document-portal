@@ -1,6 +1,7 @@
 <h1>AI_bots — House Rules</h1>
 <p>This folder holds all of Eddie&#x27;s ongoing projects, each in its own subfolder. New projects get new subfolders. <code>Claude_and_AI_Docs/</code> holds finished general documentation.</p>
 <p><strong>AI video / animation prompting — ANY project.</strong> Before writing any AI video/clip prompt (Kling, Runway, image-to-video, etc.), read <code>Claude_and_AI_Docs/VIDEO_PROMPTING_GUIDE.md</code>. It is the reusable playbook for making generated clips actually move: ground the keyframe, spell out the full beat-by-beat motion arc with foot-to-floor contact, use a START+END keyframe pair to force locomotion (a leaping/mid-stride pose held static &quot;flies in place&quot;), paste a camera move from the library, and put anti-float terms in the negative-prompt field. Terse motion prompts freeze or hover and waste paid credits.</p>
+<p><strong>On-screen text / motion graphics — ANY project.</strong> Before putting ANY words on a video (ads, Shorts, Reels, trailers, explainers, captions-as-design), read <code>Claude_and_AI_Docs/Motion_Text_Playbook.html</code>. It&#x27;s the method Eddie called &quot;amazing&quot; on course ad 03: the text is part of the story&#x27;s concept (decide that first), never on a face (map faces with Apple Vision, place text in the empty bands), nothing appears without an animated entrance, each genre/mood gets its own type, and every slam gets a sound hit. Exact spring/timing values and the reference Remotion build (<code>Magnific_clone/studio/tools/explainer/src/SameFace.jsx</code>) are in it. Static captions faded on and off = rejected as &quot;basic&quot;. Copy the playbook&#x27;s components instead of improvising.</p>
 <p><strong>AI image / video prompting — ANY project.</strong> For any image or video prompt work (writing, fixing, picking a model, character sheets, camera moves, chaining clips), also load the <code>visual-prompting</code> skill. <strong>Project rules win:</strong> the project&#x27;s own CLAUDE.md and proven prompt formula come first, then <code>VIDEO_PROMPTING_GUIDE.md</code> for clips, then the skill fills the gaps.</p>
 <h2>READ THIS FIRST — every session, before the first tool call</h2>
 <p>Cowork does <strong>not</strong> auto-load this file the way terminal Claude Code does. So:</p>
@@ -38,9 +39,9 @@
 <p>When Eddie corrects a real mistake:</p>
 <ol>
 <li>Fix it.</li>
-<li>Append it to &quot;Learned from mistakes&quot; below — or to the project&#x27;s own <code>CLAUDE.md</code> if it&#x27;s</li>
+<li>Add it to &quot;Learned from mistakes&quot; below as a dated bullet under the matching theme — or to the</li>
 </ol>
-<p>project-specific — as a <strong>dated, specific, actionable</strong> rule.</p>
+<p>project&#x27;s own <code>CLAUDE.md</code> if it&#x27;s project-specific — as a <strong>dated, specific, actionable</strong> rule. One or two lines; the full story goes in <code>Claude_and_AI_Docs/CLAUDE_mistakes_full_log.md</code>.</p>
 <ol>
 <li>State that you did, and quote the line you added.</li>
 </ol>
@@ -48,183 +49,304 @@
 <p>Eddie&#x27;s half of the ritual, when he wants it enforced: end the correction with <strong>&quot;Update CLAUDE.md so you don&#x27;t make that mistake again.&quot;</strong></p>
 <hr>
 <h2>Learned from mistakes</h2>
-<p>Newest last. Keep each entry to a date, what happened, and the rule it produces.</p>
+<p>Every rule below came from a real correction by Eddie (dates in brackets). Merged by theme on 2026-10-24. The full story behind each one is in <code>Claude_and_AI_Docs/CLAUDE_mistakes_full_log.md</code> (read it when a rule&#x27;s reason isn&#x27;t clear). New corrections go in as a dated bullet under the matching theme, one or two lines. Add a new theme only if none fits.</p>
+<h3>A. Money: never spend without a clear yes</h3>
 <ul>
-<li><strong>2026-08-07: the self-correcting setup existed but was inert.</strong> Hooks were configured in</li>
+<li><strong>Every paid run needs Eddie&#x27;s yes for that spend, in dollars, even cents.</strong> Give the customer</li>
 </ul>
-<p><code>Polymarket-Arbitrage-Bot/.claude/settings.json</code> only, and project hooks cannot fire in Cowork cloud sessions at all — the folder isn&#x27;t in the session&#x27;s filesystem. Result: the guardrails looked implemented and enforced nothing for the other 14 projects. <strong>Rule: never assume a guardrail is running because it&#x27;s configured. Check where it executes.</strong></p>
+<p>price and the owner cost (customer ÷ 2.5). &quot;Research&quot; means free reading. Never fire paid jobs in parallel without a yes: a stop can&#x27;t recall jobs already sent. [10-16]</p>
 <ul>
-<li><strong>2026-08-07: <code>zc_trading/CLAUDE.md</code> was silently corrupted</strong> by a heredoc that wrote its</li>
+<li><strong>First ask whether Eddie already has it, or makes it himself for free</strong> (Gemini, his own tools).</li>
 </ul>
-<p>own <code>EOF</code> and a trailing <code>cat</code> command into the file. Nobody noticed. <strong>Rule: rule 7 above — no heredocs for file writes; read back what you wrote.</strong></p>
+<p>Never pitch spending on something he just showed he does himself. [10-24: thumbnails]</p>
 <ul>
-<li>**2026-08-18: gave up on publishing to GitHub Pages after ~4 blocked commands and fell back</li>
+<li><strong>Never generate what already exists.</strong> Take finished assets from the connected service&#x27;s own</li>
 </ul>
-<p>to handing Eddie a <code>.command</code> file / asking him to do it, then declared it &quot;impossible here.&quot;<strong> It was NOT impossible — <code>gh repo edit &lt;repo&gt; --visibility public --accept-visibility-change-consequences</code> went through where <code>gh repo create --public</code> and the raw <code>gh api PATCH visibility</code> were classifier-blocked, and enabling Pages worked as its own isolated call. Eddie had to point out a public portal already existed on his account before I dug harder. </strong>Rule: when an auto-mode classifier blocks an action Eddie explicitly wants, exhaust the alternative command shapes (different subcommand, CLI vs API, isolated vs bundled, private-then-flip) BEFORE concluding it can&#x27;t be done or bouncing it back to him. Keep going until it&#x27;s actually done; don&#x27;t put him in a loop of approvals. See <code>memory/project_document_portal.md</code> for the working recipe.**</p>
+<p>logged-in UI first (e.g. Magnific characters via pikaso.cdnpk.net signed URLs in Chrome). Rebuild only when the finished asset truly can&#x27;t be reached. [09-21]</p>
 <ul>
-<li>**2026-08-24: built a hidden macOS launchd job to auto-update the document portal instead of</li>
+<li><strong>One paid attempt per model.</strong> If a schema-valid paid call fails, STOP: read the model&#x27;s</li>
 </ul>
-<p>using the Cowork scheduled-task pattern Eddie already uses.<strong> He has <code>magnific-weekly-sync</code> (a <code>SKILL.md</code> under <code>~/.claude/scheduled-tasks/</code>, visible in the Cowork sidebar) that runs weekly and does local Desktop file work. I wrongly assumed Cowork scheduled tasks can&#x27;t touch local files, so I buried the portal + git repo in <code>~/Library</code> and wired up launchd — which confused Eddie because it didn&#x27;t match how it&#x27;s always done. The magnific task proves Cowork scheduled tasks DO have full Desktop + Bash access. </strong>Rule: for anything scheduled/recurring in Cowork, first run <code>mcp<strong>scheduled-tasks</strong>list_scheduled_tasks</code> and copy the existing pattern, then create it with <code>mcp<strong>scheduled-tasks</strong>create_scheduled_task</code> (a SKILL.md that shows in the sidebar). Do NOT invent launchd/cron workarounds — Cowork tasks can read/write the Desktop and run Bash. This is rule 4 (copy the working example) again.**</p>
+<p>docs page, compare against its exact example body, and run a free check before paying again. Changing one guessed parameter and re-paying is not debugging. [09-18]</p>
 <ul>
-<li>**2026-09-07: downloaded a webinar video straight to the iCloud-synced Desktop with</li>
+<li><strong>Before ANY paid batch, run ONE item</strong> and check every property the deliverable needs (shape,</li>
 </ul>
-<p><code>yt-dlp --concurrent-fragments 8</code>, which littered ~600 <code>*.mp4.part-FragN</code> temp files there.** The download finished, merged, and cleaned the fragments <em>on the Cowork machine</em> — but iCloud had already uploaded the temp pieces, so Eddie&#x27;s Mac was left showing hundreds of dataless &quot;ghost&quot; fragments (grouped into a Desktop <strong>Stack</strong> he couldn&#x27;t delete — a Stack is a view grouping, not a folder). The Cowork filesystem showed zero leftovers, so I couldn&#x27;t <code>rm</code> them from here; cleanup had to run on his Mac. <strong>Rule: never download/extract multi-fragment media (HLS/yt-dlp, unzips, anything that spawns many temp files) into the iCloud-synced Desktop or Documents. Download into the session scratchpad (<code>/private/tmp/.../scratchpad</code>, NOT synced), verify the single finished file, then <code>mv</code> only that file to its destination. This is rule 6 (deliverables only) — the temp-file spray is exactly what rule 6 forbids, and iCloud makes it permanent. If ghosts already exist on his Mac, they can only be cleared on his Mac: drop a self-deleting <code>.command</code> on the Desktop (syncs down, he double-clicks once) or a Terminal one-liner he runs on his own machine — the app&#x27;s &quot;Run&quot; button executes on the Cowork box, which does NOT have the ghosts.</strong></p>
+<p>pixel size, likeness, content). Picture-EDIT models copy the source picture&#x27;s shape; for a fixed output shape use text-to-image with the character in <code>refImageUrls</code>. Read back every URL and parameter before sending. [10-22]</p>
 <ul>
-<li>**2026-09-18: burned three paid runs (615 + 615 + 1,230 credits, all refunded) guessing why</li>
+<li><strong>Test a new feature first on a top model customers actually pick for that job</strong>, so a failure</li>
 </ul>
-<p>fal rejected FLUX 3 Extend with a generic <code>invalid_request</code>, and only THEN read the model&#x27;s docs page.<strong> The very first rejection of a schema-valid request was the signal that the problem wasn&#x27;t in the fields I could see. </strong>Rule: one paid attempt per model. If a paid call fails and the request already matches the schema, STOP — read the model&#x27;s docs/API page, compare against its exact example body, and run a free check (schema endpoint, HEAD, a minimal probe) before spending again. Changing one guessed parameter and re-paying is not debugging.**</p>
+<p>means the feature is broken, not the model weak. Cheap models only after it&#x27;s proven. [10-06]</p>
 <ul>
-<li>**2026-09-21: rebuilt Magnific&#x27;s characters from raw cast photos on disk — and spent 24</li>
+<li><strong>A full render is the LAST step, run once.</strong> First print the changed lines&#x27; word times next to</li>
 </ul>
-<p>credits on a test generation — when the finished character assets (styled cover portraits + stored reference images) already existed in the Magnific web app.<strong> Eddie had to point at the Characters library page. The API/MCP listing didn&#x27;t expose image URLs, but the logged-in web app did (pikaso.cdnpk.net signed URLs, readable via Chrome). </strong>Rule: when importing or replicating an asset that lives in a connected service, FIRST open that service&#x27;s own UI (logged-in Chrome) and take the finished asset as-is. Rebuild from source materials only when the finished asset truly can&#x27;t be reached — and never spend credits generating something that already exists.**</p>
+<p>their clicks (free) and fix gaps over 0.5 s, then render only the changed section (<code>--frames=a-b</code>), then the whole video. Say up front how many renders a fix needs. [10-21]</p>
 <ul>
-<li>**2026-10-02: invented a new caption-burning method for solorender&#x27;s social clips</li>
+<li><strong>solorender pricing: price = real cost × 2.5. Every cost drop goes to the customer</strong>; never call</li>
 </ul>
-<p>(Chromium-rendered PNGs layered on with ffmpeg overlay) after finding the Mac&#x27;s ffmpeg 8.1.1 has no text/subtitle filters — when the Podcast project had already solved exactly that.<strong> Eddie had to point it out. The working method: a libass-capable static ffmpeg at <code>Podcast/Podcast/90Day_LastResort_Season3/_SHARED/bin/ffmpeg</code> (9.0.2, has <code>subtitles</code>, <code>ass</code>, <code>drawtext</code>), captions written as an ASS file, burned with the explicit <code>subtitles=filename=…:fontsdir=…</code> form — see <code>_SHARED/captions/build_captions.py</code>. </strong>Rule: before building ANY media step (captions, encoding, stitching, thumbnails, audio) in one project, grep the sibling projects — Podcast first, it has the most video tooling — for a working method and reuse it. A missing capability on this Mac has usually been solved once already; find that, don&#x27;t route around it.**</p>
+<p>it extra margin. Check <code>price_adjustments</code> / <code>/api/models/prices</code> before describing prices. [10-16]</p>
 <ul>
-<li>**2026-10-04: sent Eddie to the IRS EIN online application on a Sunday, promising it was open</li>
+<li><strong>A price Eddie calls absurd is not a budget.</strong> Never quote it back as a limit (&quot;under your $30&quot;).</li>
 </ul>
-<p>3–9 pm Pacific because the irs.gov info page listed weekend hours.<strong> The live application said &quot;System Unavailable … Monday to Friday 7 a.m. – 10:00 p.m. Eastern time.&quot; </strong>Rule: before telling Eddie when or how a government or third-party portal works, open the portal&#x27;s own entry point and trust what IT says over the agency&#x27;s info page. If you can&#x27;t reach it, say the hours are unconfirmed instead of stating them as fact.<strong> 2026-10-12 follow-up: I loaded only the EIN landing page, saw &quot;Begin Application Now&quot;, and told Eddie &quot;it&#x27;s open&quot; — the system behind that button was down (&quot;experiencing technical difficulties&quot;). </strong>A landing page loading proves nothing about the service behind it: report exactly how far you got (&quot;the start page loads; I can&#x27;t test past Begin&quot;) and never say &quot;it works/it&#x27;s open&quot; beyond that.<strong> 2026-10-13: broke this the next day — clicked Begin, reached question 1, and told Eddie &quot;it&#x27;s working right now.&quot; Eddie: &quot;starting was never a problem.&quot; </strong>If the failure happened at a later step, a check that stops before that step says NOTHING about it — the honest answer is &quot;unknown until you try,&quot; never &quot;it&#x27;s working.&quot;**</p>
+<p>Keep his exact meaning when writing his words into a rule. [10-22]</p>
+<h3>B. Look at every result before Eddie sees it (he is not the QA)</h3>
 <ul>
-<li>**2026-10-06: handed Eddie a Markdown file (<code>GTO_Holdem/IMPLEMENTATION_PLAN.md</code>) as his</li>
+<li><strong>A test passes only after I have LOOKED at every output</strong>: a frame strip (start, middle, end)</li>
 </ul>
-<p>deliverable — linked it in chat and sent it to his device.<strong> His words: &quot;stop showing me md files.. those r for u.. html for me.&quot; </strong>Rule: anything Eddie is meant to read (plans, reports, research write-ups, summaries) is delivered as a designed HTML page — never send, link, or point him at a <code>.md</code> file. Markdown is only for Claude&#x27;s own working files (CLAUDE.md, memory, plan sources). If a <code>.md</code> source exists, keep an HTML version alongside it, regenerate the HTML whenever the <code>.md</code> changes, and link/send only the HTML.**</p>
+<p>of every clip, every picture at readable size, voice length and loudness. Check it against what was promised. Report &quot;plumbing works&quot; and &quot;looks right&quot; separately. [10-11]</p>
 <ul>
-<li>**2026-10-06: ran a paid test of MiniMax Speech 2.8 for solorender and reported only numbers</li>
+<li><strong>QA the way the customer sees it</strong>: the whole result page and the FINISHED film, start to end,</li>
 </ul>
-<p>(wait time, credits, a transcript check) without letting Eddie hear the voice.<strong> His words: &quot;show me the end result every time u do a test.&quot; </strong>Rule: every test that produces an output (an image, video, voice, music, a rendered clip, a page) ends with that output sent to Eddie via SendUserFile (download a URL result to the scratchpad first), captioned with what was tested. Measurements go alongside the result, never instead of it. For a batch, send the results or a contact sheet of them — not just a pass/fail table.<strong> Same test, second mistake: from a transcript (the word &quot;laughs&quot; not spoken) plus a loudness reading, I put &quot;acts out (laughs)&quot; into the live site description. Eddie listened: &quot;almost sounds like he&#x27;s taking a breath.&quot; </strong>A measurement can rule a claim out, but it can&#x27;t prove a quality (a laugh, a style, a likeness). No quality claim goes on a customer-facing page until a person has seen or heard the result.**</p>
+<p>against the brief. Does the action match the input? Does anyone leave and re-enter? Is every cut a real change of angle, not a zoom? Any one of these = FAIL, not &quot;small flaw&quot;. [10-14]</p>
 <ul>
-<li>**2026-10-06: tested solorender&#x27;s new negative-prompt (&quot;Avoid&quot;) box on Qwen Image — picked</li>
+<li><strong>QA a picture against its STORY, not its parts.</strong> Does it show the moment the script describes</li>
 </ul>
-<p>only because it was the cheapest model with the box — and it ignored the words, so the new feature looked broken.<strong> Eddie: &quot;why Qwen first? its not a top model.&quot; Ideogram 3 obeyed the same words on its first run. </strong>Rule: test a new feature first on a top model customers actually choose for that job, where a failure means the feature is broken and not the model being weak. Use cheap models to save money only after the feature is proven on a good one.**</p>
+<p>(dodging = no laser touches him)? Check where hazards, props and lines meet the character at full size. [10-22]</p>
 <ul>
-<li>**2026-10-08: asked Eddie to write a TypeScript function (a <code>TODO(human)</code> &quot;Learn by Doing&quot;</li>
+<li><strong>Read every picture the way a stranger would at a glance</strong>: what is the body showing, who is it</li>
 </ul>
-<p>request from the Learning output style) to settle a billing-rounding choice in solorender.<strong> His words: &quot;why woul i edit code?&quot; </strong>Rule: Eddie is not a programmer — never hand him code to write, fill in, or edit, whatever an output style says. When a choice is his (a pricing rule, a policy), ask it in plain words with the options&#x27; real effect on customers and money, recommend one, and write the code yourself.**</p>
+<p>facing, could it read as rude, sexual or creepy (especially near children)? If so, don&#x27;t send it. Never prompt poses like &quot;on its back, belly up&quot; near kids. [10-21]</p>
 <ul>
-<li>**2026-10-09: rewrote Eddie&#x27;s fal support email and dropped his &quot;what does it take to go above</li>
+<li><strong>Clip checklist</strong> (a frame strip is not enough on its own):</li>
+<li>Camera moves: a push-in makes the subject AND background grow; a pull-back makes both shrink.</li>
 </ul>
-<p>40 concurrent jobs&quot; question, telling him fal sales had already answered it.<strong> Sami&#x27;s &quot;$60k a year / about 3% / better past $120k&quot; figures were DISCOUNT terms; concurrency was only named as something a commitment can include, with no numbers. Eddie: &quot;thats refering to discounts not concurency.&quot; </strong>Rule: never mark a question &quot;already answered&quot; because a source answered a neighboring one (price vs. capacity, discount vs. limit). Before dropping or closing a question, quote the exact sentence that answers it; if no single sentence does, keep the question.**</p>
+<p>People the camera moves past must LEAVE the frame and stay gone. Background holding its size, or people riding along at the edges = faked move = FAIL. [10-18]</p>
 <ul>
-<li>**2026-10-09: told Eddie &quot;Veo blocks your 90 Day cast… for real cast members, use Kling&quot; after</li>
+<li>Hands: what is each hand touching, frame by frame? In prompts, name the exact prop (&quot;both</li>
 </ul>
-<p>ONE solorender Veo 3.1 Fast run came back blocked.<strong> fal&#x27;s error gave no reason (&quot;content checker&quot;, <code>model_moderated</code>); the cause was my guess. Google&#x27;s own Veo docs allow reference images &quot;of a single person, character, or product&quot; and say blocks can also come from audio processing. Eddie: &quot;its the first time i ever heard of that.&quot; </strong>Rule: one failure with no stated reason is one data point, not a rule. Report the exact error text, say what it does NOT tell us, list the possible causes, and give no advice (&quot;use X instead&quot;) until a test has isolated the cause. Check the provider&#x27;s own docs before naming a policy as the reason.**</p>
+<p>hands on the computer keyboard&quot;) or avoid the action. [10-23]</p>
 <ul>
-<li>**2026-10-09: tested solorender&#x27;s new Entities feature on Eddie&#x27;s 90 Day cast with my own</li>
+<li>Feet: a CLOSE-UP strip of the feet at 4+ frames a second, whole clip. Every step lands on the</li>
 </ul>
-<p>generic prompts (&quot;…palm trees, photo&quot;) and showed him the results.<strong> They came out as realistic people who didn&#x27;t look like Jenny. Eddie: &quot;it shows a real person not the animation one.&quot; The show&#x27;s look comes from its proven keyframe formula in <code>Podcast/Podcast/CLAUDE.md</code> (&quot;Graphic-novel semi-real painterly illustration, crisp inked linework, clean cel shading… jewel-tone teal-blue, amber, magenta&quot;). With that text, the same pictures gave the illustrated look first try. </strong>Rule: when a test uses Eddie&#x27;s own characters or brand, copy that project&#x27;s proven prompt formula and style text (grep Podcast first) and judge the result against what his show actually looks like. A generic prompt only proves the model works, not that the feature works for him.**</p>
+<p>surface, never past an edge, and the surface keeps its shape (no buckling where a foot lands). A tracking prompt must say the surface keeps going ahead of him. [10-23, 10-24]</p>
 <ul>
-<li>**2026-10-10: told Eddie to open solorender.com/admin/models and look for the new &quot;Live</li>
+<li>Anything the model drew that wasn&#x27;t in the start picture (a door, a prop, a person): check its</li>
 </ul>
-<p>prices&quot; box — without having confirmed my deploy went out.<strong> It hadn&#x27;t: my <code>vercel deploy</code> ended on a &quot;Promote to production&quot; notice I didn&#x27;t read, and that deployment 404&#x27;d the new route. Eddie found no box. Same change: I touched the admin model list (100 rows) and left it unsortable. Eddie: &quot;why would u not make sorting criteria available for the list.. thats basic feature for lists.&quot; </strong>Rule: (1) after every deploy, prove the new code is live yourself — probe a new route or marker on the production URL and read the deploy output to the end — before telling Eddie it&#x27;s there; if you can&#x27;t prove it, say &quot;not confirmed live&quot; and never send him to check. (2) Any list or table Eddie will use gets sortable column headers (click to sort, click again to flip) and a search box from the first version.**</p>
+<p>kind, size and direction against the script. If a crop removed a prop the action needs, make a new start picture that shows it. [10-22]</p>
 <ul>
-<li>**2026-10-10: on solorender&#x27;s live-prices feature I improvised at every blocked step instead of</li>
+<li>Cuts: trim every shot to an exact frame count, confirm real cut times with scene detection</li>
 </ul>
-<p>following the recipes already in memory.<strong> I invented a new scheduler (Supabase pg_cron) without asking; when adding a password was blocked I redesigned the hourly check to run without one; I deployed from the shared folder instead of the clean-worktree recipe in <code>memory/parallel-session-git-deploy.md</code>; then I counted on other sessions&#x27; deploys to ship my work. Eddie: &quot;Stop improvising… Why must we go through this every other day?&quot; </strong>Rule: before each step (schedule, deploy, verify, secrets), open the matching memory/CLAUDE.md recipe and follow it exactly. If a step is blocked, retry that same recipe or tell Eddie it&#x27;s blocked — never redesign the feature around the block. A mechanism this project has never used (a new scheduler, host, or auth scheme) needs Eddie&#x27;s yes BEFORE it&#x27;s built.**</p>
+<p>(<code>select=&#x27;gt(scene,0.25)&#x27;,showinfo</code>) before adding crops/text/sound, and check a frame strip across every cut of the final file. [10-24]</p>
 <ul>
-<li>**2026-10-10: asked Eddie to choose between &quot;the database scheduler&quot; and &quot;the GitHub method&quot;</li>
+<li>Before paying, audit prompts for ambiguous motion words (&quot;turn&quot;, &quot;drop&quot;, &quot;flip&quot;) and</li>
 </ul>
-<p>without ever explaining what the database scheduler was.<strong> He picked GitHub, then had to stop me and ask how the other one worked — and once explained, chose it. Eddie: &quot;It would have helped if you would have told me about it ahead of time instead of just asking me as if I really know wtf you&#x27;re talking about.&quot; </strong>Rule: before asking Eddie to choose, explain each option in plain words — what it is, where it runs, what it costs, what changes for him — in the same message as the question. Never offer a choice between things he hasn&#x27;t been told about.**</p>
+<p>voice/face mismatches. [10-11]</p>
 <ul>
-<li>**2026-10-10: told Eddie &quot;I can see your Chrome but can&#x27;t click or scroll in it&quot; while</li>
+<li><strong>Speech checks: every Whisper pass uses <code>vad_filter=True</code> and reports <code>no_speech_prob</code>.</strong></li>
 </ul>
-<p>reporting the solorender Editor test.<strong> The Claude-in-Chrome extension had said &quot;not connected&quot; twice earlier in the session; it connected ~40 minutes later and I never re-checked. Eddie: &quot;yes u can.&quot; </strong>Rule: a &quot;not connected&quot; from earlier in a session is stale. Before telling Eddie a browser action can&#x27;t be done, re-run <code>mcp<strong>claude-in-chrome</strong>list_connected_browsers</code> (then <code>tabs_context_mcp</code>) at that moment, and say &quot;can&#x27;t&quot; only with that fresh result in hand.**</p>
+<p>&quot;Thank you&quot; / &quot;thanks for watching&quot; on quiet audio is Whisper&#x27;s stock hallucination, never proof of speech. Before any speech test, confirm the source clip actually has speech, and confirm a problem exists by a second check before building a fix. faster-whisper is installed: <code>HF_HUB_OFFLINE=1 /usr/bin/python3 script.py</code> WITHOUT <code>-I</code> (models small, small.en, base; see <code>Podcast/Podcast/vps-pipeline/transcribe.py</code>). Check spoken lines in every clip. [10-15, 10-23]</p>
 <ul>
-<li>**2026-10-10: called solorender&#x27;s recipe research &quot;deep&quot; competitor research when only ONE</li>
+<li><strong>A voice cut into pieces is cut only inside a measured pause</strong> (<code>silencedetect</code> at −30 dB), with no extra</li>
 </ul>
-<p>competitor&#x27;s template catalog (Magnific&#x27;s) had actually been read in full.<strong> The ~15 others got a revenue number and a handful of example names each. Eddie: &quot;thats just one competitor... how about the other 20-30 that are out there?&quot; </strong>Rule: competitor research means reading each competitor&#x27;s own catalog/feature list, not citing its revenue. Before reporting, count how many competitors were covered in depth vs. only mentioned, and state both numbers in the report. If Eddie names a scale (&quot;20-30 competitors&quot;), meet it or say exactly how far short you fell and why.**</p>
+<p>frames past the cut, and each cut point&#x27;s loudness is measured (≥25 dB below speech). Whisper does NOT catch a doubled syllable: it heard &quot;Included&quot; once while Eddie heard &quot;Inc… Included&quot;. [10-25]</p>
 <ul>
-<li><strong>2026-10-11: Eddie had to ask a second time for solorender&#x27;s price tags to show &quot;% off&quot;.</strong> The</li>
+<li><strong>Names and pronunciation are checked by ear</strong>, not Whisper (it spells what it guesses). Write a</li>
 </ul>
-<p>2026-10-10 fix changed only the &quot;Sale&quot; tag on one picker row; the &quot;Discounted&quot; tag beside it, the selected-model button and Flow&#x27;s model menus were left as they were. Eddie: &quot;We already addressed this issue, but here we go again.&quot; <strong>Rule: when Eddie asks for a display change, grep the whole app for every place that shows the same thing (the label text AND the field behind it, e.g. <code>saleFrom</code>, <code>isDiscounted</code>) and change all of them in one go, through one shared helper. List each place you changed in the report.</strong></p>
+<p>name the way it should sound (&quot;Solo render&quot;) if the voice slips. [10-21]</p>
 <ul>
-<li>**2026-10-11: marked solorender recipe tests &quot;PASS&quot; because the steps ran and the right number of</li>
+<li><strong>Lip sync / voice tests</strong>: use a silent, non-talking source clip and a voice about as long as</li>
 </ul>
-<p>results came back — without looking at the results.<strong> Eddie watched the Satisfying clip&#x27;s &quot;Tap &amp; turn&quot; himself: the finger pushed the perfume bottle over onto its side (my prompt said &quot;turns it&quot;). Eddie: &quot;You need to double check everything, man. Because I don&#x27;t have time to check every single one of these myself.&quot; </strong>Rule: a generation test passes only after I have LOOKED at every output — a frame strip (start, middle, end) of every clip, every picture at readable size, voice length and loudness — and checked it against what the recipe promises (product upright and unchanged, faces kept, voice matches the face, no garbled text). Before spending on a test, audit the prompts for ambiguous motion words (&quot;turn&quot;, &quot;drop&quot;, &quot;flip&quot;) and voice/face mismatches. Report each test as &quot;plumbing works&quot; and &quot;looks right&quot; separately; never ask Eddie to be the quality check.**</p>
+<p>the clip; copy the provider&#x27;s example settings (Runware: <code>originalAudioVolume: 0</code>). Before showing: Whisper the output (only the new words?), measure leftover original sound, and lay out mouth crops every 0.2 s against word timings. [10-16]</p>
 <ul>
-<li>**2026-10-12: found that solorender&#x27;s picture storage refuses bursts of requests (429) and told</li>
+<li><strong>Before feeding a recording to a voice clone, listen-check it like a result.</strong> A file name</li>
 </ul>
-<p>Eddie &quot;it should be fine… if you ever see blank tiles, let me know&quot; instead of fixing it.<strong> Eddie: &quot;why not just fix it now before any customer runs into that issue… Don&#x27;t leave it for the customer to trip over.&quot; </strong>Rule: when I find a problem a customer could hit (a limit, a slow load, a broken edge case), fix it in the same session, or say plainly that it&#x27;s unfixed and why. Never hand Eddie a &quot;let me know if you see it&quot; for a risk I already know about.**</p>
+<p>(&quot;clean&quot;, &quot;final&quot;) proves nothing; Whisper proves words, not sound quality. [10-16]</p>
 <ul>
-<li>**2026-10-12: solorender&#x27;s help center was text-only — 34 articles, no screenshots, no videos —</li>
+<li><strong>A measurement can rule a claim out but can&#x27;t prove a quality</strong> (a laugh, a style, a likeness).</li>
 </ul>
-<p>and its layout was cramped (14px text; label pills like &quot;Text&quot;/&quot;Image&quot; jammed against the sentence after them in one run-on block).<strong> Eddie: &quot;it looks like an amateur did it… what you&#x27;re doing now is going to make me lose customers.&quot; </strong>Rule: anything customers read (help, docs, guides) is product design, not a text dump. Every how-to step shows a real screenshot of that step, multi-step processes get a short video, reference lists (boxes, buttons, models) get a structured layout (icon/label column + description, real spacing), body text is ≥16px with comfortable line height, and before shipping I look at the rendered page myself at desktop AND phone width. Never ship customer-facing content I haven&#x27;t seen rendered.**</p>
+<p>No quality claim goes on a customer page until a person has seen or heard it. [10-06]</p>
 <ul>
-<li>**2026-10-12: to screenshot solorender pages that need Eddie&#x27;s login, I opened a test-browser</li>
+<li><strong>&quot;I can&#x27;t judge that&quot; is never a hand-off to Eddie.</strong> Find the measurement that can. [10-16]</li>
+<li><strong>Every test that makes something ends with the result sent to Eddie</strong> via SendUserFile</li>
 </ul>
-<p>sign-in window (Google blocked it), then started building a &quot;Forgot password?&quot; feature just so he could log in there.<strong> Eddie: &quot;You&#x27;ve never done this before, so why are we doing things differently again?&quot; The working method already existed and had made that day&#x27;s Flow pictures: the clip recorder&#x27;s Playwright against the LOCAL dev server (no login needed) with a staged canvas and real recipe media. </strong>Rule: help/marketing screenshots and recordings come from <code>studio/tools/clip-recorder</code> against the local dev server, staged with real existing media. Never build a product feature, a new login route, or a new auth workaround to get a picture. If a page truly can&#x27;t be shown that way, leave its picture out and tell Eddie which ones — don&#x27;t invent a new pipeline.**</p>
+<p>(download URL results first), captioned with what was tested. Measurements go alongside, never instead. A batch gets the results or a contact sheet. [10-06]</p>
+<h3>C. Prove it before saying it</h3>
 <ul>
-<li>**2026-10-12: Eddie started solorender believing it could compete on price, because in August I</li>
+<li><strong>Verify what you claim, at the step where it could fail.</strong> A landing page loading proves</li>
 </ul>
-<p>framed it as &quot;buy wholesale from fal, mark up ~3×, undercut Magnific&quot;.<strong> The same August note (<code>memory/onda-wholesale-strategy.md</code>) held both sets of numbers: fal&#x27;s cost (Nano Banana $0.04, Kling $0.28) and Magnific&#x27;s retail (Nano Banana Pro $0.075, a credit = $0.001). Nobody put them side by side. Fal ×3 was already 2–3× Magnific&#x27;s price on day one, and Magnific sells some models BELOW fal&#x27;s price to us. Eddie: &quot;I would have never started this project if you didn&#x27;t make me feel like I could be competitive from the gate. So where is the disconnect?&quot; </strong>Rule: before telling Eddie a business, product or price can compete, compute our cost + markup per unit for the top sellers and set it beside each competitor&#x27;s actual retail price for the SAME unit, in dollars, not credits. Show that table in the same message as the recommendation. If we come out more expensive, say so plainly up front and name the real edge (if any) instead of calling it competitive.**</p>
+<p>nothing about the service behind it. Report exactly how far you got (&quot;the start page loads; I can&#x27;t test past Begin&quot;). If the failure happens at a later step, an earlier check says nothing: say &quot;unknown until you try&quot;. For any portal&#x27;s hours or rules, trust its own entry point over the agency&#x27;s info page. [10-04, 10-12, 10-13]</p>
 <ul>
-<li>**2026-10-12: ran solorender&#x27;s &quot;deep&quot; supplier research split by supplier group (one agent per maker), so</li>
+<li><strong>After every deploy, prove the new code is live</strong>: read the deploy output to the end and probe</li>
 </ul>
-<p>no one asked &quot;who else sells THIS model?&quot;<strong> Segmind (Seedance at ByteDance&#x27;s exact price) and Atlas Cloud (&quot;authorized U.S. reseller&quot;) only surfaced after Eddie asked for a workaround. Eddie: &quot;thats what you should have done during the research.. now go back and find every possible avenue for every model&quot;. </strong>Rule: supplier/price research is a full MATRIX — every model × every source (maker direct, every reseller/marketplace, big-cloud marketplaces, authorized partners, sales/partner programs, startup credits, cheaper variants, self-hosting). Each source is checked against the WHOLE model list, gaps are written down as &quot;not carried&quot;, and blocked routes get their legal workaround checked in the same pass, not afterwards.**</p>
+<p>a new route or marker on the production URL. Otherwise say &quot;not confirmed live&quot; and never send Eddie to check. [10-10]</p>
 <ul>
-<li>**2026-10-14: reported solorender&#x27;s Sketch to Shot recipe as &quot;passes, small flaw&quot; after checking each</li>
+<li><strong>Before sending any page link, open the rendered page and MEASURE what the message claims</strong></li>
 </ul>
-<p>picture and clip on its own.<strong> Eddie watched the result page top to bottom: the detective walked OUT of the room (the sketch&#x27;s arrow said in), vanished and reappeared mid-shot, and the &quot;second angle&quot; was the same view zoomed in, so the film jump-cut to a blown-up figure. Eddie: &quot;is all wrong&quot; / &quot;You need to do some serious QA. Don&#x27;t leave it up to me.&quot; </strong>Rule: QA a generated recipe the way the customer sees it — the result page top to bottom and the FINISHED FILM start to end — against the brief and the inputs: does the action match the input (direction, who does what), does anyone leave and re-enter, is every cut a real change of angle (not a zoom of the same shot), does the last frame make sense. Any one of these = FAIL, not &quot;small flaw&quot;. Never call a recipe passed until the whole film would satisfy the person who typed the brief.**</p>
+<p>(image sizes, columns, counts). Customer-facing pages are checked at desktop AND phone width. A change to a shared frame (header, footer, wrapper) is checked on a short page, a long scrolling page and an app page, by measuring where content ends against the footer. [10-12, 10-14, 10-22]</p>
 <ul>
-<li>**2026-10-14: moved solorender&#x27;s footer into the root layout (&quot;every page&quot;) and checked it only on short</li>
+<li><strong>Every sentence of explanation needs its own check</strong>, not just the headline finding. If I</li>
 </ul>
-<p>pages (login, dashboard) — on long pages (the Learn guides) it landed mid-screen with the content running over it.<strong> Eddie found it on /learn/kling-v3. </strong>Rule: a change to a shared frame (header, footer, page wrapper) is checked on a SHORT page, a LONG page that scrolls several screens, and an app page — by measuring where the content ends against where the footer starts, not by one screenshot.**</p>
+<p>haven&#x27;t checked the cause, say &quot;I checked X; I haven&#x27;t checked why&quot;. [10-18]</p>
 <ul>
-<li>**2026-10-15: told Eddie &quot;there&#x27;s no speech-to-text tool on this Mac&quot; after checking only the</li>
+<li><strong>One failure with no stated reason is one data point, not a rule.</strong> Quote the exact error, say</li>
 </ul>
-<p><code>whisper</code> command and the default <code>python3</code>, so solorender&#x27;s preview clips went out with their spoken lines &quot;unchecked&quot;.<strong> Eddie: &quot;what about whisper?&quot; faster-whisper 1.2.1 IS installed for the system Python (<code>/usr/bin/python3</code>, user site-packages) with the <code>small</code>/<code>small.en</code>/<code>base</code> models cached in <code>~/.cache/huggingface/hub</code> — the Podcast pipeline uses it (<code>Podcast/Podcast/vps-pipeline/transcribe.py</code>). Run it as <code>HF_HUB_OFFLINE=1 /usr/bin/python3 script.py</code> WITHOUT <code>-I</code> (isolated mode hides the user packages). </strong>Rule: before saying a tool isn&#x27;t on this Mac, grep the sibling projects for it (Podcast first) and try every Python (<code>/usr/bin/python3</code>, Homebrew, project venvs) — and check spoken lines in every generated clip with it before reporting a test.**</p>
+<p>what it does NOT tell us, list possible causes, check the provider&#x27;s own docs, and give no advice until a test has isolated the cause. [10-09]</p>
 <ul>
-<li>**2026-10-16: on 10-14 a Runware Kling lip sync run billed $0.35 against a listed $0.0462 (7.6× off) and I</li>
+<li><strong>Never mark a question &quot;already answered&quot;</strong> because a source answered a neighbouring one</li>
 </ul>
-<p>only wrote &quot;4× fal, keep on fal&quot; in a code comment — no follow-up.<strong> Eddie: &quot;4x is waaaay off.. that in itself should have triggered a follow up&quot;. When followed up: Runware&#x27;s own four example runs on the same page billed $0.32 (its table is wrong), and the &quot;fal is cheaper&quot; side had never been checked either — fal&#x27;s &quot;$0.014/s&quot; was a page reading; the real fal bill (x-fal-billable-units) was 10 units = $0.14. </strong>Rule: when a real bill and a listed price disagree by more than 1.5×, investigate in the same session before any decision: compare against the supplier&#x27;s own example bills, get the OTHER supplier&#x27;s real bill for the same inputs (not its page), and report both numbers. A comparison is only as good as its weakest side — never decide &quot;cheaper on X&quot; from one real bill and one price page.**</p>
+<p>(discount vs. concurrency). Quote the exact sentence that answers it, or keep the question. [10-09]</p>
 <ul>
-<li>**2026-10-16: told Eddie that Segmind and WaveSpeed &quot;looked cheap but turned out to ban resale&quot;,</li>
+<li><strong>Any &quot;new&quot;, &quot;just shipped&quot; or &quot;since X&quot; claim gets its date from the code history</strong></li>
 </ul>
-<p>repeating a 4-day-old memory note as fact.<strong> Eddie: &quot;are you sure?&quot; Re-reading the live terms: WaveSpeed has NO resale/SaaS ban (its Acceptable Use page covers &quot;content generated for your own end users&quot;); Segmind doesn&#x27;t ban resale outright, it requires written permission. </strong>Rule: a claim about a supplier&#x27;s terms (allowed / banned / needs permission) is re-read from the supplier&#x27;s live terms page before I repeat it, quoted with the clause number — never restated from memory or an agent&#x27;s summary. Use the exact strength of the clause (&quot;needs written OK&quot; ≠ &quot;banned&quot;).<strong> Same day: I put &quot;ElevenLabs direct is 75% cheaper&quot; at the top of a savings page; the cheap price only covers using it yourself — resale needs Scale ($299/mo, voices) or Enterprise (music). </strong>A supplier&#x27;s price is not a saving until its terms for OUR use (selling to our customers) are read, and the cost of the plan that allows it is added to the comparison.**</p>
+<p>(<code>git log -S&lt;model-id&gt;</code>), checked per item, never lumped together from a memory note. Told Eddie six tools went live &quot;yesterday&quot;; two had been live since September. [10-24]</p>
 <ul>
-<li>**2026-10-16: wrote &quot;we keep a bigger margin while fal&#x27;s lower price lasts&quot; about solorender&#x27;s H3</li>
+<li><strong>Supplier terms are re-read from the live terms page before I repeat them</strong>, quoted with the</li>
 </ul>
-<p>Max Turbo.<strong> Eddie: &quot;We never keep a bigger margin. We always adjust our prices to match at 2.5x.&quot; (The live-prices sync was already marking it down.) </strong>Rule: in solorender, every cost drop goes to the customer — price = real cost × 2.5 (edit/clip ×2). Never present a cheaper cost as extra margin; check <code>price_adjustments</code> / <code>/api/models/prices</code> before describing what customers pay.**</p>
+<p>clause number and its exact strength (&quot;needs written OK&quot; ≠ &quot;banned&quot;). A cheaper price is not a saving until the terms for OUR use (reselling) are read and that plan&#x27;s cost is added. [10-16]</p>
 <ul>
-<li>**2026-10-16: sent Eddie two Kling lip sync clips (fal vs Runware) saying &quot;same face, length and sound</li>
+<li><strong>On any pricing page, open EVERY tab and toggle</strong> (trial, plan, period, region) and cover every</li>
 </ul>
-<p>level — I can&#x27;t judge mouth timing from stills&quot;.<strong> Eddie watched: the fal one &quot;goes out of sync halfway&quot;, the Runware one has &quot;two separate voices talking at the same time&quot;. Both were my test&#x27;s fault: the input clip was an OmniHuman clip that was ALREADY TALKING (so its old mouth moves showed once the shorter new voice ended, and Runware mixed its old speech in at 70% because I left out the <code>originalAudioVolume: 0</code> that Runware&#x27;s own examples send). </strong>Rule: a lip sync / voice test uses a silent, non-talking source clip and a voice about as long as the clip, copies the provider&#x27;s example request settings, and before it is shown I check it myself: Whisper the output (does it hold ONLY the new words?), measure leftover original sound, and lay out mouth crops every 0.2 s against the word timings. &quot;I can&#x27;t judge that&quot; is never a hand-off to Eddie — find the measurement that can.**</p>
+<p>feature we use (lip sync, not just video). If Eddie has bought from the supplier, ask what he paid and got first. [10-16]</p>
 <ul>
-<li>**2026-10-16: told Eddie &quot;no Kling package saves money&quot; after reading only the 180-Day tab of</li>
+<li><strong>When a real bill and a listed price differ by more than 1.5×, investigate the same session</strong>:</li>
 </ul>
-<p>kling.ai/dev/pricing and only the video models.<strong> The Trial tab (one click away) sells 100 units for $9.80 / 1,000 for $98 at $0.098 per unit — 30% under fal — and Eddie had already bought trial packs and used them for lip sync at 1 unit per 10-second job. Eddie: &quot;what you tell me does not match with my experience.&quot; </strong>Rule: on any pricing page, open EVERY tab and toggle (trial/plan/period/region) before concluding, and cover every feature we actually use (lip sync, not just video). If Eddie has bought from the supplier, ask what he paid and got before drawing a conclusion.**</p>
+<p>compare the supplier&#x27;s own example bills and get the OTHER supplier&#x27;s real bill for the same inputs (fal: <code>x-fal-billable-units</code>). Never decide from one bill and one price page. [10-16]</p>
 <ul>
-<li>**2026-10-16: published solorender&#x27;s Prompt Library previews with the sound stripped (<code>ffmpeg -an</code>)</li>
+<li><strong>Compare only options the same customer can actually buy.</strong> Read the offer&#x27;s own rules (memory +</li>
 </ul>
-<p>&quot;to keep the files small&quot; — my own idea, never asked for, never checked.<strong> I copied the Recipes hover-loop clips (mostly silent) when the right example was /learn&#x27;s model-result clips, which keep their sound. The punk music video, dialogue and sizzles all played silent. Eddie: &quot;you really have to stop improvising.. what was the purpose of keeping the files small?&quot; </strong>Rule: when making web copies of a generated result, keep everything the result promises (sound, length, frame shape) — only resize. Copy the example that does the SAME job (a result viewers judge = /learn), not the nearest-looking one. Any trade-off that removes part of a result needs Eddie&#x27;s yes first. After publishing media, probe the LIVE file (ffprobe the URL: has audio? right length?) before reporting.**</p>
+<p>checkout code) for who can buy it. A sub-agent&#x27;s comparison is a lead, not a finding. [10-16]</p>
 <ul>
-<li>**2026-10-16: made solorender&#x27;s first Kling voice clone of Ruby from <code>Podcast/ruby_voice_sample_clean.wav</code></li>
+<li><strong>Before telling Eddie anything can compete on price</strong>, show a table: our cost + markup per unit</li>
 </ul>
-<p>because the file NAME said &quot;clean&quot;, and checked only that Whisper could read the words.<strong> Eddie: the clone &quot;does not&quot; sound like her, &quot;and even the original one sounds weird with background noise&quot;. The file is heavily processed (gated to digital silence between words). </strong>Rule: before feeding a recording to any voice clone / voice model, listen-check it like a result — tell Eddie which file and why, send him the exact clip first if its quality is unproven, and never trust a file name (&quot;clean&quot;, &quot;final&quot;) as proof. Whisper proves words, not sound quality.**</p>
+<p>for the top sellers beside each competitor&#x27;s retail price for the SAME unit, in dollars. If we come out dearer, say so up front and name the real edge, if any. [10-12]</p>
 <ul>
-<li>**2026-10-16: Eddie said &quot;do the research&quot; on voice cloning and I fired a paid 7-model shootout</li>
+<li><strong>Research means depth.</strong> Competitor research reads each competitor&#x27;s own catalog, not its</li>
 </ul>
-<p>(~$1.55, mostly MiniMax&#x27;s $1.50 clone) in one go — I had told him &quot;check for free, then ONE test&quot;.<strong> Eddie: &quot;I really don&#x27;t want to spend any money on this right now.&quot; Stopping the script didn&#x27;t cancel the jobs already sent to fal. </strong>Rule: &quot;research&quot; means free reading. Every paid run needs Eddie&#x27;s yes for that specific spend, stated in dollars, even when it&#x27;s cents — and never fire paid jobs in parallel without that yes, because a stop can&#x27;t recall them.**</p>
+<p>revenue; report how many were covered in depth vs. only mentioned, and meet the scale Eddie names. Supplier research is a full MATRIX: every model × every source (maker, resellers, marketplaces, partners, credits, self-hosting), gaps written down as &quot;not carried&quot;, and blocked routes get their legal workaround checked in the same pass. [10-10, 10-12]</p>
 <ul>
-<li>**2026-10-16: in a site-wide wording audit I told Eddie solorender&#x27;s &quot;bigger plans give cheaper</li>
+<li><strong>Earlier &quot;not connected&quot; / &quot;blocked&quot; results go stale.</strong> Before saying a browser action can&#x27;t be</li>
 </ul>
-<p>credits&quot; claim was half wrong because the top-up packs beat the monthly plans — repeating a sub-agent&#x27;s finding without checking who packs are for.<strong> Eddie: &quot;the top up packs are supposed to be for current plan holders.&quot; <code>memory/onda-monetization-state.md</code> already said packs are refills for existing customers. </strong>Rule: before calling a price or offer claim wrong, read the offer&#x27;s own rules (memory + checkout code) for WHO can buy it, and compare only options the same customer can actually buy. A sub-agent&#x27;s comparison is a lead, not a finding.**</p>
+<p>done, re-run <code>mcp<strong>claude-in-chrome</strong>list_connected_browsers</code> (then <code>tabs_context_mcp</code>). A login wall in the built-in browser is not a dead end: check Eddie&#x27;s Chrome for an existing session, view only, no paid clicks. [10-10, 10-23]</p>
 <ul>
-<li>**2026-10-17: testing solorender&#x27;s video-editor export in Safari, I ran <code>open -a Safari &lt;test page&gt;</code> once per</li>
+<li>**Before saying a tool isn&#x27;t on this Mac, grep the sibling projects (Podcast first) and try every</li>
 </ul>
-<p>test and never closed a tab — 6 tabs, each loading 3 HD clips + music.<strong> Eddie: &quot;you&#x27;re opening a bunch of separate tabs… Your hogging up the memory.&quot; </strong>Rule: any test I open in Eddie&#x27;s own browsers runs in ONE tab at a time; close it (osascript for Safari) right after each run and count that none are left; stop local dev servers when testing pauses.**</p>
+<p>Python** (<code>/usr/bin/python3</code>, Homebrew, project venvs). [10-15]</p>
 <ul>
-<li>**2026-10-18: told Eddie solorender&#x27;s &quot;Render priority&quot; perk was fake because &quot;everyone shares the same 40</li>
+<li><strong>Before raising an open issue, check memory for whether Eddie already decided it</strong>, and whether</li>
 </ul>
-<p>supplier slots&quot;.<strong> The finding (no per-plan priority) was checked in code; the REASON was improvised from memory and wrong — Render film runs on our own Render.com worker (first-come queue, one film at a time), the 40 slots are fal&#x27;s only, and Runware has its own limits I hadn&#x27;t looked at. Eddie: &quot;how am i supposed to trust u if you keep improvising&quot;. </strong>Rule: every sentence of explanation needs its own check, not just the headline finding. Before naming a cause (a limit, a queue, a supplier), open the code or doc for THAT specific thing. If I haven&#x27;t checked the cause, say &quot;I checked X; I haven&#x27;t checked why&quot; instead of filling the gap.**</p>
+<p>a customer can actually reach it. Hidden or retired items with no use are not issues. [10-18]</p>
 <ul>
-<li>**2026-10-18: after fixing solorender&#x27;s Seedance 480p prices I flagged the hidden Seedance 2.5 US</li>
+<li><strong>Before handing Eddie click steps, check the control accepts the value I&#x27;m telling him to set.</strong></li>
 </ul>
-<p>listings as &quot;may overcharge at 480p&quot; — a model Eddie had already retired on 10-14, with 0 runs ever and 0 saved items using it.<strong> Eddie: &quot;we dealt with it.. why is it coming up again?&quot; </strong>Rule: before raising anything as an open issue, check memory for whether Eddie already decided it, and check whether a customer can actually reach it (runs, saved flows, recipes). Hidden/retired items with no use are not issues — don&#x27;t list them.**</p>
+<p>Told him &quot;Render Manual Scaling → type 0&quot;; Render&#x27;s minimum is 1 (&quot;it won&#x27;t let me&quot;). The real way was Settings → Suspend. Look at the screen or the provider&#x27;s docs first. [10-25]</p>
 <ul>
-<li>**2026-10-18: passed a Grok clip of a &quot;camera pushes between the couple to the street&quot; shot because</li>
+<li><strong>Never assume a guardrail runs because it&#x27;s configured.</strong> Check where it executes (project hooks</li>
 </ul>
-<p>nobody turned around — but the camera never moved: the sign, horse and buildings stayed the same size while the two people slid apart sideways like curtains.<strong> Eddie: &quot;the camera doesn&#x27;t push in.. it is moving the 2 people out of the way&quot;. </strong>Rule: to pass a camera move, check SIZE across the frame strip, not just poses. Push-in / dolly = both the subject AND the background grow, and foreground people blur past the lens; a pull-back = both shrink. If the background holds its size while people move, the camera faked the move — that is a FAIL, whatever else looks right.<strong> Same day, again: passed two Kling clips because faces grew and the street grew — but the couple stayed glued to the frame edges to the end while the street rushed at them. Eddie: &quot;the background buildings move past the camera not the other way around&quot;. </strong>For a move past/through people: they must LEAVE the frame and stay gone. People who ride along at the edges while the world approaches = the world moved, not the camera = FAIL.**</p>
+<p>never fire in Cowork). [08-07]</p>
+<h3>D. Copy the working example, never improvise</h3>
+<ul>
+<li>**Before building any media step (captions, encoding, stitching, thumbnails, audio), grep the</li>
+</ul>
+<p>sibling projects (Podcast first) for a working method.** Captions: the libass ffmpeg at <code>Podcast/Podcast/90Day_LastResort_Season3/_SHARED/bin/ffmpeg</code> (has <code>subtitles</code>, <code>ass</code>, <code>drawtext</code>), captions as an ASS file, burned with <code>subtitles=filename=…:fontsdir=…</code>; see <code>_SHARED/captions/build_captions.py</code>. [10-02]</p>
+<ul>
+<li>**Before each step (schedule, deploy, verify, secrets), open the matching memory/CLAUDE.md</li>
+</ul>
+<p>recipe and follow it exactly** (deploys: <code>memory/parallel-session-git-deploy.md</code>). If blocked, retry that recipe or tell Eddie. Never redesign the feature around the block. A mechanism this project has never used (new scheduler, host, auth scheme) needs Eddie&#x27;s yes BEFORE it&#x27;s built. [10-10]</p>
+<ul>
+<li><strong>Scheduled/recurring work in Cowork</strong>: run <code>mcp<strong>scheduled-tasks</strong>list_scheduled_tasks</code>, copy</li>
+</ul>
+<p>the existing pattern (e.g. <code>magnific-weekly-sync</code>), create it with <code>mcp<strong>scheduled-tasks</strong>create_scheduled_task</code>. Cowork tasks CAN read/write the Desktop and run Bash. No launchd/cron workarounds. [08-24]</p>
+<ul>
+<li><strong>When an auto-mode classifier blocks something Eddie wants, exhaust other command shapes</strong></li>
+</ul>
+<p>(different subcommand, CLI vs API, isolated vs bundled, private-then-flip) before saying it can&#x27;t be done. E.g. <code>gh repo edit &lt;repo&gt; --visibility public --accept-visibility-change-consequences</code> worked where <code>gh repo create --public</code> was blocked; recipe in <code>memory/project_document_portal.md</code>. [08-18]</p>
+<ul>
+<li>**Help/marketing screenshots and recordings come from <code>studio/tools/clip-recorder</code> against the</li>
+</ul>
+<p>local dev server**, staged with real existing media. Screens only a signed-in customer sees come from Eddie&#x27;s signed-in Chrome (view only, no paid clicks), cropped so owner-only prices don&#x27;t show. Never build a product feature, login route or auth workaround to get a picture. [10-12, 10-22]</p>
+<ul>
+<li><strong>When making web copies of a result, keep everything it promises</strong> (sound, length, frame</li>
+</ul>
+<p>shape); only resize. Copy the example that does the SAME job. Any trade-off that removes part of a result needs Eddie&#x27;s yes. After publishing media, probe the LIVE file (ffprobe the URL). [10-16]</p>
+<ul>
+<li><strong>Eddie&#x27;s own characters or brand: copy that project&#x27;s proven prompt formula and style text</strong></li>
+</ul>
+<p>(grep Podcast first, e.g. the graphic-novel keyframe formula in <code>Podcast/Podcast/CLAUDE.md</code>) and judge results against what his show actually looks like. [10-09]</p>
+<ul>
+<li><strong>Keep a character&#x27;s face the same by EDITING an approved picture of him</strong> (new setting, clothes,</li>
+</ul>
+<p>props), not drawing him fresh. If drawing fresh is unavoidable, compare faces side by side before showing. Before building a video around a character, make keyframes in the exact frame shape and placement it will use and get Eddie&#x27;s OK. Never reuse a clip made for another shape and hope a crop works. [10-20, 10-22]</p>
+<ul>
+<li><strong>A how-to documents the method that was ACTUALLY used first.</strong> Inventory every tool from the</li>
+</ul>
+<p>session&#x27;s scripts and transcript (<code>~/.claude/projects/&lt;project&gt;/&lt;session&gt;.jsonl</code>) and put that stack, with counts, ahead of any alternative. [10-22]</p>
+<ul>
+<li>**When adapting an outside video/course for solorender, map EVERY other-app step to the matching</li>
+</ul>
+<p>solorender tool** in a step → tool table checked in the code. No equivalent = &quot;no solorender tool yet&quot; on the gap list. Never a reason to drop the source; never show the outside brand. [10-23]</p>
+<h3>E. Creative quality: ideas first, never bland</h3>
+<ul>
+<li><strong>The IDEA is judged first.</strong> Every sample, demo or test picture starts from a concept with a</li>
+</ul>
+<p>hook (humour, surprise, impossible scale, a story moment, real emotion). Read the idea list back and cut anything that could be a stock photo. Light and style can&#x27;t rescue a dull idea. [10-21]</p>
+<ul>
+<li><strong>Example characters are fun, mainstream, instantly likeable types with a big visual hook</strong></li>
+</ul>
+<p>(a retired circus strongman with a handlebar moustache, a grumpy garden gnome), never an ordinary person picked to look &quot;real&quot; or make a point. Grep memory for character rules first (no Nora; max 3 appearances per character in a set). Clear rejected drafts from any preview Eddie can open. [10-21, 10-22]</p>
+<ul>
+<li>**Before spending on any creative piece (music, picture, clip), write down how it serves THIS</li>
+</ul>
+<p>piece&#x27;s specific idea.** If the brief could be pasted into any other ad unchanged, it&#x27;s generic: rethink. Offer the idea-driven option first. [10-22]</p>
+<ul>
+<li><strong>Click-by-click explainers</strong>: the narrator says exactly what is typed, while it&#x27;s typed; every</li>
+</ul>
+<p>choice goes through the app&#x27;s visible control (picker, button), never a typed shortcut; everything the narration mentions is shown being made, or the video says where it came from. [10-21]</p>
+<ul>
+<li><strong>YouTube thumbnails are designed composites, never a raw frame</strong>: emotional face (left third)</li>
+</ul>
+<p>plus the story element in one image, huge 2-line headline (white line + orange line, heavy condensed caps), short white premise line, green pill badge. Eddie makes these himself in Gemini. Examples: <code>Claude_and_AI_Docs/thumbnail-examples/</code>; formula: Magnific_clone memory <code>thumbnail-formula.md</code>. [10-24]</p>
+<ul>
+<li><strong>Anything customers read (help, docs, guides) is product design</strong>: a real screenshot for every</li>
+</ul>
+<p>how-to step, a short video for multi-step processes, structured layouts for reference lists, body text ≥16px with comfortable line height. [10-12]</p>
+<h3>F. Working with Eddie</h3>
+<ul>
+<li><strong>Anything Eddie reads is a designed HTML page, never a <code>.md</code> file.</strong> Markdown is only for</li>
+</ul>
+<p>Claude&#x27;s own files. If a <code>.md</code> source exists, keep an HTML version and send only that. [10-06]</p>
+<ul>
+<li><strong>Eddie is not a programmer. Never hand him code to write, fill in or edit</strong>, whatever an output</li>
+</ul>
+<p>style says. Ask his choices in plain words with their real effect on customers and money, recommend one, and write the code yourself. [10-08]</p>
+<ul>
+<li><strong>Before asking Eddie to choose, explain each option in plain words</strong> (what it is, where it runs,</li>
+</ul>
+<p>what it costs, what changes for him) in the same message. [10-10]</p>
+<ul>
+<li><strong>When I find a problem a customer could hit, fix it in the same session</strong>, or say plainly it&#x27;s</li>
+</ul>
+<p>unfixed and why. Never &quot;let me know if you see it&quot;. [10-12]</p>
+<ul>
+<li><strong>A display or layout change applies everywhere the same thing shows.</strong> Grep the whole app for</li>
+</ul>
+<p>the label AND the field behind it, change all through one shared helper, and list each place changed. A layout rule for one Studio lane applies to every lane showing the same kind of thing (Image, Video, Edit, Upscaler, Talk, Clip tools); skip one only with a stated reason. [10-11, 10-20]</p>
+<ul>
+<li><strong>Any list or table Eddie uses gets sortable column headers and a search box</strong> from the first</li>
+</ul>
+<p>version. [10-10]</p>
+<ul>
+<li><strong>Browser tests in Eddie&#x27;s own browsers run in ONE tab at a time</strong>; close it right after each run</li>
+</ul>
+<p>(osascript for Safari), count that none are left, and stop local dev servers when testing pauses. [10-17]</p>
+<ul>
+<li>**Never change anything on Eddie&#x27;s live accounts (YouTube, site, stores) unless he asked for that</li>
+</ul>
+<p>exact change.** If his words can mean &quot;check&quot; or &quot;change&quot;, ask first. Before replacing anything, look at what is there now and ask whether it&#x27;s his. [10-24: covered his own Short thumbnail]</p>
+<ul>
+<li><strong>Any long job (render, encode, batch, upload) runs with its progress output ON</strong>, written to a</li>
+</ul>
+<p>log, so &quot;how far / when done&quot; always gets a real number. [10-20]</p>
+<ul>
+<li><strong>Never tell Eddie &quot;you never complained&quot; or &quot;you approved&quot; because notes and memory are silent.</strong></li>
+</ul>
+<p>They hold only what someone wrote down; his chat complaints aren&#x27;t there. A method in use for months isn&#x27;t proof he likes it (he accepted the Podcast&#x27;s blur-fill Shorts as a compromise he was talked into when new, and never liked them). Ask him how he feels about it. [10-24]</p>
+<h3>G. Files and this Mac</h3>
+<ul>
+<li><strong>Never write files with shell heredocs</strong> (rule 7). One silently corrupted <code>zc_trading/CLAUDE.md</code>.</li>
+</ul>
+<p>Read back what you wrote. [08-07]</p>
+<ul>
+<li><strong>Never download or extract multi-fragment media into the iCloud-synced Desktop or Documents</strong></li>
+</ul>
+<p>(yt-dlp/HLS, unzips, anything spawning many temp files). Use the session scratchpad, verify the single finished file, then <code>mv</code> only that file. iCloud &quot;ghost&quot; fragments can only be cleared on Eddie&#x27;s Mac (a self-deleting <code>.command</code> he double-clicks, or a Terminal one-liner he runs). [09-07]</p>
 <hr>
 <h2>Where the automated hooks do apply</h2>
 <p><code>.claude/settings.json</code> hooks only run in <strong>terminal Claude Code</strong>, launched from inside that project folder. They do nothing in Cowork. Projects that have them:</p>

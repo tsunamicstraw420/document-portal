@@ -226,9 +226,9 @@
 </ul>
 <p>auto-captions.</p>
 <ul>
-<li><strong>Shorts</strong> = their own vertical karaoke burned in, always cut from the CLEAN master,</li>
+<li><strong>Shorts</strong> = cut from the CLEAN master, never from the burned YouTube file. **Since</li>
 </ul>
-<p>never from the burned YouTube file.</p>
+<p>2026-10-24 Shorts are TALL CUTS<strong> (<code>/vertical shorts</code> skill: a moving 9:16 window over the real picture, faces filling the phone). The old blur-fill (picture in a strip, blurred copy around it) is RETIRED — Eddie never liked it. </strong>Captions on Shorts are now a choice made with Eddie per batch** (Eddie 2026-10-24: karaoke &quot;might not be the right choice everywhere&quot;); the old Bangers karaoke is one option, placed under the chin, never on a face. Make a new batch only when Eddie asks.</p>
 <ul>
 <li>Long-form karaoke style is locked: Bangers 120, spoken word gold. Do NOT revert</li>
 </ul>
@@ -244,14 +244,14 @@
 <ul>
 <li><strong>Production pipeline = Ruby → Magnific → Resolve.</strong> Ruby records the voice; the Magnific</li>
 </ul>
-<p>process turns that recording into the show (animated Ruby lip-sync + scene visuals); everything out of Magnific goes into DaVinci Resolve for editing/assembly, then export. <strong>We do NOT use Riverside — do not reintroduce it.</strong> Shorts are cut from the exported master by timecode (<code>EP##/shorts_pipeline/make_shorts.py</code>), not by any auto-clipper.</p>
+<p>process turns that recording into the show (animated Ruby lip-sync + scene visuals); everything out of Magnific goes into DaVinci Resolve for editing/assembly, then export. <strong>We do NOT use Riverside — do not reintroduce it.</strong> Shorts are cut from the exported master by timecode with the <code>/vertical shorts</code> skill (it replaced <code>EP##/shorts_pipeline/make_shorts.py</code> on 2026-10-24), not by any auto-clipper.</p>
 <ul>
 <li><strong>Notion:</strong> only the <strong>Episode Tracker</strong> is auto-populated (Zap #1). <strong>Content Calendar</strong></li>
 </ul>
 <p>and <strong>Show Notes Library</strong> are written directly by Claude — they are NOT event-triggered Zaps. Don&#x27;t go looking for a Zap that doesn&#x27;t exist.</p>
 <hr>
 <h1>Weekly production schedule</h1>
-<table><thead><tr><th>Day</th><th>Who</th><th>What</th></tr></thead><tbody><tr><td>MON</td><td>Claude</td><td>Research episode topics, generate SEO titles, create Notion episode card</td></tr><tr><td>TUE</td><td>Claude drafts → Ruby refines</td><td>Claude writes the production script and strips it into the clean teleprompter Doc; Ruby reviews and tweaks</td></tr><tr><td>WED</td><td>Ruby → Magnific → Resolve</td><td>Ruby records the voice; Magnific turns it into the show (animated Ruby + scene visuals); assemble/edit in DaVinci Resolve; export; upload to YouTube <strong>unlisted</strong></td></tr><tr><td>THU</td><td>Eddie + Claude</td><td>Shorts cut from the master by timecode (<code>shorts_pipeline/make_shorts.py</code>); Claude writes show notes + captions</td></tr><tr><td>FRI</td><td>Eddie</td><td>(1) Flip YouTube unlisted→public. (2) Upload the episode audio to Spotify for Creators — THAT is what generates the RSS feed → Apple/Amazon/iHeart. (3) Post to the 4 FB groups + send email — <strong>both still MANUAL.</strong></td></tr></tbody></table>
+<table><thead><tr><th>Day</th><th>Who</th><th>What</th></tr></thead><tbody><tr><td>MON</td><td>Claude</td><td>Research episode topics, generate SEO titles, create Notion episode card</td></tr><tr><td>TUE</td><td>Claude drafts → Ruby refines</td><td>Claude writes the production script and strips it into the clean teleprompter Doc; Ruby reviews and tweaks</td></tr><tr><td>WED</td><td>Ruby → Magnific → Resolve</td><td>Ruby records the voice; Magnific turns it into the show (animated Ruby + scene visuals); assemble/edit in DaVinci Resolve; export; upload to YouTube <strong>unlisted</strong></td></tr><tr><td>THU</td><td>Eddie + Claude</td><td>Shorts cut from the master as tall cuts (<code>/vertical shorts</code>, only when Eddie asks for a batch); Claude writes show notes + captions</td></tr><tr><td>FRI</td><td>Eddie</td><td>(1) Flip YouTube unlisted→public. (2) Upload the episode audio to Spotify for Creators — THAT is what generates the RSS feed → Apple/Amazon/iHeart. (3) Post to the 4 FB groups + send email — <strong>both still MANUAL.</strong></td></tr></tbody></table>
 <blockquote>⚠️ <strong>Reality check (2026-08-14):</strong> the only live automation is <strong>Zap #1</strong> (podcast RSS → Notion Episode Tracker card). Flipping a YouTube video Public triggers <strong>nothing</strong> automated. <strong>Zap #2</strong> (episode → Facebook groups) is <strong>NOT built</strong>, and <strong>MailerLite</strong> (email) is <strong>not connected</strong> — both are on the Open list in <code>PROJECT_REFERENCE.md</code>. YouTube and the Spotify/RSS feed are separate distribution paths: a YouTube upload never touches the RSS feed. Do not describe FB/email as automated until Zap #2 + MailerLite actually exist.</blockquote>
 <p><strong>Roles:</strong> Claude drafts. Ruby refines and is the on-air host/voice. Eddie is the account holder and handles clips + publishing.</p>
 <hr>

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Google Bill Check</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Syne:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#0a0a0a;--card:#151515;--line:#2a2a2a;--ink:#ffffff;--green:#6ee05a;--orange:#f7931a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 Manrope,system-ui,sans-serif}
+main{max-width:980px;margin:0 auto;padding:40px 16px 64px}
+h1{font:700 34px/1.15 Syne,sans-serif;margin:6px 0 10px}
+h2{font:700 22px/1.2 Syne,sans-serif;margin:40px 0 12px}
+.eyebrow{color:var(--green);font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+.verdict{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--green);border-radius:12px;padding:18px 20px;margin:22px 0}
+.verdict p{margin:6px 0}
+.wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;min-width:720px}
+th,td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--green);font-size:13px;letter-spacing:.05em;text-transform:uppercase;background:var(--card)}
+td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.tag{display:inline-block;font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;border:1px solid var(--green);color:var(--green);white-space:nowrap}
+.tag.wait{border-color:var(--orange);color:var(--orange)}
+ul{padding-left:20px}li{margin:6px 0}
+a{color:#fff;text-decoration-color:var(--green)}
+</style>
+</head>
+<body>
+<main>
+<div class="eyebrow">solorender · Google direct · checked 2026-10-20, 10-21, 10-22</div>
+<h1>Does Google's bill match what we recorded?</h1>
+
+<div class="verdict">
+<p><strong>No price needs changing today.</strong></p>
+<p>Google's real bill for 20 October is in, and it matches ours for every model.</p>
+<p>Two models were off on that bill: Gemini voice cost Google double our number, and Nano Banana 2.1 cost about 12% less. Both prices were fixed on 21 October (voice 4 → 8 credits, 2.1 10 → 9, 2.1 Edit 11 → 10).</p>
+<p><strong>The $300 trial credit paid for all of it.</strong> 20 October's usage was $3.42, and the amount owed after the credit was $0.00.</p>
+<p>Today (22 October) I could not open Google's billing pages. Google asked for your password again before it would show them. So 21 October's runs ($5.51 by our records) are <strong>not yet checked against Google's bill</strong>.</p>
+<p>Every Google run so far came from your own account. No customer has used these models yet.</p>
+</div>
+
+<h2>20 October: our cost vs Google's real bill</h2>
+<div class="wrap">
+<table>
+<thead><tr><th>Model</th><th>Runs</th><th>Our recorded cost</th><th>Google early estimate</th><th>Google real bill</th><th>Result</th></tr></thead>
+<tbody>
+<tr><td>Nano Banana Pro</td><td class="n">1</td><td class="n">$0.137</td><td class="n">~$0.13</td><td class="n">$0.13</td><td><span class="tag">Matches</span></td></tr>
+<tr><td>Nano Banana 2 + Edit</td><td class="n">8</td><td class="n">$0.553</td><td class="n">~$0.13 (partial)</td><td class="n">$0.56</td><td><span class="tag">Matches</span></td></tr>
+<tr><td>Nano Banana 2.1 + Edit</td><td class="n">7</td><td class="n">$0.306</td><td class="n">~$0.10 (partial)</td><td class="n">$0.27</td><td><span class="tag">Google 12% lower · fixed 10-21</span></td></tr>
+<tr><td>Lyria 2 music</td><td class="n">1</td><td class="n">$0.060</td><td class="n">~$0.06</td><td class="n">$0.06</td><td><span class="tag">Matches</span></td></tr>
+<tr><td>Veo 3.1 Fast (all 3 kinds)</td><td class="n">3</td><td class="n">$2.400</td><td class="n">not shown</td><td class="n">$2.40</td><td><span class="tag">Matches</span></td></tr>
+<tr><td>Gemini 3.8 voice</td><td class="n">1</td><td class="n">$0.004</td><td class="n">not shown</td><td class="n">~$0.008</td><td><span class="tag wait">Google 2× higher · fixed 10-21</span></td></tr>
+<tr><td><strong>Total</strong></td><td class="n"><strong>21</strong></td><td class="n"><strong>$3.460</strong></td><td class="n"></td><td class="n"><strong>$3.42</strong><br>after credit: $0.00</td><td></td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>21 October: our records only (Google not read yet)</h2>
+<div class="wrap">
+<table>
+<thead><tr><th>Model</th><th>Runs</th><th>Our recorded cost</th><th>Per picture / clip</th><th>Price now</th><th>Google real bill</th><th>Result</th></tr></thead>
+<tbody>
+<tr><td>Nano Banana Pro</td><td class="n">4</td><td class="n">$0.556</td><td class="n">$0.139</td><td class="n">35 cr</td><td class="n">not read</td><td><span class="tag wait">Unconfirmed</span></td></tr>
+<tr><td>Nano Banana 2 + Edit</td><td class="n">31</td><td class="n">$2.229</td><td class="n">$0.067–0.069</td><td class="n">17 cr</td><td class="n">not read</td><td><span class="tag wait">Unconfirmed</span></td></tr>
+<tr><td>Nano Banana 2.1 + Edit</td><td class="n">33</td><td class="n">$1.124</td><td class="n">$0.034 / Edit $0.035</td><td class="n">9 / 10 cr</td><td class="n">not read</td><td><span class="tag wait">Unconfirmed</span></td></tr>
+<tr><td>Veo 3.1 Fast (text to video)</td><td class="n">2</td><td class="n">$1.600</td><td class="n">$0.80</td><td class="n">200 cr</td><td class="n">not read</td><td><span class="tag wait">Unconfirmed</span></td></tr>
+<tr><td><strong>Total</strong></td><td class="n"><strong>70</strong></td><td class="n"><strong>$5.510</strong></td><td></td><td></td><td class="n"><strong>not read</strong></td><td></td></tr>
+</tbody>
+</table>
+</div>
+<p>Our own records for 21 October already fit the 2.5× rule for every price, one small exception aside. The 2.1 Edit now records $0.035 a picture. At 2.5× that is 9 credits, and the price is 10. On 21 October Google's bill put it at about $0.039, which is what the price of 10 was set from. I'd wait for Google's bill for 21 October before touching it.</p>
+
+<h2>What each column means</h2>
+<ul>
+<li><strong>Our recorded cost</strong> is what solorender worked out from Google's own usage numbers times Google's price list. It's what the 2.5× customer price is based on.</li>
+<li><strong>Google early estimate</strong> is Google's "Live costs" report. Google says these are rough, rounded to the cent, only cover some products, and may change.</li>
+<li><strong>Google real bill</strong> is the real charge, before the trial credit is taken off. Google says it can take more than 24 hours to show up.</li>
+<li>The warning line is a Google charge more than 10% above ours. Only Gemini voice crossed it, and its price was already doubled to match.</li>
+</ul>
+
+<h2>Still to do</h2>
+<ul>
+<li>Read Google's real bill for 21 October once you're signed in again. That covers 70 runs ($5.51 by our records), mostly pictures.</li>
+<li>Read how much of the $300 trial credit is left. On 21 October Google showed the credit covering everything, but the exact balance wasn't written down.</li>
+</ul>
+
+<h2>Where these numbers came from</h2>
+<ul>
+<li>Our side, read 22 October: the solorender database. The <code>supplier_runs</code> table holds pictures, voice and music. The <code>video_jobs</code> rows marked Google hold Veo. Days are Pacific time. Every run was on your account (eddie.barna@gmail.com).</li>
+<li>Google's real bill for 20 October: read on 21 October from Billing → Reports, set to 1–21 October and grouped by SKU. It showed $3.42 of usage, $0.00 after the free-trial credit. The voice price came from the Pricing page: $18 per million audio tokens, not the $9 we had.</li>
+<li>Google's early estimate: read on 20 October from "Live costs by SKU" (~$0.43 at that time).</li>
+<li>22 October: the Reports page opened Google's "Verify it's you" password screen for eddie@solorender.com. The Credits page sits behind the same sign-in, so I didn't try it separately. I can't type passwords, so nothing on Google's side was read today. Nothing was changed.</li>
+</ul>
+</main>
+</body>
+</html>

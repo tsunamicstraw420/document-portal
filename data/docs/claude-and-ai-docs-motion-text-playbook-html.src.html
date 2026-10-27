@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Motion Text Playbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: a working playbook. Rules first, then the toolkit with exact timings, then the build steps and the pre-send check. */
+:root{
+  --bg:#0a0a0a; --panel:#141412; --line:#2a2a26;
+  --ink:#ffffff; --green:#6ee05a; --orange:#f7931a; --red:#ff5a4f;
+  --display:'Anton',Impact,sans-serif; --body:'Manrope',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 90px}
+.wrap{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:46px}
+h1,h2,h3{margin:0;line-height:1.1;text-wrap:balance}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(2.4rem,7vw,4rem);letter-spacing:.5px}
+h2{font-family:var(--display);font-weight:400;font-size:clamp(1.6rem,4.5vw,2.3rem);letter-spacing:.5px}
+h3{font-size:1.1rem;font-weight:700}
+p{margin:0;max-width:72ch}
+section{display:flex;flex-direction:column;gap:16px;min-width:0}
+.eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--green)}
+ul,ol{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px;max-width:76ch}
+code{font-family:var(--mono);font-size:.86rem;color:var(--green)}
+.rule{border-left:5px solid var(--orange);background:var(--panel);padding:16px 20px;border-radius:0 8px 8px 0;display:flex;flex-direction:column;gap:6px}
+.rule b{font-size:1.05rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.card h3{color:var(--ink)}
+.tag{font-family:var(--mono);font-size:.74rem;color:var(--green)}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:.95rem}
+th,td{text-align:left;vertical-align:top;padding:11px 14px;border-bottom:1px solid var(--line)}
+th{font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--green);font-weight:500;background:var(--panel)}
+td.n{font-family:var(--mono);font-size:.86rem;white-space:nowrap}
+.no{color:var(--ink)}
+.no::before{content:"✕ ";color:var(--red);font-weight:700}
+.yes::before{content:"✓ ";color:var(--green);font-weight:700}
+pre{margin:0;background:#060606;border:1px solid var(--line);border-radius:8px;padding:16px;overflow-x:auto;font-family:var(--mono);font-size:.82rem;line-height:1.5;color:#ffffff}
+a{color:var(--ink);text-decoration-color:var(--green);text-underline-offset:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header style="display:flex;flex-direction:column;gap:14px">
+  <span class="eyebrow">Claude_and_AI_Docs · written 23 Oct 2026 · read before any on-screen text</span>
+  <h1>Motion Text Playbook</h1>
+  <p>How to put words on a video so it looks made by a seasoned content creator, not slapped on. It comes from course ad 03 "Same Face" (solorender). Eddie rejected two plain-caption versions, then called the third "amazing". Everything here is the method that won, with the exact timings used.</p>
+  <p><b>Use it for:</b> ads, Shorts, Reels, trailers, explainers, course promos. Any video in any project where words appear on screen.</p>
+</header>
+
+<section>
+  <span class="eyebrow">The five rules</span>
+  <h2>Never break these</h2>
+  <div class="rule"><b>1. The text is part of the story, not a caption.</b><span>First ask: what is this video's one idea, and what graphic shows that idea? "Same Face" was about consistent faces, so the text became a face-recognition scanner, with the match score falling for the random heroes and hitting 100% for Brix. Decide this concept before writing a single line of text. A brief that could fit any other video is generic: rethink it.</span></div>
+  <div class="rule"><b>2. Never put text on a face.</b><span>Measure where every face is, frame by frame, with a face detector (below). Then place text only in the empty bands. Never judge it by eye.</span></div>
+  <div class="rule"><b>3. Nothing appears without moving in.</b><span>Every line enters with an animation that suits its meaning: a slam for a punchline, a glitch for something broken, a focus-pull for a lesson, a typewriter for tech. Static text appearing and disappearing reads as "basic".</span></div>
+  <div class="rule"><b>4. Each genre or mood gets its own type.</b><span>Use one strong main face (Anton) for the voice of the ad. Each scene's title borrows the look of its world: a wanted-poster stamp, art-deco rules, terminal typing, a 70s TV slide.</span></div>
+  <div class="rule"><b>5. Sound sells the motion.</b><span>Every slam gets an impact hit, and every hard cut gets a glitch or whoosh. Start an entrance 1–2 frames before its hit so the eye and ear land together.</span></div>
+</section>
+
+<section>
+  <span class="eyebrow">What got rejected</span>
+  <h2>Eddie's "no" list</h2>
+  <ul>
+    <li class="no">Plain Bangers captions fading on and off. "no idea what i'm looking at", then "basic as fuck".</li>
+    <li class="no">Text across faces. "Don't put the text on your faces."</li>
+    <li class="no">A cut with no explainer text at all. Viewers need to be told what they're looking at, beat by beat.</li>
+    <li class="no">Generic "fun" music before the concept existed. Three tracks wasted. The winner was music built on the idea: the score changes genre with every cut.</li>
+    <li class="no">Defaulting to the first, easiest treatment. "Basic and bland is your first reaction, get that out of your thinking."</li>
+  </ul>
+</section>
+
+<section>
+  <span class="eyebrow">Step one, every time</span>
+  <h2>Map the faces before placing text</h2>
+  <p>The Mac's built-in face detector (Apple Vision) runs free and offline from a tiny Swift script. Pull frames at 5 per second from every shot, detect faces, pad each box to cover hair, hats and chin, and keep text out of it.</p>
+<pre>// faces.swift — usage: swift faces.swift &lt;folder of PNG frames&gt;
+// prints "file x y w h" per face, top-left origin, 0..1
+import Foundation; import Vision; import AppKit
+let dir = CommandLine.arguments[1]
+for f in try FileManager.default.contentsOfDirectory(atPath: dir).filter({ $0.hasSuffix(".png") }).sorted() {
+  let url = URL(fileURLWithPath: dir).appendingPathComponent(f)
+  guard let img = NSImage(contentsOf: url),
+        let cg = img.cgImage(forProposedRect: nil, context: nil, hints: nil) else { continue }
+  let req = VNDetectFaceRectanglesRequest()
+  try? VNImageRequestHandler(cgImage: cg, options: [:]).perform([req])
+  let faces = (req.results ?? []).map { r in String(format: "%.3f %.3f %.3f %.3f",
+      r.boundingBox.minX, 1 - r.boundingBox.maxY, r.boundingBox.width, r.boundingBox.height) }
+  print(f, faces.isEmpty ? "none" : faces.joined(separator: " | "))
+}
+
+# frames:  ffmpeg -i shot.mp4 -vf "fps=5,scale=540:-1" frames/shot_%03d.png
+# pad each box: x − 0.28w, y − 0.45h, width ×1.56, height ×1.75 (hair, hat, chin)
+# keep the BIGGEST face per frame (ignores crew in the background)</pre>
+  <p>In "Same Face", faces sat between 12% and 53% down the frame. So almost all text went to the band from <b>58% to 80% down</b> (y 1110–1540 on 1080×1920). Score pills went to whichever side of the face had more room.</p>
+</section>
+
+<section>
+  <span class="eyebrow">Phone safe zones · 1080 × 1920</span>
+  <h2>Where the app covers your video</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Platform</th><th>Top</th><th>Bottom</th><th>Left</th><th>Right</th></tr></thead>
+    <tbody>
+      <tr><td>YouTube Shorts</td><td class="n">288 px</td><td class="n">672 px</td><td class="n">48 px</td><td class="n">192 px</td></tr>
+      <tr><td>Instagram Reels</td><td class="n">270 px</td><td class="n">670 px</td><td class="n">65 px</td><td class="n">120 px</td></tr>
+      <tr><td>TikTok</td><td class="n">220–240 px</td><td class="n">480–660 px</td><td class="n">60–120 px</td><td class="n">140–180 px</td></tr>
+    </tbody>
+  </table></div>
+  <p>Safest single box for all three is x 130–900, y 290–1250. These figures come from third-party guides (<a href="https://reap.video/blog/short-form-video-safe-zones">Reap</a>, <a href="https://www.revid.ai/youtube-shorts-safe-zone">revid.ai</a>), not the platforms, and the apps change. Key lines (the punchline, the URL) belong inside that box. Supporting lines can sit a little lower.</p>
+</section>
+
+<section>
+  <span class="eyebrow">The toolkit · 30 fps · values used in "Same Face"</span>
+  <h2>Animations and their exact settings</h2>
+  <p>Springs are Remotion's <code>spring()</code>: damping / stiffness / mass. The research only gave starting values. These are the tuned ones that shipped.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Move</th><th>Use it for</th><th>Settings that shipped</th></tr></thead>
+    <tbody>
+      <tr><td><b>Scanner brackets</b></td><td>Locking onto a face; anything "detected" or "tracked"</td><td class="n">4 corner brackets, 7 px, glow · scale 1.45→1, spring 11/160/0.8 · scan line sweeps the box over 14 frames, starting 6 frames in</td></tr>
+      <tr><td><b>Counter pill</b></td><td>Scores, percentages, stats</td><td class="n">mono font · counts over 18 frames (out-cubic) from frame 8 · slides in 60 px from the face side · red = bad, green = good</td></tr>
+      <tr><td><b>RGB glitch line</b></td><td>Something broken or wrong, hard cuts</td><td class="n">cyan + pink copies offset ±6 px for 9 frames · jitter ±(7−n)×2.2 px for 7 frames · scale 1.25→1, spring 10/220 · paired with rgbashift ±14 on the cut (−0.04 to +0.10 s)</td></tr>
+      <tr><td><b>Stamp slam</b></td><td>The punchline, the verdict ("NO MATCH", "SAME FACE.")</td><td class="n">scale 2.2→1, spring 9/260/0.7 · shake sin(n×2.6)×10 px × 0.72ⁿ, frames 3–12 · optional box border and −6° tilt · impact hit 0.2 s before the land</td></tr>
+      <tr><td><b>Word-by-word rise</b></td><td>A sentence the viewer must read</td><td class="n">each word rises 50 px and fades in · stagger 3 frames · spring 12/170 · exit: 6-frame blur 12 px + rise 40 px</td></tr>
+      <tr><td><b>Highlight swipe</b></td><td>The one key word ("AI.")</td><td class="n">gold bar behind the word, scaleX 0→1 from the left over 8 frames, skew −8°, text turns black</td></tr>
+      <tr><td><b>Focus pull</b></td><td>A lesson title, a reveal</td><td class="n">blur 20 px→0 + scale 1.15→1 over 12 frames (out-cubic)</td></tr>
+      <tr><td><b>Mask wipe</b></td><td>The line under a title</td><td class="n">clip-path inset from the right, 100%→0 over 14 frames, starting 8 frames after the title</td></tr>
+      <tr><td><b>Frame-to-card</b></td><td>End card: keep the hero on screen</td><td class="n">whole frame scales 1→0.44 and moves up 470 px, spring 15/120 · rounded 40 px · green outline · dot-grid backdrop</td></tr>
+      <tr><td><b>Staggered end lines</b></td><td>Course / brand / URL</td><td class="n">5 frames apart · rise 60 px + blur 8 px→0, spring 12/150 · URL letter-spacing −4→10 px over 24 frames</td></tr>
+      <tr><td><b>Freeze and drain</b></td><td>"Stop, here's the problem" moment</td><td class="n">hold the last frame · grayscale 0.85 + brightness −35% over 6 frames · inner red glow 220 px</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <span class="eyebrow">Wide 16:9 version</span>
+  <h2>Same pieces, side columns</h2>
+  <p>Widening tall pictures (Bria Expand) leaves the subject in the middle third. In "Same Face" every face sat between 42% and 58% across. So in the wide cut, all words move to two side columns that flank the face. Nothing goes under the chin.</p>
+  <ul>
+    <li>Columns are 640 px wide, 70 px in from each edge. The tall components are reused as they are, inside a column scaled with CSS <code>zoom: 0.62</code>.</li>
+    <li><b>Bug to avoid:</b> <code>zoom</code> also shrinks the column's own <code>left</code> value. Set <code>left: x / zoom</code>, or the right column lands on the face. This happened on the first wide pass.</li>
+    <li>Alternate sides for the genre titles (western left, noir right, sci-fi left, cooking right). Stamp on one side, sentence on the other. Two-part punchlines flank the face ("SAME FACE." left, "EVERY SHOT." right).</li>
+    <li>End card: the frozen frame shrinks to a card on the left (scale 0.52, moved 420 px left), and the course lines sit in the right column.</li>
+    <li>Reference build: <code>src/SameFaceWide.jsx</code>. Final file: <code>Claude outputs/same-face-ad-16x9.mp4</code>.</li>
+  </ul>
+</section>
+
+<section>
+  <span class="eyebrow">Genre title cards</span>
+  <h2>Each world gets its own type</h2>
+  <div class="grid">
+    <div class="card"><span class="tag">Rye · Western</span><h3>Wanted-poster stamp</h3><p>Aged-paper plate (radial cream to tan), double brown border, inset burn, tilted −3°. Slams in at 1.9→1 (spring 10/300/0.6) with a small shake and an impact hit. Line underneath: "★ SAME FACE ★". It waits until the action that matters (the doors swinging) has played, so it never covers it.</p></div>
+    <div class="card"><span class="tag">Limelight · Film noir</span><h3>Art-deco rules</h3><p>Two thin white rules and a diamond draw outward from the centre over 15 frames. The title comes in with letter-spacing 30→8 px and blur to sharp. A small spaced subtitle sits below.</p></div>
+    <div class="card"><span class="tag">Orbitron + Share Tech Mono · Sci-fi</span><h3>Terminal typing</h3><p>A cyan panel opens on Y with scanlines and a glow. The title types at 2 frames per letter with a block cursor blinking every 8 frames. Then "&gt; SAME FACE_" types at 1.5 frames per letter.</p></div>
+    <div class="card"><span class="tag">Shrikhand · 70s TV</span><h3>Striped-shadow slide</h3><p>Yellow title with stacked orange / pink / teal offset shadows, tilted −4°. It slides in from off-screen left (spring 10/140) while a pink pill ("same face!") slides the opposite way.</p></div>
+  </div>
+  <p><b>Main voice:</b> Anton for every big line. <b>Small print:</b> Inter 500. All of these are free Google Fonts (OFL), loaded in Remotion with <code>@remotion/google-fonts</code>. Other genre picks from the research: Sancreek (western), Poiret One (deco), Audiowide (sci-fi), Righteous (70s).</p>
+</section>
+
+<section>
+  <span class="eyebrow">How it's built</span>
+  <h2>The pipeline</h2>
+  <ol>
+    <li><b>Concept first.</b> Write the one-line idea, then the graphic that shows it. Only then pick music and text.</li>
+    <li><b>Base film without text.</b> Cut the clips, music and sound effects with the libass ffmpeg (<code>Podcast/…/_SHARED/bin/ffmpeg</code>). Use the concat filter, not the concat demuxer. Write the shot start and end times to a JSON file.</li>
+    <li><b>Face map.</b> Run faces.swift on 5 fps frames of every shot, and turn the output into timed boxes in the same JSON.</li>
+    <li><b>Motion layer in Remotion</b> at <code>studio/tools/explainer</code>. The base film plays as <code>OffthreadVideo</code>, and the text, scanners and cards are React on top. Reference build: <code>src/SameFace.jsx</code>. Copy its components (Scanner, GlitchLine, Slam, Words, LessonEight, the genre cards, EndCard) rather than writing new ones.</li>
+    <li><b>Stills first.</b> Before any full render, render about 12 stills at key frames (<code>npx remotion still … --frame=N</code>) and tile them into one sheet. Fix placement, then render a 10-second sample for Eddie, then the whole thing.</li>
+    <li><b>Render:</b> <code>npx remotion render src/index.jsx &lt;Comp&gt; out.mp4 --concurrency=8 --browser-executable=~/Library/Caches/ms-playwright/chromium_headless_shell-1243/chrome-headless-shell-mac-x64/chrome-headless-shell</code>. Keep the progress output on.</li>
+    <li><b>Finish:</b> two-pass loudnorm to −14 LUFS with true peak −1.5, and convert to <code>yuv420p</code> TV range (Remotion outputs full-range yuvj420p, and effects like rgbashift can produce 4:4:4, which phones may not play).</li>
+  </ol>
+</section>
+
+<section>
+  <span class="eyebrow">Before it goes to Eddie</span>
+  <h2>The check</h2>
+  <ul>
+    <li class="yes">A frame grid of the whole video (2–3 frames per second). Zero text on any face, and nothing past the frame edges.</li>
+    <li class="yes">Key lines inside x 130–900, y 290–1250.</li>
+    <li class="yes">Every line has an entrance and an exit. None just appears.</li>
+    <li class="yes">Each slam has its sound hit, landing with the visual.</li>
+    <li class="yes">Each line stays up long enough to read: about 0.3 s per word, plus its entrance.</li>
+    <li class="yes">Loudness about −14 LUFS, peak under −1 dB, yuv420p, plays on a phone.</li>
+    <li class="yes">The words are true. Check names, numbers and claims (lesson titles, plan names) against the real product.</li>
+  </ul>
+</section>
+
+<section>
+  <span class="eyebrow">Sources</span>
+  <h2>Where the research came from</h2>
+  <ul>
+    <li><a href="https://angietaylor.co.uk/kinetic-typography-techniques-for-after-effects/">Angie Taylor: kinetic typography techniques</a>. Type should carry mood, not just words.</li>
+    <li><a href="https://reap.video/blog/short-form-video-safe-zones">Reap: short-form safe zones</a>, plus <a href="https://www.revid.ai/youtube-shorts-safe-zone">revid.ai Shorts</a>, <a href="https://www.revid.ai/instagram-reels-safe-zone">Reels</a> and <a href="https://www.revid.ai/tiktok-safe-zone">TikTok</a> safe-zone guides.</li>
+    <li><a href="https://www.remotion.dev/docs/layout-utils/fit-text-on-n-lines">Remotion fitTextOnNLines</a>. Sizes a line to a width so it never runs off the edge.</li>
+    <li><a href="https://21st.dev/@21st/components/kinetic-title.md">21st.dev kinetic title</a> and <a href="https://www.wireflow.ai/catalog/blocks/kinetic_text_intro">wireflow word-by-word reveal</a>. Small stagger and entrance examples.</li>
+    <li>The timings in the toolkit table were tuned by eye on "Same Face" and approved by Eddie. They are not from a published standard.</li>
+  </ul>
+</section>
+
+</div>
+</body>
+</html>

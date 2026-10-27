@@ -1,0 +1,131 @@
+<title>Explainer Cloud Rendering Plan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Manrope:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one reading column (~70ch); answer first, then what gets made, cost, unknowns, decision. Always-dark page for Eddie. */
+:root{
+  --bg:#0b0a09; --panel:#151310; --line:#2b2722; --ink:#ffffff; --green:#6ee05a; --orange:#f7931a;
+  --display:"Syne","Avenir Next",system-ui,sans-serif;
+  --body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.65 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+main{max-width:860px;margin:0 auto;padding-block:40px 96px;display:flex;flex-direction:column;gap:44px}
+section{display:flex;flex-direction:column;gap:14px;min-width:0}
+h1,h2{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(30px,5.6vw,46px);font-weight:800}
+h2{font-size:clamp(22px,3.4vw,29px);font-weight:800}
+p{margin:0}
+.lab{color:var(--green);font-size:13px;font-weight:800;letter-spacing:.09em;text-transform:uppercase}
+.lede{font-size:19px}
+.hl{color:var(--orange);font-weight:800}
+b{font-weight:800}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px 22px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.warn{border-color:var(--orange)}
+ul,ol{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:15.5px;min-width:640px}
+th,td{text-align:left;vertical-align:top;padding:11px 13px;border-top:1px solid var(--line)}
+th{color:var(--green);font-size:12.5px;letter-spacing:.07em;text-transform:uppercase;border-top:0}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px}
+.fact{border-top:2px solid var(--green);padding-top:10px;display:flex;flex-direction:column;gap:4px}
+.fact .n{font-family:var(--display);font-size:30px;font-weight:800;color:var(--orange);font-variant-numeric:tabular-nums}
+.src{font-size:14px}
+a{color:var(--green)} a:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+code{font-family:var(--mono);font-size:.9em}
+</style>
+
+<main>
+  <header style="display:flex;flex-direction:column;gap:12px">
+    <div class="lab">solorender · explainer videos · plan for your yes</div>
+    <h1>Render explainers on Google Cloud</h1>
+    <p class="lede">Make the Pembrook-style explainers on a Google machine instead of your Mac, paid from the Google credits you already have. Nothing below has been created yet.</p>
+  </header>
+
+  <section>
+    <div class="facts">
+      <div class="fact"><span class="n">$0</span><span>expected bill for the test render (free monthly allowance, then your $300 trial credit)</span></div>
+      <div class="fact"><span class="n">42–84¢</span><span>machine time per 3½-min explainer once the free allowance is used (estimate)</span></div>
+      <div class="fact"><span class="n">~6–11</span><span>renders a month inside Google's free allowance</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="lab">The approach</div>
+    <h2>A plain "render job", not Remotion's Google add-on</h2>
+    <p>Remotion (the video maker we use) has its own Google Cloud add-on, but we can't use it here:</p>
+    <ul>
+      <li>Its installer makes a <b>service-account key file</b>. Your Google organization blocks key files. That's the same block that made us connect solorender to Google without a key on Oct 20.</li>
+      <li>Remotion calls the add-on <i>"in Alpha status and not actively being developed."</i></li>
+      <li>It stops any render after 60 minutes.</li>
+    </ul>
+    <p>Instead, we package the same video maker that runs on your Mac and run it as a <b>Cloud Run job</b>. A job is a Google machine that switches on, does one task and switches off. Jobs can run up to 7 days, so there's no 60-minute cutoff. You start it from your Mac signed in as yourself, so it needs <b>no key file</b>.</p>
+  </section>
+
+  <section>
+    <div class="lab">What gets created</div>
+    <h2>Six things, all inside your existing Google project</h2>
+    <p>All of it goes in the project <code>solorender-ai</code>, the one that already runs Veo and Nano Banana, on the same bill and credits.</p>
+    <div class="tw"><table>
+      <thead><tr><th>What</th><th>What it's for</th><th>Monthly cost</th></tr></thead>
+      <tbody>
+        <tr><td><b>Google's command tool</b> on your Mac</td><td>Google's official installer (about 150 MB, from Google). It lets me start renders from here. You sign in once in the browser as eddie@solorender.com and click Allow.</td><td class="num">free</td></tr>
+        <tr><td><b>3 Google services switched on</b></td><td>Cloud Run (runs the job), Cloud Build (packages the video maker), Artifact Registry (stores that package).</td><td class="num">free to switch on</td></tr>
+        <tr><td><b>One storage folder</b> ("bucket")</td><td>Holds each explainer's media (~0.5 GB) and the finished video.</td><td class="num">~1¢</td></tr>
+        <tr><td><b>The packaged video maker</b></td><td>The Remotion renderer plus its browser, built once (and again when its code changes).</td><td class="num">~15¢</td></tr>
+        <tr><td><b>One service account</b> "explainer-render"</td><td>The identity the job runs as. It can only read and write that one storage folder. It has no key file.</td><td class="num">free</td></tr>
+        <tr><td><b>One Cloud Run job</b> "explainer-render"</td><td>8 processors, 16 GB memory, a 3-hour limit. It runs only when started.</td><td class="num">only while rendering</td></tr>
+      </tbody>
+    </table></div>
+    <p>In the code: a recipe file for the package and one command, "render this explainer on Google". It uploads the media, runs the job and downloads the video. Then the usual volume fix and checks run here as now.</p>
+  </section>
+
+  <section>
+    <div class="lab">Cost</div>
+    <h2>What one render costs</h2>
+    <div class="tw"><table>
+      <thead><tr><th>Item</th><th>Google's price</th><th>Per 3½-min explainer</th></tr></thead>
+      <tbody>
+        <tr><td>Machine time (8 processors + 16 GB), 40–80 min</td><td class="num">$0.000018 /processor-sec<br>$0.000002 /GB-sec</td><td class="num">42–84¢</td></tr>
+        <tr><td>Packaging the video maker (~10 min, once)</td><td class="num">2,500 build-min free /month</td><td class="num">$0</td></tr>
+        <tr><td>Downloading the finished video (~170 MB)</td><td class="num">internet transfer rate</td><td class="num">~2¢ (estimate)</td></tr>
+      </tbody>
+    </table></div>
+    <ul>
+      <li><b>Free every month:</b> 240,000 processor-seconds and 450,000 GB-seconds. At this machine size, that's about 470–500 minutes of rendering, roughly <span class="hl">6–11 explainers a month free</span>.</li>
+      <li><b>Past that:</b> 10 explainers a month ≈ $0–4. 30 a month ≈ $8–21. While the $300 trial credit lasts (until Jan 19, 2027), even that comes out of the credit. The $2,000 startup credit you applied for would follow.</li>
+      <li>For comparison, Amazon (Remotion Lambda) was estimated at 10–40¢ a video and splits a render across many machines. Kept for later, as you said.</li>
+    </ul>
+    <p class="src">Prices read today from Google's own pages: <a href="https://cloud.google.com/run/pricing">Cloud Run pricing</a> (jobs table, us-central1), <a href="https://cloud.google.com/build/pricing">Cloud Build pricing</a>, <a href="https://cloud.google.com/artifact-registry/pricing">Artifact Registry pricing</a>, <a href="https://cloud.google.com/storage/pricing">Cloud Storage pricing</a>. Limits from <a href="https://docs.cloud.google.com/run/quotas">Cloud Run quotas</a>: "8" processors, "32" GB, job tasks up to "168 hours (7 days)".</p>
+  </section>
+
+  <section>
+    <div class="panel warn">
+      <div class="lab" style="color:var(--orange)">Not known until the test</div>
+      <ul>
+        <li><b>How long a render takes there.</b> Google's 8 "processors" are probably slower than your Mac's 8 cores. My 40–80 minute guess is just that, a guess. The test gives the real number, and with it the real cost.</li>
+        <li><b>Whether 16 GB of memory is enough.</b> If not, I raise it to 32 GB. That adds about a third to the machine cost.</li>
+        <li><b>Whether another organization rule blocks a step.</b> If one does, I stop and tell you the exact message. I won't work around it.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="lab">Later, if you want speed</div>
+    <p>Run the same job on 6 machines at once, each doing a slice of the video, then join the slices. That gives the same total machine time, so about the same cost, and a 3½-minute explainer would take ~10–15 minutes instead of an hour. I'd do this only after the single-machine test works.</p>
+  </section>
+
+  <section>
+    <div class="lab">Your decision</div>
+    <h2>Two yeses, in this order</h2>
+    <ol>
+      <li><b>Set it up.</b> I install Google's command tool, you click Allow once, and I create the six things above. This costs nothing to set up.</li>
+      <li><b>One test render</b> of today's Pembrook explainer: 42–84¢ of machine time, expected to be fully covered by the free allowance. I compare it frame by frame with today's Mac render and report the real time and cost.</li>
+    </ol>
+  </section>
+</main>

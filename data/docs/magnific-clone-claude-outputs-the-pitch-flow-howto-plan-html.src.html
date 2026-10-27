@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pitch How-to Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Syne:wght@800&display=swap" rel="stylesheet">
+<style>
+  :root { color-scheme: dark; --bg:#0a0a0a; --card:#151412; --line:#2a2824; --ink:#ffffff; --green:#6ee05a; --orange:#f7931a; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:17px/1.6 Manrope, system-ui, sans-serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 40px 16px 80px; }
+  h1 { font-family: Syne, sans-serif; font-size: clamp(30px, 6vw, 46px); line-height:1.08; margin: 6px 0 14px; }
+  h2 { font-family: Syne, sans-serif; font-size: 26px; margin: 44px 0 12px; }
+  .eyebrow { color:var(--green); font-weight:800; letter-spacing:.14em; font-size:13px; text-transform:uppercase; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px 20px; margin:14px 0; }
+  .seg { display:grid; grid-template-columns: 92px 1fr; gap: 6px 18px; }
+  .seg .t { color:var(--green); font-weight:800; font-size:14px; padding-top:3px; }
+  .seg h3 { margin:0 0 4px; font-size:19px; }
+  .seg p { margin: 4px 0; }
+  .tag { display:inline-block; color:var(--green); border:1px solid var(--green); border-radius:999px; font-size:12px; font-weight:800; padding:1px 9px; margin-right:6px; }
+  table { width:100%; border-collapse:collapse; margin-top:8px; }
+  td, th { text-align:left; padding:10px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--green); font-size:13px; letter-spacing:.08em; text-transform:uppercase; }
+  .big { font-family:Syne, sans-serif; color:var(--orange); font-size:34px; }
+  ol li, ul li { margin: 6px 0; }
+  .q { border-left:4px solid var(--orange); }
+  @media (max-width:600px){ .seg { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">AI Filmmaking course · plan for your OK</div>
+  <h1>How "The Pitch" was built in Flow</h1>
+  <p>This is a click-by-click video for the course. Ruby's voice walks the customer through building the ad on a Flow canvas. A short, optional Video editor finish comes at the end. It is about <b>4 minutes</b>, in 16:9.</p>
+
+  <div class="card">
+    <p><b>How it gets made.</b> This copies the method behind the "How to prompt" videos.</p>
+    <ul>
+      <li>The recorder drives the real app on this Mac. It uses your real Flow canvas 257 and the real pictures, voices and clips from it.</li>
+      <li>Generate is pressed on screen. The press never reaches a model: it is answered with the result we already made. <b>No credits are spent on screen.</b></li>
+      <li>Ruby's voice is laid over the screen, with the zooms onto each click. Ruby is not on camera.</li>
+      <li>The ad's own score plays underneath. It eases down smoothly whenever Ruby talks.</li>
+    </ul>
+  </div>
+
+  <h2>The segments</h2>
+
+  <div class="card seg"><div class="t">0:00–0:15</div><div>
+    <h3>1 · Open on the result</h3>
+    <p>About 10 seconds of the finished ad: the trailer, the cigar dropping, then "Sign him." After that comes the title card: <i>Build The Pitch in Flow</i>.</p>
+    <p><span class="tag">FREE</span>It uses the approved 16:9 ad.</p>
+  </div></div>
+
+  <div class="card seg"><div class="t">0:15–0:35</div><div>
+    <h3>2 · The map: one canvas, two rows</h3>
+    <p>This is canvas 257 exactly as you built it. The pointer moves along each row:</p>
+    <ul>
+      <li>The top row is the boardroom: the pictures, the voices and the talking shots.</li>
+      <li>The bottom row is Milo's trailer: the hamster heist.</li>
+    </ul>
+    <p>The message is that every box is one run, and a wire carries each result to the next box.</p>
+  </div></div>
+
+  <div class="card seg"><div class="t">0:35–1:40</div><div>
+    <h3>3 · Build a talking shot, live</h3>
+    <ol>
+      <li>Add a Picture box and pick <b>Mr. Vance</b> from the Library.</li>
+      <li>Add a Voice box and type <i>"A hamster heist?!"</i>.</li>
+      <li>Pick the voice <b>Algenib</b> from the voice list.</li>
+      <li>Type the "How it's said" direction: <i>Booming, gravelly old Hollywood studio boss…</i>. Ruby reads the whole direction aloud while it is typed.</li>
+      <li>Press Generate, and the line plays.</li>
+      <li>Add a Talk box and drag the two wires: picture to face, voice to voice.</li>
+      <li>Press Generate, and Vance shouts.</li>
+    </ol>
+  </div></div>
+
+  <div class="card seg"><div class="t">1:40–2:45</div><div>
+    <h3>4 · Fix the picture before you animate it</h3>
+    <p>The laser picture is already on the canvas. Ruby points out the problem with the first try: a beam runs through Hammond's head.</p>
+    <ol>
+      <li>Add an Edit box and type the fix: <i>"Move the red laser beams so that NONE of them touches the hamster…"</i>.</li>
+      <li>Generate, and now the beams miss him.</li>
+      <li>Add a Video box and pick <b>Grok Video 1.5 Lite</b> from the model list. Type the motion prompt.</li>
+      <li>Generate, and he creeps under the lasers.</li>
+    </ol>
+    <p>The lesson: fixing a picture is cheap, and redoing a clip is not.</p>
+  </div></div>
+
+  <div class="card seg"><div class="t">2:45–3:10</div><div>
+    <h3>5 · The rest of the heist, quick tour</h3>
+    <p>Nothing is typed here. The pointer visits the finished boxes:</p>
+    <ul>
+      <li><b>The vault:</b> one picture turned into one clip.</li>
+      <li><b>The motorbike:</b> the clip starts from a picture with both wheels on the desk. A mid-jump picture just hangs in the air.</li>
+      <li><b>The cigar:</b> a close-up made from Vance's own picture.</li>
+    </ul>
+    <p>Ruby also says that the bike clip was made longer with Extend in Clip tools.</p>
+  </div></div>
+
+  <div class="card seg"><div class="t">3:10–3:55</div><div>
+    <h3>6 · Optional: finish in the Video editor</h3>
+    <p>Ruby says first: <i>"This part is optional. Every clip is already in your Library, so you can finish wherever you like."</i></p>
+    <ol>
+      <li>Press <b>🎞 Open in video editor</b>. The clips land in order.</li>
+      <li>Add the score from the Library onto the Music row. Trim it to the film and turn it down.</li>
+      <li>Add the end-card text.</li>
+      <li>Point at Export. It is not pressed.</li>
+    </ol>
+    <p><b>Honest note in the video:</b> three touches in the finished ad were done outside solorender. They are the title playing inside the laptop, the bouncing captions and the 2.4× speed-up on the bike. The separate finishing guide covers those.</p>
+  </div></div>
+
+  <div class="card seg"><div class="t">3:55–4:05</div><div>
+    <h3>7 · Close</h3>
+    <p>What it cost a customer comes from your ledger: 68 runs, about <b>$17.61 on the Studio plan</b>. Then the end card: <i>AI Filmmaking course · solorender.com</i>.</p>
+  </div></div>
+
+  <h2>Cost</h2>
+  <table>
+    <tr><th>Item</th><th>Cost</th></tr>
+    <tr><td>Screen recordings (the real app with your real media, Generate answered locally)</td><td>$0</td></tr>
+    <tr><td>Music: the ad's own score</td><td>$0</td></tr>
+    <tr><td>Ruby's voice: about 3,500 characters on MiniMax Speech 2.8 at $0.10 per 1,000 (fal's live price list)</td><td>≈ $0.40</td></tr>
+    <tr><td>Room for re-takes of a line or two</td><td>≈ $0.20</td></tr>
+    <tr><td>The one full render, on Google Cloud (inside your free monthly allowance)</td><td>$0</td></tr>
+  </table>
+  <p class="big">Up to $0.60</p>
+
+  <h2>Before the one full render</h2>
+  <ul>
+    <li>You see and approve each recorded segment first.</li>
+    <li>Every typed word is checked against Ruby's word timings.</li>
+    <li>"Solo render" and "Algenib" are checked by ear.</li>
+    <li>Then the video is rendered once, with a progress log.</li>
+  </ul>
+
+  <div class="card q">
+    <p><b>Your OK needed on two things:</b></p>
+    <ol>
+      <li><b>Voice-only Ruby</b>, like the "How to prompt" videos. My pick: yes, at ≈ $0.60. The other option is Ruby on camera like the Pembrook explainer, which adds about $3 of lip syncs.</li>
+      <li><b>About 4 minutes</b>, with every typed word read aloud. The other option is two shorter videos: Flow (about 3:10) and the editor (about 0:50).</li>
+    </ol>
+    <p>Where it goes on the site comes after you've watched it.</p>
+  </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Pitch by the Numbers</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Manrope:wght@400;600;800&display=swap">
+<style>
+/* Layout: a production ledger — headline figures, a to-scale bar per stage, then the stage-by-stage log. Always dark (solorender). */
+:root{
+  --bg:#0a0a0a; --panel:#131313; --line:#262626;
+  --ink:#ffffff; --label:#6ee05a; --accent:#f7931a; --accent-dim:#5c3a10;
+  --display:"Syne","Manrope",system-ui,sans-serif;
+  --body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 64px}
+.wrap{max-width:1040px;margin:0 auto;display:grid;gap:48px}
+a{color:var(--ink);text-decoration-color:var(--label);text-underline-offset:3px}
+a:focus-visible{outline:2px solid var(--label);outline-offset:3px}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--label)}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.08}
+h1{font-size:clamp(34px,6vw,56px);font-weight:800}
+h2{font-size:clamp(24px,3.4vw,32px);font-weight:800}
+h3{font-size:19px;font-weight:700}
+p{margin:0;max-width:68ch}
+.stack{display:grid;gap:14px}
+.nav{display:flex;flex-wrap:wrap;gap:12px 20px;font-size:15px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:12px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:4px;align-content:start}
+.tile b{font-family:var(--body);font-size:36px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1.1}
+.tile span{font-size:15px}
+.chart{display:grid;gap:10px}
+.row{display:grid;grid-template-columns:150px 1fr 120px;gap:12px;align-items:center;font-size:15px}
+.bar{height:22px;background:var(--panel);border-radius:4px;overflow:hidden;display:flex}
+.bar i{display:block;height:100%}
+.bar .k{background:var(--accent)}
+.bar .x{background:repeating-linear-gradient(135deg,var(--accent-dim) 0 6px,#3a250a 6px 12px)}
+.row .n{text-align:right;font-variant-numeric:tabular-nums}
+.key{display:flex;flex-wrap:wrap;gap:18px;font-size:14px}
+.key i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:6px}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:14px}
+table{border-collapse:collapse;width:100%;min-width:860px;font-size:15px}
+th,td{text-align:left;vertical-align:top;padding:12px 14px;border-bottom:1px solid var(--line)}
+th{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--label);font-weight:800;background:var(--panel);position:sticky;top:0}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td .tag{display:inline-block;font-size:12px;font-weight:800;color:var(--label);letter-spacing:.06em;text-transform:uppercase}
+.free{color:var(--label);font-weight:800}
+.lessons{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.lesson{border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:6px}
+.lesson .eyebrow{font-size:11px}
+.note{font-size:15px;border-left:3px solid var(--label);padding-left:14px}
+@media (max-width:640px){.row{grid-template-columns:1fr 84px}.row .bar{grid-column:1/-1;grid-row:2}}
+</style>
+</head>
+<body>
+<main class="wrap">
+
+<header class="stack">
+  <div class="nav"><a href="./">← Finishing guide</a><span class="eyebrow">AI Filmmaking course · supplemental</span></div>
+  <h1>The Pitch, by the numbers</h1>
+  <p>Every run that went into our 35.5-second course ad, counted from solorender's own credit ledger. It shows what each stage cost, how many tries it took, which tries were thrown away and why. Use it to budget your own short ad.</p>
+</header>
+
+<section class="tiles" aria-label="Headline figures">
+  <div class="tile"><b>35.5 s</b><span>finished 16:9 ad, 11 shots</span></div>
+  <div class="tile"><b>68</b><span>generation runs. 66 were charged; 2 failed and were refunded automatically.</span></div>
+  <div class="tile"><b>1,959 cr</b><span>at customer prices. About $17.61 on Studio, $16.58 on Max, $13.75 on Super Max.</span></div>
+  <div class="tile"><b>1,211 cr</b><span>went into things you see or hear in the ad (62%). The rest was tries we threw away.</span></div>
+  <div class="tile"><b>0 cr</b><span>for finishing: rough cuts, speed ramp, sound mix, the laptop effect and the end-card animation.</span></div>
+  <div class="tile"><b>About 7 h</b><span>start to finish over two days, including waiting for review notes.</span></div>
+</section>
+
+<section class="stack">
+  <span class="eyebrow">The back-and-forth</span>
+  <h2>One afternoon of making, checking and notes</h2>
+  <p>From 12:28 pm to 5:31 pm on October 22, Claude made and checked the ad through solorender's connection for AI assistants and free tools on the computer, while the director reviewed. These counts come from that session's record.</p>
+  <div class="tiles">
+    <div class="tile"><b>36</b><span>messages from the director. At least 9 were notes that sent something back to be redone.</span></div>
+    <div class="tile"><b>30</b><span>previews sent for review, 59 files in all: pictures, clips, voices, music and rough cuts.</span></div>
+    <div class="tile"><b>49</b><span>make calls to solorender, plus 40 status checks while runs finished.</span></div>
+    <div class="tile"><b>57</b><span>ffmpeg runs: trims, ramps, sound mixes, frame strips and the final MP4.</span></div>
+    <div class="tile"><b>20</b><span>Whisper checks, listening for every spoken word and its timing.</span></div>
+    <div class="tile"><b>14</b><span>loudness readings, so no shot jumps out louder or quieter.</span></div>
+  </div>
+  <p class="note">The full list of tools, and what each one did, is in the <a href="./#toolkit">finishing guide's toolkit table</a>.</p>
+</section>
+
+<section class="stack">
+  <span class="eyebrow">Where the credits went</span>
+  <h2>Spend per stage, at customer prices</h2>
+  <div class="key"><span><i style="background:var(--accent)"></i>Kept and used</span><span><i style="background:repeating-linear-gradient(135deg,var(--accent-dim) 0 4px,#3a250a 4px 8px)"></i>Thrown away</span></div>
+  <div class="chart" role="img" aria-label="Bar chart of credits per stage, kept versus thrown away">
+    <!-- widths are % of the largest stage (cast pictures, 525 cr) -->
+    <div class="row"><span>Cast pictures</span><div class="bar"><i class="k" style="width:53.3%"></i><i class="x" style="width:46.7%"></i></div><span class="n">525 · kept 280</span></div>
+    <div class="row"><span>Action clips</span><div class="bar"><i class="k" style="width:53.3%"></i><i class="x" style="width:7.6%"></i></div><span class="n">320 · kept 280</span></div>
+    <div class="row"><span>Talking shots</span><div class="bar"><i class="k" style="width:45.7%"></i><i class="x" style="width:13.7%"></i></div><span class="n">312 · kept 240</span></div>
+    <div class="row"><span>Title in laptop</span><div class="bar"><i class="k" style="width:22.3%"></i><i class="x" style="width:26.7%"></i></div><span class="n">257 · kept 117</span></div>
+    <div class="row"><span>Model test</span><div class="bar"><i class="k" style="width:7.6%"></i><i class="x" style="width:16.8%"></i></div><span class="n">128 · kept 40</span></div>
+    <div class="row"><span>Music</span><div class="bar"><i class="k" style="width:2.9%"></i><i class="x" style="width:20%"></i></div><span class="n">120 · kept 15</span></div>
+    <div class="row"><span>Heist pictures</span><div class="bar"><i class="k" style="width:13%"></i><i class="x" style="width:3.2%"></i></div><span class="n">85 · kept 68</span></div>
+    <div class="row"><span>Voices</span><div class="bar"><i class="k" style="width:9.1%"></i><i class="x" style="width:6.1%"></i></div><span class="n">80 · kept 48</span></div>
+    <div class="row"><span>End card</span><div class="bar"><i class="k" style="width:9.3%"></i><i class="x" style="width:1.7%"></i></div><span class="n">58 · kept 49</span></div>
+    <div class="row"><span>Cigar drop</span><div class="bar"><i class="k" style="width:7.6%"></i></div><span class="n">40 · kept 40</span></div>
+    <div class="row"><span>Picture fixes</span><div class="bar"><i class="k" style="width:6.5%"></i></div><span class="n">34 · kept 34</span></div>
+  </div>
+  <p class="note">Half of the cast pictures were never meant for this cut. We made every character twice in both shapes, wide and tall, and kept 4 of each. The tall ones are for the 9:16 version, which is still being made and is not counted here.</p>
+</section>
+
+<section class="stack">
+  <span class="eyebrow">Stage by stage</span>
+  <h2>What each stage took</h2>
+  <p>Times are Pacific. Customer price is what a Studio-plan customer would pay. Our cost is what solorender paid its suppliers, for the curious.</p>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Stage</th><th>When</th><th>Runs</th><th>Customer price</th><th>Our cost</th><th>What happened</th></tr></thead>
+    <tbody>
+      <tr><td><b>Ideas and scripts</b><br><span class="tag">Writing</span></td><td class="num">Oct 21, evening</td><td class="num">10 ideas<br>6 scripts</td><td class="num free">0 cr</td><td class="num">$0</td><td>Ten ad ideas, six written out shot by shot. The Pitch was picked to make first.</td></tr>
+      <tr><td><b>Cast pictures</b><br><span class="tag">Nano Banana Pro</span></td><td class="num">Oct 21<br>8:33–8:50 pm</td><td class="num">15 · kept 8</td><td class="num">525 cr<br>$4.72</td><td class="num">$2.10</td><td>Milo, Mr. Vance, the boardroom and Hammond the hamster, two takes each, in wide and tall. Made in one 17-minute batch alongside the other five ads.</td></tr>
+      <tr><td><b>Picture fixes</b><br><span class="tag">Nano Banana 2 Edit</span></td><td class="num">Oct 22<br>11:26 am</td><td class="num">2 · kept 2</td><td class="num">34 cr<br>$0.31</td><td class="num">$0.14</td><td>The boy seen from behind needed Milo's cap and windbreaker. Vance needed the gold tooth from the script.</td></tr>
+      <tr><td><b>Model test</b><br><span class="tag">Grok Lite vs Kling Turbo</span></td><td class="num">1:26 pm</td><td class="num">2 · kept 1</td><td class="num">128 cr<br>$1.15</td><td class="num">$0.51</td><td>Same vault shot on both. Grok Video 1.5 Lite: 1 minute, a real push-in, sound included, 40 cr. Kling 2.5 Turbo: 10 minutes, no sound, barely moved, 88 cr. Grok made every action shot after that, and the test clip became the vault shot.</td></tr>
+      <tr><td><b>Voices</b><br><span class="tag">Gemini 3.8 Voice</span></td><td class="num">1:41–2:27 pm</td><td class="num">10 · kept 6</td><td class="num">80 cr<br>$0.72</td><td class="num">$0.30</td><td>The trailer line was rewritten to "In a world…". Milo's first voice sounded too old, so two more were tried. The trailer voice was then made one semitone deeper and its big pause stretched to 0.7 s in a free audio tool.</td></tr>
+      <tr><td><b>Talking shots</b><br><span class="tag">OmniHuman</span></td><td class="num">2:06–2:30 pm</td><td class="num">5 · kept 3</td><td class="num">312 cr<br>$2.80</td><td class="num">$1.25</td><td>One run stalled for 13¾ minutes at the supplier and was refunded automatically; the re-run took 3 minutes. Milo's first talking shot was dropped when his voice changed.</td></tr>
+      <tr><td><b>Heist pictures</b><br><span class="tag">Nano Banana 2 Edit</span></td><td class="num">2:36–3:08 pm</td><td class="num">5 · kept 4</td><td class="num">85 cr<br>$0.76</td><td class="num">$0.35</td><td>The first laser picture had a beam running through Hammond's head. The joke is that he slips under them, so it was fixed. A new start picture was made for the motorbike (next row).</td></tr>
+      <tr><td><b>Action clips</b><br><span class="tag">Grok Lite + Extend</span></td><td class="num">2:37–3:14 pm</td><td class="num">6 · kept 5</td><td class="num">320 cr<br>$2.88</td><td class="num">$1.28</td><td>The first motorbike take started mid-jump and flew the wrong way. A grounded start picture fixed it. Grok Extend then added 6 seconds so he lands and rides out the door. In the boardroom laugh, a bald exec gets hidden after 2.5 s, so only the first 1.5 s is used.</td></tr>
+      <tr><td><b>Music</b><br><span class="tag">Lyria 2</span></td><td class="num">2:37–3:36 pm</td><td class="num">9 · kept 1</td><td class="num">120 cr<br>$1.08</td><td class="num">$0.48</td><td>Three rounds. A brass sting and a heist bed were rejected. Of three trailer tracks, the action one won, then lost for being "not memorable". Three more, each asked for a hummable theme, gave the comedy-epic score. One Lyria 3.5 run failed and was refunded.</td></tr>
+      <tr><td><b>Title in the laptop</b><br><span class="tag">Edit · Ideogram · Grok</span></td><td class="num">4:00–4:59 pm</td><td class="num">10 · kept 5</td><td class="num">257 cr<br>$2.31</td><td class="num">$1.03</td><td>Four runs (137 cr) tried to fake "the title plays on the laptop" inside solorender: a cut between two clips showed, and one long take froze the letters. The working version was put together outside solorender for free (guide, section 6).</td></tr>
+      <tr><td><b>End card</b><br><span class="tag">Nano Banana 2.1 · Grok</span></td><td class="num">5:01–5:05 pm</td><td class="num">3 · kept 2</td><td class="num">58 cr<br>$0.52</td><td class="num">$0.23</td><td>Two backdrops; the outward searchlights won and were animated. The orange line was unreadable on the gold beams, so a soft dark veil went behind the words.</td></tr>
+      <tr><td><b>Cigar drop</b><br><span class="tag">Grok Lite</span></td><td class="num">5:10 pm</td><td class="num">1 · kept 1</td><td class="num">40 cr<br>$0.36</td><td class="num">$0.16</td><td>Vance's laugh dies and the cigar falls. Cut as soon as it leaves his fingers.</td></tr>
+      <tr><td><b>Flow canvas</b><br><span class="tag">Flow</span></td><td class="num">Oct 22</td><td class="num">23 boxes</td><td class="num free">0 cr</td><td class="num">$0</td><td>Every picture, voice and clip laid out on one canvas, so the whole ad can be seen and re-run in one place.</td></tr>
+      <tr><td><b>Rough cuts</b><br><span class="tag">Finishing</span></td><td class="num">3:22–5:29 pm</td><td class="num">5 cuts</td><td class="num free">0 cr</td><td class="num">$0</td><td>v1 34.6 s. v2 swapped a flat 1.4× motorbike for a speed ramp. Three music tests. v3 added the laptop title, new score, cigar drop and end card (41.2 s). v4 trimmed to 35.5 s and cut the cigar fall shorter.</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section class="stack">
+  <span class="eyebrow">What the redos taught us</span>
+  <h2>Nine lessons that save credits</h2>
+  <div class="lessons">
+    <div class="lesson"><span class="eyebrow">Test before you commit</span><p>Run one shot on two models first. One 128-credit test picked the model for every action clip that followed, and its winning clip went into the ad.</p></div>
+    <div class="lesson"><span class="eyebrow">Voice before face</span><p>Approve the voice before making the talking shot. Changing Milo's voice meant paying for his talking shot twice.</p></div>
+    <div class="lesson"><span class="eyebrow">Check the story, not the parts</span><p>The laser picture had everything right except the joke: no beam may touch the hamster.</p></div>
+    <div class="lesson"><span class="eyebrow">Start on the ground</span><p>A clip made from a mid-air picture can't show the take-off. Make a start picture where the action begins.</p></div>
+    <div class="lesson"><span class="eyebrow">Extend, don't redo</span><p>"Land and ride out the door" took 6 seconds of Extend on top of the ride we already liked, instead of gambling on a whole new take.</p></div>
+    <div class="lesson"><span class="eyebrow">Ask for a hummable theme</span><p>Music was the most thrown-away stage: 105 of 120 credits. Ask for a catchy melody and judge it inside the cut, never alone.</p></div>
+    <div class="lesson"><span class="eyebrow">Know what's a finishing job</span><p>A picture playing inside a screen is compositing work. Four generation tries cost 137 credits; the free editor did it properly.</p></div>
+    <div class="lesson"><span class="eyebrow">Dip the music slowly</span><p>An instant 8 dB drop under the narrator sounded like a grabbed volume knob. 6 dB, eased in over 0.7 s and out over 1.2 s, sounded right, and cost nothing to fix.</p></div>
+    <div class="lesson"><span class="eyebrow">Use only the good seconds</span><p>The boardroom clip is 5 seconds long. The ad uses 1.5 of them, before the extra in the back gets blocked.</p></div>
+  </div>
+</section>
+
+<section class="stack">
+  <span class="eyebrow">How these numbers were counted</span>
+  <p class="note">Every figure comes from solorender's credit ledger and Library for this one ad. Runs for the other course ads made the same days are left out. The cast batch was paid two pictures per run for six ads at once, so it is counted per delivered picture. Dollar prices use each plan's own credit price: Studio $40 for 4,450 credits, Max $80 for 9,450, Super Max $300 for 42,750. Times come from when each item landed in the Library and are approximate.</p>
+</section>
+
+</main>
+</body>
+</html>

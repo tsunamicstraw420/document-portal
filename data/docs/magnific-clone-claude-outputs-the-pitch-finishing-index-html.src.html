@@ -1,0 +1,437 @@
+<title>Finishing The Pitch</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Manrope:wght@400;600;800&family=JetBrains+Mono:wght@400&display=swap">
+<style>
+/* Layout: a finishing room. The ad plays first, then two routes (AI assistant or by hand), then eight finishing moves, each set beside the real frames from The Pitch. Always dark (solorender). */
+:root{
+  --bg:#0a0a0a; --panel:#131313; --panel-2:#1a1a1a; --line:#262626;
+  --ink:#ffffff; --label:#6ee05a; --accent:#f7931a; --accent-dim:#5c3a10; --no:#ff6b5e;
+  --display:"Syne","Manrope",system-ui,sans-serif;
+  --body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{background:var(--bg);color:var(--ink);font:17px/1.6 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 72px}
+.wrap{max-width:1080px;margin:0 auto;display:grid;gap:64px}
+a{color:var(--ink);text-decoration-color:var(--label);text-underline-offset:3px}
+a:focus-visible,summary:focus-visible{outline:2px solid var(--label);outline-offset:3px}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--label)}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.08}
+h1{font-size:clamp(36px,6.4vw,64px);font-weight:800}
+h2{font-size:clamp(26px,3.6vw,36px);font-weight:800}
+h3{font-size:19px;font-weight:700}
+p,li{max-width:68ch}
+p{margin:0}
+ol,ul{margin:0;padding-left:22px;display:grid;gap:6px}
+.stack{display:grid;gap:14px;min-width:0}
+.nav{display:flex;flex-wrap:wrap;gap:12px 20px;font-size:15px;align-items:baseline}
+figure{margin:0;display:grid;gap:6px;min-width:0}
+figure img,video{width:100%;max-width:100%;display:block;border-radius:10px;background:#000}
+figcaption{font-size:14px}
+video{aspect-ratio:16/9}
+.hero{display:grid;gap:20px}
+.facts{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:15px}
+.facts b{color:var(--accent);font-variant-numeric:tabular-nums}
+.routes{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.route{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:10px;align-content:start}
+.route .who{font-family:var(--display);font-size:22px;font-weight:800}
+.loop{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;counter-reset:s}
+.loop div{border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:4px;align-content:start}
+.loop div::before{counter-increment:s;content:"Step " counter(s);font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--label)}
+.loop b{font-size:16px}
+.loop span{font-size:15px}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:14px}
+table{border-collapse:collapse;width:100%;font-size:15px}
+.t-wide{min-width:760px}
+th,td{text-align:left;vertical-align:top;padding:11px 14px;border-bottom:1px solid var(--line)}
+th{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--label);font-weight:800;background:var(--panel)}
+tr:last-child td{border-bottom:0}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.yes{color:var(--label);font-weight:800}
+.part{color:var(--accent);font-weight:800}
+.no{color:var(--no);font-weight:800}
+.move{display:grid;gap:22px;padding-top:28px;border-top:1px solid var(--line)}
+.move-head{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;align-items:baseline}
+.move-head .n{font-family:var(--body);font-size:44px;font-weight:800;color:var(--accent);line-height:1;grid-row:span 2;font-variant-numeric:tabular-nums}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;align-items:start}
+.how{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:10px;align-content:start;min-width:0}
+.how h3{font-size:16px;font-family:var(--body);font-weight:800;letter-spacing:.02em}
+.how.claude{border-color:#2f4a2a}
+.badge{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:999px;border:1px solid currentColor}
+.frames{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.frames figcaption{font-size:13px;font-variant-numeric:tabular-nums}
+.strip{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.strip figcaption{font-size:12px}
+@media (max-width:700px){.strip{grid-template-columns:repeat(3,1fr)}}
+code,.code{font-family:var(--mono);font-size:13.5px}
+pre{margin:0;overflow-x:auto;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font:13px/1.55 var(--mono);color:var(--ink)}
+details{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--panel)}
+details[open]{display:grid;gap:10px}
+summary{cursor:pointer;font-weight:800}
+.wave{position:relative;background:var(--panel);border-radius:10px;padding:18px 0 34px}
+.wave img{background:none;border-radius:0}
+.mark{position:absolute;top:6px;bottom:22px;border-left:2px dashed var(--label)}
+.mark span{position:absolute;bottom:-22px;left:4px;font-size:12px;white-space:nowrap;color:var(--ink)}
+.mark.cut{border-left-color:var(--accent)}
+.svgbox{background:var(--panel);border-radius:10px;padding:10px;overflow-x:auto}
+.svgbox svg{display:block;width:100%;min-width:560px;height:auto}
+.callout{border-left:3px solid var(--accent);padding:2px 0 2px 14px;display:grid;gap:6px}
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:6px 16px;font-size:15px}
+.kv dt{color:var(--label);font-weight:800}
+.kv dd{margin:0}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+
+<main class="wrap">
+
+<header class="hero">
+  <div class="nav"><span class="eyebrow">AI Filmmaking course · supplemental how-to</span><a href="by-the-numbers.html">The Pitch by the numbers →</a></div>
+  <h1>How we finished The Pitch</h1>
+  <p>Every picture, voice, clip and note of music in this ad was made in solorender. The last mile was finished outside it: the cut, the speed ramp, the sound mix, the title playing inside the laptop and the animated end card. This guide shows exactly how, and how you can do the same with free tools.</p>
+  <figure>
+    <video controls playsinline preload="metadata" poster="img/shot05.jpg" src="the-pitch-16x9.mp4"></video>
+    <figcaption>The Pitch, 16:9, 35.5 seconds. Rough cut v4. The 9:16 version is still being made.</figcaption>
+  </figure>
+  <div class="facts"><span><b>11</b> shots</span><span><b>6</b> voices</span><span><b>1</b> music track</span><span><b>8</b> finishing moves</span><span><b>0</b> credits spent on finishing</span></div>
+</header>
+
+<section class="stack" id="routes">
+  <span class="eyebrow">Pick your route</span>
+  <h2>Two ways to finish, same result</h2>
+  <div class="routes">
+    <div class="route">
+      <span class="eyebrow">How The Pitch was actually made</span>
+      <span class="who">An AI assistant does the work</span>
+      <p>Claude, connected to solorender, made every asset, checked every result, cut the film with free command-line tools, and sent each version for review. The person directing only watched and gave notes.</p>
+      <p><b>You need:</b> a solorender plan (connector keys come with every plan and Super Max), Claude with solorender connected from <a href="https://solorender.com/connect">solorender.com/connect</a>, and the free tools listed below on your computer.</p>
+    </div>
+    <div class="route">
+      <span class="eyebrow">Recommended if you like hands-on</span>
+      <span class="who">You edit it yourself</span>
+      <p>Make your assets in solorender, download them from your Library, and finish in <b>DaVinci Resolve</b>. It is free, works on Mac and Windows, and allows commercial use. Every move below has Resolve steps.</p>
+      <p>solorender's own <b>Video editor</b> already does five of the eight moves. Each section says what it can and can't do yet.</p>
+    </div>
+  </div>
+</section>
+
+<section class="stack" id="loop">
+  <span class="eyebrow">The back-and-forth that made it</span>
+  <h2>How the AI route works, step by step</h2>
+  <p>This is the loop that ran 30 times in one afternoon. In about five hours the director sent 36 messages and got 30 previews back (59 files). At least nine of those messages were notes that sent something back to be redone.</p>
+  <div class="loop">
+    <div><b>Ask in plain words</b><span>"Make the hamster ride up the ramp and land." Claude turns that into a full prompt with timed beats and camera move.</span></div>
+    <div><b>Claude prices it first</b><span>Every run is quoted in credits and dollars before it is made. Nothing is spent without a yes.</span></div>
+    <div><b>Claude makes it in solorender</b><span>Through the solorender connection: 49 runs for this ad, each saved to the Library.</span></div>
+    <div><b>Claude checks it before you see it</b><span>A frame strip every quarter second, a loudness reading, and Whisper listening for every spoken word.</span></div>
+    <div><b>You watch and give notes</b><span>"Laser hits him." "Not memorable." "The text isn't moving." Each note becomes the next run.</span></div>
+    <div><b>Claude cuts the film</b><span>Free tools on your computer stitch, ramp, mix and export a new rough cut in under a minute.</span></div>
+  </div>
+</section>
+
+<section class="stack" id="toolkit">
+  <span class="eyebrow">Every tool used</span>
+  <h2>The full toolkit</h2>
+  <p>Counts are from the session that made The Pitch, from 12:28 pm to 5:31 pm on October 22. Everything except the solorender runs is free.</p>
+  <div class="scroll">
+  <table class="t-wide">
+    <thead><tr><th>Tool</th><th>What it did on The Pitch</th><th>Used</th><th>Cost</th></tr></thead>
+    <tbody>
+      <tr><td><b>solorender</b><br>Studio, Talk, Clip tools, Library</td><td>Every picture (Nano Banana Pro, Nano Banana 2 Edit, Ideogram V4), voice (Gemini 3.8), talking shot (OmniHuman), action clip (Grok Video 1.5 Lite, Grok Extend) and music track (Lyria 2).</td><td class="num">68 runs</td><td class="num">1,959 cr</td></tr>
+      <tr><td><b>solorender Flow</b></td><td>The whole ad laid out on one canvas: 23 boxes, from cast pictures to finished clips, so it can be re-run or changed in one place.</td><td class="num">1 canvas</td><td class="num">Free</td></tr>
+      <tr><td><b>Claude + the solorender connection</b></td><td>Wrote the 10 ideas and 6 scripts, wrote every prompt, made and polled each run, saved the Flow canvas, and quoted every cost before spending.</td><td class="num">49 make calls<br>40 status checks</td><td class="num">Your Claude plan</td></tr>
+      <tr><td><b>ffmpeg</b><br>free video and audio tool</td><td>Trims, joins, speed ramp, loudness levelling, the music dip under the narrator, the hard cut to silence, the trailer voice made deeper with a longer pause, frame strips for checking, and the final MP4.</td><td class="num">57 runs</td><td class="num">Free</td></tr>
+      <tr><td><b>ffprobe</b><br>comes with ffmpeg</td><td>Read every file's exact length and size so cuts land on the right frame.</td><td class="num">32 runs</td><td class="num">Free</td></tr>
+      <tr><td><b>Loudness meter</b><br>ffmpeg's EBU R128 meter</td><td>Measured how loud each clip, voice and the finished ad sounds, in LUFS.</td><td class="num">14 readings</td><td class="num">Free</td></tr>
+      <tr><td><b>Whisper</b><br>faster-whisper, small.en model, runs offline</td><td>Listened to every voice and talking shot and wrote down each word with its time, to prove the lines were said right and to time the cuts.</td><td class="num">20 checks</td><td class="num">Free</td></tr>
+      <tr><td><b>Python + Pillow</b><br>free picture library</td><td>Built the two shots no generator could: the HAMMOND title playing inside the laptop screen, and the end card with its moving text over the searchlights.</td><td class="num">2 small programs</td><td class="num">Free</td></tr>
+      <tr><td><b>Mouth close-ups</b><br>ffmpeg crops</td><td>Lined up mouth crops against Whisper's word times to check the lip sync on each talking shot.</td><td class="num">4 sheets</td><td class="num">Free</td></tr>
+      <tr><td><b>Chrome</b></td><td>Checked that the Flow canvas fits one screen at the zoom the director uses, and sent screenshots of it.</td><td class="num">3 screenshots</td><td class="num">Free</td></tr>
+      <tr><td><b>DaVinci Resolve</b></td><td>Not used for this cut. It is the hands-on route in this guide and the "pro finish" lesson.</td><td class="num">—</td><td class="num">Free</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <details>
+    <summary>Setting up the free tools (Mac)</summary>
+    <ol>
+      <li>Install Homebrew from <a href="https://brew.sh">brew.sh</a>, then run <code>brew install ffmpeg</code>.</li>
+      <li>Install Whisper's offline version: <code>pip3 install faster-whisper</code>. The first run downloads the small English model, then it works without internet.</li>
+      <li>Install Pillow: <code>pip3 install pillow</code>.</li>
+      <li>Connect Claude to solorender from <a href="https://solorender.com/connect">solorender.com/connect</a>. Then tell Claude which free tools are installed, and ask it to check every result before showing you.</li>
+    </ol>
+  </details>
+</section>
+
+<section class="stack" id="before">
+  <span class="eyebrow">Before you edit</span>
+  <h2>Set up the edit the same way every time</h2>
+  <div class="cols">
+    <div class="how">
+      <h3>Download everything whole</h3>
+      <p>Download each clip, voice and the music from your Library at full length. Don't trim before you edit. Keep at least one second spare at each end of every shot so you can slide a cut later.</p>
+    </div>
+    <div class="how">
+      <h3>Match the clips</h3>
+      <p>The Pitch is 1280×720 at 24 frames a second, because Grok Video 1.5 Lite makes 720p clips. Set your timeline to the same frame rate as your clips.</p>
+    </div>
+    <div class="how">
+      <h3>One job per track</h3>
+      <dl class="kv"><dt>V1</dt><dd>main shots</dd><dt>V2</dt><dd>pictures and overlays, on their own track</dd><dt>V3</dt><dd>text</dd><dt>A1</dt><dd>sound from the clips</dd><dt>A2</dt><dd>voices</dd><dt>A3</dt><dd>music</dd></dl>
+    </div>
+  </div>
+  <p>Want captions? solorender's Video editor can write them and download a <code>.srt</code> file. In Resolve, right-click the Media Pool and choose <b>Import Subtitle…</b>. Keep them as an .srt file so they stay editable.</p>
+</section>
+
+<section class="stack" id="glance">
+  <span class="eyebrow">At a glance</span>
+  <h2>The eight moves, and where each one works</h2>
+  <div class="scroll">
+  <table class="t-wide">
+    <thead><tr><th>Move</th><th>DaVinci Resolve (free)</th><th>solorender Video editor today</th><th>How Claude did it</th></tr></thead>
+    <tbody>
+      <tr><td><a href="#m1">1 · Trim and order</a></td><td class="yes">Yes</td><td class="yes">Yes</td><td>ffmpeg</td></tr>
+      <tr><td><a href="#m2">2 · Speed ramp</a></td><td class="yes">Yes</td><td class="part">Yes, in steps (2× or 3×, not 2.4×)</td><td>ffmpeg</td></tr>
+      <tr><td><a href="#m3">3 · Music dip under a voice</a></td><td class="yes">Yes</td><td class="no">Not smoothly yet</td><td>ffmpeg volume curve</td></tr>
+      <tr><td><a href="#m4">4 · Even loudness</a></td><td class="yes">Yes</td><td class="part">By ear, with the volume slider</td><td>Loudness meter + ffmpeg</td></tr>
+      <tr><td><a href="#m5">5 · Hard cut to silence</a></td><td class="yes">Yes</td><td class="yes">Yes</td><td>ffmpeg</td></tr>
+      <tr><td><a href="#m6">6 · Picture inside a screen</a></td><td class="yes">Yes</td><td class="no">Not yet</td><td>Python + Pillow</td></tr>
+      <tr><td><a href="#m7">7 · Animated end card</a></td><td class="yes">Yes</td><td class="part">Text moves yes; dark veil untested</td><td>Python + Pillow</td></tr>
+      <tr><td><a href="#m8">8 · Export wide and tall</a></td><td class="yes">Yes</td><td class="yes">Yes, one project per shape</td><td>ffmpeg</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- 1 -->
+<section class="move" id="m1">
+  <div class="move-head"><span class="n">1</span><span class="eyebrow">Trim and order</span><h2>Use only the best seconds of each shot</h2></div>
+  <p>Most AI clips are 5 seconds long. The ad uses as little as 1.5 seconds of some. Cut each shot on its action: the boardroom laugh ends before an extra in the back gets hidden, and Vance's shot ends the instant the cigar leaves his fingers.</p>
+  <div class="strip">
+    <figure><img src="img/shot01.jpg" alt="Mr. Vance laughing with a cigar"><figcaption>1 · 2.1 s</figcaption></figure>
+    <figure><img src="img/shot02.jpg" alt="Executives laughing at the boardroom table"><figcaption>2 · 1.5 s</figcaption></figure>
+    <figure><img src="img/shot03.jpg" alt="Vance smirking"><figcaption>3 · 4.85 s</figcaption></figure>
+    <figure><img src="img/shot04.jpg" alt="Milo at the end of the table"><figcaption>4 · 2.0 s</figcaption></figure>
+    <figure><img src="img/shot05.jpg" alt="HAMMOND title on Milo's laptop"><figcaption>5 · 5.04 s</figcaption></figure>
+    <figure><img src="img/shot07.jpg" alt="Hamster cracking a vault"><figcaption>6 · 2.0 s</figcaption></figure>
+    <figure><img src="img/shot08.jpg" alt="Hamster under red lasers"><figcaption>7 · 2.0 s</figcaption></figure>
+    <figure><img src="img/shot09.jpg" alt="Hamster jumping a toy motorbike"><figcaption>8 · 5.9 s</figcaption></figure>
+    <figure><img src="img/shot10.jpg" alt="Vance's jaw drops"><figcaption>9 · 1.6 s</figcaption></figure>
+    <figure><img src="img/shot11.jpg" alt="Cigar falling into coffee"><figcaption>10 · 3.6 s</figcaption></figure>
+    <figure><img src="img/shot12.jpg" alt="End card text over searchlights"><figcaption>11 · 4.8 s</figcaption></figure>
+    <figure><img src="img/shot06.jpg" alt="HAMMOND title full frame"><figcaption>5 ends full frame</figcaption></figure>
+  </div>
+  <div class="scroll">
+  <table class="t-wide">
+    <thead><tr><th>#</th><th>Shot</th><th>Made with</th><th>Part used</th><th>On screen</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>Vance: "A hamster heist?!"</td><td>OmniHuman talking shot</td><td class="num">0–2.1 s</td><td class="num">2.1 s</td></tr>
+      <tr><td class="num">2</td><td>The board laughs</td><td>Grok Video 1.5 Lite</td><td class="num">0–1.5 s</td><td class="num">1.5 s</td></tr>
+      <tr><td class="num">3</td><td>Vance: "Ninety million dollars…"</td><td>OmniHuman</td><td class="num">0–4.85 s</td><td class="num">4.85 s</td></tr>
+      <tr><td class="num">4</td><td>Milo: "I already made the trailer."</td><td>OmniHuman</td><td class="num">0–2.0 s</td><td class="num">2.0 s</td></tr>
+      <tr><td class="num">5</td><td>HAMMOND plays on the laptop</td><td>Two Grok clips, combined (move 6)</td><td class="num">all</td><td class="num">5.04 s</td></tr>
+      <tr><td class="num">6</td><td>Vault</td><td>Grok Lite</td><td class="num">0.6–2.6 s</td><td class="num">2.0 s</td></tr>
+      <tr><td class="num">7</td><td>Lasers</td><td>Grok Lite</td><td class="num">1.0–3.0 s</td><td class="num">2.0 s</td></tr>
+      <tr><td class="num">8</td><td>Motorbike jump and exit</td><td>Grok Lite + Grok Extend</td><td class="num">1.0–11.0 s, ramped</td><td class="num">5.9 s</td></tr>
+      <tr><td class="num">9</td><td>Vance's laugh dies</td><td>Grok Lite</td><td class="num">0.8–2.4 s</td><td class="num">1.6 s</td></tr>
+      <tr><td class="num">10</td><td>Cigar into the coffee, "Sign him."</td><td>Grok Lite + Gemini voice</td><td class="num">0.3–3.9 s</td><td class="num">3.6 s</td></tr>
+      <tr><td class="num">11</td><td>End card</td><td>Nano Banana 2.1 + Grok, text added (move 7)</td><td class="num">all</td><td class="num">4.8 s</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="cols">
+    <div class="how"><h3>In DaVinci Resolve</h3><ol><li>Drag your clips into the Media Pool, then onto V1 in story order.</li><li>Put the playhead where a shot should end and split with <b>Timeline › Split Clip</b> (<code>⌘\</code>), or press <code>B</code> for the Blade tool.</li><li>Delete the spare piece and close the gap.</li></ol></div>
+    <div class="how"><h3>In solorender's Video editor</h3><p><span class="badge yes">Works</span></p><p>Drag clips onto the Main row; they snap end to end. Drag a clip's edge to trim, or use <b>Split</b> at the playhead.</p></div>
+    <div class="how claude"><h3>How Claude did it</h3><p>One ffmpeg command per shot: start time, length, then scale to 1280×720 at 24 fps. The shots are joined with ffmpeg's concat <i>filter</i>. Joining with the concat <i>list</i> method gave 173 audio errors.</p></div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="move" id="m2">
+  <div class="move-head"><span class="n">2</span><span class="eyebrow">Speed ramp</span><h2>Real speed for the stunt, fast for the getaway</h2></div>
+  <p>The motorbike clip is 11 seconds, too long for a trailer beat. Playing it all at 1.4× made the jump feel rushed. Splitting it fixed that: the ride, ramp and jump play at normal speed, then everything after the take-off plays at 2.4×. Ten seconds of clip became 5.9 on screen.</p>
+  <div class="frames">
+    <figure><img src="img/moto_1.0.jpg" alt="Hamster riding toward the ramp"><figcaption>1.0 s · 100%</figcaption></figure>
+    <figure><img src="img/moto_4.0.jpg" alt="Hamster leaving the ramp"><figcaption>4.0 s · split here</figcaption></figure>
+    <figure><img src="img/moto_7.0.jpg" alt="Hamster landing near a pencil cup"><figcaption>7.0 s · 240%</figcaption></figure>
+    <figure><img src="img/moto_10.5.jpg" alt="Coin trail after the hamster leaves"><figcaption>10.5 s · gone, coins left behind</figcaption></figure>
+  </div>
+  <div class="cols">
+    <div class="how"><h3>In DaVinci Resolve</h3><ol><li>Split the clip at the take-off frame (<code>⌘\</code>).</li><li>Right-click the second piece › <b>Change Clip Speed</b>, type <b>240</b>%. Tick <b>Pitch Correction</b> so the engine sound doesn't squeak.</li><li>For a smooth ramp instead of a jump in speed, use <b>Clip › Retime Controls</b> (<code>⌘R</code>) and add speed points.</li></ol></div>
+    <div class="how"><h3>In solorender's Video editor</h3><p><span class="badge part">Works in steps</span></p><p>Split at the take-off, then set the second piece's Speed. The choices go 1.5×, 2× or 3×; there is no 2.4×. At 2× the getaway lasts 3.5 s, at 3× it lasts 2.3 s.</p></div>
+    <div class="how claude"><h3>How Claude did it</h3><p>ffmpeg cut the clip at 4.0 s and sped the second piece's picture and sound up 2.4× without changing the sound's pitch. That was rough cut v2, after the director asked for a ramp instead of a flat speed-up.</p></div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="move" id="m3">
+  <div class="move-head"><span class="n">3</span><span class="eyebrow">Music dip under a voice</span><h2>Duck the music, slowly</h2></div>
+  <p>The first try dropped the music 8 dB in an instant when the trailer voice came in. It sounded like someone grabbed the volume knob. The fix is a smaller, slower dip. Fade 6 dB down over 0.7 seconds, starting just before the voice. Hold it there. Ease back up over 1.2 seconds after the voice ends.</p>
+  <div class="svgbox">
+    <svg viewBox="0 0 720 230" role="img" aria-label="Music volume over the trailer section: level at 0 dB, eases to minus 6 dB over 0.7 seconds before the narrator, holds, eases back to 0 dB over 1.2 seconds, then cuts to silence at 25.4 seconds">
+      <rect x="0" y="0" width="720" height="230" fill="#131313"/>
+      <line x1="40" y1="40" x2="700" y2="40" stroke="#262626"/><line x1="40" y1="150" x2="700" y2="150" stroke="#262626"/>
+      <text x="34" y="44" fill="#ffffff" font-size="12" text-anchor="end" font-family="Manrope,sans-serif">0 dB</text>
+      <text x="34" y="154" fill="#ffffff" font-size="12" text-anchor="end" font-family="Manrope,sans-serif">−6 dB</text>
+      <rect x="172.4" y="166" width="370.6" height="14" rx="3" fill="#6ee05a"/>
+      <text x="357.7" y="198" fill="#ffffff" font-size="13" text-anchor="middle" font-family="Manrope,sans-serif">Trailer voice "In a world…" 13.45–21.85 s</text>
+      <polyline fill="none" stroke="#f7931a" stroke-width="3" points="40,40 143.7,40 174.6,150 547.4,150 600.3,40 700,40"/>
+      <line x1="700" y1="40" x2="700" y2="210" stroke="#f7931a" stroke-width="3" stroke-dasharray="5 4"/>
+      <text x="150" y="98" fill="#ffffff" font-size="12" font-family="Manrope,sans-serif" text-anchor="end">0.7 s down</text>
+      <text x="580" y="98" fill="#ffffff" font-size="12" font-family="Manrope,sans-serif">1.2 s up</text>
+      <text x="694" y="30" fill="#ffffff" font-size="12" font-family="Manrope,sans-serif" text-anchor="end">25.4 s: cut to silence</text>
+      <text x="40" y="222" fill="#ffffff" font-size="12" font-family="Manrope,sans-serif">10.45 s</text>
+      <text x="700" y="222" fill="#ffffff" font-size="12" font-family="Manrope,sans-serif" text-anchor="end">25.41 s</text>
+    </svg>
+  </div>
+  <div class="cols">
+    <div class="how"><h3>In DaVinci Resolve</h3><ol><li>On the music clip, <b>Option-click</b> the volume line four times to add four keyframes.</li><li>Place them at: 0.65 s before the voice (0 dB), just as the voice starts (−6 dB), 0.1 s after it ends (−6 dB), and 1.2 s later (0 dB).</li><li>Or let Resolve do it: Fairlight's <b>Ducker</b> lowers the music track whenever the voice track plays.</li></ol></div>
+    <div class="how"><h3>In solorender's Video editor</h3><p><span class="badge no">Not smoothly yet</span></p><p>Each sound has one volume level. You can split the music and turn the middle piece down 6 dB, but the change is instant, which is exactly the version that sounded wrong.</p></div>
+    <div class="how claude"><h3>How Claude did it</h3><p>One ffmpeg volume curve on the music, worked out from the voice's start and length. The voice's start came from Whisper's word times. Claude measured the result and sent the smooth version for a listen before using it in the cut.</p></div>
+  </div>
+</section>
+
+<!-- 4 -->
+<section class="move" id="m4">
+  <div class="move-head"><span class="n">4</span><span class="eyebrow">Even loudness</span><h2>Make every shot feel equally loud</h2></div>
+  <p>Loudness is measured in LUFS; the closer to zero, the louder it feels. Phones and YouTube play videos at about −14. The raw clips for this ad ranged from −43.6 to −15.5, a 28 dB spread. Left alone, the lasers would be nearly silent and the boss would blast. Every piece was measured, then set to a target for its role.</p>
+  <div class="scroll">
+  <table class="t-wide">
+    <thead><tr><th>Piece</th><th>As made</th><th>Set to</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>Vance talking shots</td><td class="num">−15.5 / −15.6</td><td class="num">−16</td><td>Dialogue, the reference level</td></tr>
+      <tr><td>Milo talking shot</td><td class="num">−20.3</td><td class="num">−16</td><td>Same as the other dialogue</td></tr>
+      <tr><td>Boardroom laugh</td><td class="num">−24.4</td><td class="num">−16</td><td>Laughter is part of the dialogue</td></tr>
+      <tr><td>Vault, lasers, motorbike sound</td><td class="num">−34.7 / −43.6 / −31.4</td><td class="num">−16, then 12 dB lower</td><td>Sound effects sit under the music and narrator</td></tr>
+      <tr><td>Trailer voice</td><td class="num">−16.3</td><td class="num">−14</td><td>On top of everything during the trailer</td></tr>
+      <tr><td>Music (trailer section)</td><td class="num">−22.2</td><td class="num">−18, dipping 6 dB</td><td>Big, but under the voice</td></tr>
+      <tr><td>Cigar in coffee</td><td class="num">−34.1</td><td class="num">−18</td><td>A small sound in sudden silence</td></tr>
+      <tr><td>"Sign him." whisper</td><td class="num">−18.3</td><td class="num">−18</td><td>A whisper should stay quieter</td></tr>
+      <tr><td>Narrator on the end card</td><td class="num">−15.8</td><td class="num">−14</td><td>The last line has to land</td></tr>
+      <tr><td><b>Finished ad</b></td><td class="num">—</td><td class="num"><b>−15.9</b></td><td>Measured on the final file</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="cols">
+    <div class="how"><h3>In DaVinci Resolve</h3><ol><li>Select the dialogue clips, right-click › <b>Normalize Audio Levels</b>.</li><li>Pick a loudness mode (the BS.1770 / EBU R128 kind, not a Peak mode) and set the level. Choose <b>Independent</b> so each clip is levelled on its own.</li><li>Repeat for effects at a lower level, then fine-tune by ear.</li></ol></div>
+    <div class="how"><h3>In solorender's Video editor</h3><p><span class="badge part">By ear</span></p><p>Each clip and sound has a Volume slider from −30 to +12 dB. There's no measuring, so play each cut and match by ear. Very quiet clips like the lasers (−43.6) can't be raised enough.</p></div>
+    <div class="how claude"><h3>How Claude did it</h3><p>ffmpeg's loudness meter read each file. Then ffmpeg's loudness levelling set each piece to its target in the same step as the trim. The finished ad measures −15.9.</p></div>
+  </div>
+</section>
+
+<!-- 5 -->
+<section class="move" id="m5">
+  <div class="move-head"><span class="n">5</span><span class="eyebrow">Hard cut to silence</span><h2>Let the music stop dead</h2></div>
+  <p>The joke lands when the trailer music stops mid-note and we are back in the quiet boardroom. No fade. In the soundtrack you can see the cliff at 25.4 seconds: everything before it is the trailer, everything after is a laugh dying, a cigar falling and one whisper.</p>
+  <div class="wave">
+    <img src="img/wave_v4.png" alt="Soundtrack waveform of the whole ad, loud through the trailer and nearly silent right after 25.4 seconds">
+    <div class="mark" style="left:29.5%"><span>10.45 s trailer</span></div>
+    <div class="mark cut" style="left:71.7%"><span>25.41 s cut</span></div>
+    <div class="mark" style="left:86.3%"><span>30.6 s end card</span></div>
+  </div>
+  <div class="cols">
+    <div class="how"><h3>In DaVinci Resolve</h3><p>Split the music track at the cut frame and delete everything after it. Leave no fade. Keep the next shot's own sound.</p></div>
+    <div class="how"><h3>In solorender's Video editor</h3><p><span class="badge yes">Works</span></p><p>Split the music at the cut and delete the rest. Make sure Sound fade out is 0.</p></div>
+    <div class="how claude"><h3>How Claude did it</h3><p>The music was laid only under the trailer section, so it ends exactly where that section ends. The end-card music was built as its own piece from the last seconds of the same track.</p></div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section class="move" id="m6">
+  <div class="move-head"><span class="n">6</span><span class="eyebrow">Picture inside a screen</span><h2>Play the title on the laptop, then fill the frame</h2></div>
+  <p>The director wanted the HAMMOND title playing on Milo's laptop while the camera pushes in, until it fills the whole frame. Four runs tried to get this straight from the generators (137 credits). A cut between two clips was visible, and a single long take froze the letters. The fix was to combine two clips: a push-in on a dark laptop screen, and the animated title on its own.</p>
+  <div class="frames">
+    <figure><img src="img/push_src.jpg" alt="Push-in on a laptop with a dark screen"><figcaption>Clip A: push-in, dark screen</figcaption></figure>
+    <figure><img src="img/title_src.jpg" alt="Animated HAMMOND title on its own"><figcaption>Clip B: the title, animated</figcaption></figure>
+    <figure><img src="img/comp_0.8.jpg" alt="Title playing small on the laptop"><figcaption>0.8 s · title on the screen</figcaption></figure>
+    <figure><img src="img/comp_1.8.jpg" alt="Laptop screen bigger"><figcaption>1.8 s · screen grows</figcaption></figure>
+    <figure><img src="img/comp_2.6.jpg" alt="Screen nearly fills the frame"><figcaption>2.6 s · easing out</figcaption></figure>
+    <figure><img src="img/comp_3.2.jpg" alt="Title full frame"><figcaption>3.2 s · full frame</figcaption></figure>
+  </div>
+  <div class="cols">
+    <div class="how"><h3>In DaVinci Resolve</h3><ol><li>Clip A on V1, sped to 150% so the camera reaches the screen by 3 seconds. Clip B on V2, starting on the same frame.</li><li>Select clip B. In the Inspector, use <b>Transform</b> (Zoom, Position) and <b>Cropping</b> to fit it exactly over the screen, then click the keyframe diamonds.</li><li>Move 6–12 frames ahead, re-fit, keyframe again. Add more keyframes where the push speeds up.</li><li>From 2.55 s to 3.0 s, go to Zoom 1.0 and Position 0 so the title fills the frame. Right-click the keyframes to ease them.</li><li>Optional glass shine: a copy of clip A on V3, Composite Mode set to Screen, low opacity, fading out by 3.0 s.</li></ol><p>Advanced: in the Fusion page, the <b>Planar Tracker</b> and <b>Corner Positioner</b> pin the title to the screen's corners for you. Both are in the free version.</p></div>
+    <div class="how"><h3>In solorender's Video editor</h3><p><span class="badge no">Not yet</span></p><p>A picture on a Layer row stays where you put it for its whole length; it can't move or grow over time. Moving picture-in-picture is on the wish list.</p></div>
+    <div class="how claude"><h3>How Claude did it</h3><p>A small Python program with Pillow did it frame by frame (121 frames at 24 a second). It found the screen's edges in each frame by brightness and smoothed the box so it only grows. Once the edges left the picture, it kept the same growth curve. It pasted the title into the box with a faint glass shine, eased to full frame by 3.0 s, and ffmpeg encoded the result.</p></div>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="move" id="m7">
+  <div class="move-head"><span class="n">7</span><span class="eyebrow">Animated end card</span><h2>Moving words over an AI backdrop</h2></div>
+  <p>The backdrop is a generated still of two searchlights, animated with Grok. The first orange line was unreadable on the gold beams. A soft dark oval behind the words fixed it while keeping the beams at the edges. Four lines arrive one after another, each move lasting 0.4 seconds.</p>
+  <div class="frames">
+    <figure><img src="img/end_raw.jpg" alt="Searchlight backdrop without text"><figcaption>Backdrop as made</figcaption></figure>
+    <figure><img src="img/end_0.5.jpg" alt="First line zooming in"><figcaption>0.35 s · Zoom</figcaption></figure>
+    <figure><img src="img/end_1.4.jpg" alt="Second line pops in"><figcaption>1.15 s · Pop</figcaption></figure>
+    <figure><img src="img/end_2.6.jpg" alt="Course line and web address rise in"><figcaption>2.0 / 2.35 s · Rise</figcaption></figure>
+  </div>
+  <dl class="kv"><dt>Font</dt><dd>Manrope ExtraBold: 72 px headline lines, 36 px orange course line, 40 px web address (on a 1280×720 frame)</dd><dt>Veil</dt><dd>a dark oval, about two-thirds opaque in the middle, heavily blurred, fading in over 0.4 s</dd><dt>Sound</dt><dd>narrator from 0.5 s, over the last 4.8 s of the same music track so it ends on the music's own ending</dd></dl>
+  <div class="cols">
+    <div class="how"><h3>In DaVinci Resolve</h3><ol><li>Backdrop clip on V1.</li><li>A dark oval on V2: a black Solid Color with a soft circular mask, or a ready-made dark-oval picture.</li><li>Each line as its own <b>Text+</b> title on V3 and up. Animate Zoom and Opacity with Inspector keyframes, or start from one of the animated <b>Fusion Titles</b>.</li></ol></div>
+    <div class="how"><h3>In solorender's Video editor</h3><p><span class="badge part">Mostly</span></p><p>Text comes in with <b>Zoom</b>, <b>Pop</b> and <b>Rise</b>, the same moves used here (the end card was built to copy them). A dark oval picture on a Layer row should give the veil, but we haven't tested it yet.</p></div>
+    <div class="how claude"><h3>How Claude did it</h3><p>A second Python program drew each frame: the backdrop, the veil, then each line with its own zoom, pop or rise and a soft shadow. ffmpeg mixed the narrator over the music's ending and joined picture and sound.</p></div>
+  </div>
+</section>
+
+<!-- 8 -->
+<section class="move" id="m8">
+  <div class="move-head"><span class="n">8</span><span class="eyebrow">Export wide and tall</span><h2>One MP4 for YouTube, one for phones</h2></div>
+  <p>The wide version is 1280×720, 24 frames a second, H.264 with AAC sound. Don't make the tall version by cropping the wide one. Every character was made in both shapes at the start, so the 9:16 cut uses real tall pictures and shots. That version is being made now.</p>
+  <div class="cols">
+    <div class="how"><h3>In DaVinci Resolve</h3><ol><li><b>Deliver</b> page › Custom Export › Format <b>MP4</b>, Codec <b>H.264</b>. Resolution and frame rate follow the timeline. There are also YouTube and TikTok presets.</li><li>For 9:16, make a second timeline. Right-click it › <b>Timelines › Timeline Settings</b>, untick <b>Use Project Settings</b>, and set 1080×1920 (or tick <b>Use vertical resolution</b>).</li></ol></div>
+    <div class="how"><h3>In solorender's Video editor</h3><p><span class="badge yes">Works</span></p><p>Pick the shape when you start a project: 16:9, 9:16, 1:1 or 4:5. Export is free and lands in your Library. Make one project per shape.</p></div>
+    <div class="how claude"><h3>How Claude did it</h3><p>ffmpeg wrote the final MP4. The finished file measures 35.46 s, 1280×720, with sound, at −15.9 LUFS.</p></div>
+  </div>
+</section>
+
+<section class="stack" id="commands">
+  <span class="eyebrow">For the technical</span>
+  <h2>The exact settings Claude used</h2>
+  <p>You never have to type these. They are here so you, or your own AI assistant, can repeat the same finish.</p>
+  <details>
+    <summary>ffmpeg settings, move by move</summary>
+<pre># every shot: trim, fit to 1280×720 at 24 fps, level the sound
+-ss START -t LENGTH -vf "scale=1280:720:force_original_aspect_ratio=increase,crop=1280:720,fps=24,setsar=1,format=yuv420p"
+-af "aresample=48000,aformat=channel_layouts=stereo,loudnorm=I=-16:TP=-1.5,volume=GAINdB"
+
+# speed ramp: normal to 4.0 s, then 2.4× (picture and sound)
+[0:v]trim=1:4,setpts=PTS-STARTPTS[v1];[0:v]trim=4:11,setpts=(PTS-STARTPTS)/2.4[v2]
+[0:a]atrim=4:11,asetpts=PTS-STARTPTS,atempo=2.4[a2]
+
+# music dip: −6 dB, 0.7 s down starting 0.65 s before the voice, 1.2 s back up
+# VS = voice start, VL = voice length (seconds, inside the trailer section)
+volume='1-0.5*clip((t-(VS-0.65))/0.7,0,1)+0.5*clip((t-(VS+VL+0.1))/1.2,0,1)':eval=frame
+
+# mix music, voice and clip sound without automatic level changes
+amix=inputs=3:duration=first:normalize=0
+
+# join shots with the concat FILTER (the concat list method broke the sound)
+[0:v][0:a][1:v][1:a]…concat=n=N:v=1:a=1[v][a]
+
+# trailer voice one semitone deeper, same speed
+asetrate=48000*0.94,aresample=48000,atempo=1.0638
+
+# measure loudness
+ffmpeg -i file.mp4 -af ebur128 -f null -</pre>
+  </details>
+  <details>
+    <summary>How Claude checks a clip before showing it</summary>
+    <ol>
+      <li>Download it and read its length, size and whether it has sound (ffprobe).</li>
+      <li>Lay out a frame every quarter second on one sheet, then look at it: does the action match the prompt, does anyone vanish or change face?</li>
+      <li>Measure its loudness.</li>
+      <li>Run Whisper with word times on anything that speaks. Are the words right, and are there no extra ones?</li>
+      <li>For talking shots, line up mouth close-ups against the word times.</li>
+      <li>Only then send it, with what was checked.</li>
+    </ol>
+  </details>
+</section>
+
+<footer class="stack">
+  <p><a href="by-the-numbers.html">See every run, credit and redo in The Pitch by the numbers →</a></p>
+  <p style="font-size:15px">Resolve steps follow Blackmagic's DaVinci Resolve 20 Reference Manual; menu names in version 21 may differ slightly. solorender Video editor details reflect the editor as of October 22, 2026.</p>
+</footer>
+
+</main>

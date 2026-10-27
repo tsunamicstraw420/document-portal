@@ -1,0 +1,260 @@
+<title>Course Ad Scripts</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: a director's treatment binder — one slate per ad, beats laid out as a timecoded shot list */
+:root{
+  --bg:#0a0a0a; --panel:#141412; --line:#2a2a26;
+  --ink:#ffffff; --green:#6ee05a; --orange:#f7931a;
+  --display:'Syne',system-ui,sans-serif; --body:'Manrope',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+  color-scheme:dark;
+}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 80px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:56px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(2rem,6vw,3.2rem);font-weight:800}
+h2{font-size:clamp(1.5rem,4vw,2.1rem);font-weight:800}
+h3{font-size:1.05rem;font-weight:600}
+p{margin:0;max-width:68ch}
+.eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
+header{display:flex;flex-direction:column;gap:14px}
+.lede{font-size:1.15rem}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:8px}
+.fact{border:1px solid var(--line);border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.fact b{font-family:var(--display);font-size:1.4rem;color:var(--orange)}
+.slate{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:28px;display:flex;flex-direction:column;gap:20px;min-width:0}
+.slate-top{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:baseline;border-bottom:1px dashed var(--line);padding-bottom:16px}
+.num{font-family:var(--mono);color:var(--orange);font-size:.95rem}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.tag{font-family:var(--mono);font-size:.75rem;color:var(--green);border:1px solid var(--green);border-radius:3px;padding:2px 8px;letter-spacing:.04em}
+.logline{font-size:1.12rem;font-weight:600}
+.hook{border-left:3px solid var(--orange);padding-left:14px}
+.shots{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line)}
+.shot{display:grid;grid-template-columns:78px 1fr;gap:4px 16px;padding:12px 0;border-bottom:1px solid var(--line)}
+.tc{font-family:var(--mono);font-size:.85rem;color:var(--green);padding-top:3px;font-variant-numeric:tabular-nums}
+.shot .tool{grid-column:2;font-family:var(--mono);font-size:.8rem;color:var(--ink)}
+.shot .tool::before{content:"solorender → ";color:var(--green)}
+.vo{font-style:italic}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.cols > div{display:flex;flex-direction:column;gap:6px;min-width:0}
+.why{border:1px solid var(--line);border-radius:6px;padding:14px 16px}
+.pick{border:2px solid var(--orange);border-radius:8px;padding:24px;display:flex;flex-direction:column;gap:12px}
+ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+@media (max-width:600px){.cols{grid-template-columns:1fr}.slate{padding:20px}.shot{grid-template-columns:1fr}.shot .tool{grid-column:1}}
+</style>
+
+<div class="wrap">
+<header>
+  <span class="eyebrow">Treatment binder · AI Filmmaking course · 21 Oct 2026</span>
+  <h1>Ten ads for the course</h1>
+  <p class="lede">Written the way a director pitches a client: logline, the first three seconds, a timecoded beat sheet, and which part of solorender makes each shot. Outlines only. Nothing has been generated or spent.</p>
+  <div class="facts">
+    <div class="fact"><span class="eyebrow">What we sell</span><b>21 lessons</b><span>in 5 modules, idea to finished film and trailer</span></div>
+    <div class="fact"><span class="eyebrow">Who gets it</span><b>Studio · Max</b><span>and Super Max. Unlocks instantly. Solo does not include it.</span></div>
+    <div class="fact"><span class="eyebrow">The promise</span><b>One person</b><span>Claude plans, solorender makes, an editor finishes</span></div>
+  </div>
+  <p>Every claim in these scripts comes from the live /course page. The ads never promise a free course, a Solo plan with the course, or "no editing needed". Lesson 15 uses an editor for the final cut.</p>
+</header>
+
+<!-- 1 -->
+<section class="slate">
+  <div class="slate-top"><span class="num">AD 01</span><h2>Thirty Years</h2></div>
+  <div class="tags"><span class="tag">45 s</span><span class="tag">16:9 + 9:16</span><span class="tag">Gravel-voice narrator</span><span class="tag">Nostalgic → triumphant</span></div>
+  <p class="logline">A grizzled old director remembers every disaster it took to make one dragon shot in 1987, while we watch that same shot made beautifully by one person today.</p>
+  <p class="hook"><b>First 3 seconds:</b> a foam dragon head collapses in the rain onto a soaked film crew. Gus, silver ponytail and aviators, says: "Eighty people. Three trucks. One dragon. It fell over."</p>
+  <div class="shots">
+    <div class="shot"><span class="tc">00–03</span><span>The foam dragon collapses on set, 1980s film grain. Crew scatters.</span><span class="tool">Image lane keyframe (grainy 35mm look) → Veo 3.1 Fast clip with rain sound</span></div>
+    <div class="shot"><span class="tc">03–12</span><span>Gus in his director's chair, close-up. <span class="vo">"Took me thirty years to learn how to get a shot like that right."</span></span><span class="tool">Gus saved as an Entity → Talk lane, his voice + lip sync</span></div>
+    <div class="shot"><span class="tc">12–25</span><span>Match cut: the same dragon, now real and enormous, rises over a misty canyon. Three angles, one shot each.</span><span class="tool">Kling O3 multi-shot (wide, low angle, close on the eye)</span></div>
+    <div class="shot"><span class="tc">25–35</span><span>Reveal: a young creator at a kitchen table, laptop, the Flow canvas full of shots. Gus is standing behind them, arms folded, impressed.</span><span class="tool">Image lane, both Entities in one frame → Kling O3 clip</span></div>
+    <div class="shot"><span class="tc">35–45</span><span>Gus: <span class="vo">"It took me thirty years. It takes you twenty-one lessons."</span> End card: AI Filmmaking course, included with Studio, Max and Super Max.</span><span class="tool">Talk lane line → Lyria music swell → Render film / video editor for the end card</span></div>
+  </div>
+  <div class="cols">
+    <div><span class="eyebrow">Call to action</span><p>"Start the course today. solorender.com"</p></div>
+    <div><span class="eyebrow">Why it sells</span><p>It sells experience, not software. The old-vs-new contrast does the arguing without a single feature list.</p></div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="slate">
+  <div class="slate-top"><span class="num">AD 02</span><h2>The Pitch</h2></div>
+  <div class="tags"><span class="tag">30 s</span><span class="tag">16:9 + 9:16</span><span class="tag">Comedy</span><span class="tag">Twist ending</span></div>
+  <p class="logline">A nervous teenager pitches "a hamster heist movie" to cigar-chomping studio executives, who laugh it out of the room, until the kid plays the trailer.</p>
+  <p class="hook"><b>First 3 seconds:</b> a gold-toothed executive bellows "A HAMSTER heist?" and the whole boardroom erupts in laughter.</p>
+  <div class="shots">
+    <div class="shot"><span class="tc">00–06</span><span>Mahogany boardroom, smoke, three executives laughing. <span class="vo">"Ninety million dollars. Two years. Minimum."</span></span><span class="tool">Executives as Entities → Kling O3 talking clip (Veo for room sound)</span></div>
+    <div class="shot"><span class="tc">06–09</span><span>The kid, unbothered, spins a laptop around. <span class="vo">"I already made the trailer."</span></span><span class="tool">Talk lane line, lip sync</span></div>
+    <div class="shot"><span class="tc">09–22</span><span>The trailer plays full screen: a hamster in a tiny tuxedo cracks a vault, slides down a laser hallway, escapes on a toy motorbike. Pure blockbuster.</span><span class="tool">Hamster saved as an Entity → Kling O3 multi-shot action beats → Lyria heist music</span></div>
+    <div class="shot"><span class="tc">22–26</span><span>Back in the boardroom. The executive's cigar drops into his coffee. Silence.</span><span class="tool">Veo 3.1 Fast close-up with the sizzle sound</span></div>
+    <div class="shot"><span class="tc">26–30</span><span>Card: "One person. One laptop. Learn how in 21 lessons." AI Filmmaking course, Studio, Max and Super Max.</span><span class="tool">Video editor, text + end card</span></div>
+  </div>
+  <div class="cols">
+    <div><span class="eyebrow">Call to action</span><p>"Make the trailer first. solorender.com"</p></div>
+    <div><span class="eyebrow">Why it sells</span><p>Everyone who ever had a film idea has been told it's too expensive. The punchline is the product working on screen.</p></div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="slate">
+  <div class="slate-top"><span class="num">AD 03</span><h2>Same Face, Every Shot</h2></div>
+  <div class="tags"><span class="tag">20 s</span><span class="tag">9:16 first</span><span class="tag">Problem → fix</span><span class="tag">Cheapest to make</span></div>
+  <p class="logline">Shows the one thing that makes AI films look amateur, a hero whose face changes every shot, then fixes it live with @brix the retired circus strongman, who stays himself across four genres.</p>
+  <p class="hook"><b>First 3 seconds:</b> a hero walks through four quick shots and his face changes in every one: beard, no beard, different eyes, different age. Text on screen: "This is why your AI film looks like AI."</p>
+  <div class="shots">
+    <div class="shot"><span class="tc">00–05</span><span>The "before": four fast cuts of a hero who never looks the same twice.</span><span class="tool">Four separate Image lane runs with no saved character (cheap pictures, animated lightly)</span></div>
+    <div class="shot"><span class="tc">05–07</span><span>Record-scratch freeze. Text: "Lesson 8: Create your hero."</span><span class="tool">Video editor text</span></div>
+    <div class="shot"><span class="tc">07–17</span><span>@brix, handlebar moustache and leopard leotard, in four genres back to back: a dusty Western saloon, a rainy film-noir alley, a space station airlock, a cooking show flipping pancakes. Same face every time.</span><span class="tool">@brix Entity (already saved) → Image lane keyframes → Kling O3 · Entities clips</span></div>
+    <div class="shot"><span class="tc">17–20</span><span>@brix winks at camera. Card: "21 lessons. Your character, every shot."</span><span class="tool">Kling O3 clip → Render film</span></div>
+  </div>
+  <div class="cols">
+    <div><span class="eyebrow">Call to action</span><p>"Learn it in the AI Filmmaking course."</p></div>
+    <div><span class="eyebrow">Why it sells</span><p>It names the exact pain AI creators feel and proves the fix in 20 seconds. Built for Shorts, Reels and TikTok, where scrolling viewers need a problem they recognize.</p></div>
+  </div>
+</section>
+
+<!-- 4 -->
+<section class="slate">
+  <div class="slate-top"><span class="num">AD 04</span><h2>Sticky Note to Premiere</h2></div>
+  <div class="tags"><span class="tag">30 s</span><span class="tag">16:9 + 9:16</span><span class="tag">One continuous push-in</span><span class="tag">Shows all 5 modules</span></div>
+  <p class="logline">A sticky note that says "a goldfish who robs a bank" turns into a red-carpet premiere, travelling through each of the course's five modules on the way.</p>
+  <p class="hook"><b>First 3 seconds:</b> extreme close-up of a yellow sticky note on a monitor, scrawled: "goldfish robs a bank??" The camera dives straight into the ink.</p>
+  <div class="shots">
+    <div class="shot"><span class="tc">00–06</span><span><b>Plan.</b> Through the note into a wall of storyboards and a shot list being written. Label: Module 1.</span><span class="tool">Image lane storyboard frames → Kling O3 with start + end frame for the push-through</span></div>
+    <div class="shot"><span class="tc">06–12</span><span><b>Pictures.</b> A reference sheet of the goldfish in a tiny ski mask, front, three-quarter, side. Module 2.</span><span class="tool">Goldfish Entity, one picture per angle</span></div>
+    <div class="shot"><span class="tc">12–18</span><span><b>Clips.</b> The goldfish bowl rolls down a bank hallway on a skateboard, guards diving. Module 3.</span><span class="tool">Kling O3 multi-shot</span></div>
+    <div class="shot"><span class="tc">18–24</span><span><b>Edit.</b> The scene snaps into an editing timeline, clips sliding into place, music waveform pulsing. Module 4.</span><span class="tool">Screen recording of the video editor (clip recorder, local)</span></div>
+    <div class="shot"><span class="tc">24–30</span><span><b>Publish.</b> Red carpet, flashbulbs, the goldfish in its bowl on a velvet pedestal. Card: "Idea to premiere. 21 lessons." Module 5.</span><span class="tool">Image lane → Veo 3.1 Fast with crowd sound → Lyria music</span></div>
+  </div>
+  <div class="cols">
+    <div><span class="eyebrow">Call to action</span><p>"Bring your sticky note. solorender.com/course"</p></div>
+    <div><span class="eyebrow">Why it sells</span><p>The whole course structure is told as one ride, so a viewer sees exactly what they will learn without reading a syllabus.</p></div>
+  </div>
+</section>
+
+<!-- 5 -->
+<section class="slate">
+  <div class="slate-top"><span class="num">AD 05</span><h2>Behind the Scenes</h2></div>
+  <div class="tags"><span class="tag">45–60 s</span><span class="tag">16:9 (YouTube pre-roll)</span><span class="tag">Mockumentary</span><span class="tag">Interview format</span></div>
+  <p class="logline">A deadpan "making-of" documentary for an epic film, with interviews from its diva T-rex lead, its stunt double and its costume designer, until the camera finds the crew: one person in a hoodie.</p>
+  <p class="hook"><b>First 3 seconds:</b> a T-rex in a makeup chair, a stylist powdering its snout. The T-rex sighs: "They wanted me to do my own stunts."</p>
+  <div class="shots">
+    <div class="shot"><span class="tc">00–10</span><span>The T-rex interview, lower-third "Rex, lead actor". Complains about the catering.</span><span class="tool">Rex Entity → Talk lane (voice + lip sync on a creature face)</span></div>
+    <div class="shot"><span class="tc">10–20</span><span>The stunt double, a smaller identical T-rex with a neck brace: <span class="vo">"I did the volcano jump. Twice."</span></span><span class="tool">Same Entity, restyled with props → Talk lane</span></div>
+    <div class="shot"><span class="tc">20–32</span><span>B-roll of the "film": volcano jump, jungle chase, the T-rex in a tuxedo at a gala.</span><span class="tool">Kling O3 multi-shot + Veo 3.1 Fast for the sound-heavy shots</span></div>
+    <div class="shot"><span class="tc">32–45</span><span>Interviewer: "And how big is the crew?" Pull back: one creator in a hoodie at a desk, coffee, Flow canvas on screen. They wave.</span><span class="tool">Image lane + Kling O3 pull-back (background shrinks with the subject)</span></div>
+    <div class="shot"><span class="tc">45–55</span><span>Rex, offscreen: <span class="vo">"Honestly? Best director I've worked with."</span> Card: AI Filmmaking course, 21 lessons, Studio, Max and Super Max.</span><span class="tool">Talk lane voice → video editor end card</span></div>
+  </div>
+  <div class="cols">
+    <div><span class="eyebrow">Call to action</span><p>"Be the whole crew. solorender.com"</p></div>
+    <div><span class="eyebrow">Why it sells</span><p>Longer, funnier, built to be watched to the end on YouTube. It also proves the hardest course skill: characters that talk.</p></div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section class="slate">
+  <div class="slate-top"><span class="num">AD 06</span><h2>The Critic</h2></div>
+  <div class="tags"><span class="tag">30 s</span><span class="tag">16:9 + 9:16</span><span class="tag">Comedy</span><span class="tag">"Anyone can" twist</span></div>
+  <p class="logline">The snobbiest film critic alive, monocle and velvet cravat, gives a festival film five stars, then finds out who made it: a retired plumber with a tool belt who made it in his garage.</p>
+  <p class="hook"><b>First 3 seconds:</b> the critic in a dark screening room, slowly removing his monocle, whispering: "...Magnificent."</p>
+  <div class="shots">
+    <div class="shot"><span class="tc">00–05</span><span>The critic in the screening room, the projector beam lighting his shocked face.</span><span class="tool">Critic saved as an Entity → Veo 3.1 Fast clip with projector hum</span></div>
+    <div class="shot"><span class="tc">05–12</span><span>Glimpses of the film he is watching: a lighthouse keeper in a storm, a wave smashing the glass. Gorgeous, moody.</span><span class="tool">Kling O3 multi-shot, one style written once and used on every shot</span></div>
+    <div class="shot"><span class="tc">12–20</span><span>The festival Q&amp;A: <span class="vo">"And the director is...?"</span> Up walks Sal, 64, wrench still in his tool belt, waving with a huge grin.</span><span class="tool">Sal as an Entity → Image lane keyframe → Kling O3 clip</span></div>
+    <div class="shot"><span class="tc">20–25</span><span>The critic drops his monocle into his champagne.</span><span class="tool">Veo 3.1 Fast close-up with the plink sound</span></div>
+    <div class="shot"><span class="tc">25–30</span><span>Card: "No film school. 21 lessons." AI Filmmaking course, Studio, Max and Super Max.</span><span class="tool">Video editor end card + Lyria music sting</span></div>
+  </div>
+  <div class="cols">
+    <div><span class="eyebrow">Call to action</span><p>"Your garage is a studio now. solorender.com"</p></div>
+    <div><span class="eyebrow">Why it sells</span><p>It speaks to the older, hobbyist buyer who thinks filmmaking isn't for them, and it has a big laugh at the reveal.</p></div>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="slate">
+  <div class="slate-top"><span class="num">AD 07</span><h2>The Ghost Director</h2></div>
+  <div class="tags"><span class="tag">30 s</span><span class="tag">16:9 + 9:16</span><span class="tag">Black-and-white to colour</span><span class="tag">Teaches shot language</span></div>
+  <p class="logline">The black-and-white ghost of a 1920s silent-film director haunts a young creator's laptop, barking camera directions, and every shot on screen changes the instant he yells.</p>
+  <p class="hook"><b>First 3 seconds:</b> a flickering, see-through director in jodhpurs and a beret floats out of the laptop screen, raises a megaphone and roars: "WRONG LENS!"</p>
+  <div class="shots">
+    <div class="shot"><span class="tc">00–06</span><span>Late night, a creator's desk. The ghost rises out of the screen in grainy black and white.</span><span class="tool">Ghost as an Entity (silent-film look) → Kling O3 clip</span></div>
+    <div class="shot"><span class="tc">06–18</span><span>A rapid-fire run: <span class="vo">"Lower!"</span> the shot drops to a low angle. <span class="vo">"Push in!"</span> the camera moves in. <span class="vo">"Moonlight!"</span> the scene turns blue. Same samurai on a bridge each time.</span><span class="tool">Ghost lines via Talk lane → the samurai shot re-made with each instruction using ✨ Direct</span></div>
+    <div class="shot"><span class="tc">18–24</span><span>The final shot plays and it's beautiful. The ghost lowers his megaphone and slowly turns to full colour.</span><span class="tool">Kling O3 with start frame (grey) and end frame (colour)</span></div>
+    <div class="shot"><span class="tc">24–30</span><span>Ghost: <span class="vo">"Lesson five. Shot language. Now you don't need me."</span> He fades. Card: AI Filmmaking course.</span><span class="tool">Talk lane → video editor end card</span></div>
+  </div>
+  <div class="cols">
+    <div><span class="eyebrow">Call to action</span><p>"Learn to direct. solorender.com/course"</p></div>
+    <div><span class="eyebrow">Why it sells</span><p>It shows the course is about real directing craft, not just pressing buttons, and the colour change is a memorable visual moment.</p></div>
+  </div>
+</section>
+
+<!-- 8 -->
+<section class="slate">
+  <div class="slate-top"><span class="num">AD 08</span><h2>Grandma's Story</h2></div>
+  <div class="tags"><span class="tag">60 s</span><span class="tag">16:9 (YouTube, Facebook)</span><span class="tag">Emotional</span><span class="tag">Holiday-ready</span></div>
+  <p class="logline">For forty years Grandma told the same bedtime story about a bear who stole the moon. This year her grandson turns it into a film and plays it on the living-room TV at Christmas.</p>
+  <p class="hook"><b>First 3 seconds:</b> a giant, sheepish brown bear tiptoes across rooftops carrying the full moon under one arm like a stolen beach ball.</p>
+  <div class="shots">
+    <div class="shot"><span class="tc">00–08</span><span>The bear tiptoes over snowy rooftops with the moon. The whole town goes dark behind him.</span><span class="tool">Bear as an Entity, storybook-painting style → Kling O3 clip</span></div>
+    <div class="shot"><span class="tc">08–20</span><span>Pull back: it's playing on a TV. The family is gathered on the sofa. Grandma, with reading glasses and a cardigan covered in knitted reindeer, slowly sits up.</span><span class="tool">Family + Grandma Entities → Image lane keyframe → Kling O3 pull-back</span></div>
+    <div class="shot"><span class="tc">20–38</span><span>Cut between the film (the bear hangs the moon back in the sky, embarrassed) and Grandma mouthing the words along with the narrator.</span><span class="tool">Kling O3 multi-shot + narrator voice (Gemini voice, gentle) + Lyria soft piano</span></div>
+    <div class="shot"><span class="tc">38–50</span><span>Grandma turns to her grandson, eyes wet: <span class="vo">"How did you...?"</span> He shrugs: <span class="vo">"I took a course."</span></span><span class="tool">Talk lane, both lines, lip sync</span></div>
+    <div class="shot"><span class="tc">50–60</span><span>Card: "Every family has a story. Film yours." AI Filmmaking course, 21 lessons.</span><span class="tool">Video editor end card</span></div>
+  </div>
+  <div class="cols">
+    <div><span class="eyebrow">Call to action</span><p>"Film the story only you know. solorender.com"</p></div>
+    <div><span class="eyebrow">Why it sells</span><p>It's the only concept built on real emotion, and it's ready for the holiday season. It sells a reason to make a film, not just the tools.</p></div>
+  </div>
+</section>
+
+<!-- 9 -->
+<section class="slate">
+  <div class="slate-top"><span class="num">AD 09</span><h2>The Six-Legged Horse</h2></div>
+  <div class="tags"><span class="tag">20 s</span><span class="tag">9:16 first</span><span class="tag">Problem → fix</span><span class="tag">Teaches saving credits</span></div>
+  <p class="logline">A creator keeps re-rolling one expensive video shot and every try comes back worse, with a horse sprouting extra legs, while a credit counter ticks down like a bomb timer. Then the course shows the habit that fixes it.</p>
+  <p class="hook"><b>First 3 seconds:</b> a cowboy gallops toward camera on a horse with six legs. A red counter in the corner drains fast. Text: "Try #7."</p>
+  <div class="shots">
+    <div class="shot"><span class="tc">00–06</span><span>Three failed tries in a row: six legs, a horse melting into a fence, a cowboy with no head. The counter keeps dropping.</span><span class="tool">Deliberately loose prompts on a cheap video model (low-cost failure shots)</span></div>
+    <div class="shot"><span class="tc">06–09</span><span>The counter freezes. Text: "Lesson 6: picture first, then video."</span><span class="tool">Video editor text + timer graphic</span></div>
+    <div class="shot"><span class="tc">09–17</span><span>The right way: four cheap pictures appear, the creator picks the best one, and one video run turns it into a perfect gallop. The counter barely moves.</span><span class="tool">Screen recording of Studio (clip recorder, local) → Kling O3 from the chosen picture</span></div>
+    <div class="shot"><span class="tc">17–20</span><span>The cowboy tips his hat. Card: "Stop paying for six-legged horses." AI Filmmaking course.</span><span class="tool">Kling O3 clip → Render film</span></div>
+  </div>
+  <div class="cols">
+    <div><span class="eyebrow">Call to action</span><p>"Spend credits like a pro. solorender.com/course"</p></div>
+    <div><span class="eyebrow">Why it sells</span><p>Everyone who has used AI video has paid for a broken shot. This ad names that pain with a laugh and promises the money-saving habit.</p></div>
+  </div>
+</section>
+
+<!-- 10 -->
+<section class="slate">
+  <div class="slate-top"><span class="num">AD 10</span><h2>Episode 47</h2></div>
+  <div class="tags"><span class="tag">30 s</span><span class="tag">9:16 + 16:9</span><span class="tag">Series / channel growth</span><span class="tag">Sells Module 5</span></div>
+  <p class="logline">Inspector Coo, a pigeon detective in a trench coat, has solved 47 cases on a creator's YouTube channel, and the ad shows how one character becomes a whole series.</p>
+  <p class="hook"><b>First 3 seconds:</b> a pigeon in a tiny trench coat and fedora slams a breadcrumb down on an interrogation table: "Where were you on the night of the sandwich?"</p>
+  <div class="shots">
+    <div class="shot"><span class="tc">00–06</span><span>The interrogation scene, film-noir lighting, a guilty-looking seagull sweating.</span><span class="tool">Inspector Coo + seagull Entities → Talk lane line, lip sync</span></div>
+    <div class="shot"><span class="tc">06–16</span><span>Quick flips through episode title cards: "Ep. 1: The Missing Crust", "Ep. 12: Fowl Play", "Ep. 31: Feathers at Dawn". Same pigeon, new places each time.</span><span class="tool">Same Entity reused → Image lane title frames → short Kling O3 clips</span></div>
+    <div class="shot"><span class="tc">16–24</span><span>A channel page with a growing row of thumbnails. Text: "Lesson 20: turn it into a series. Reuse your character, places and flow."</span><span class="tool">Mock channel page built as a picture (no real channel claims)</span></div>
+    <div class="shot"><span class="tc">24–30</span><span>Coo tips his fedora: <span class="vo">"Case closed."</span> Card: "Make one character. Make a hundred episodes." AI Filmmaking course.</span><span class="tool">Talk lane → video editor end card</span></div>
+  </div>
+  <div class="cols">
+    <div><span class="eyebrow">Call to action</span><p>"Start your series. solorender.com/course"</p></div>
+    <div><span class="eyebrow">Why it sells</span><p>It speaks to creators who want a channel, not one film, and it shows the course gets you all the way to publishing and growing.</p></div>
+  </div>
+</section>
+
+<section class="pick">
+  <span class="eyebrow">Director's recommendation</span>
+  <h2>Shoot AD 02 first, AD 03 alongside it</h2>
+  <p><b>The Pitch</b> has the strongest hook and the clearest promise. It works as the hero ad on every platform.</p>
+  <p><b>Same Face, Every Shot</b> is the cheapest to make, because @brix already exists. It runs as the Shorts companion and tests whether the "problem → fix" angle pulls better than comedy.</p>
+  <ul>
+    <li>Before any spend: a full script with every spoken line, then keyframes of each character in the exact frame shape for your approval.</li>
+    <li>I'll give you the credit estimate in dollars for the ad you pick before anything runs.</li>
+    <li>Ads 05 and 10 need talking animal faces. That is the riskiest shot type, so they go last.</li>
+  </ul>
+  <p><b>From the new five:</b> <b>Grandma's Story</b> (AD 08) is the one to make for the holidays. <b>The Six-Legged Horse</b> (AD 09) is a cheap, sharp Shorts ad and a good partner for AD 03.</p>
+  <p>Tell me which ones to develop, and I'll write the full shooting script next.</p>
+</section>
+</div>

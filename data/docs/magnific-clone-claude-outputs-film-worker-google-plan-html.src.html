@@ -1,0 +1,162 @@
+<title>Film Worker Move</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one reading column; the options table is the centre of gravity, the recommendation sits right under it. */
+:root{
+  --bg:#0a0a0a; --panel:#141413; --line:#2a2a27;
+  --ink:#ffffff; --green:#6ee05a; --orange:#f7931a; --red:#ff6b5a;
+  --display:"Syne",system-ui,sans-serif; --body:"Manrope",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 64px}
+main{max-width:860px;margin:0 auto;display:grid;gap:40px}
+section{display:grid;gap:14px;min-width:0}
+h1,h2{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(30px,6vw,46px);font-weight:800}
+h2{font-size:24px;font-weight:700}
+p{margin:0;max-width:68ch}
+.eyebrow{font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
+.lede{font-size:19px}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:720px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;vertical-align:top;padding:12px 14px;border-bottom:1px solid var(--line);font-size:15px}
+th{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--green);font-weight:500}
+tr:last-child td{border-bottom:0}
+tr.pick td{background:#16210f}
+td b{font-weight:700}
+.tag{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:99px;border:1px solid var(--green);color:var(--green);margin-top:4px}
+.rec{background:var(--panel);border:1px solid var(--orange);border-radius:12px;padding:22px;display:grid;gap:12px}
+.rec h2{color:var(--orange)}
+.money{font-family:var(--display);font-size:clamp(28px,5vw,38px);font-weight:800;color:var(--orange)}
+ul,ol{margin:0;padding-left:22px;display:grid;gap:8px;max-width:70ch}
+code{font-family:var(--mono);font-size:14px;background:var(--panel);border:1px solid var(--line);padding:2px 6px;border-radius:5px;word-break:break-all}
+.cmd{display:block;padding:12px 14px;margin-top:6px}
+.todo li::marker{color:var(--green);font-weight:700}
+.note{border-left:3px solid var(--green);padding-left:14px}
+.warn{border-left:3px solid var(--red);padding-left:14px}
+a{color:var(--ink);text-decoration-color:var(--green)}
+.src{font-size:14px}
+</style>
+
+<main>
+<header style="display:grid;gap:12px">
+  <div class="eyebrow">solorender · film server · plan for Eddie · 25 Oct 2026</div>
+  <h1>Moving the film server from Render to Google</h1>
+  <p class="lede">The film server is the program that joins clips into one finished film. Today it runs on Render.com as two copies at $7 a month each. Below are three ways to run it, with the real monthly cost of each. Nothing has been built or charged yet.</p>
+</header>
+
+<section class="rec" style="border-color:var(--green)">
+  <div class="eyebrow">Update 25 Oct, 22:00 UTC: done</div>
+  <h2 style="color:var(--green)">Films now run on Google. Render is suspended as the backup.</h2>
+  <p>You chose B. Every film now goes to Google, which wakes up for it and goes back to sleep. Render is <b>suspended</b>, not deleted. Render won't go below 1 copy, so Suspend was the only way to stop it. To bring Render back: Render → onda-render-worker → Settings → <b>Resume Background Worker</b>.</p>
+  <div class="scroll">
+  <table style="min-width:560px">
+    <thead><tr><th>Test (live site, your account, house credits)</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>Charged once, saved, sound right</td><td>One −7 charge. In the Library. Sound identical to Render's film of the same clips (−21.4 / −23.5 LUFS).</td></tr>
+      <tr><td>Refund when a film fails</td><td>Broken clip: −7, then +7 back, with a clear error.</td></tr>
+      <tr><td>Two films at once</td><td>Two Google copies, 19 s and 15 s, each charged once.</td></tr>
+      <tr><td>Server killed mid-film</td><td>Picked up again exactly 3 minutes later. Still one charge.</td></tr>
+      <tr><td>Real customer path, from asleep</td><td>Google started in 1.9 s. Whole film 13.6 s (Render's middle film: 22 s).</td></tr>
+      <tr><td>Outage alert</td><td>Render died mid-film while Google was unreachable. Telegram alert at 21:55. Google back at 21:56, film finished by itself, "✅ back" at 22:00. One charge.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p><b>What's left for you:</b> after a week of clean films (around 1 November), you can cancel Render. It's at 1 copy ($7 a month) since you lowered it earlier. I haven't checked whether Render charges for a suspended worker. Cancelling ends the charge for certain.</p>
+</section>
+
+<section>
+  <div class="eyebrow">What a film looks like today</div>
+  <p>57 films so far, 51 of them in the last 30 days. The middle film took <b>22 seconds</b> from click to finished. The slowest 1 in 10 took <b>42 seconds</b> or more. A finished film is about 2 to 7 MB. <span class="src">(Source: the live render_jobs table and the R2 file sizes, checked today.)</span></p>
+</section>
+
+<section>
+  <div class="eyebrow">The three options</div>
+  <h2>Cost per month at 0, 100 and 1,000 films</h2>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Option</th><th>0 films</th><th>100 films</th><th>1,000 films</th><th>After Google credits run out</th><th>Customer wait</th><th>2+ films at once</th></tr></thead>
+    <tbody>
+      <tr class="pick">
+        <td><b>B. Google, wakes per film</b><br>Sleeps until a film is queued, then starts, makes it, and goes back to sleep.<br><span class="tag">Recommended</span></td>
+        <td><b>$0</b></td><td><b>$0</b></td><td><b>about $0.50</b><br>(sending films to R2)</td>
+        <td>Same as the left. Google's monthly free allowance stays after the credits end.</td>
+        <td>About the same as today. The 5-second check delay goes away. The wake-up delay is not measured yet (see below).</td>
+        <td>Each film gets its own copy, on its own. Capped at 10 copies.</td>
+      </tr>
+      <tr>
+        <td><b>A. Google, always on</b><br>Runs all day and checks for films every 5 seconds, like today.</td>
+        <td colspan="3">1 copy <b>$27.58</b> · 2 copies <b>$60.38</b><br>Paid from credits while they last. That uses up the $300 trial fast.</td>
+        <td>1 copy $27.58 · 2 copies $60.38, paid in cash</td>
+        <td>Same as today</td>
+        <td>Fixed number of copies, like today</td>
+      </tr>
+      <tr>
+        <td><b>C. Stay on Render</b></td>
+        <td colspan="3"><b>$14</b> flat (2 copies)</td>
+        <td>$14. Google credits don't apply to Render.</td>
+        <td>Same as today (22 s middle film)</td>
+        <td>2 at once. More copies cost $7 each.</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="src">How the numbers were worked out: Google's live Cloud Run price page (us-central1), 25 Oct 2026.
+    Always-on copy (1 processor + 1 GB) for a full month = $0.000011244 × 2,628,000 s + $0.000001235 × 2,628,000 s = $32.80, less the free allowance worth $5.22.
+    Wake-per-film = $0.000024 + $0.0000025 per second while a film is being made. That is about $0.0008 per 30-second film, or $0.80 per 1,000 films. The free allowance (180,000 processor-seconds a month) covers about 6,000 films.
+    Sending films out of Google: the first 1 GB a month is free, then $0.12 per GB. 1,000 films × ~5 MB = ~5 GB, so about $0.48.
+    One flag: Google's own worked example on that page prices an always-on copy lower ($16.83) than its own price table gives. Even the lower figure costs more than Render's $7.</p>
+</section>
+
+<section class="rec">
+  <div class="eyebrow" style="color:var(--orange)">My recommendation</div>
+  <h2>Option B: the film server wakes up for each film</h2>
+  <div class="money">$0 / month now · about $0.50 at 1,000 films</div>
+  <p>It saves the $14 a month you pay Render. It stays near free after the Google credits end. It also handles a rush of films on its own, because every film gets its own copy. Option A costs more than Render, so it isn't worth moving for.</p>
+  <p>The brief suggested a Google "job" for this. I recommend a Google "service" that sleeps instead. A job is meant for long one-off work, like the explainer renders, and takes longer to start. A sleeping service starts in seconds and is billed only while a film is being made. I haven't measured either start time yet. Google signed this Mac out overnight, so I couldn't read the explainer's start times. I will measure both before anything goes live.</p>
+  <p><b>The rule I'll hold it to:</b> the middle film must finish within 5 seconds of today's 22 s. If it doesn't, the fix is to keep one copy awake. That costs about $13 a month, which is still less than Render. I'd ask you before doing that.</p>
+</section>
+
+<section>
+  <div class="eyebrow">What changes for you</div>
+  <h2>What you have to do</h2>
+  <ol class="todo">
+    <li><b>Sign Google back in on this Mac.</b> Your sign-in expired overnight (a Google rule for your company account). Run this, then pick eddie@solorender.com in the browser and click Allow:
+      <code class="cmd">~/google-cloud-sdk/bin/gcloud auth login --update-adc</code></li>
+    <li><b>Say yes to the spend.</b> I'm asking for up to <b>$1 of Google trial credit</b> to build and test. I expect it to stay inside the free allowances, so $0 cash. Test films use house credits on a test account and clips you already have, so there's no fal spend.</li>
+    <li><b>At switch-over, set Render to 0 copies.</b> Render: the service → Compute → Manual Scaling → type 0 → press Tab → Save Changes → Update instances. I have no Render login, and I won't touch your Render account. Render stays there as a backup.</li>
+    <li><b>After a week of clean films, cancel Render</b> if you want the $14 back.</li>
+  </ol>
+  <p>You don't need to turn on any Google services yourself. Once you're signed back in, I can switch on the one new piece, Google's password safe for the server's database key. It's free for the one secret we need.</p>
+</section>
+
+<section>
+  <div class="eyebrow">Safety</div>
+  <h2>Keys, stuck films and alerts</h2>
+  <ul>
+    <li><b>Keys:</b> the server needs only one secret, the database key. It goes in Google Secret Manager, readable only by the film server's own Google account. No key files (your company setting blocks them anyway). The server needs no R2 keys. Each film comes with its own one-time upload link.</li>
+    <li><b>A server that dies mid-film:</b> today another copy picks the film up after 3 silent minutes. With option B, a safety check every minute wakes the server if a film is waiting or stalled. So a dead server's film restarts within about 4 minutes, and the customer is never charged twice. This uses the timer that already runs every minute for Google videos.</li>
+    <li><b>Alerts:</b> one correction to the brief. A Telegram alert for a stuck queue <b>already exists</b>. It messages you when a film waits more than 5 minutes, and again when films flow again. It also alerts when the server's "still alive" signal stops. With option B the server sleeps between films, so that "still alive" signal would false-alarm. I'd change it to alert only when a real film isn't picked up. I'd test it by staging a stuck film and confirming the message reaches you.</li>
+  </ul>
+</section>
+
+<section>
+  <div class="eyebrow">Build order after your yes</div>
+  <h2>Steps, with Render running the whole time</h2>
+  <ol>
+    <li>Measure Google's start time (free). If it misses the 5-second rule, I stop and ask you.</li>
+    <li>Same program, one small addition: when Google wakes it, it makes every waiting film, then sleeps. On Render it keeps working exactly as today, so Render stays a working backup.</li>
+    <li>Set it up like the explainer: same Google project, same image storage, same build tool, and its own Google account with only the access it needs.</li>
+    <li>Live tests, with proof for each: charged once · refunded when a film fails · film lands in the Library with sound at −23 LUFS · two films at the same time · a server killed mid-film gets its film picked back up.</li>
+    <li>solorender.com wakes Google for every new film. You set Render to 0. I watch the first real films, then update the alerts and the notes.</li>
+  </ol>
+  <p class="warn">Two risks I'll prove before anything goes live. First, solorender.com has to wake Google with a sign-in token type I haven't tested with your keyless Google setup yet. I'll prove it works in the first hour, and I know a fallback if it doesn't. Second, Google lists the free allowance for explainer renders and for this server separately. I haven't confirmed whether they share one pot. Worst case is $0.80 per 1,000 films.</p>
+</section>
+
+<section class="note">
+  <p><b>Your choice:</b> B (recommended), A, or stay on C. Reply with the letter and "yes to $1". Sign Google back in first if you pick B or A.</p>
+</section>
+</main>

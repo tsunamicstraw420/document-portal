@@ -95,7 +95,7 @@ footer{display:flex;flex-direction:column;gap:12px;font-size:.95rem}
     <p><b>Kling 2.5 and Nano Banana stay 2–4× rivals' prices.</b> Magnific sells Kling 2.5 Turbo at $0.14, which is below the $0.35 Kling itself charges anyone, so no supplier deal can match it.</p>
   </div>
   <div class="tiers">
-    <div class="tier"><div class="what">Free · this month</div><div class="cost">$0</div><p><b>Veo 3.1 Fast −33%</b> from Google direct.</p><p>Nano Banana 2 −16% and Pro −11%.</p><p>Ideogram Character up to −60%. It is the same Ideogram 3 model on Runware; one test is needed first.</p><p>Small tools −50% to −85%.</p><p>About $21,000–27,000 in free startup credits.</p></div>
+    <div class="tier"><div class="what">Free · this month</div><div class="cost">$0</div><p><b>Veo 3.1 Fast −33%</b> from Google direct.</p><p>Nano Banana 2 −16% and Pro −11%.</p><p>Ideogram Character −60% (live 20 Oct: 38 → 15 credits on Runware).</p><p>Small tools −50% to −85%.</p><p>About $21,000–27,000 in free startup credits.</p></div>
     <div class="tier"><div class="what">Runware Growth deposit</div><div class="cost">$25,000</div><p>Runware adds $10,000 on top, so we get $35,000 of credit. That is <b>28.6% off everything we buy there</b>.</p><p>Runware sells most of our catalog at fal's price, including Seedance, Kling, Grok Lite, VEED Fabric, OmniHuman, Nano Banana and GPT Image. The credit never expires, but it can't be refunded.</p></div>
     <div class="tier"><div class="what">Runware Scale deposit</div><div class="cost">$50,000</div><p>Runware adds $30,000, so we get $80,000 of credit. That is <b>37.5% off</b>.</p><p>Runware says Scale is the best fit for "Seed to Series A" companies. A raise would make us a seed-funded company. It only makes sense once we spend several thousand dollars a month on suppliers.</p></div>
   </div>
@@ -117,19 +117,28 @@ footer{display:flex;flex-direction:column;gap:12px;font-size:.95rem}
   <div class="eyebrow">The plan</div>
   <h2>Steps ranked by what they cut, with the cash each needs</h2>
   <ol class="steps">
-    <li><div class="head"><b>Open a Google Cloud account and buy Google's own models direct</b><span class="cash">$0 up front</span></div>
-      <p><b>Veo 3.1 Fast:</b> $0.10 a second, against fal's $0.15. I read it myself on ai.google.dev/gemini-api/docs/pricing today. An 8-second clip drops from <span class="money">$1.20</span> to <span class="money">$0.80</span>, and customers' price from 300 to 200 credits.</p>
-      <p><b>Other Google models:</b> Nano Banana 2 drops from $0.08 to $0.067, and Pro from $0.15 to $0.134. The editors come from Google too: editing is the same model with the customer's picture attached. Nano Banana 2 Edit drops from $0.08 to $0.068, and Nano Banana 2.1 Edit from our $0.049 bill to about $0.035. Lyria 2 is 40% cheaper and Lyria 3.5 20% cheaper. The Gemini voice is about 64% cheaper until Google doubles its price on 1 January.</p>
-      <p><b>Free credit:</b> Google for Startups gives $2,000 for companies founded in the last 24 months.</p>
-      <p><b>Rules:</b> Google's terms say the app must not be "directed towards or likely to be accessed by" anyone under 18, so we need an 18+ check at sign-up. New accounts also start with a spending limit: $10 every 10 minutes, about 12 Veo clips. It rises after $100 paid plus 3 days.</p></li>
-    <li><div class="head"><b>Move the cheap Runware swaps that need no deposit</b><span class="cash">$0 up front</span></div>
+    <li><div class="head"><b>DONE 20 Oct: Google's own models bought from Google directly</b><span class="cash">$0 up front</span></div>
+      <p>Live for every customer since 20 October, with your yes. Every model was tested side by side with fal, on the same picture or words. Google's cost is its own token count × its price list; fal's is its bill. Prices are the Google cost × 2.5.</p>
       <ul class="plain">
-        <li><b>Ideogram Character:</b> $0.06 on Runware against $0.15 on fal. Runware's own example bill was $0.09 at Quality speed, where fal charges $0.20.</li>
-        <li><b>Qwen Edit 2511:</b> about $0.011 against $0.03.</li>
-        <li><b>Qwen Image:</b> about $0.003 against $0.02.</li>
-        <li><b>Seedream 5 Flash Edit:</b> $0.019 against $0.027.</li>
+        <li><b>Veo 3.1 Fast</b> (picture start, prompt only, Entities): <span class="money">$0.80</span> against fal's $1.20 for 8 seconds. Customers pay 200 credits, down from 300.</li>
+        <li><b>Nano Banana 2</b> and its Edit: $0.067–0.068 against $0.08. 17 credits, down from 20.</li>
+        <li><b>Nano Banana 2.1</b>: about $0.034 against $0.047. Google's bill shows it doesn't charge for the "thinking" step. 9 credits, down from 10 (21 Oct). Its Edit: about $0.039 against $0.047. 10 credits, down from 13.</li>
+        <li><b>Nano Banana Pro</b>: $0.137 against $0.15. 35 credits, down from 38.</li>
+        <li><b>Gemini 3.8 Voice</b>: about $0.031 per 1,000 characters against $0.045. Google's bill showed twice the rate we first used. 8 credits since 21 Oct, down from 12 on fal. Still to check: whether Google raises it again on 1 January 2027.</li>
+        <li><b>Lyria 2</b>: $0.06 against $0.10. 15 credits, down from 25.</li>
       </ul>
-      <p>Each needs one test run, with your yes for that cost.</p></li>
+      <p><b>How it changed from this plan:</b> Google switches Veo off its simple developer service on 22 October, so everything runs through Google Cloud's business service instead. It has the same prices, no prepay and no monthly cap. solorender signs in through Vercel, so there's no key file. Lyria 3.5 isn't sold there, so it stays on fal.</p>
+      <p><b>Bill check, 21 October:</b> Google's billing page shows <span class="money">$3.42</span> of use, all from our tests. The free-trial credit covered it, so the bill is $0.00. Veo ($2.40), Nano Banana 2, Pro and Lyria 2 matched our own records. Two didn't match, and both prices were fixed the same day with your yes: the voice costs twice what we recorded (4 → 8 credits), and Nano Banana 2.1 costs about 13% less (10 → 9, Edit 11 → 10).</p>
+      <p><b>Also done:</b> an 18+ tick box at sign-up (Google's rule). The $2,000 Google for Startups application was sent on 20 October; Google answers in about 1–2 weeks.</p></li>
+    <li><div class="head"><b>DONE 20 Oct: the cheap Runware swaps that need no deposit</b><span class="cash">$0 up front</span></div>
+      <p>All four moved to Runware on 20 October, with your yes. The numbers below are real bills from one test of each, using the same picture and words on both suppliers. Prices are the Runware bill × 2.5.</p>
+      <ul class="plain">
+        <li><b>Ideogram Character:</b> <span class="money">$0.06</span> on Runware against <span class="money">$0.15</span> on fal. The likeness was just as good. Price 38 → <b>15 credits</b>. Proven on the live site.</li>
+        <li><b>Seedream 5 Flash Edit:</b> <span class="money">$0.0193</span> against <span class="money">$0.027</span>. Same quality, same speed. Price 7 → <b>5 credits</b>. Proven on the live site.</li>
+        <li><b>Qwen Edit 2511:</b> <span class="money">$0.0487</span> against <span class="money">$0.06</span>. That's four times the $0.011 the price page suggested, because Runware bills it by computer time. fal also charges more than its page says, since it bills every started megapixel. Price 8 → <b>13 credits</b>. It's slower: 77 seconds against fal's 20.</li>
+        <li><b>Qwen Image:</b> <span class="money">$0.0166</span> against <span class="money">$0.02</span>. Price stays <b>5 credits</b>. It's much slower: 288 seconds against fal's 9 in the test.</li>
+      </ul>
+      <p>The two slow Qwen tools now run in the background, like videos. That way a slow picture never charges anyone twice. Test spend: $0.45.</p></li>
     <li><div class="head"><b>Buy a few small tools straight from their makers</b><span class="cash">$0 up front</span></div>
       <ul class="plain">
         <li><b>Clarity upscaler:</b> $0.005 per megapixel against $0.03, or −83%.</li>
@@ -232,7 +241,7 @@ footer{display:flex;flex-direction:column;gap:12px;font-size:.95rem}
       </ul>
       <p>Neither matched your 2.5× rule.</p></div>
     <div class="panel o"><h3>Watch: models being switched off</h3>
-      <p>Google says the original Nano Banana "will be shut down on October 2, 2026". fal still lists it, so our "Nano Banana" could stop at any time. Nano Banana 2.1 is the cheaper replacement.</p>
+      <p>Google's price page says the original Nano Banana "will be shut down on October 2, 2026". Its shutdown list (checked 20 October) gives 15 March 2027 instead. fal still sells it, so our "Nano Banana" could stop at any time. Nano Banana 2.1 is the cheaper replacement.</p>
       <p>Runware switches off Seedance 1.5 Pro on 11 November, and we buy it there first. fal sells it at the same price.</p>
       <p>fal's H3 Max sale (35% off) ends 31 October. Our live-prices check moves those prices back up by itself.</p></div>
     <div class="panel o"><h3>Ask: permission emails (free)</h3>
@@ -398,3 +407,4 @@ makeTable("t-rows", [
 ], ROWS, {sortKey:"model", dir:"asc", q:"q-rows", f:"f-rows", fKey:"area", c:"c-rows", text:r => Object.values(r).join(" "),
   row: r => `<tr><td class="name">${esc(r.model)}</td><td>${esc(r.source)}</td><td>${esc(r.carried)}</td><td class="w">${esc(r.setting)}</td><td class="n">${esc(r.price)}</td><td class="n">${esc(r.cur)}</td><td class="w">${esc(r.evidence)}</td><td>${esc(r.grade)}</td><td class="w">${esc(r.quote)}</td><td class="w">${esc(r.plan)}</td><td class="w">${r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.url.replace(/^https?:\/\//,"").slice(0,60))}</a>` : ""}<small>${esc(r.date)}</small></td></tr>`});
 </script>
+

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pitch How-to Script</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Syne:wght@800&display=swap" rel="stylesheet">
+<style>
+  :root { color-scheme: dark; --bg:#0a0a0a; --card:#151412; --line:#2a2824; --ink:#ffffff; --green:#6ee05a; --orange:#f7931a; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:18px/1.65 Manrope, system-ui, sans-serif; }
+  main { max-width: 900px; margin: 0 auto; padding: 40px 16px 80px; }
+  h1 { font-family: Syne, sans-serif; font-size: clamp(30px, 6vw, 44px); line-height:1.08; margin: 6px 0 14px; }
+  .eyebrow { color:var(--green); font-weight:800; letter-spacing:.14em; font-size:13px; text-transform:uppercase; }
+  .part { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px 20px; margin:16px 0; }
+  .part h2 { font-family: Syne, sans-serif; font-size: 22px; margin: 2px 0 10px; }
+  .row { display:grid; grid-template-columns: 170px 1fr; gap: 6px 18px; padding: 10px 0; border-top:1px solid var(--line); }
+  .row:first-of-type { border-top:0; }
+  .screen { color:var(--green); font-weight:700; font-size:14px; padding-top:3px; }
+  .typed { color:var(--orange); font-weight:700; }
+  .note { border-left:4px solid var(--orange); padding-left:14px; }
+  @media (max-width:600px){ .row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">AI Filmmaking course · Ruby's script · draft for your OK</div>
+  <h1>How "The Pitch" was built in Flow</h1>
+  <p>On the left is what's on screen; on the right is what Ruby says. Words in <span class="typed">orange</span> are typed on screen while she reads them out, word for word. 524 words (about 3 minutes 10 seconds of talking), so roughly 4 minutes once the results play.</p>
+  <p class="note">"Solo render" is written as two words so the voice says it right. That spelling worked in the Pembrook video, and I'll check it by ear again.</p>
+
+  <div class="part"><h2>1 · Open on the result</h2>
+    <div class="row"><div class="screen">The ad plays: trailer, cigar drop, "Sign him."</div><div>(No Ruby. The ad's own sound plays.)</div></div>
+    <div class="row"><div class="screen">Ruby on camera</div><div>A teenager pitches a hamster heist movie to three studio bosses. Every picture, voice and clip in that ad was made in Solo render, and the heart of it lives on one Flow canvas. Let me show you how it's built.</div></div>
+  </div>
+
+  <div class="part"><h2>2 · The map</h2>
+    <div class="row"><div class="screen">Your whole canvas 257; the pointer runs along each row</div><div>Here's the whole canvas. Two rows. The top row is the boardroom: the pictures, the voices and the talking shots. The bottom row is Milo's trailer: the heist. Each box holds a picture or makes one thing, and the wires carry each result into the next box.</div></div>
+  </div>
+
+  <div class="part"><h2>3 · Build a talking shot</h2>
+    <div class="row"><div class="screen">Points at Mr. Vance's picture</div><div>Let's build Vance's first line. Here's his picture.</div></div>
+    <div class="row"><div class="screen">Adds a Voice box, drags it next to him, picks the model</div><div>Add a Voice box, drag it next to him, and pick Gemini 3.8 Voice.</div></div>
+    <div class="row"><div class="screen">Types the line, picks the voice</div><div>Type the line: <span class="typed">A hamster heist?!</span> Pick the voice Algenib.</div></div>
+    <div class="row"><div class="screen">Types "How it's said"</div><div>Then tell it how it's said: <span class="typed">Booming, gravelly old Hollywood studio boss with a thick New York accent, shouting in mocking disbelief, on the edge of bursting out laughing.</span></div></div>
+    <div class="row"><div class="screen">🎙 Speak, and his line plays</div><div>Hit Speak.  <i>(Vance: "A hamster heist?!")</i></div></div>
+    <div class="row"><div class="screen">Adds a Talk box, picks OmniHuman, drags both wires</div><div>Now a Talk box. Pick OmniHuman. Wire his picture into face, and the voice into voice.</div></div>
+    <div class="row"><div class="screen">🗣 Make it talk, and the clip plays with sound</div><div>Make it talk.  <i>(Vance's clip plays.)</i></div></div>
+  </div>
+
+  <div class="part"><h2>4 · Fix the picture, then animate it</h2>
+    <div class="row"><div class="screen">Points at the first laser picture</div><div>Now the heist. Here's my first laser shot. Look closely: a beam hits him. Don't animate a mistake. Fixing a picture costs less than half the price of redoing a clip.</div></div>
+    <div class="row"><div class="screen">Adds an Edit box, wires the picture in, types the fix</div><div>Add an Edit box, wire the picture in, and type: <span class="typed">Move the red laser beams so that NONE of them touches the hamster: every beam passes clearly above him as he crouches low and squeezes underneath them. Also put a small silver stethoscope back around his neck. Keep everything else exactly the same.</span></div></div>
+    <div class="row"><div class="screen">▶ Run, and the fixed picture appears</div><div>Run it. Now the beams pass above and behind him.</div></div>
+    <div class="row"><div class="screen">Adds an Animate box, picks Grok, wires, types</div><div>Now an Animate box. Pick Grok Video 1.5 Lite: low-priced clips, with sound. Wire in the fixed picture and type: <span class="typed">Low camera at floor level with a slow push-in. The hamster creeps forward under the laser web, belly low to the floor, paws reaching ahead one at a time, eyes glancing up at the beams. The red laser beams stay perfectly still above and behind him and never touch him. SFX: a low electric laser hum, tiny paw taps on the polished floor. No music. No subtitles.</span></div></div>
+    <div class="row"><div class="screen">▶ Run, and the clip plays</div><div>Run.  <i>(The laser clip plays with its sound.)</i></div></div>
+  </div>
+
+  <div class="part"><h2>5 · The rest of the heist</h2>
+    <div class="row"><div class="screen">Vault clip plays</div><div>The rest of the heist works the same way. The vault: one picture, one clip.</div></div>
+    <div class="row"><div class="screen">Pans; bike start picture, then the bike clip</div><div>The motorbike: start from a picture with both wheels on the desk. Animate a mid-jump picture and he just hangs in the air. Later I made this clip longer with Extend, in Clip tools.</div></div>
+    <div class="row"><div class="screen">Cigar picture, then the cigar clip</div><div>And the cigar close-up was made from Vance's own picture, so the sleeve and the ring match.</div></div>
+  </div>
+
+  <div class="part"><h2>6 · Optional: finish in the Video editor</h2>
+    <div class="row"><div class="screen">Ruby on camera</div><div>Finishing is up to you. Every clip is already in your Library.</div></div>
+    <div class="row"><div class="screen">🎞 Open in video editor; clips land in order</div><div>To finish here, hit Open in video editor. The clips arrive in reading order, row by row.</div></div>
+    <div class="row"><div class="screen">Score onto the Music row, turned down</div><div>Add your music from the Library onto the Music row and turn it down.</div></div>
+    <div class="row"><div class="screen">+ Text after the last clip, types the card, points at Export</div><div>Add your end card: <span class="typed">The AI Filmmaking course</span>. Then Export.</div></div>
+    <div class="row"><div class="screen">Ruby on camera</div><div>Our finished ad was cut and mixed outside Solo render, with a few extra touches: the title playing inside the laptop, the animated end card, the bouncing captions, the speed-up on the bike and a deeper trailer voice. The finishing guide shows how.</div></div>
+  </div>
+
+  <div class="part"><h2>7 · Close</h2>
+    <div class="row"><div class="screen">Ruby, then the end card</div><div>The wide ad took sixty-eight runs, retakes included. At Studio plan prices that's about seventeen dollars and sixty cents. Your turn.</div></div>
+  </div>
+
+  <p class="note"><b>Checked against the app:</b> the Talk box has no prompt box, so nothing is typed there and Ruby doesn't claim anything was. Grok is not called the cheapest: a live sale has H3 Max Turbo at 33 credits, under Grok's 40. The cost line comes from your ledger: 1,959 credits at customer prices for the wide version, which is about $17.61 on Studio.</p>
+</main>
+</body>
+</html>

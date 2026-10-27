@@ -1,0 +1,161 @@
+<title>solorender SEO Checkup</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Manrope:wght@400;500;700&display=swap">
+<style>
+/* Layout: one reading column; a scoreboard up top, then three answers (done / fix / add), each a stack of findings with a severity chip. Always dark, matching solorender. */
+:root{
+  --bg:#0a0a0a; --panel:#141414; --line:#2a2a2a;
+  --ink:#ffffff; --green:#6ee05a; --orange:#f7931a; --red:#ff5d5d;
+  --display:"Syne",system-ui,sans-serif; --body:"Manrope",system-ui,sans-serif;
+  color-scheme:dark;
+}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6}
+.wrap{max-width:860px;margin:0 auto;padding-block:40px 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;color:var(--ink)}
+h1{font-size:clamp(30px,5vw,44px);line-height:1.1;font-weight:800}
+h2{font-size:26px;font-weight:700;margin-top:56px;padding-top:24px;border-top:1px solid var(--line)}
+h3{font-size:19px;font-weight:700}
+p{margin:0}
+.eyebrow{color:var(--green);font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.stack{display:flex;flex-direction:column;gap:14px}
+.lede{font-size:19px;margin-top:14px}
+.board{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:28px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.tile b{font-family:var(--display);font-size:34px;line-height:1;font-variant-numeric:tabular-nums}
+.tile span{font-size:15px}
+.tile .src{color:var(--green);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.chip{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 9px;border-radius:999px;color:#0a0a0a;align-self:flex-start}
+.c-big{background:var(--red)}.c-mid{background:var(--orange)}.c-small{background:var(--green)}
+ul{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px}
+.tbl{overflow-x:auto;margin-top:6px}
+table{border-collapse:collapse;width:100%;font-size:15px;min-width:560px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--green);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+td.n{font-variant-numeric:tabular-nums;white-space:nowrap}
+.key{border-left:3px solid var(--orange);padding:4px 0 4px 16px}
+.ask{border:1px solid var(--green)}
+a{color:var(--ink);text-decoration-color:var(--green)}
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">solorender.com · SEO checkup · Oct 20, 2026</p>
+  <h1>Where our Google work stands, six days in</h1>
+  <p class="lede">The site side is in good shape: 359 public pages, all clean. Google has barely started reading them. The pages I spot-checked show the same split. A page we asked for by hand is in Google. Pages that only sit in our list are still waiting in Google's queue. The next gains come from two things: giving Google reasons to trust a brand-new site, and making our thinnest pages (the 214 style pages) worth indexing.</p>
+
+  <div class="board">
+    <div class="tile"><span class="src">Live site crawl</span><b>359</b><span>public pages, every one loads (all 359 returned OK)</span></div>
+    <div class="tile"><span class="src">Search Console · sitemap</span><b>358</b><span>pages Google has found in our list (read Oct 19)</span></div>
+    <div class="tile"><span class="src">Search Console · inspect</span><b>1 of 3</b><span>spot-checked pages are in Google: the one we asked for by hand. The other two aren't yet.</span></div>
+    <div class="tile"><span class="src">Search Console · 28 days</span><b>24 / 2</b><span>times shown in Google / clicks. Average spot: 5.5</span></div>
+  </div>
+
+  <h2>1. Where we stand with Google</h2>
+  <div class="stack">
+    <p>I checked Search Console today (your logged-in Chrome):</p>
+    <ul>
+      <li><b>Sitemap:</b> read on Oct 19, status "Success", 358 pages found.</li>
+      <li><b>Pages report:</b> still says "Processing data, please check again in a day or so." Google hasn't finished its first count for the site.</li>
+      <li><b>Spot checks.</b> <i>/learn/veo-3-1</i> (asked for by hand on Oct 14) is <b>in Google</b>. <i>/learn/seedance</i> and <i>/styles/acid-pop</i> say <b>"Discovered – currently not indexed"</b>. That means Google knows they exist but hasn't visited them yet. For the style page, Google found no other page linking to it. It only knows the page from our list.</li>
+      <li><b>Searches:</b> only two kinds so far. "solarrender" (a misspelling of our name) showed us 12 times. "nano banana vs flux" showed us once, for our comparison guide.</li>
+      <li><b>www:</b> 15 of the 24 appearances were the old <i>www.solorender.com</i> address. The redirect to solorender.com works (checked today, permanent 308), so Google will merge the two by itself.</li>
+      <li><b>Videos:</b> "No video indexed" on the Learn pages, even though they hold dozens of real clips.</li>
+    </ul>
+    <p class="key">This is normal for a site that is a few weeks old with almost no other sites linking to it. Google rations how fast it reads new sites. Adding more pages today won't speed that up. Trust signals and stronger pages will.</p>
+  </div>
+
+  <h2>2. What we accomplished (Oct 14–19)</h2>
+  <div class="stack">
+    <div class="tbl"><table>
+      <tr><th>Section</th><th>Pages</th><th>What it is</th></tr>
+      <tr><td>Styles</td><td class="n">214</td><td>197 style pages + 16 style family pages + the index. They used to be behind the login.</td></tr>
+      <tr><td>Recipes</td><td class="n">55</td><td>54 recipe pages with steps and models used (no prompts) + the index. Also used to be behind the login.</td></tr>
+      <tr><td>Help</td><td class="n">46</td><td>Help center, now public. Includes the new Entities section.</td></tr>
+      <tr><td>Learn</td><td class="n">23</td><td>14 model guides plus side-by-side tests: images (14 models), video, music, voices, talking photos, editors, upscalers.</td></tr>
+      <tr><td>Tools</td><td class="n">13</td><td>"What do you want to make" pages (product video, UGC ad, headshots…).</td></tr>
+      <tr><td>Other</td><td class="n">8</td><td>Home, pricing, about (new Oct 19), support, terms, privacy, affiliates.</td></tr>
+    </table></div>
+    <p>Behind the scenes (checked on every one of the 359 pages today):</p>
+    <ul>
+      <li>Every page has its own title and description. No two are the same.</li>
+      <li>Every page has its own share picture. That's the preview card on X, iMessage, Slack and similar apps.</li>
+      <li>Every page tells Google its one true address. No page is blocked from Google by mistake.</li>
+      <li>Every page has exactly one main heading.</li>
+      <li>Done earlier: the www fix, Search Console set up, sitemap sent in, the phone-speed fix (headline shows in about 1 s on a slow phone instead of 1.7 s), and logins and password pages hidden from Google on purpose.</li>
+      <li>Hidden on purpose and correct: the Prompt Library (a paid perk), the dashboard, Flow, Library and the course.</li>
+    </ul>
+  </div>
+
+  <h2>3. What to improve</h2>
+  <div class="stack">
+    <div class="box">
+      <span class="chip c-big">Biggest</span>
+      <h3>Style pages are too thin</h3>
+      <p>214 of our 359 pages are style pages, and each one carries only about 60 words of its own. That's one picture, two sentences, three "good for" tags and a how-to line. The rest is the menu and footer every page shares. Google often reads pages like this and then leaves them out ("Crawled – not indexed"). A pile of thin pages can also make Google rate the whole site lower.</p>
+      <p><b>Fix:</b> give each style page real substance. Show several real pictures in that style on different subjects, which models it works best on, and a sample prompt. The catch is that we only have a cover picture for most styles. More examples would mean either using results customers already made with the style (if any exist; I haven't checked) or a paid batch run, which needs your OK. A free stop-gap: merge the 16 family pages into stronger hub pages, and link each style to the matching Tools and Recipes pages.</p>
+    </div>
+    <div class="box">
+      <span class="chip c-big">Big</span>
+      <h3>Almost no one links to us yet</h3>
+      <p>For a new site, links from other sites are Google's main reason to trust it and read it faster. Free routes: listings in AI tool directories (many take free submissions; check each one's rules), a Product Hunt launch, our affiliates linking from their own sites and videos, and your social profiles pointing to the Learn tests. The side-by-side tests are the most shareable pages we have.</p>
+    </div>
+    <div class="box">
+      <span class="chip c-mid">Medium</span>
+      <h3>No "labels" for Google on 358 pages</h3>
+      <p>Only the homepage carries the hidden labels that tell Google what a page is. Adding them is free code work:</p>
+      <ul>
+        <li><b>Video labels on Learn pages.</b> This would let our real clips show in Google's video results. Right now Search Console says "No video indexed".</li>
+        <li><b>Article labels</b> on guides and tests, with the date updated.</li>
+        <li><b>Breadcrumbs</b> (Home › Styles › Cartoon › Acid Pop) on every page. Google shows these in place of the address.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <span class="chip c-mid">Medium</span>
+      <h3>The sitemap has no "last updated" dates</h3>
+      <p>Our list gives Google 359 addresses but never says when a page changed. With real dates, Google knows which pages to re-read first, for example after a Learn guide gets new results.</p>
+    </div>
+    <div class="box">
+      <span class="chip c-mid">Medium</span>
+      <h3>Every page opens with the same ad bar</h3>
+      <p>The first text Google reads on every page is the announcement bar ("New: Nano Banana 2.1 · Try it…"), repeated several times in the page code. That pushes each page's own words down and makes 359 pages start identically. Fix: keep the bar for visitors but have Google skip it.</p>
+    </div>
+    <div class="box">
+      <span class="chip c-small">Small</span>
+      <h3>Tidy-ups</h3>
+      <ul>
+        <li>8 Learn titles are longer than Google shows (over 65 characters), so they get cut off with "…".</li>
+        <li>9 recipe pages are on the thin side (under 250 words including the menu).</li>
+        <li>Terms, privacy, support and a few help pages have very short descriptions, under 70 characters.</li>
+        <li>Style pages link only to other styles. They should also point to the Tools, Recipes and Learn pages that use them, so Google finds them by more than one road.</li>
+        <li>Page speed scores (Core Web Vitals): Google shows "No data" yet. It needs more visitors first. Check again in a month.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>4. New pages that could get found</h2>
+  <div class="stack">
+    <p>Ranked by how likely each is to earn real searches, and what it costs. All of these follow your rules: no "alternative to X" pages, no copying anyone's wording, no quality claims without a real result someone has seen or heard.</p>
+    <div class="tbl"><table>
+      <tr><th>Idea</th><th>New pages</th><th>Cost</th><th>Why people search it</th></tr>
+      <tr><td><b>One page per model</b>: live price, what it's good at, limits, length and shape options, a real result where we have one</td><td class="n">~60–100</td><td>Free (catalog + existing results)</td><td>"Kling 3 price", "Seedream 5 max length". We have 113 models and only 14 guides. Models with no real result get a plain facts page, no quality claims.</td></tr>
+      <tr><td><b>Head-to-head pages</b> cut from tests we already ran (e.g. "Seedance vs Hailuo", "GPT Image vs Nano Banana")</td><td class="n">~25–30</td><td>Free (results exist)</td><td>"X vs Y" searches. Our only search for a real topic so far was one of these ("nano banana vs flux"). Each needs its own verdict text, not a copy of the big test page.</td></tr>
+      <tr><td><b>More "AI ___ maker" tool pages</b> (logo, thumbnail, sticker, music video, product photo…), each backed by a real recipe or style family</td><td class="n">~15–20</td><td>Free</td><td>High-intent searches from people about to make something. Only add ones we can truly do today.</td></tr>
+      <tr><td><b>Filmmaking glossary</b> (dolly, J-cut, Dutch angle, room tone…), each term with a clip example</td><td class="n">~30–40</td><td>Free if clips exist</td><td>Beginner searches. The course already explains these words. Risk: thin if a term gets only a sentence.</td></tr>
+      <tr><td><b>Public Prompt Library previews</b>: the result and the idea, without the full prompt</td><td class="n">up to 58</td><td>Free</td><td>"AI UGC ad prompt", "anime prompt". <b>Your decision:</b> the library is a paid perk, so how much to show.</td></tr>
+      <tr><td><b>Course lesson summaries</b>, or the first lesson free</td><td class="n">up to 30</td><td>Free</td><td>"How to make an AI short film". <b>Your decision:</b> the course is for Studio and up.</td></tr>
+    </table></div>
+    <p>For scale: on Oct 14 the rivals had about 1,230 (Krea), 1,780 (OpenArt) and 2,300 (Higgsfield) pages. I haven't re-checked those today. The ideas above would take us from 359 to roughly 550–650. Strong pages count for more than the total.</p>
+  </div>
+
+  <h2>5. Suggested order</h2>
+  <div class="stack">
+    <div class="box ask">
+      <ul>
+        <li><b>This week, free code work, no decisions needed:</b> video, article and breadcrumb labels; sitemap dates; hide the ad bar from Google; shorten the 8 long titles; cross-links from styles to tools and recipes.</li>
+        <li><b>Next, free pages:</b> head-to-head pages from existing tests, then the per-model pages.</li>
+        <li><b>Your calls:</b> (1) how to make the style pages richer: reuse customer results, or a paid batch with a price I'd give you first; (2) public Prompt Library previews, yes or no; (3) course summaries, yes or no; (4) a Product Hunt launch and directory listings, which you'd own since they're posted under your name.</li>
+        <li><b>Re-check:</b> Search Console's pages report around Oct 27, once it has its first count.</li>
+      </ul>
+    </div>
+  </div>
+</div>

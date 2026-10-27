@@ -1,0 +1,280 @@
+<title>Six Filmmaking Tools</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one reading column; a ranked board up top, then one section per tool with options, prices and the question for Eddie. Always dark (solorender house look). */
+:root{
+  --bg:#0a0a0a; --panel:#131313; --panel-2:#1a1a1a; --line:#2a2a2a;
+  --fg:#ffffff; --label:#6ee05a; --accent:#f7931a; --warn:#ff6b5a;
+  --display:"Syne", "Avenir Next", system-ui, sans-serif;
+  --body:"Manrope", "Helvetica Neue", system-ui, sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.6;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:40px 80px}
+.wrap{max-width:960px;margin:0 auto;display:flex;flex-direction:column;gap:56px}
+h1,h2,h3{font-family:var(--display);color:var(--fg);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(34px,6vw,52px);font-weight:800;letter-spacing:-.01em}
+h2{font-size:clamp(26px,4vw,34px);font-weight:700}
+h3{font-size:20px;font-weight:700}
+p{margin:0;max-width:68ch}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--label)}
+.lede{display:flex;flex-direction:column;gap:16px}
+.lede p{font-size:19px}
+.facts{display:flex;flex-wrap:wrap;gap:12px}
+.chip{border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:15px;font-weight:600}
+.chip b{color:var(--accent)}
+section{display:flex;flex-direction:column;gap:20px}
+.tablebox{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15.5px;font-variant-numeric:tabular-nums}
+th{font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--label);text-align:left;font-weight:700;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--panel)}
+td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td.num{white-space:nowrap}
+.rank{font-family:var(--display);font-weight:800;font-size:22px;color:var(--accent)}
+.pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:13px;font-weight:700;white-space:nowrap}
+.hi{background:#1d3a18;color:var(--label)}
+.mid{background:#3a2a10;color:var(--accent)}
+.lo{background:#262626;color:var(--fg)}
+.tool{border-top:2px solid var(--line);padding-top:32px;display:flex;flex-direction:column;gap:18px}
+.tool-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px 18px}
+.tool-head .rank{font-size:30px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.box .eyebrow{font-size:12px}
+ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.ask{background:var(--panel-2);border:1px solid var(--accent);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:10px}
+.ask .eyebrow{color:var(--accent)}
+.rec{color:var(--label);font-weight:700}
+.flag{color:var(--warn);font-weight:700}
+.money{color:var(--accent);font-weight:700}
+small, .note{font-size:14.5px}
+a{color:var(--accent)}
+.foot{border-top:1px solid var(--line);padding-top:24px;display:flex;flex-direction:column;gap:10px;font-size:15px}
+@media (max-width:520px){body{font-size:16px} td,th{padding:10px}}
+</style>
+
+<div class="wrap">
+
+<header class="lede">
+  <div class="eyebrow">solorender · research · 23 Oct 2026</div>
+  <h1>Six filmmaking tools we don't have yet</h1>
+  <p>Dan Kieft's "Master AI Filmmaking in 30 Minutes" does six things solorender can't do today. For each one, this page lists every model that can do it and everyone who sells that model. It also gives the price from each seller's own price list, and what the customer would pay at our 2.5× rule.</p>
+  <p>Nothing was spent. No paid run was made. Before building, each tool needs one test run, which only happens with your yes in dollars.</p>
+  <div class="facts">
+    <span class="chip">All six can be done with <b>suppliers we already use</b> (fal, Runware) or no supplier at all</span>
+    <span class="chip">All six tests together: <b>$0.94</b></span>
+    <span class="chip">One tool is <b>free to build and free to use</b></span>
+  </div>
+</header>
+
+<section>
+  <div class="eyebrow">The ranking</div>
+  <h2>What to build first</h2>
+  <p>Ranked by how much a filmmaker gains against how much work it is to build. "Credits" is what a customer pays for a typical 5-second clip, at real cost × 2.5.</p>
+  <div class="tablebox"><table>
+    <thead><tr><th>#</th><th>Tool</th><th>Value</th><th>Build work</th><th>Recommended model</th><th>Customer pays</th><th>Test</th></tr></thead>
+    <tbody>
+      <tr><td class="rank">1</td><td><b>Grab a frame</b><br><small>start the next clip from it</small></td><td><span class="pill hi">High</span></td><td><span class="pill hi">Small</span></td><td>None. Done inside the app.</td><td class="num">Free</td><td class="num money">$0</td></tr>
+      <tr><td class="rank">2</td><td><b>Sound effects</b><br><small>typed effects + sound for a silent clip</small></td><td><span class="pill hi">High</span></td><td><span class="pill hi">Small</span></td><td>Stable Audio 3 SFX · Kling video-to-audio (fal)</td><td class="num">6 cr · 9 cr</td><td class="num money">$0.06</td></tr>
+      <tr><td class="rank">3</td><td><b>Motion transfer</b><br><small>act it out, your character copies you</small></td><td><span class="pill hi">High</span></td><td><span class="pill mid">Medium</span></td><td>DreamActor v2 (fal)</td><td class="num">63 cr</td><td class="num money">$0.25</td></tr>
+      <tr><td class="rank">4</td><td><b>Cut out a person, swap the background</b></td><td><span class="pill mid">Medium</span></td><td><span class="pill mid">Medium</span></td><td>Bria Video Background Removal v3 (fal)</td><td class="num">63 cr</td><td class="num money">$0.25</td></tr>
+      <tr><td class="rank">5</td><td><b>Your voice or a video as a reference</b> inside a clip run</td><td><span class="pill mid">Medium</span></td><td><span class="pill mid">Medium</span></td><td>Seedance 2.0 Mini (Runware)</td><td class="num">102–133 cr</td><td class="num money">$0.14</td></tr>
+      <tr><td class="rank">6</td><td><b>Relight a clip</b><br><small>"golden hour", "neon night"</small></td><td><span class="pill mid">Medium</span></td><td><span class="pill mid">Medium</span></td><td>MiniMax H3 Max Relight (fal)</td><td class="num">100 cr</td><td class="num money">$0.24</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">Value: how often a filmmaker reaches for it, judged from the Dan Kieft video and our own course. Build work: <b>Small</b> means a button or one new model on top of what exists. <b>Medium</b> means a new kind of input (a customer video or voice) or an extra finishing step on our film worker. Customers can already upload their own clips, up to 60 seconds, so no tool needs a new upload system.</p>
+</section>
+
+<!-- 1 -->
+<section class="tool" id="frame">
+  <div class="tool-head"><span class="rank">1</span><h2>Grab a frame</h2><span class="pill hi">Build now · free</span></div>
+  <p>Filmmakers chain clips by starting clip B from the last picture of clip A. Our own AI Filmmaking course tells customers "solorender doesn't have a button for this", so today they have to screenshot it themselves.</p>
+  <div class="grid2">
+    <div class="box"><div class="eyebrow">What the customer does</div><p>On any finished clip they click <b>📸 Last frame</b>, or pause anywhere and click <b>📸 This frame</b>. The picture lands in their Library and can go straight in as the start picture of the next clip.</p></div>
+    <div class="box"><div class="eyebrow">Where it lives</div><p>On clip results in Studio, in the Library viewer, and on video boxes in Flow.</p></div>
+    <div class="box"><div class="eyebrow">Cost</div><p>No supplier is involved. The customer's own browser takes the picture from the clip. We store it like any uploaded picture. <b>0 credits, $0 per use.</b></p></div>
+    <div class="box"><div class="eyebrow">Checked today</div><p>All 465 saved clips are in our own storage. That storage already lets solorender.com read video frames, which is the one thing that could have blocked this.</p></div>
+  </div>
+  <div class="ask"><div class="eyebrow">Your call</div><p class="rec">Recommend: build it now, on all three places (Studio, Library, Flow), with both buttons.</p><p>Reply "build frame grab", or name the places you want it.</p></div>
+</section>
+
+<!-- 2 -->
+<section class="tool" id="sfx">
+  <div class="tool-head"><span class="rank">2</span><h2>Sound effects</h2><span class="pill hi">High value · small build</span></div>
+  <p>Many of our video models make silent clips, and so do customer uploads. Two jobs are needed:</p>
+  <ul>
+    <li><b>Typed effect:</b> type "heavy wooden door creaks open" and get a sound file.</li>
+    <li><b>Sound for a clip:</b> pick a silent clip and get it back with matching footsteps, wind and impacts, timed to what's on screen.</li>
+  </ul>
+  <p>None of our models does either today. The only CassetteAI model we sell makes music.</p>
+  <h3>Typed effect: every option</h3>
+  <div class="tablebox"><table>
+    <thead><tr><th>Model</th><th>fal</th><th>Runware</th><th>Google</th><th>Maker / others</th><th>5 s · 10 s</th></tr></thead>
+    <tbody>
+      <tr><td><b>Stable Audio 3 Small SFX</b> <span class="rec">← pick</span></td><td class="num">$0.0206 per effect, any length to 120 s</td><td>not sold</td><td>not sold</td><td>Stability direct $0.08 (dearer)</td><td class="num">6 · 6 cr</td></tr>
+      <tr><td>ElevenLabs Sound Effects v2</td><td class="num">$0.002/s</td><td>not sold</td><td>not sold</td><td>ElevenLabs direct $0.002/s (same)</td><td class="num">3 · 5 cr</td></tr>
+      <tr><td>Sonilo SFX</td><td class="num">$0.0018/s</td><td>not sold</td><td>not sold</td><td>not checked</td><td class="num">3 · 5 cr</td></tr>
+      <tr><td>CassetteAI SFX</td><td class="num">$0.01 per effect, max 30 s</td><td>not sold</td><td>not sold</td><td>—</td><td class="num">3 · 3 cr</td></tr>
+      <tr><td>Mirelo SFX 2.0</td><td class="num">$0.01/s per take (2 takes default)</td><td>1.5 only, price table contradicts itself</td><td>not sold</td><td>Mirelo ~$0.008–0.013/s</td><td class="num">13 · 25 cr</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Sound for a clip: every option</h3>
+  <div class="tablebox"><table>
+    <thead><tr><th>Model</th><th>fal</th><th>Others</th><th>Per 5 s clip</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><b>Kling video-to-audio</b> <span class="rec">← pick</span></td><td class="num">$0.035 per clip (3–20 s)</td><td>WaveSpeed same price</td><td class="num">9 cr (also 9 at 20 s)</td><td>Takes a "what sounds" prompt plus a music prompt</td></tr>
+      <tr><td>ThinkSound</td><td class="num">$0.001/s</td><td>Replicate (banned for resale)</td><td class="num">2 cr</td><td>Cheapest; quality unknown</td></tr>
+      <tr><td>MMAudio v2</td><td class="num">$0.001/s</td><td>WaveSpeed, Replicate</td><td class="num">2 cr</td><td class="flag">Maker's licence is non-commercial</td></tr>
+      <tr><td>Sonilo video SFX</td><td class="num">$0.009/s</td><td>—</td><td class="num">12 cr</td><td>Keeps speech, prompts per scene</td></tr>
+      <tr><td>Mirelo SFX 2.0</td><td class="num">$0.01/s per take</td><td>Runware (1.5 only, ≤10 s), WaveSpeed $0.016/s</td><td class="num">13 cr</td><td>Mirelo direct may train on your clips</td></tr>
+      <tr><td>Hunyuan Foley · PixVerse SFX · CassetteAI video</td><td class="num">$0.10/10 s · $0.10/5 s · $0.20/min</td><td>—</td><td class="num">13–25 cr</td><td>No reason to prefer</td></tr>
+    </tbody>
+  </table></div>
+  <div class="grid2">
+    <div class="box"><div class="eyebrow">Where it lives</div><p><b>Typed effect:</b> a new "Sound effect" tab in the Video editor's sound panel, next to voice, music and upload. Also a model in the Studio Audio lane.</p><p><b>Sound for a clip:</b> a "🔊 Add sound" button in Clip tools and on clips in the Video editor. It returns the same clip with sound.</p></div>
+    <div class="box"><div class="eyebrow">Why not ElevenLabs?</div><p>It's the best-known name, but ElevenLabs' Sound Effects terms (9 Oct 2026, Exhibit 4 §2) forbid handing out results "as isolated audio files or samples". A Studio lane that returns a bare effect file is exactly that. Whether it binds fal is unclear. Stable Audio 3 has no such rule and costs 6 credits per effect against ElevenLabs' 3–5.</p></div>
+  </div>
+  <div class="ask"><div class="eyebrow">Your call · test spend <span class="money">$0.06</span></div>
+    <p class="rec">Recommend: one Stable Audio 3 effect ($0.0206) and one Kling video-to-audio run on a silent 5 s clip ($0.035).</p>
+    <p>I'll send you both to hear before anything is built. I'll check the clip's sound lines up with the action, and that no voices or words have crept in.</p>
+    <p>Reply "test sound effects, $0.06".</p></div>
+</section>
+
+<!-- 3 -->
+<section class="tool" id="motion">
+  <div class="tool-head"><span class="rank">3</span><h2>Motion transfer</h2><span class="pill hi">High value · medium build</span></div>
+  <p>The customer films themselves acting a moment on their phone, such as a shrug, a punch or a line of dialogue. They add a picture of their character, and get a clip of the character doing exactly that performance: body, face and expressions. This is the headline trick in Dan Kieft's video. No model we sell does it.</p>
+  <div class="tablebox"><table>
+    <thead><tr><th>Model</th><th>fal</th><th>Runware</th><th>Maker direct</th><th>Resellers</th><th>Per 5 s</th></tr></thead>
+    <tbody>
+      <tr><td><b>DreamActor v2</b> (ByteDance) <span class="rec">← pick</span></td><td class="num">$0.05/s</td><td>not sold</td><td>not on BytePlus price list</td><td>WaveSpeed, Replicate $0.05</td><td class="num">63 cr</td></tr>
+      <tr><td>Kling Motion Control v3 Standard</td><td class="num">$0.126/s</td><td class="num">$0.126/s</td><td>Kling packs ~$0.088/s (terms unclear)</td><td>Atlas, Kie cheaper (terms ban or silent)</td><td class="num">158 cr</td></tr>
+      <tr><td>Kling Motion Control v3 Pro</td><td class="num">$0.168/s</td><td class="num">$0.168/s</td><td>—</td><td>—</td><td class="num">210 cr</td></tr>
+      <tr><td>Kling Motion Control 2.6 Standard</td><td class="num">$0.07/s</td><td>unclear</td><td>—</td><td>Kie $0.055</td><td class="num">88 cr</td></tr>
+      <tr><td>P-Video-Animate (Pruna)</td><td>not sold</td><td class="num">$0.03/s</td><td>—</td><td>Replicate, Segmind</td><td class="num">38 cr</td></tr>
+      <tr><td>Wan 2.2 Animate</td><td class="num">$0.08 per "second" (billed by frames ÷ 16 = ×1.5)</td><td>not sold</td><td>Alibaba $0.12/s</td><td>several</td><td class="num">150 cr</td></tr>
+      <tr><td>Runway Act-Two</td><td>not sold</td><td>not sold</td><td>Runway $0.05/s, needs "Powered by Runway" on screen</td><td>—</td><td class="num">63 cr</td></tr>
+      <tr><td>Marey motion transfer</td><td class="num">$2.00 per clip</td><td>—</td><td>—</td><td>—</td><td class="num">500 cr</td></tr>
+    </tbody>
+  </table></div>
+  <div class="grid2">
+    <div class="box"><div class="eyebrow">What the customer uploads</div><p>A phone video of up to 30 s with their head and body in view, using our existing clip upload. Plus one character picture from their Library or an upload.</p></div>
+    <div class="box"><div class="eyebrow">What they get</div><p>A clip of their character doing the performance. DreamActor copies face, lip movement and body, and works on cartoons and animals too. Its first second is a short blend, which we can trim off.</p></div>
+    <div class="box"><div class="eyebrow">Where it lives</div><p>A new "🎭 Act it out" tool in Clip tools, and the same as a box in Flow.</p></div>
+    <div class="box"><div class="eyebrow">Two price levels later</div><p>If DreamActor passes, it's the Standard choice. Kling Motion Control v3 is the "Best" choice (158 cr): sharper and keeps the customer's own sound by default. This copies how our recipes already offer Saver / Standard / Best.</p></div>
+  </div>
+  <div class="ask"><div class="eyebrow">Your call · test spend <span class="money">$0.25</span></div>
+    <p class="rec">Recommend: one DreamActor run with a 5 s acted clip and one of our approved characters (a hook character, not Nora).</p>
+    <p>I'll check a frame strip for the body copying the moves, the face staying the character, and the mouth moving with the words. Then I'll send it to you. If it looks weak, the next step would be one Kling Motion Control v3 test ($0.63), with your yes first.</p>
+    <p>Reply "test motion transfer, $0.25".</p></div>
+</section>
+
+<!-- 4 -->
+<section class="tool" id="bgswap">
+  <div class="tool-head"><span class="rank">4</span><h2>Cut out a person, swap the background</h2><span class="pill mid">Medium value · medium build</span></div>
+  <p>Take a person out of a clip and put them in front of a new picture or clip.</p>
+  <p>Kling O3 4K Edit can already do it from a description, but it costs 525 credits for 5 s. It also redraws the whole clip, so the person can change slightly.</p>
+  <p>The cheaper, more exact route has two steps. A cut-out model gives us the person on a see-through background. Then our own film worker lays them over the new background, which costs us next to nothing.</p>
+  <div class="tablebox"><table>
+    <thead><tr><th>Model</th><th>fal</th><th>Runware</th><th>Maker / others</th><th>Gives a see-through cut-out?</th><th>Per 5 s</th></tr></thead>
+    <tbody>
+      <tr><td><b>Bria Video Background Removal v3</b> <span class="rec">← pick</span></td><td class="num">$0.05/s</td><td class="num">$0.05/s</td><td>Bria direct $0.04/s (terms not readable today)</td><td>Yes, keeps the sound</td><td class="num">63 cr</td></tr>
+      <tr><td>Veed background removal</td><td class="num">$0.015–0.0225 per 30 frames</td><td>—</td><td>—</td><td>Yes</td><td class="num">23 cr</td></tr>
+      <tr><td>Pixelcut</td><td class="num">$0.022 per 30 frames</td><td>—</td><td>—</td><td>Yes</td><td class="num">22 cr</td></tr>
+      <tr><td>BEN v2</td><td class="num">$0.001 per megapixel</td><td>—</td><td>open model</td><td>Yes (webm)</td><td class="num">28 cr</td></tr>
+      <tr><td>SAM 3 video</td><td class="num">$0.005 per 16 frames</td><td>—</td><td>open model</td><td>Mask only, edge quality unknown</td><td class="num">10 cr</td></tr>
+      <tr><td>Kling O3 4K Edit (ours today)</td><td class="num">$0.42/s</td><td>—</td><td>—</td><td>No, redraws the clip</td><td class="num">525 cr</td></tr>
+      <tr><td>Kling O3 Standard edit</td><td class="num">$0.14/s (fal page says $0.168)</td><td class="num">$0.168/s</td><td>—</td><td>No, redraws the clip</td><td class="num">175 cr</td></tr>
+    </tbody>
+  </table></div>
+  <div class="grid2">
+    <div class="box"><div class="eyebrow">What the customer does</div><p>Picks or uploads a clip, then picks a new background picture or clip from their Library. They get back the finished clip with the person in the new scene, and the original sound kept. They can also download just the cut-out person to use in the Video editor.</p></div>
+    <div class="box"><div class="eyebrow">Where it lives</div><p>"✂ Swap background" in Clip tools. The final step runs on our existing Render.com film worker, which already joins clips for Render film.</p></div>
+    <div class="box"><div class="eyebrow">Why Bria and not the cheaper ones</div><p>Bria is the only one sold at the same price by both our suppliers, and it's built for this job (hair edges, keeps sound). Veed, Pixelcut and BEN are a third to half the price, but nobody has seen their quality. After Bria passes, one cheap test of Veed could cut the price to about 23 credits.</p></div>
+    <div class="box"><div class="eyebrow">Known weakness</div><p>The cut-out person keeps the old lighting, so they can look pasted on. Relight (tool 6) fixes that as an optional second step.</p></div>
+  </div>
+  <div class="ask"><div class="eyebrow">Your call · test spend <span class="money">$0.25</span></div>
+    <p class="rec">Recommend: one Bria run on a 5 s 720p clip, then I lay it over a new background on this Mac for free.</p>
+    <p>I'll check the hair and edges at full size, and whether the person flickers. You get the finished clip.</p>
+    <p>Reply "test background swap, $0.25".</p></div>
+</section>
+
+<!-- 5 -->
+<section class="tool" id="refs">
+  <div class="tool-head"><span class="rank">5</span><h2>Your voice or a video as a reference</h2><span class="pill mid">Medium value · medium build</span></div>
+  <div class="box"><div class="eyebrow">Already works today (checked live)</div><p>A voice a customer records and uploads in the Video editor already shows up in Talk and Lip Sync under "Pick from Library". I opened that picker on solorender.com in your Chrome and your uploaded "welcome-voice" was in the list. So "make my character say my own recorded words" is already possible. The one limit: uploading a voice is only in the Video editor, which is for paid plans.</p></div>
+  <p>The new part is different. Some newer clip models take a voice file or a sample video <b>alongside</b> the picture and prompt, and use it to shape the clip:</p>
+  <ul>
+    <li><b>A reference video</b> lets the new clip copy its camera move, timing or style.</li>
+    <li><b>A reference voice</b> shapes the sound of the clip.</li>
+  </ul>
+  <p>Seedance 2.0 is the leading one, and we already run Seedance 2.0 on Runware. So this means adding upload slots to a model we already sell, not adding a new model.</p>
+  <div class="tablebox"><table>
+    <thead><tr><th>Model</th><th>Takes</th><th>fal</th><th>Runware</th><th>Google</th><th>Per 5 s 720p</th></tr></thead>
+    <tbody>
+      <tr><td><b>Seedance 2.0 Mini</b> <span class="rec">← pick</span></td><td>3 videos + 3 voices</td><td>token billing, the sample video's seconds are billed too (~227 cr)</td><td class="num">$0.081/s plain, $0.106/s with a video</td><td>not sold</td><td class="num">102 · 133 cr</td></tr>
+      <tr><td>Seedance 2.0 Fast</td><td>same</td><td>~363 cr</td><td class="num">$0.167/s with a video</td><td>—</td><td class="num">209 cr</td></tr>
+      <tr><td>Seedance 2.0</td><td>same</td><td>dearer</td><td class="num">$0.219/s with a video</td><td>—</td><td class="num">275 cr</td></tr>
+      <tr><td>MiniMax H3 reference</td><td>videos + voices</td><td class="num">$0.05–0.06/s</td><td>not sold</td><td>—</td><td class="num">63–75 cr</td></tr>
+      <tr><td>Wan 3.0 reference</td><td>videos + voices</td><td class="num">$0.10/s + sample seconds</td><td class="num">$0.10/s</td><td>—</td><td class="num">125+ cr</td></tr>
+      <tr><td>Gemini Omni Flash</td><td>videos (voice unclear)</td><td>—</td><td>—</td><td class="num">~$0.11/s incl. sample</td><td class="num">138 cr</td></tr>
+      <tr><td>Kling O3 video reference</td><td>1 video, no voice</td><td class="num">$0.14/s</td><td class="num">$0.126–0.168/s</td><td>—</td><td class="num">175 cr</td></tr>
+      <tr><td>Veo 3.1</td><td colspan="5">Takes neither a voice nor a video.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="grid2">
+    <div class="box"><div class="eyebrow">What nobody could confirm</div><p>No supplier's documentation says a reference voice makes the character <i>speak those exact words</i>, lips in sync. It may only borrow the voice's feel and rhythm. For exact words, Talk and Lip Sync remain the proven route. The test below answers this for $0.14.</p></div>
+    <div class="box"><div class="eyebrow">Where it lives</div><p>Two new optional slots on Seedance 2.0 in the Studio Video lane and Flow: "Reference video" and "Reference voice". Credits rise to the "with a video" rate only when a video is attached.</p></div>
+  </div>
+  <div class="ask"><div class="eyebrow">Your call · test spend <span class="money">$0.14</span></div>
+    <p class="rec">Recommend: one Seedance 2.0 Mini run at 480p, 4 s, with a character picture and a short recorded voice clip.</p>
+    <p>Whisper will tell us whether the clip says the recorded words, and mouth crops will tell us whether the lips match. If the words don't come through, I'd suggest building only the reference-video slot.</p>
+    <p>Reply "test voice reference, $0.14".</p></div>
+</section>
+
+<!-- 6 -->
+<section class="tool" id="relight">
+  <div class="tool-head"><span class="rank">6</span><h2>Relight a clip</h2><span class="pill mid">Medium value · medium build</span></div>
+  <p>Take a finished clip and change only the light, for example to golden hour, neon night or a moody backlight. People, scene and movement stay the same.</p>
+  <p>Only a few models are built for this. The others are "edit with words" models that might relight when asked, but none of their makers show it.</p>
+  <div class="tablebox"><table>
+    <thead><tr><th>Model</th><th>fal</th><th>Others</th><th>Per 5 s</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><b>MiniMax H3 Max Relight</b> <span class="rec">← pick</span></td><td class="num">$0.05/s 480p · $0.08/s 768p · $0.16/s 1080p</td><td>not sold elsewhere</td><td class="num">63 · 100 · 200 cr</td><td>Built for relighting. Clips up to 15 s.</td></tr>
+      <tr><td>Light-X relight</td><td class="num">$0.10/s</td><td>—</td><td class="num">125 cr</td><td class="flag">Research model, licence may be non-commercial</td></tr>
+      <tr><td>LTX Day-to-Night</td><td class="num">~$0.27 per 5 s</td><td>—</td><td class="num">68 cr</td><td>Only turns day into night</td></tr>
+      <tr><td>Grok edit (by words)</td><td class="num">$0.07/s + input</td><td>Runware per clip</td><td class="num">75–100 cr</td><td>Relighting unproven</td></tr>
+      <tr><td>Gemini Omni edit (by words)</td><td>—</td><td>Google ~$0.11/s</td><td class="num">138 cr</td><td>Relighting unproven</td></tr>
+      <tr><td>Runway Aleph · Luma Modify</td><td>—</td><td>$0.28/s · $1.44 per 5 s</td><td class="num">350 · 360 cr</td><td>Most expensive</td></tr>
+      <tr><td>Beeble SwitchLight</td><td>—</td><td>Beeble "from $0.10 per generation"</td><td>?</td><td class="flag">Bans building a "similar product"</td></tr>
+    </tbody>
+  </table></div>
+  <div class="grid2">
+    <div class="box"><div class="eyebrow">The catch</div><p>H3 Max Relight doesn't take words. It wants a picture of a ball showing where the light comes from. So we would make a set of ready-made lighting choices once ourselves, drawn by computer for free: Golden hour, Neon night, Moody backlight, Soft studio, Candlelight, Blue hour. The customer just picks one.</p></div>
+    <div class="box"><div class="eyebrow">Where it lives</div><p>"💡 Relight" in Clip tools, with a row of lighting presets, and as a box in Flow. fal's own notes say the lighting is approximate.</p></div>
+    <div class="box"><div class="eyebrow">Price needs one real bill</div><p>fal's price list shows $0.05 per "unit" for this model, not per second. fal's units have not matched real seconds on other models, so the 100-credit figure is only firm after one real run.</p></div>
+  </div>
+  <div class="ask"><div class="eyebrow">Your call · test spend <span class="money">$0.24</span></div>
+    <p class="rec">Recommend: one 3 s clip at 768p with a golden-hour preset I draw.</p>
+    <p>I'll lay out frames before and after: same people, same movement, warmer low light, no flicker. You get both versions side by side.</p>
+    <p>Reply "test relight, $0.24".</p></div>
+</section>
+
+<section class="ask" style="border-color:var(--label)">
+  <div class="eyebrow" style="color:var(--label)">Everything at once</div>
+  <h2>Say "all six" to approve the frame button plus all five tests: $0.94 in total.</h2>
+  <p>Tests run one at a time, never several at once. Each result comes to you with what I checked. A tool is built only after you've seen its result. Then each one is committed and deployed, and I check it live on solorender.com before telling you it's there.</p>
+</section>
+
+<footer class="foot">
+  <div class="eyebrow">How this was checked</div>
+  <p>fal prices for every pick were read from fal's own price list today (pricing lookup, no runs): H3 Max Relight, Bria v3, Stable Audio 3 SFX, ElevenLabs SFX, Kling video-to-audio, ThinkSound, MMAudio, DreamActor v2, Kling Motion Control v3, Wan Animate, H3 reference. Runware prices come from Runware's own model files (Seedance 2.0 Mini read directly). Runware's tables have been wrong before, so its prices count only after one real bill.</p>
+  <p>Terms quoted are from each supplier's live page today: ElevenLabs Sound Effects Exhibit 4 §2, Decart §3.6(c), Beeble §2(c)(i), Replicate §2.7(c)(iii), Segmind §2.3, PixVerse §3.1, Runway §1(b). Every pick is on fal or Runware, which we already buy from, so no new supplier agreement is needed.</p>
+  <p>Not checked: the sound or picture quality of any model (nobody has seen or heard a result yet), Bria's current direct terms, and the terms of the smaller resellers (WaveSpeed, Atlas, Kie, PiAPI). Cheaper direct sellers (Bria $0.04/s, Kling packs) would mean a new supplier account, so they wait for a separate yes from you.</p>
+</footer>
+
+</div>

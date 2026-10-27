@@ -1,0 +1,242 @@
+<title>Course Ad Shooting Scripts</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: shooting-script binder — a cast sheet per ad, then a timecoded script where each row is one shot */
+:root{
+  --bg:#0a0a0a; --panel:#141412; --line:#2a2a26;
+  --ink:#ffffff; --green:#6ee05a; --orange:#f7931a;
+  --display:'Syne',system-ui,sans-serif; --body:'Manrope',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+  color-scheme:dark;
+}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 80px}
+.wrap{max-width:940px;margin:0 auto;display:flex;flex-direction:column;gap:56px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(2rem,6vw,3.1rem);font-weight:800}
+h2{font-size:clamp(1.5rem,4vw,2.1rem);font-weight:800}
+h3{font-size:1.05rem;font-weight:600}
+p{margin:0;max-width:70ch}
+a{color:var(--ink);text-decoration-color:var(--green)}
+.eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
+header,.block{display:flex;flex-direction:column;gap:14px}
+nav{display:flex;flex-wrap:wrap;gap:8px}
+nav a{font-family:var(--mono);font-size:.82rem;border:1px solid var(--line);border-radius:4px;padding:4px 10px;text-decoration:none}
+nav a:hover,nav a:focus-visible{border-color:var(--green);outline:none}
+.ad{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:28px;display:flex;flex-direction:column;gap:22px;min-width:0}
+.ad-top{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:baseline;border-bottom:1px dashed var(--line);padding-bottom:16px}
+.num{font-family:var(--mono);color:var(--orange);font-size:.95rem}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.tag{font-family:var(--mono);font-size:.75rem;color:var(--green);border:1px solid var(--green);border-radius:3px;padding:2px 8px}
+.cast{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.who{border:1px solid var(--line);border-radius:6px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.who b{font-family:var(--display);font-size:1.05rem}
+.script{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.row{display:grid;grid-template-columns:96px 1fr;gap:4px 18px;padding:14px 0;border-bottom:1px solid var(--line)}
+.tc{font-family:var(--mono);font-size:.85rem;color:var(--green);padding-top:3px;font-variant-numeric:tabular-nums}
+.body{display:flex;flex-direction:column;gap:6px;min-width:0}
+.line{font-weight:700}
+.line .spk{font-family:var(--mono);font-size:.8rem;color:var(--green);font-weight:500;letter-spacing:.06em;margin-right:6px}
+.snd::before{content:"SOUND  ";font-family:var(--mono);font-size:.75rem;color:var(--green)}
+.txt::before{content:"ON SCREEN  ";font-family:var(--mono);font-size:.75rem;color:var(--green)}
+.how{font-family:var(--mono);font-size:.8rem}
+.how::before{content:"MADE WITH  ";color:var(--green)}
+.note{border-left:3px solid var(--orange);padding-left:14px}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:620px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--green);font-weight:500}
+td.n{text-align:right;white-space:nowrap}
+tr.total td{font-weight:700;border-top:2px solid var(--orange)}
+.cost{border:2px solid var(--orange);border-radius:8px;padding:24px;display:flex;flex-direction:column;gap:16px}
+.big{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.big div{border:1px solid var(--line);border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:2px}
+.big b{font-family:var(--display);font-size:1.7rem;color:var(--orange)}
+ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+@media (max-width:600px){.ad{padding:20px}.row{grid-template-columns:1fr}}
+</style>
+
+<div class="wrap">
+<header>
+  <span class="eyebrow">Shooting scripts · AI Filmmaking course ads · 21 Oct 2026</span>
+  <h1>Six ads, fully scripted</h1>
+  <p>Every shot, every spoken word, every sound and every line of on-screen text for the six ads you picked. At the bottom is the cost of the approval round: one picture of each character in the ad's exact frame shape. Nothing has been generated yet.</p>
+  <p>Every spoken line was timed at normal talking speed (about 2.5 words a second) to fit its slot. In the voice scripts the brand is written "Solo render" so the voice says it correctly.</p>
+  <nav aria-label="Jump to an ad">
+    <a href="#ad02">02 The Pitch</a><a href="#ad03">03 Same Face</a><a href="#ad05">05 Behind the Scenes</a><a href="#ad06">06 The Critic</a><a href="#ad08">08 Grandma's Story</a><a href="#ad09">09 Six-Legged Horse</a><a href="#cost">Approval cost</a>
+  </nav>
+</header>
+
+<!-- ============ 02 ============ -->
+<section class="ad" id="ad02">
+  <div class="ad-top"><span class="num">AD 02</span><h2>The Pitch</h2></div>
+  <div class="tags"><span class="tag">30 s</span><span class="tag">16:9 + 9:16</span><span class="tag">Comedy</span></div>
+  <p><b>Look:</b> glossy 35mm studio comedy. The boardroom is amber light, mahogany and cigar smoke. The trailer inside the ad switches to blockbuster teal-and-orange with lens flares.</p>
+  <div class="cast">
+    <div class="who"><span class="eyebrow">The kid</span><b>Milo, 16</b><span>Shaggy red hair under a backwards cap, braces, an oversized 1990s green windbreaker, a pencil behind one ear. Calm as a poker player.</span></div>
+    <div class="who"><span class="eyebrow">The boss</span><b>Mr. Vance, 60s</b><span>Slicked silver hair, one gold front tooth, pinstripe suit, pinky ring, a cigar as thick as a thumb.</span></div>
+    <div class="who"><span class="eyebrow">The board</span><b>Two executives</b><span>A twitchy bald man in a polka-dot bow tie, and a towering woman in a white power suit wearing sunglasses indoors.</span></div>
+    <div class="who"><span class="eyebrow">The star</span><b>Hammond</b><span>A golden hamster in a tiny black tuxedo and bow tie, a thin black eye mask, a stethoscope around his neck. A master safecracker.</span></div>
+  </div>
+  <div class="script">
+    <div class="row"><span class="tc">00:00–03</span><div class="body"><p>Wide shot of the boardroom. Vance slams the table.</p><p class="line"><span class="spk">VANCE</span>"A HAMSTER heist?"</p><p class="snd">The whole room bursts out laughing.</p><p class="how">Kling O3 with all four characters as Entities, sound on</p></div></div>
+    <div class="row"><span class="tc">00:03–07</span><div class="body"><p>Medium shot of Vance leaning back, blowing smoke.</p><p class="line"><span class="spk">VANCE</span>"Ninety million dollars. Two years. Minimum."</p><p class="how">Talk lane, Vance's voice and lip sync</p></div></div>
+    <div class="row"><span class="tc">00:07–10</span><div class="body"><p>Milo, unbothered, slowly spins his laptop around to face them.</p><p class="line"><span class="spk">MILO</span>"I already made the trailer."</p><p class="how">Talk lane, Milo's voice and lip sync</p></div></div>
+    <div class="row"><span class="tc">00:10–12</span><div class="body"><p>Push in until the laptop screen fills the frame. Black title card: HAMMOND.</p><p class="snd">A deep trailer "BWAAM" hit, then heist music starts.</p><p class="how">Image lane title card, Lyria heist music</p></div></div>
+    <div class="row"><span class="tc">00:12–15</span><div class="body"><p>Hammond lowers on a wire into a bank vault and presses his stethoscope to the dial.</p><p class="snd">Click… click… clunk.</p><p class="how">Kling O3 · Entities</p></div></div>
+    <div class="row"><span class="tc">00:15–18</span><div class="body"><p>He slides belly-first under a criss-cross of red laser beams.</p><p class="how">Kling O3 · Entities</p></div></div>
+    <div class="row"><span class="tc">00:18–21</span><div class="body"><p>Slow motion: Hammond jumps a toy motorbike off a desk ramp, bow tie flapping.</p><p class="line"><span class="spk">TRAILER VOICE</span>"This summer… size doesn't matter."</p><p class="how">Kling O3 · Entities, trailer voice from the voice models</p></div></div>
+    <div class="row"><span class="tc">00:21–25</span><div class="body"><p>Hard cut back to the boardroom. Silence. Close-up as Vance's cigar falls out of his mouth into his coffee.</p><p class="snd">A tiny sizzle. Then the bow-tie executive whispers:</p><p class="line"><span class="spk">EXEC</span>"…Sign him."</p><p class="how">Veo 3.1 Fast close-up with sound</p></div></div>
+    <div class="row"><span class="tc">00:25–30</span><div class="body"><p class="txt">"One person. One laptop. Learn how in 21 lessons." Then: AI Filmmaking course · included with Studio, Max and Super Max · solorender.com</p><p class="line"><span class="spk">NARRATOR</span>"The AI Filmmaking course. On Solo render."</p><p class="how">Video editor end card, music sting</p></div></div>
+  </div>
+  <p class="note"><b>Tall 9:16 version:</b> the same shots recomposed tall. Vance sits in the centre of the boardroom shot and the laptop fills the screen top to bottom. That's why every character in this ad gets an approval picture in both shapes.</p>
+</section>
+
+<!-- ============ 03 ============ -->
+<section class="ad" id="ad03">
+  <div class="ad-top"><span class="num">AD 03</span><h2>Same Face, Every Shot</h2></div>
+  <div class="tags"><span class="tag">20 s</span><span class="tag">9:16</span><span class="tag">No voice, text-led</span></div>
+  <p><b>Look:</b> each genre gets its own look, and Brix's face and moustache never change. It's made to work with the sound off, because most people scroll Shorts muted.</p>
+  <div class="cast">
+    <div class="who"><span class="eyebrow">The hero</span><b>@brix (already saved)</b><span>Retired circus strongman in his seventies, huge curled white handlebar moustache, bald on top. His costume changes with each genre. His face does not.</span></div>
+    <div class="who"><span class="eyebrow">The "before"</span><b>A generic hero</b><span>A man in a leather jacket made with no saved character, so he comes out different every time. That's on purpose, so no approval is needed.</span></div>
+  </div>
+  <div class="script">
+    <div class="row"><span class="tc">00:00–05</span><div class="body"><p>Four fast cuts, about 1.2 seconds each, of the "before" hero walking. His face changes every cut: beard, no beard, blue eyes, older.</p><p class="txt">"This is why your AI film looks like AI."</p><p class="snd">A glitch hit on every cut, over a fast drum track.</p><p class="how">Four Image lane pictures (cheap model, no Entity), lightly animated</p></div></div>
+    <div class="row"><span class="tc">00:05–07</span><div class="body"><p>The picture freezes on the last face.</p><p class="snd">Record scratch.</p><p class="txt">"Lesson 8: Create your hero."</p><p class="how">Video editor text</p></div></div>
+    <div class="row"><span class="tc">00:07–09.5</span><div class="body"><p>WESTERN: Brix bursts through swinging saloon doors and twirls his moustache.</p><p class="snd">Spurs jingle, doors creak.</p><p class="txt">WESTERN</p><p class="how">@brix → Image lane keyframe → Kling O3 · Entities</p></div></div>
+    <div class="row"><span class="tc">00:09.5–12</span><div class="body"><p>NOIR: Brix under a rainy streetlamp in a trench coat over his striped vest, lighting a match. Black and white.</p><p class="snd">Rain, match strike.</p><p class="txt">NOIR</p><p class="how">same as above</p></div></div>
+    <div class="row"><span class="tc">00:12–14.5</span><div class="body"><p>SCI-FI: Brix in a space-station airlock, spacesuit helmet open, moustache floating in zero gravity.</p><p class="snd">Airlock hiss.</p><p class="txt">SCI-FI</p><p class="how">same as above</p></div></div>
+    <div class="row"><span class="tc">00:14.5–17</span><div class="body"><p>COOKING SHOW: Brix flips a giant pancake with one finger on a bright TV set.</p><p class="snd">Studio audience applause.</p><p class="txt">COOKING SHOW</p><p class="how">same as above</p></div></div>
+    <div class="row"><span class="tc">00:17–20</span><div class="body"><p>Brix winks straight at the camera.</p><p class="txt">"Same face. Every shot. 21 lessons." AI Filmmaking course · solorender.com</p><p class="how">Kling O3 · Entities → Render film</p></div></div>
+  </div>
+</section>
+
+<!-- ============ 05 ============ -->
+<section class="ad" id="ad05">
+  <div class="ad-top"><span class="num">AD 05</span><h2>Behind the Scenes</h2></div>
+  <div class="tags"><span class="tag">55 s</span><span class="tag">16:9</span><span class="tag">Mockumentary</span></div>
+  <p><b>Look:</b> a handheld making-of documentary with natural light, white lower-third name captions and a dry, off-screen interviewer. The "film" scenes inside it are full blockbuster.</p>
+  <div class="cast">
+    <div class="who"><span class="eyebrow">The diva</span><b>Rex</b><span>A green T-rex in a burgundy silk dressing gown with "REX" embroidered on it, star-shaped sunglasses pushed up on his head.</span></div>
+    <div class="who"><span class="eyebrow">The stunt double</span><b>Rex Jr.</b><span>Same species, slightly smaller and scuffed, wearing a neck brace and knee pads, holding a paper cup of coffee in his tiny claws.</span></div>
+    <div class="who"><span class="eyebrow">The whole crew</span><b>Dani</b><span>A creator with a huge curly afro held back by big headphones, a hoodie with a cartoon dinosaur on it, at a desk ringed by empty coffee mugs.</span></div>
+    <div class="who"><span class="eyebrow">Off screen</span><b>The interviewer</b><span>Voice only. Dry, British, documentary-serious.</span></div>
+  </div>
+  <div class="script">
+    <div class="row"><span class="tc">00:00–04</span><div class="body"><p>A makeup trailer. Rex sits in the chair while a stylist powders his snout. He sighs.</p><p class="line"><span class="spk">REX</span>"They wanted me to do my own stunts."</p><p class="how">Rex Entity → Talk lane, voice and lip sync</p></div></div>
+    <div class="row"><span class="tc">00:04–06</span><div class="body"><p class="txt">Name caption: REX · Lead actor</p><p class="line"><span class="spk">INTERVIEWER</span>"And did you?"</p></div></div>
+    <div class="row"><span class="tc">00:06–10</span><div class="body"><p>Rex holds up his tiny arms.</p><p class="line"><span class="spk">REX</span>"Darling. I have tiny arms."</p><p class="how">Talk lane</p></div></div>
+    <div class="row"><span class="tc">00:10–13</span><div class="body"><p>Rex Jr. on a folding chair behind the set, neck brace on, sipping coffee.</p><p class="txt">Name caption: REX JR. · Stunt double</p><p class="how">Image lane keyframe → Kling O3</p></div></div>
+    <div class="row"><span class="tc">00:13–18</span><div class="body"><p class="line"><span class="spk">REX JR.</span>"I did the volcano jump. Twice. Nobody remembers the stunt double."</p><p class="how">Talk lane, a tired, gravelly voice</p></div></div>
+    <div class="row"><span class="tc">00:18–30</span><div class="body"><p>A montage from "the film": a slow-motion jump over a lava river, a chase through giant ferns, then Rex in a tuxedo on a red carpet as flashbulbs pop.</p><p class="snd">Epic orchestral music, roars, camera shutters.</p><p class="how">Kling O3 multi-shot, Veo 3.1 Fast for the lava and red-carpet sound, Lyria music</p></div></div>
+    <div class="row"><span class="tc">00:30–34</span><div class="body"><p>The music cuts out. We're back in the makeup trailer.</p><p class="line"><span class="spk">INTERVIEWER</span>"So how big was the crew?"</p></div></div>
+    <div class="row"><span class="tc">00:34–42</span><div class="body"><p>One long pull-back: past the studio lights, out of the fake jungle set, all the way back to Dani at a desk with the Flow canvas on screen. Everything gets smaller as the camera pulls away. Dani looks up and waves.</p><p class="how">Image lane keyframes for start and end → Kling O3 start and end frame</p></div></div>
+    <div class="row"><span class="tc">00:42–48</span><div class="body"><p>Back to Rex in the makeup chair. He blows a kiss to camera.</p><p class="line"><span class="spk">REX</span>"Honestly? Best director I've worked with."</p><p class="how">Talk lane</p></div></div>
+    <div class="row"><span class="tc">00:48–55</span><div class="body"><p class="txt">"Be the whole crew." AI Filmmaking course · 21 lessons · included with Studio, Max and Super Max · solorender.com</p><p class="line"><span class="spk">NARRATOR</span>"Make the film. Be the whole crew. Solo render."</p><p class="how">Video editor end card</p></div></div>
+  </div>
+  <p class="note"><b>Risk:</b> lip sync on a dinosaur face is the hardest shot in all six ads. Before building the rest, I'd make one 4-second test of Rex talking and send it to you to watch.</p>
+</section>
+
+<!-- ============ 06 ============ -->
+<section class="ad" id="ad06">
+  <div class="ad-top"><span class="num">AD 06</span><h2>The Critic</h2></div>
+  <div class="tags"><span class="tag">30 s</span><span class="tag">16:9 + 9:16</span><span class="tag">Comedy</span></div>
+  <p><b>Look:</b> a dark, plush screening room lit only by the projector beam, then a bright festival stage. The film being screened is a moody storm-at-sea painting come to life.</p>
+  <div class="cast">
+    <div class="who"><span class="eyebrow">The snob</span><b>Percival Thorne, 70s</b><span>Gaunt, pencil moustache, a monocle on a gold chain, a burgundy velvet cravat, a tiny leather notebook.</span></div>
+    <div class="who"><span class="eyebrow">The director</span><b>Sal, 64</b><span>Beefy and sunburnt, grey buzz cut, the biggest grin in the building. Plumber's overalls, a tool belt with a wrench in it, and a festival lanyard.</span></div>
+    <div class="who"><span class="eyebrow">In Sal's film</span><b>The lighthouse keeper</b><span>An old sea captain with a wild white beard, a yellow oilskin coat, holding a storm lantern high.</span></div>
+  </div>
+  <div class="script">
+    <div class="row"><span class="tc">00:00–03</span><div class="body"><p>Close-up of Thorne in the dark, the projector beam flickering on his face. He slowly removes his monocle.</p><p class="line"><span class="spk">THORNE</span>(whispering) "…Sublime."</p><p class="how">Thorne Entity → Talk lane</p></div></div>
+    <div class="row"><span class="tc">00:03–11</span><div class="body"><p>What he's watching: the lighthouse keeper in a storm. A wave smashes the lantern-room glass, and the keeper raises his lantern defiantly into the wind.</p><p class="snd">Storm, crashing glass, swelling strings.</p><p class="how">Kling O3 multi-shot, one painterly style on every shot, Lyria strings</p></div></div>
+    <div class="row"><span class="tc">00:11–13</span><div class="body"><p>Thorne's pen scratches five stars in his notebook and underlines them twice.</p><p class="how">Veo 3.1 Fast insert shot with sound</p></div></div>
+    <div class="row"><span class="tc">00:13–17</span><div class="body"><p>A festival Q&amp;A stage with applause.</p><p class="line"><span class="spk">HOST</span>"Please welcome the director…"</p></div></div>
+    <div class="row"><span class="tc">00:17–21</span><div class="body"><p>Sal strides on, wrench clanking in his tool belt, waving with both hands.</p><p class="line"><span class="spk">SAL</span>"Hiya! Made it in my garage."</p><p class="how">Sal Entity → Talk lane</p></div></div>
+    <div class="row"><span class="tc">00:21–24</span><div class="body"><p>Close-up of Thorne. His monocle drops out of his eye into his champagne glass.</p><p class="snd">Plink. Bubbles.</p><p class="how">Veo 3.1 Fast with sound</p></div></div>
+    <div class="row"><span class="tc">00:24–30</span><div class="body"><p class="txt">"No film school. No crew. 21 lessons." AI Filmmaking course · included with Studio, Max and Super Max · solorender.com</p><p class="line"><span class="spk">NARRATOR</span>"Your garage is a studio now. Solo render."</p><p class="how">Video editor end card</p></div></div>
+  </div>
+  <p class="note">Thorne doesn't say "Magnificent", because it sounds too close to a competitor's name. "Sublime" lands the same joke.</p>
+</section>
+
+<!-- ============ 08 ============ -->
+<section class="ad" id="ad08">
+  <div class="ad-top"><span class="num">AD 08</span><h2>Grandma's Story</h2></div>
+  <div class="tags"><span class="tag">60 s</span><span class="tag">16:9</span><span class="tag">Emotional · holiday</span></div>
+  <p><b>Look:</b> two worlds. The bear's film is a hand-painted storybook in soft gouache. The living room is warm, real and cinematic: fairy lights, a tree, a fire.</p>
+  <div class="cast">
+    <div class="who"><span class="eyebrow">The thief</span><b>Barnaby the bear</b><span>A huge, shaggy, sheepish brown bear in a red knitted scarf that's far too small for him. Storybook-painted.</span></div>
+    <div class="who"><span class="eyebrow">The storyteller</span><b>Grandma Rose, 80</b><span>Tiny and sharp-eyed, a silver bun, round red reading glasses on a beaded chain, a cardigan knitted with reindeer.</span></div>
+    <div class="who"><span class="eyebrow">The filmmaker</span><b>Theo, 19</b><span>Lanky with curly hair, wearing a Christmas jumper with a reindeer whose nose lights up.</span></div>
+    <div class="who"><span class="eyebrow">The audience</span><b>The family</b><span>Mum, Dad, Grandma and Theo squeezed on one sofa, plus a basset hound in a Santa hat.</span></div>
+  </div>
+  <div class="script">
+    <div class="row"><span class="tc">00:00–06</span><div class="body"><p>Storybook: Barnaby tiptoes across snowy rooftops carrying the full moon under one arm like a beach ball. The town's lights dim behind him.</p><p class="line"><span class="spk">NARRATOR</span>(warm, old) "Once, a bear named Barnaby wanted the moon for his very own."</p><p class="how">Barnaby Entity, storybook style → Kling O3, Lyria soft piano</p></div></div>
+    <div class="row"><span class="tc">00:06–12</span><div class="body"><p>He stuffs the moon under his bed. It glows through the blanket. Outside, the whole world goes dark.</p><p class="line"><span class="spk">NARRATOR</span>"So he took it. And the whole world went dark."</p><p class="how">Kling O3 · Entities</p></div></div>
+    <div class="row"><span class="tc">00:12–18</span><div class="body"><p>The camera pulls back. The storybook is playing on a living-room TV, and the family is on the sofa. Grandma slowly lowers her teacup.</p><p class="how">Family Entities → Image lane keyframe → Kling O3 pull-back</p></div></div>
+    <div class="row"><span class="tc">00:18–24</span><div class="body"><p>Close-up of Grandma, mouthing the words along with the narrator. She knows them by heart.</p><p class="line"><span class="spk">NARRATOR + GRANDMA</span>"…and the owls couldn't find their way home."</p><p class="how">Talk lane, Grandma's lips synced to the narrator's line</p></div></div>
+    <div class="row"><span class="tc">00:24–34</span><div class="body"><p>Storybook: Barnaby, ashamed, climbs the tallest pine and hangs the moon back in the sky. The town lights up and owls fly home.</p><p class="line"><span class="spk">NARRATOR</span>"So Barnaby climbed the tallest tree, and gave the moon back. Because the best things glow brighter when they're shared."</p><p class="snd">The music swells.</p><p class="how">Kling O3 multi-shot</p></div></div>
+    <div class="row"><span class="tc">00:34–40</span><div class="body"><p>The living room. The film ends and there's a quiet beat. The dog's tail thumps. Grandma takes off her glasses, eyes wet.</p><p class="how">Kling O3, with the sound kept quiet</p></div></div>
+    <div class="row"><span class="tc">00:40–46</span><div class="body"><p class="line"><span class="spk">GRANDMA</span>(to Theo) "Forty years I told that story. How did you…?"</p><p class="how">Talk lane</p></div></div>
+    <div class="row"><span class="tc">00:46–50</span><div class="body"><p>Theo shrugs and smiles while his jumper's reindeer nose blinks.</p><p class="line"><span class="spk">THEO</span>"I took a course, Nan."</p><p class="how">Talk lane</p></div></div>
+    <div class="row"><span class="tc">00:50–54</span><div class="body"><p>Grandma pulls him into a hug. The dog jumps on both of them.</p><p class="snd">Laughter, a crackling fire.</p><p class="how">Kling O3 · Entities</p></div></div>
+    <div class="row"><span class="tc">00:54–60</span><div class="body"><p class="txt">"Every family has a story. Film yours." AI Filmmaking course · 21 lessons · included with Studio, Max and Super Max · solorender.com</p><p class="line"><span class="spk">NARRATOR</span>"The AI Filmmaking course. On Solo render."</p><p class="how">Video editor end card</p></div></div>
+  </div>
+</section>
+
+<!-- ============ 09 ============ -->
+<section class="ad" id="ad09">
+  <div class="ad-top"><span class="num">AD 09</span><h2>The Six-Legged Horse</h2></div>
+  <div class="tags"><span class="tag">20 s</span><span class="tag">9:16</span><span class="tag">No voice, text-led</span></div>
+  <p><b>Look:</b> a golden-hour Western. A red credit counter sits in the top corner like a bomb timer. The counter only shows that credits are draining and never states a price.</p>
+  <div class="cast">
+    <div class="who"><span class="eyebrow">The rider</span><b>Dusty</b><span>A lanky cowboy with a giant white ten-gallon hat, a sunburnt nose, a bushy ginger moustache, a red bandana and a fringed leather jacket.</span></div>
+    <div class="who"><span class="eyebrow">The horse</span><b>Biscuit</b><span>A chestnut horse with a white blaze down its nose. In the good version it has four legs.</span></div>
+  </div>
+  <div class="script">
+    <div class="row"><span class="tc">00:00–02</span><div class="body"><p>Dusty gallops straight at camera on a horse with six legs.</p><p class="txt">"Try #7" and the counter draining</p><p class="snd">A ticking timer over tense music.</p><p class="how">The good picture edited to add legs (Nano Banana edit), lightly animated</p></div></div>
+    <div class="row"><span class="tc">00:02–04</span><div class="body"><p>Try #8: the horse melts into a fence post.</p><p class="how">Edited picture, lightly animated</p></div></div>
+    <div class="row"><span class="tc">00:04–06</span><div class="body"><p>Try #9: Dusty has no head. His hat floats above the saddle.</p><p class="how">Edited picture, lightly animated</p></div></div>
+    <div class="row"><span class="tc">00:06–08</span><div class="body"><p>The counter freezes.</p><p class="snd">Alarm beep, then silence.</p><p class="txt">"STOP. Lesson 6: picture first, then video."</p></div></div>
+    <div class="row"><span class="tc">00:08–13</span><div class="body"><p>A screen recording of Studio: four pictures of Dusty appear in the grid and the cursor picks the best one.</p><p class="txt">"Cheap pictures first."</p><p class="how">Clip recorder on the local app, staged with the real pictures</p></div></div>
+    <div class="row"><span class="tc">00:13–17</span><div class="body"><p>One video run: a perfect four-legged gallop through a sunset canyon. The counter barely moves.</p><p class="txt">"One video. Done."</p><p class="snd">A triumphant Western whistle tune.</p><p class="how">Kling O3 from the chosen picture, Lyria music</p></div></div>
+    <div class="row"><span class="tc">00:17–20</span><div class="body"><p>Dusty pulls up and tips his hat to camera.</p><p class="txt">"Stop paying for six-legged horses." AI Filmmaking course · solorender.com</p><p class="how">Kling O3 → Render film</p></div></div>
+  </div>
+  <p class="note">The broken shots are made on purpose by editing the good picture. A video model won't reliably fail on cue, so we don't pay for real failures.</p>
+</section>
+
+<!-- ============ COST ============ -->
+<section class="cost" id="cost">
+  <span class="eyebrow">Approval round · character pictures</span>
+  <h2>What the approval pictures cost</h2>
+  <p>You get one picture of each character, framed in the ad's exact shape and placed where they will sit in the shot. Ads that run both wide and tall get both shapes. Everything uses Nano Banana Pro, the top picture model, so a weak result means the idea is wrong and not the model. The exception is Brix, who already exists: his four pictures use Nano Banana 2 Edit fed his saved picture, so it's really him.</p>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Ad</th><th>Pictures</th><th>Shape</th><th>Model</th><th class="n">Count</th><th class="n">You pay</th></tr></thead>
+    <tbody>
+      <tr><td>02 The Pitch</td><td>Milo · Vance · the two executives · Hammond</td><td>16:9 + 9:16</td><td>Nano Banana Pro</td><td class="n">8</td><td class="n">112 cr</td></tr>
+      <tr><td>03 Same Face</td><td>@brix in Western · noir · sci-fi · cooking show</td><td>9:16</td><td>Nano Banana 2 Edit</td><td class="n">4</td><td class="n">28 cr</td></tr>
+      <tr><td>05 Behind the Scenes</td><td>Rex · Rex Jr. · Dani</td><td>16:9</td><td>Nano Banana Pro</td><td class="n">3</td><td class="n">42 cr</td></tr>
+      <tr><td>06 The Critic</td><td>Thorne · Sal · lighthouse keeper</td><td>16:9 + 9:16</td><td>Nano Banana Pro</td><td class="n">6</td><td class="n">84 cr</td></tr>
+      <tr><td>08 Grandma's Story</td><td>Barnaby · Grandma Rose · Theo · the family on the sofa</td><td>16:9</td><td>Nano Banana Pro</td><td class="n">4</td><td class="n">56 cr</td></tr>
+      <tr><td>09 Six-Legged Horse</td><td>Dusty on Biscuit</td><td>9:16</td><td>Nano Banana Pro</td><td class="n">1</td><td class="n">14 cr</td></tr>
+      <tr class="total"><td colspan="4">One picture of each</td><td class="n">26</td><td class="n">336 cr</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="big">
+    <div><span class="eyebrow">One picture each</span><b>≈ $3.36</b><span>26 pictures, no choice between versions</span></div>
+    <div><span class="eyebrow">Two to pick from (my pick)</span><b>≈ $6.72</b><span>52 pictures. You choose the better one of each pair.</span></div>
+    <div><span class="eyebrow">Your balance</span><b>4,348 cr</b><span>Plenty. This round uses about 15% of it at most.</span></div>
+  </div>
+  <ul>
+    <li>Where the numbers come from: the solorender price list today says Nano Banana Pro is 35 credits and Nano Banana 2 Edit is 17. Your owner account pays those ÷ 2.5, so about 14 and 7 credits. One owner credit is about one cent of real cost. The exact bill shows on your Credits page after the run.</li>
+    <li>Redos for anything you reject cost the same per picture: 14 credits on Nano Banana Pro.</li>
+    <li>A cheaper option is Seedream 4.5, at about 4 credits a picture (≈ $2 for two of each). I'd still start on Nano Banana Pro for the approval round, because these pictures set the look of every clip after them.</li>
+    <li>Not in this round: the clips, voices, lip sync and music. I'll price those for the 3 ads you pick to finish, before anything runs.</li>
+  </ul>
+  <p><b>Say "go" with your choice (one each or two each) and I'll make the pictures and send them to you, ad by ad.</b></p>
+</section>
+</div>

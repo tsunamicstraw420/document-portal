@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Course Depth Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Manrope:wght@400;500;700&display=swap">
+<style>
+/* One reading column: verdict, what the video teaches, tool map, overlap ledger, worked examples, plan, cost. Always dark. */
+:root{
+  --bg:#0a0a0a; --panel:#141413; --line:#2a2a27;
+  --ink:#ffffff; --green:#6ee05a; --orange:#f7931a; --red:#ff6b5a;
+  --display:"Syne",system-ui,sans-serif; --body:"Manrope",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;padding:40px 16px 80px}
+main{max-width:880px;margin:0 auto;display:grid;gap:52px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(30px,5vw,44px);font-weight:800}
+h2{font-size:26px;font-weight:700}
+h3{font-size:19px;font-weight:700}
+p{margin:0}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--green);font-weight:700}
+section{display:grid;gap:16px}
+a{color:var(--ink);text-decoration-color:var(--green);text-underline-offset:3px}
+.verdict{background:var(--panel);border:1px solid var(--orange);border-radius:10px;padding:24px;display:grid;gap:12px}
+.verdict strong{color:var(--orange)}
+.warn{background:var(--panel);border:1px solid var(--red);border-radius:10px;padding:20px 24px;display:grid;gap:10px}
+ul,ol{margin:0;padding-left:22px;display:grid;gap:8px}
+.facts{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:15px}
+.facts span b{color:var(--green);font-weight:700;margin-right:6px}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;min-width:660px;font-size:15px}
+th,td{text-align:left;vertical-align:top;padding:12px 14px;border-bottom:1px solid var(--line)}
+th{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--green);background:var(--panel)}
+tr:last-child td{border-bottom:none}
+.tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:4px;white-space:nowrap}
+.have{background:#1d3a18;color:var(--green)}
+.add{background:#3d2a0c;color:var(--orange)}
+.new{background:#16304a;color:#8fd0ff}
+.gap{background:#3d1712;color:var(--red)}
+.part{border-top:1px solid var(--line);padding-top:18px;display:grid;gap:8px}
+.part .num{color:var(--green);font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+.ex{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:22px;display:grid;gap:14px}
+.ex .who{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green)}
+.steps{counter-reset:s;list-style:none;padding:0;display:grid;gap:10px}
+.steps li{counter-increment:s;position:relative;padding-left:36px}
+.steps li::before{content:counter(s);position:absolute;left:0;top:1px;width:24px;height:24px;border-radius:50%;background:#1d3a18;color:var(--green);font-size:13px;font-weight:700;display:grid;place-items:center}
+.prompt{background:#0f1a0d;border-left:3px solid var(--green);border-radius:6px;padding:12px 14px;font-size:15px}
+.prompt.bad{background:#1f0f0c;border-left-color:var(--red)}
+.prompt b{color:var(--green);font-size:12px;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:4px}
+.prompt.bad b{color:var(--red)}
+.note{border-left:3px solid var(--green);padding-left:14px}
+.cost{font-variant-numeric:tabular-nums}
+.kbd{font-weight:700;color:var(--green)}
+</style>
+</head>
+<body>
+<main>
+
+<header style="display:grid;gap:14px">
+  <p class="eyebrow">AI Filmmaking course · video review · 24 Oct 2026</p>
+  <h1>Not a course of its own. It's the missing "advanced" half of ours.</h1>
+  <div class="facts">
+    <span><b>Video</b>"Full AI Filmmaking Course: How to Make AI Video in 2026"</span>
+    <span><b>Channel</b>AI Master</span>
+    <span><b>Length</b>1:23:47</span>
+    <span><b>Posted</b>20 Sep 2026</span>
+    <span><b>Views</b>~45K</span>
+  </div>
+  <p><a href="https://www.youtube.com/watch?v=fQuJdcdLpEY">Watch on YouTube</a> · I read the full caption track (14,500 words). Title, length, date and views come from YouTube's own page data. This page summarises the video in our own words. It doesn't copy his script, which follows our rule: take the method, never the wording.</p>
+</header>
+
+<section class="verdict">
+  <p class="eyebrow">Recommendation</p>
+  <p><strong>Add depth to our course: upgrade 8 lessons and add a short bonus module of 4 new lessons.</strong> Don't build a separate course from it. Why:</p>
+  <ul>
+    <li><b>It isn't really one course.</b> It's five separate videos joined end to end: a Seedance 2.5 manual, a Gemini Omni review, Seedance 2.0 test builds, a Seedance 4K demo, and a Grok "long video" tutorial. There's no story running through it, and the same tips repeat. Four of the five parts include an ad for a competing site: TopView, AI Master's own studio, Higgsfield and Grok.</li>
+    <li><b>About 40% of it we already teach,</b> often better. That includes picture first then motion, timeline prompts, drafting cheap, chaining clips from the last frame, references from several angles, multiple takes, and voices and sound.</li>
+    <li><b>The rest is exactly what our course is thin on: how to direct the video model itself.</b> Prompt rules for motion and camera, rules for reference pictures, copying your own acting, restyling your own footage, product ads, films longer than a minute, and making things through Claude. Our course is strong on story and the pipeline. This video is strong on "why did my clip come out wrong".</li>
+    <li><b>Good news:</b> six of the things this video shows can be done in solorender. Four went live yesterday, 23 Oct: grab a frame, Act It Out (motion copy), sound effects and Add Sound. Two have been live since September: Extend (18 Sep) and Connect Claude (21 Sep). Dates come from our code history. So far more of it is teachable than yesterday's video was.</li>
+    <li>A standalone course would date fast. Most of its numbers are tied to specific model versions ("Seedance 2.5 handles three camera moves"). Folded into our story-led course, the methods last. We test the numbers ourselves before we print them.</li>
+  </ul>
+</section>
+
+<section class="warn">
+  <p class="eyebrow" style="color:var(--red)">Found while checking: two wrong lines in the live course</p>
+  <ul>
+    <li><b>Lesson 15 tells customers "solorender can't make sound effects yet".</b> That stopped being true yesterday. Stable Audio 3 SFX (6 credits) is in the Audio lane and in the Video editor's sound panel. A paying customer reads this and goes elsewhere for something we sell.</li>
+    <li>The course's own notes still list "no motion copying" as a gap. DreamActor Act It Out went live yesterday. No lesson mentions it yet.</li>
+  </ul>
+  <p>Not fixed yet. I'd fix these two first, today, whatever you decide about the rest. I've offered that as a separate session below.</p>
+</section>
+
+<section>
+  <p class="eyebrow">What the video teaches</p>
+  <h2>Five parts, in his order</h2>
+
+  <div class="part"><span class="num">Part 1 · Seedance 2.5 manual · 0:00–23:37</span>
+    <p>The core idea: each kind of input has one job. Words say what happens and what the camera does. Pictures carry faces, clothes, places and look. A video carries motion. A music track carries timing. If a detail can live in a reference, keep it out of the words. His prompt rules: link actions with "while" and "then"; give each person one action per clip; name concrete things and materials, not adjectives; use real camera terms (dolly, orbit, crane), at most three moves, most important first, each tied to a subject. For picture-to-video: leave empty space where the movement goes; keep the face big enough in frame or it drifts; describe only the change. He also covers: draft at low resolution; copy motion from a video of yourself or a dancer; restyle your own phone footage; give every reference exactly one job, because too many references blur faces together; chain long scenes from the last frame and repeat the lighting line word for word; name the sounds you want and write the spoken line out. He ends by running one prompt on four models to show each one's "default taste".</p></div>
+
+  <div class="part"><span class="num">Part 2 · Gemini Omni review · 23:37–43:00</span>
+    <p>Physics tests: plan for two or three takes. A five-picture character pack works only if it covers the angles the clip needs. With front-only photos, the model quietly avoids turning the head. Editing by conversation: change one thing at a time ("add a plate, keep everything else the same"). Changing the framing breaks it, so treat a reframe as a new scene. He also edits real footage: a glass swapped for a mug, the background swapped for a café. Then a pipeline: make the hero picture first, then animate it. He closes with a head-to-head against Seedance 2.0 and a list of Omni's limits.</p></div>
+
+  <div class="part"><span class="num">Part 3 · Seedance 2.0 test builds · 43:00–57:56</span>
+    <p>"Timeline prompting" as eight blocks: subject, wardrobe, setting, light, mood, music, colour, what happens second by second, plus a film reference. He uses his site's "enhance prompt" button to write those blocks from one sentence. Reference rules: five pictures is his sweet spot, more starts blending faces. He drafts at 720p, then makes the final at full size. Four builds: a software ad (the woman swipes a laptop like a phone, so tell the model where hands go), a fight scene, a talking-head clip with the line written into the prompt, and a product ad with leather gloves. The pull-on motion failed three times, so his advice is to design the ad around what the model can do. He finishes with a four-model comparison.</p></div>
+
+  <div class="part"><span class="num">Part 4 · Seedance 4K on Higgsfield · 57:56–68:38</span>
+    <p>Make the perfect still first and pick the best of several. Then animate it with a motion-only prompt written in film language: shot type, lens feel, light direction, mood, the exact movement. He shows three looks with the same method (animation, fantasy, realism) and a 720p vs 1080p vs 4K test on a fast, detailed shot. Last, he plugs the site into Claude as a connector and asks Claude to turn a product page into an ad.</p></div>
+
+  <div class="part"><span class="num">Part 5 · Long videos in Grok · 68:38–83:47</span>
+    <p>An AI chat writes a 30-second, two-character story, then splits it into 6-second scene prompts. He makes a start picture, then a clip, then presses "extend" over and over. When the chain hits its limit, he saves the last frame and starts a new chain from it. Then he upscales, assembles in CapCut and exports. For multi-minute videos: plan chapters, keep one master character description pasted into every prompt, regenerate a bad scene before extending it, name the time of day in every prompt, and do a 30-second test first.</p></div>
+</section>
+
+<section>
+  <p class="eyebrow">His tools → our tools</p>
+  <h2>Every outside step, done in solorender</h2>
+  <p>Checked against our code today: the live model list (only models customers can see), the clip tools, the Video editor, and the Connect Claude page.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>What he does, and where</th><th>The solorender way</th></tr></thead>
+    <tbody>
+      <tr><td>Opens the generation panel, picks Seedance 2.5, drops references in a tray (his studio)</td><td><b>Studio → Video lane → Seedance 2.5</b>. 288 credits per 5 s at 720p, ×2.67 at 1080p, up to 30 s. It takes a <b>start picture plus an optional end frame</b>, not a reference tray. For several references, use <b>Kling O3 · Entities</b> (up to 7 pictures) and call each one by @name.</td></tr>
+      <tr><td>"Enhance prompt" button rewrites one sentence into a full prompt (his studio)</td><td><b>✨ Direct · free</b> under the prompt box. It writes the motion prompt and fills the Avoid box. It's on every picture-to-video model and every picture model. Not on text-to-video or the Entities models.</td></tr>
+      <tr><td>"Save last frame" button under the player (his studio)</td><td><b>📸 Last frame</b> / <b>📸 This frame</b> on the Studio clip viewer, the Library viewer and Flow clips. Free. In Flow, <b>➕ Next clip from it</b> makes the next clip box for you.</td></tr>
+      <tr><td>Copies his own walk onto a knight; copies a dancer's moves (Seedance reference video)</td><td><b>Clip tools → DreamActor Act It Out</b>. Put a picture of your character in "Character" and your clip in "Your acting" (2–30 s). 12.5 credits a second. There's no prompt. The look comes from the picture, the motion from the clip, and your recording's sound is kept.</td></tr>
+      <tr><td>Turns his phone walk into a cartoon (restyle)</td><td><b>Clip tools → Kling O3 4K Edit</b>, clip 3–15 s (upload up to 60 s / 90 MB). Describe the new look only. Up to 4 style pictures. Keeps the sound. 105 credits a second, so it's pricey. We have no stabiliser, so tell people to film on a steady phone.</td></tr>
+      <tr><td>Swaps a glass for a mug, or a wall for a café, on real footage (Omni)</td><td>Same <b>Kling O3 4K Edit</b>, one change per run ("replace the glass with a ceramic coffee mug, keep everything else the same"). Omni itself is hidden in our catalog.</td></tr>
+      <tr><td>Hero picture first, several options, pick one (Nano Banana 2 / Higgsfield picture tool / Grok Imagine)</td><td><b>Studio → Image lane</b>, Images stepper 1–4, then press <b>Animate</b>. Nano Banana 2 (17 cr), Seedream 5 Flash (5 cr), GPT Image 2.5 Sunburst (14 cr).</td></tr>
+      <tr><td>Saves a reusable character (his "consistent character" / Higgsfield's character trainer)</td><td><b>Entities → Character</b>, up to 20 pictures, made exactly as lesson 8 teaches: five references on mid-grey, then saved as @agnes.</td></tr>
+      <tr><td>Character sheet with GPT Image 2 in his "designer agent"</td><td>Lesson 8's method: <b>Nano Banana 2 Edit</b> from the approved portrait, one picture per angle.</td></tr>
+      <tr><td>Draft at 720p, final at 2K/4K</td><td>Seedance 2.0: 480p (×0.465) or 720p. Seedance 2.5: 720p or 1080p. Grok Lite: 480p / 720p / 1080p. There's <b>no native 4K</b> on a visible model. For 4K, use <b>Clip tools → Topaz Video Upscale</b> (5 cr/s to 1080p, 20 cr/s to 4K).</td></tr>
+      <tr><td>Several takes, pick the best</td><td><b>Versions ×1–4</b> stepper on the Video lane. Each take is its own run and its own charge.</td></tr>
+      <tr><td>Same prompt on four models</td><td>Same start picture, four runs in Studio: Seedance 2.5, Kling v3 Pro, Veo 3.1 Lite, Grok Video 1.5 Lite.</td></tr>
+      <tr><td>Extend video, chain limit, save last frame, new chain (Grok)</td><td><b>Clip tools → Grok Imagine Extend</b>: adds 4, 6, 8 or 10 s, 20 cr per added second. The source clip must be 2–15 s, so our chain "resets" at 15 s, not his 30. Then <b>📸 Last frame → Animate</b> and keep going.</td></tr>
+      <tr><td>Upscale every clip (Grok)</td><td><b>Topaz Video Upscale</b> in Clip tools.</td></tr>
+      <tr><td>Assemble, add a voice track, fade in and out, export 1080p 30 fps (CapCut)</td><td><b>Video editor</b>: add clips from your Library, upload MP3/WAV or make voice, music and sound effects in the sound panel, fade in/out on each item, export MP4 1080p 30 fps to your Library. Free.</td></tr>
+      <tr><td>Story and 6-second scene prompts in an AI chat (Grok chat)</td><td><b>Claude</b>, with lesson 2/4's script starter, or through <b>Connect Claude</b> so Claude can make the clips too.</td></tr>
+      <tr><td>Plugs his site into Claude: Settings → Connectors → custom connector → sign in (Higgsfield)</td><td><b>solorender → Connect Claude → Create key → Copy</b>. Then in Claude: <b>Settings → Connectors → Add custom connector</b>, name it solorender, paste the URL, choose <b>No sign-in</b>, and test with "check my solorender balance". Plans and Super Max only.</td></tr>
+      <tr><td>Writes the spoken line into the prompt; the model voices it and syncs the lips</td><td>Same on <b>Veo 3.1 Fast/Lite, Kling v3 Pro, Seedance 2.5/2.0, Grok Lite</b>: put the words in quotes. For a fixed voice: Audio lane, then <b>Talk</b> or <b>Lip Sync</b> (lesson 13).</td></tr>
+      <tr><td>Names the sounds he wants in the prompt</td><td>Same on the sound-making models. For a silent clip: <b>Kling Add Sound</b> (9 cr per clip, 3–20 s). For a single effect: <b>Stable Audio 3 SFX</b> (6 cr).</td></tr>
+      <tr><td>Music track as the timing guide inside the clip run</td><td><span class="tag gap">No solorender tool yet</span> No video model of ours takes an audio reference. That test was parked yesterday. Teach the edit-to-the-music method instead (lesson 18).</td></tr>
+      <tr><td>Conversational clip editing that remembers the scene (Omni)</td><td><span class="tag gap">Hidden model</span> Gemini Omni Flash is in the catalog but hidden. The one-change-at-a-time rule still works on our picture edits and Kling O3 4K Edit.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <p class="eyebrow">Side by side</p>
+  <h2>Each technique against our course</h2>
+  <p>Checked by reading every lesson in the live course code. "Have" means a lesson already says it.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Technique in the video</th><th>Status</th><th>Where it goes</th></tr></thead>
+    <tbody>
+      <tr><td>Picture first, then a motion-only prompt</td><td><span class="tag have">Have</span></td><td>Lessons 6 and 11 ("describe only motion and camera")</td></tr>
+      <tr><td>Draft at 480p/720p, final larger</td><td><span class="tag have">Have</span></td><td>Lesson 7</td></tr>
+      <tr><td>Five references from several angles, on grey</td><td><span class="tag have">Have</span></td><td>Lesson 8</td></tr>
+      <tr><td>Last frame → next clip; fix drift before continuing</td><td><span class="tag have">Have</span></td><td>Lesson 12</td></tr>
+      <tr><td>2–3 takes, keep the best</td><td><span class="tag have">Have</span></td><td>Lessons 7, 12, 16</td></tr>
+      <tr><td>Spoken line written into the prompt; ambient sound line</td><td><span class="tag have">Have</span></td><td>Lesson 13</td></tr>
+      <tr><td>✨ Direct writes the prompt for you</td><td><span class="tag have">Have</span></td><td>Lesson 11</td></tr>
+      <tr><td>Upscale a clip (Topaz)</td><td><span class="tag have">Have</span></td><td>Lesson 16</td></tr>
+      <tr><td>Words carry events only; looks live in the pictures</td><td><span class="tag add">Add</span></td><td>Lesson 10. Our example prompts still describe "the old lady in her wooden cart".</td></tr>
+      <tr><td>"While" / "then"; one action per person per clip</td><td><span class="tag add">Add</span></td><td>Lesson 11. We have "one action per 2-second step", not the per-person rule.</td></tr>
+      <tr><td>Concrete nouns and named materials</td><td><span class="tag have">Have</span> + tip</td><td>Lesson 3. Add a materials line (wet cobbles, oiled leather).</td></tr>
+      <tr><td>Camera: orbit, at most 3 moves, order, "around X"</td><td><span class="tag add">Add</span></td><td>Lesson 5 has the moves list, but not the limit, order or tie-to-subject.</td></tr>
+      <tr><td>Empty space where the motion goes; face big enough</td><td><span class="tag add">Add</span></td><td>Lesson 9's "ready to animate" checklist</td></tr>
+      <tr><td>One job per reference; too many blur faces; angles the clip needs</td><td><span class="tag add">Add</span></td><td>Lesson 10</td></tr>
+      <tr><td>Repeat the lighting / time-of-day line word for word in every segment</td><td><span class="tag add">Add</span></td><td>Lesson 12 does it in examples. Make it a stated rule.</td></tr>
+      <tr><td>Tell the model where hands go</td><td><span class="tag add">Add</span></td><td>Lesson 11 mistakes table (our prompts already do "both hands on the steering rope")</td></tr>
+      <tr><td>Kling Add Sound; sound effects made in solorender</td><td><span class="tag add">Fix + add</span></td><td>Lesson 15 (the wrong "can't make sound effects" line) and lesson 13</td></tr>
+      <tr><td>Each model's "default taste": pick by job</td><td><span class="tag new">New lesson</span></td><td>Bonus lesson 22</td></tr>
+      <tr><td>Copy your own acting onto a character</td><td><span class="tag new">New lesson</span></td><td>Bonus lesson 23 (Act It Out)</td></tr>
+      <tr><td>Restyle or edit your own filmed clip</td><td><span class="tag new">New lesson</span></td><td>Bonus lesson 23 (Kling O3 4K Edit)</td></tr>
+      <tr><td>Product ads: keep the product exact, avoid hard hand actions</td><td><span class="tag new">New lesson</span></td><td>Bonus lesson 24</td></tr>
+      <tr><td>Films of several minutes: chapters, Extend chains, master description</td><td><span class="tag new">New lesson</span></td><td>Bonus lesson 25</td></tr>
+      <tr><td>Make it all through Claude (connector)</td><td><span class="tag new">New lesson</span></td><td>Bonus lesson 25 (lesson 2 only links it today)</td></tr>
+      <tr><td>Music as the timing guide inside a clip run</td><td><span class="tag gap">Can't</span></td><td>Product gap (audio references parked 23 Oct)</td></tr>
+      <tr><td>Native 4K generation</td><td><span class="tag gap">Partly</span></td><td>Upscale only. Omni (has 4K) is hidden.</td></tr>
+      <tr><td>Conversation-style clip editing with scene memory</td><td><span class="tag gap">Partly</span></td><td>Kling O3 4K Edit, one change per run</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <p class="eyebrow">Detailed examples</p>
+  <h2>His steps, rewritten for solorender</h2>
+  <p>Each example below is draft lesson text in our course's voice, using our running example: <b>@agnes</b>, 84, secretly a speed demon, racing the town's downhill soapbox derby. The method is his. The words, story and prompts are ours. Every button named is one I found in our code today.</p>
+
+  <div class="ex">
+    <p class="who">Example 1 · Lesson 11 upgrade · "Direct the clip, don't describe it"</p>
+    <p>A clip prompt has one job: say what happens, in order, and what the camera does. Agnes's face, her biker vest and her cart are already in the start picture. Words about them only compete with it.</p>
+    <div class="prompt bad"><b>Weak</b>Agnes, an 84-year-old woman in a leather vest, races down the hill in her wooden cart, smiling and waving, overtaking everyone, fast, exciting, epic, cinematic.</div>
+    <div class="prompt"><b>Strong</b>Agnes tucks low over the steering rope while the red cart behind her clips a hay bale and spins out. Then the crowd on the pavement throws their hats in the air. Camera: low tracking shot beside her front wheel, then a slow rise that shows the street dropping away below. Sound: wooden wheels rattling over wet cobbles, a crowd roaring.</div>
+    <ul>
+      <li><b>One action per person.</b> Agnes tucks. The red cart spins out. The crowd throws hats. If Agnes also needs to wave, that's the next clip.</li>
+      <li><b>Link them with "while" and "then"</b> so the model knows the order.</li>
+      <li><b>Name things, not feelings.</b> "Wet cobbles" and "hay bale" come back the same every take. "Exciting" doesn't.</li>
+      <li><b>At most two or three camera moves, the important one first,</b> each tied to something: "beside her front wheel", not "move right".</li>
+      <li>Then press <span class="kbd">✨ Direct · free</span> if you want it polished. It keeps your action and fills the Avoid box.</li>
+    </ul>
+  </div>
+
+  <div class="ex">
+    <p class="who">Example 2 · Bonus lesson 23 · "Act it out yourself" (his reference-video step)</p>
+    <p>Some motion is easier to perform than to describe. You can't write how Agnes leans into a corner, but you can do it in a kitchen chair.</p>
+    <ol class="steps">
+      <li>Prop your phone on a shelf so it doesn't move. Sit facing it with your whole upper body in frame. Grip an imaginary rope and lean hard left, then right, then duck. Keep it under 30 seconds. 8 is plenty.</li>
+      <li>In solorender, open <b>Studio → Clip tools → DreamActor Act It Out</b>.</li>
+      <li>In <b>Character</b>, pick the @agnes picture whose shape you want. The finished clip takes that picture's shape, so use a tall picture for a tall clip.</li>
+      <li>In <b>Your acting</b>, upload your phone clip. There's no prompt to write. The picture decides the look and your clip decides the motion.</li>
+      <li>Press <b>Generate</b>. An 8-second clip is 100 credits. Your own recording's sound is kept on the result.</li>
+      <li>If you spoke, her mouth moves when you talk but won't match exactly. For true lip sync, run <b>Lip Sync</b> on the finished clip (lesson 13).</li>
+    </ol>
+    <p class="note">Rules from the video that fit ours: a steady camera (a moving camera fights the motion), the whole body in frame (anything cut off gets invented), and face the camera. A turn away from the lens has nothing to copy a face from.</p>
+  </div>
+
+  <div class="ex">
+    <p class="who">Example 3 · Bonus lesson 25 · "A three-minute film" (his Grok extend loop)</p>
+    <ol class="steps">
+      <li>Ask Claude for the story, then: "Split it into numbered scenes of about 6 seconds. Each scene says only what is seen: who moves, where, the camera, the light. Same two characters, same street, no new people."</li>
+      <li>Keep one <b>master line</b> for the light and time, for example "grey late-afternoon light, wet cobbles, autumn". Paste it word for word at the end of every scene prompt. The model forgets otherwise.</li>
+      <li>Make scene 1 in <b>Studio → Video lane</b> from @agnes's start picture. <b>Grok Video 1.5 Lite</b> is the budget pick (40 credits per 5 s).</li>
+      <li>Open <b>Clip tools → Grok Imagine Extend</b>, choose the clip, paste scene 2, and add 6 seconds (120 credits). Repeat until the clip reaches 15 seconds. Extend only takes clips up to 15 s.</li>
+      <li>At 15 s, open the clip and press <b>📸 Last frame</b>, then <b>Animate</b>. That still becomes the start of the next chain, so faces carry over.</li>
+      <li>If a scene comes back wrong (the vest changed colour, a stranger walked in), <b>don't extend it.</b> Make it again first. Every later scene inherits the mistake.</li>
+      <li>Optional: <b>Topaz Video Upscale</b> each finished chain.</li>
+      <li>Open the <b>Video editor</b>, add every chain from your Library in order, add music or sound effects in the sound panel, fade in at the start and out at the end, then export.</li>
+    </ol>
+    <p class="note">Do a 30-second version first. For a film of several minutes, plan it in chapters (opening, trouble, race, finish), and give Claude one chapter at a time. One thing I haven't checked yet: whether Extend returns the whole longer clip or only the new seconds. I'll check it on the first example run before the lesson says either.</p>
+  </div>
+
+  <div class="ex">
+    <p class="who">Example 4 · Bonus lesson 24 · "A product ad that keeps the product"</p>
+    <p>Our own product, not his gloves: Agnes's brass pocket stopwatch, the one the derby is timed on.</p>
+    <ol class="steps">
+      <li>Make three pictures of the stopwatch: front, back, and a close-up of the engraving. Use <b>Nano Banana 2 Edit</b> from one approved picture, so they match.</li>
+      <li>Save all three as one <b>Prop</b> entity: <b>@stopwatch</b>.</li>
+      <li>In <b>Studio → Video lane → Kling O3 · Entities</b>, write: "An old hand opens @stopwatch on a sunlit wooden bench and the second hand starts to sweep. Slow push in to the engraving. Sound: a soft click, a ticking."</li>
+      <li>Check the details every take: does the engraving stay the same, and does the brass stay brass?</li>
+      <li>Design around what the model does well. Opening a lid or turning the watch in light works. Fiddly hand actions (winding the crown, fastening a strap) bend things the wrong way. Show the product still, and move the camera instead.</li>
+    </ol>
+  </div>
+
+  <div class="ex">
+    <p class="who">Example 5 · Bonus lesson 22 · "Every model has a taste"</p>
+    <p>Give four models the same picture and the same short prompt, and you get four different films. Each one fills the gaps in your prompt with its own habits. So pick the model whose habits match your film.</p>
+    <ol class="steps">
+      <li>Take @agnes's start picture at the top of the hill. Write one plain prompt: "Agnes pushes off and the cart rolls down the hill. The crowd cheers."</li>
+      <li>Run it four times in <b>Studio → Video lane</b>: Seedance 2.5, Kling v3 Pro, Veo 3.1 Lite, Grok Video 1.5 Lite.</li>
+      <li>Watch them side by side and write one line per model: who cuts between angles, who holds one shot, who looks like film, who looks like a phone.</li>
+      <li>That table becomes your "which model for which film" sheet. The lesson shows ours, from our real runs, not his.</li>
+    </ol>
+  </div>
+
+  <div class="ex">
+    <p class="who">Example 6 · Bonus lesson 25 · "Let Claude make it" (his connector step)</p>
+    <ol class="steps">
+      <li>In solorender, open <b>Connect Claude</b> from the sidebar and press <b>Create key</b>. Copy the URL straight away. It's shown once.</li>
+      <li>In Claude, open <b>Settings → Connectors → Add custom connector</b>. Name it <b>solorender</b>, paste the URL and choose <b>No sign-in</b>. The key inside the URL is the sign-in.</li>
+      <li>Test it by asking Claude: "check my solorender balance".</li>
+      <li>Then ask for real work: "Make a 15-second ad for the stopwatch on Kling O3 · Entities using @stopwatch, then put it in my derby project." Claude runs it on your credits, and the result lands in your Library.</li>
+    </ol>
+    <p class="note">Treat the URL like a password. Anyone with it can spend your credits. Revoke it on the same page if it leaks.</p>
+  </div>
+</section>
+
+<section>
+  <p class="eyebrow">The plan</p>
+  <h2>Changes, lesson by lesson</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Lesson</th><th>What changes</th></tr></thead>
+    <tbody>
+      <tr><td>3 · Five-part prompt</td><td>One line on materials: name what things are made of, and the model gets the physics right.</td></tr>
+      <tr><td>5 · Shot language</td><td>Add orbit. Add three rules: at most three moves, the main one first, each tied to a subject.</td></tr>
+      <tr><td>9 · Beat the AI look</td><td>Two more checks on the "ready to animate" list: is there empty space where the motion goes, and is the face big enough to hold.</td></tr>
+      <tr><td>10 · Set up a shot</td><td>Words carry events, pictures carry looks. One job per reference. Include the angles the clip needs (a head turn needs a side view).</td></tr>
+      <tr><td>11 · Your first clip</td><td>Example 1 above, plus "say where the hands go" in the mistakes table.</td></tr>
+      <tr><td>12 · Joining clips</td><td>The master light line, pasted word for word, stated as a rule.</td></tr>
+      <tr><td>13 · Make them speak</td><td>Kling Add Sound for silent clips. Naming sounds in the prompt.</td></tr>
+      <tr><td>15 · Final cut</td><td><b>Fix the wrong line:</b> sound effects are made right in the editor's sound panel (6 credits).</td></tr>
+      <tr><td><b>New Module 6 · Go further</b></td><td>22 Every model has a taste · 23 Act it out, restyle your footage · 24 Product ads · 25 Long films and Claude. Numbered after the final project, so no existing lesson moves and no customer loses a tick.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <p class="eyebrow">What we don't take</p>
+  <h2>Kept out on purpose</h2>
+  <ul>
+    <li>Every brand: AI Master, TopView, Higgsfield, Grok's own app, CapCut. His steps are kept, done in solorender.</li>
+    <li>His examples: the chef and the cat, the lighthouse, the knight, the gloves, the forest lantern story. We use Agnes and our own product.</li>
+    <li>His numbers, until we've seen them ourselves: "three camera moves", "face at least a tenth of the frame", "15–20 references", "five pictures is the sweet spot". They're his observations on his set-up. Some don't apply to us anyway. Kling O3 takes 7 pictures and Veo Entities takes 3, so a 15–20 ceiling is meaningless here. The lesson says "a rule of thumb" or uses our own test results.</li>
+    <li>His "write the prompt in Chinese" type tricks and his paid prompt packs.</li>
+  </ul>
+</section>
+
+<section>
+  <p class="eyebrow">Cost and decisions</p>
+  <h2>What I need from you</h2>
+  <p>New lessons need real example clips (course rule: every result shown is a real solorender run, checked by eye). One take each:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Example media</th><th>Lesson</th><th class="cost">Credits (customer price)</th><th class="cost">Our cost</th></tr></thead>
+    <tbody class="cost">
+      <tr><td>Weak vs strong prompt, same Agnes picture, Seedance 2.0 at 480p</td><td>11</td><td>186 cr ($1.86)</td><td>$0.74</td></tr>
+      <tr><td>Act It Out, 8 s</td><td>23</td><td>100 cr ($1.00)</td><td>$0.40</td></tr>
+      <tr><td>Same prompt on four models</td><td>22</td><td>638 cr ($6.38)</td><td>$2.55</td></tr>
+      <tr><td>Stopwatch: 3 pictures + one Kling O3 · Entities clip</td><td>24</td><td>191 cr ($1.91)</td><td>$0.76</td></tr>
+      <tr><td>Long-film chain: 2 clips + 3 extends (~31 s)</td><td>25</td><td>400 cr ($4.00)</td><td>$1.60</td></tr>
+      <tr><td>Add Sound + one sound effect</td><td>13, 15</td><td>15 cr ($0.15)</td><td>$0.06</td></tr>
+      <tr><td><b>Core total</b></td><td></td><td><b>1,530 cr ($15.30)</b></td><td><b>$6.11</b></td></tr>
+      <tr><td>Optional: restyle demo, Kling O3 4K Edit, 3 s</td><td>23</td><td>315 cr ($3.15)</td><td>$1.26</td></tr>
+      <tr><td>Optional: Topaz 4K upscale, 5 s</td><td>16</td><td>100 cr ($1.00)</td><td>$0.40</td></tr>
+    </tbody>
+  </table></div>
+  <p>Our cost = credits ÷ 2.5. If about half the shots need a second take, as the course build did, expect up to about $10 for the core set. Nothing gets generated until you say yes, and I'd run one item first and show it to you before the rest.</p>
+  <ol>
+    <li><b>Approve the approach:</b> upgrade 8 lessons and add bonus Module 6 (4 lessons), not a separate course.</li>
+    <li><b>Approve the spend:</b> the core set ($6.11 one take, up to ~$10), and say yes or no to each optional line.</li>
+    <li><b>Act It Out clip:</b> do you want to film the 8-second "steering" clip on your phone (the lesson is about <i>your</i> acting, so it's the honest example)? Or should I reuse an acting clip already in your Library?</li>
+    <li><b>Fix the wrong sound-effects line in lesson 15 now</b>, separately, whatever you decide on the rest. My recommendation: yes, today.</li>
+  </ol>
+</section>
+
+</main>
+</body>
+</html>
