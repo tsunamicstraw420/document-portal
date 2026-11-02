@@ -1,0 +1,195 @@
+<title>Creator Search Tools</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Manrope:wght@400;600;700&display=swap">
+<style>
+/* Layout: answer first in a reading column, then the shortlist cards, then one full-width searchable ledger. */
+:root{
+  color-scheme:dark;
+  --bg:#0a0a0a; --panel:#151412; --line:#2a2823; --ink:#ffffff;
+  --green:#6ee05a; --orange:#f7931a; --red:#ff6b5e;
+  --display:"Syne","Avenir Next",Arial,sans-serif;
+  --body:"Manrope","Avenir Next","Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;margin:0;padding-inline:20px;padding-block:40px 80px}
+.wrap{max-width:1180px;margin:0 auto;display:grid;gap:36px}
+.wrap > *{min-width:0}
+.col{max-width:780px}
+h1{font-family:var(--display);font-weight:800;font-size:1.6rem;line-height:1.2;margin:0;text-wrap:balance}
+h2{font-family:var(--display);font-weight:700;font-size:1.125rem;margin:0 0 8px}
+h3{font-family:var(--display);font-weight:700;font-size:1rem;margin:0}
+p{margin:10px 0 0}
+a{color:var(--green);text-underline-offset:3px}
+.label{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--green)}
+ul.plain{margin:10px 0 0;padding-left:20px;display:grid;gap:8px}
+.box{border:1px solid var(--line);border-radius:6px;padding:16px 18px;background:var(--panel)}
+.box.o{border-color:var(--orange)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px;display:grid;gap:8px;align-content:start;min-width:0}
+.card .rank{font-family:var(--display);font-weight:800;color:var(--orange)}
+.cost{display:flex;gap:16px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.cost b{color:var(--orange)}
+.small{font-size:.875rem}
+.tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.tools input,.tools select{font:600 .95rem var(--body);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:9px 12px}
+.tools input{flex:1 1 260px;min-width:0}
+.count{font-size:.8125rem;color:var(--green)}
+.tablebox{overflow-x:auto;border:1px solid var(--line);border-radius:6px;margin-top:12px}
+table{border-collapse:collapse;width:100%;font-size:.875rem;min-width:1000px}
+th{position:sticky;top:0;background:#1d1c19;text-align:left}
+th button{all:unset;cursor:pointer;display:block;padding:10px 12px;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green);white-space:nowrap}
+th button:focus-visible{outline:2px solid var(--orange)}
+th button::after{content:" ↕";opacity:.5}
+th[aria-sort="ascending"] button::after{content:" ↑";opacity:1}
+th[aria-sort="descending"] button::after{content:" ↓";opacity:1}
+td{padding:10px 12px;border-top:1px solid var(--line);vertical-align:top}
+.vt{font-weight:700}
+.vt.s{color:var(--orange)} .vt.n{color:var(--red)}
+.mtable{width:100%;border-collapse:collapse;font-size:.9rem;min-width:0}
+.mtable td,.mtable th{padding:8px 10px;border-top:1px solid var(--line);text-align:left}
+</style>
+
+<div class="wrap">
+<header class="col">
+  <div class="label">Solorender · affiliate recruiting · research read October 28, 2026</div>
+  <h1>Alternatives to Heepsy and Modash</h1>
+  <p>Tools for finding YouTube creators in AI, video and creative niches (mostly 5,000–250,000 subscribers), with real view counts and a business email, to invite into the partner program and for about 10 paid trial videos.</p>
+</header>
+
+<section class="col box o">
+  <h2>The answer</h2>
+  <ul class="plain">
+    <li><strong>Don't buy anything yet.</strong> The free setup you already have finds most of what you need, and no paid tool proved it fills the one real gap.</li>
+    <li><strong>The real gap is email.</strong> About 4 in 10 channels in these niches put a business email in their channel description, which the free YouTube API reads. The other 6 in 10 hide it behind YouTube's "View email address" button, which needs a CAPTCHA. No tool documented getting those, and YouTube's terms ban automated scraping.</li>
+    <li><strong>Next step (free):</strong> take 20 channels with no email in their description and run them through the free trials of Modash, Clickanalytic, Influencers.club and Heepsy, plus ChannelCrawler's free preview. Count how many real emails each one adds. Only a tool that fills that gap is worth paying for. You'd start the trials yourself, since they need an account.</li>
+    <li><strong>If none fills it:</strong> stay free, plus NanoInfluencer at $29 a month. It follows a creator's link-in-bio and website, where emails the description search misses often sit.</li>
+  </ul>
+</section>
+
+<section class="col">
+  <h2>What your free setup already does (tested today)</h2>
+  <p>Five topic searches through the free YouTube API ("AI video tutorial", "AI image generator tutorial", "faceless youtube automation", "video editing tutorial capcut", "UGC ads AI") used about 5% of one day's free allowance.</p>
+  <table class="mtable">
+    <tr><th>Result</th><th>Count</th></tr>
+    <tr><td>Channels found</td><td>155</td></tr>
+    <tr><td>In the 5,000–250,000 subscriber range</td><td>86</td></tr>
+    <tr><td>With an email in the description (free)</td><td>36 of 86, about 4 in 10</td></tr>
+    <tr><td>Stating the creator's country</td><td>68 of 86 (28 say US)</td></tr>
+  </table>
+  <p class="small">It also gives live subscriber and view counts, and Nexlev adds similar channels and stand-out videos (50 lookups a week). What it can't give: audience country (only the creator's own), the CAPTCHA-hidden email, or email checking. Your October 11 list found emails for 103 of 303 prospects the same way.</p>
+  <p class="small"><strong>Heepsy spot check:</strong> its free email finder, run on 3 channels, found one email that was already in the description and none for the other two. Its subscriber counts were out of date: Alicia Lyttle 60K on Heepsy against 208K live, Isa does AI 65.5K against 72.6K, Danny Why 197K against 217K. Three channels is a small sample, but it's a warning.</p>
+</section>
+
+<section>
+  <h2>Shortlist, if a paid tool is needed</h2>
+  <div class="cards">
+    <div class="card"><div class="rank">1 · ChannelCrawler</div><div class="small">YouTube-only database, pay per export, no subscription. Filters by subscribers, views, country, engagement and "has email". Free filter preview.</div><div class="cost"><span>6 mo <b>$240–$480</b></span><span>12 mo <b>$480–$960</b></span></div><div class="small"><strong>Risk:</strong> doesn't say where its emails come from; may only repackage description emails you get free.</div></div>
+    <div class="card"><div class="rank">2 · NanoInfluencer</div><div class="small">$29 a month ($1.99 for a 3-day trial). 300 email credits a month, charged only when an email is found. Follows link-in-bio and linked pages. YouTube, Instagram, TikTok, X.</div><div class="cost"><span>6 mo <b>≈$176</b></span><span>12 mo <b>≈$350</b></span></div><div class="small"><strong>Risk:</strong> public emails only; small new company; terms not read.</div></div>
+    <div class="card"><div class="rank">3 · Clickanalytic</div><div class="small">$79 a month, or $59 billed yearly. 100 email unlocks a month (+$15 per 100), engagement filter, built-in outreach. 14-day trial, no card, 10 unlocks.</div><div class="cost"><span>6 mo <b>$474</b></span><span>12 mo <b>$708</b></span></div><div class="small"><strong>Risk:</strong> YouTube subscriber filter not confirmed; only 8 reviews; its terms (§9.12) bar collecting personal data about others, so ask in writing first.</div></div>
+    <div class="card"><div class="rank">4 · Influencers.club</div><div class="small">Starter from $140 a month, no yearly plan. Claims a verified email for every YouTuber in its 12M+ database. 500 export credits a month that roll over. 10 free credits.</div><div class="cost"><span>6 mo <b>$840</b></span><span>12 mo <b>$1,680</b></span></div><div class="small"><strong>Risk:</strong> its own page lists three different entry prices; Trustpilot 3.9 from 16 reviews, including a recent complaint about list quality.</div></div>
+    <div class="card"><div class="rank">5 · Collabstr</div><div class="small">For the 10 paid trial videos only: a marketplace where creators list their prices. Free for brands; 10% fee per deal; payment held in escrow. 491 YouTube "Technology" creators listed.</div><div class="cost"><span>10 deals <b>$325–$867</b> in fees</span></div><div class="small"><strong>Risk:</strong> many listed creators are outside the US or Shorts-only; doesn't help affiliate recruiting.</div></div>
+  </div>
+  <p class="small">For comparison: Heepsy Starter $534 for 6 months ($828 for a year on yearly billing), only 100 profiles a month, contact export only from its $149–$199 plan. Modash Essentials $1,194 for 6 months, $2,388 a year, best documentation, but its own page shows conflicting monthly prices ($199 vs about $299).</p>
+</section>
+
+<section>
+  <h2>Every tool checked</h2>
+  <div class="tools">
+    <input id="q" type="search" placeholder="Search, e.g. YouTube, email, free, marketplace" aria-label="Search tools">
+    <select id="f" aria-label="Filter by group"><option value="">All groups</option><option>Influencer database</option><option>YouTube tool or email finder</option><option>Sponsorship marketplace</option><option>Affiliate directory</option></select>
+    <span class="count" id="c"></span>
+  </div>
+  <div class="tablebox"><table id="t"></table></div>
+</section>
+
+<section class="col">
+  <h2>What couldn't be verified</h2>
+  <ul class="plain small">
+    <li>G2 and Capterra blocked direct reading, so their review scores come from search-result snippets. Trustpilot figures were read directly. Reddit was blocked, so no community threads were used.</li>
+    <li>No tool publishes how often it finds an email, or how many of its emails bounce. That's what the 20-channel trial test measures.</li>
+    <li>Conflicting or missing prices on vendors' own pages: Modash monthly, Influencers.club entry plan, Favikon labels, NanoInfluencer yearly, ChannelCrawler minimum export, trial length and terms (its terms page returned an error).</li>
+    <li>Audience-country filters for Clickanalytic, Heepsy and Influencers.club; terms for Favikon, Upfluence, Influencity, NanoInfluencer and TubeMailer; brand fees for Passionfroot, Agentio, Spotter and YouTube BrandConnect.</li>
+    <li>No independent evidence that any affiliate directory brings active affiliates. Database sizes are all the vendors' own claims. "Best tools" listicles were vendor marketing and weren't used as evidence.</li>
+  </ul>
+  <p class="small"><strong>Coverage:</strong> 28 tools in depth (own pricing page plus terms, independent reviews or a hands-on test), 39 only mentioned (blocked pages, enterprise quote-only, or the wrong kind of tool). Free reading only: no sign-ups, purchases or trial starts.</p>
+</section>
+</div>
+
+<script>
+const R=[
+["Influencer database","Heepsy","Starter $89/mo ($69 yearly); Plus $199/$149; Advanced $299/$229","Free: 500 results, 10 profiles a month","Unlocked profiles; export from Plus","Capterra 4.5 (72)","Cheap, but stale data in test","heepsy.com/pricing"],
+["Influencer database","Modash","Essentials $199/mo or $2,388/yr; Performance $499/$5,988; Enterprise from $14,700/yr","14 days, no card, 6 unlocks","150 a month","Capterra 4.9 (15)","Best data; 2–3x budget","modash.io/pricing"],
+["Influencer database","Favikon","Core €159–199; Pro €239–299; email lookup = 3 credits","15 credits a month","Yes","Capterra 4.6 (34)","YouTube unproven","favikon.com/pricing"],
+["Influencer database","Upfluence","Quote only, 12-month minimum (G2: from $478)","After a sales call","Yes","G2 4.6 (139)","Not shoestring","upfluence.com/pricing"],
+["Influencer database","HypeAuditor","From $299/mo billed yearly","Through sales","About 1,000 a month","G2 4.6 (~241)","Overkill","blog.hypeauditor.com"],
+["Influencer database","Influencity","No prices shown","7-day trial","Verified contacts (claim)","G2 ~4.5 (275)","Quote-style","influencity.com/pricing"],
+["Influencer database","inBeat","Database removed","—","—","—","Dead","inbeat.co"],
+["Influencer database","Afluencer","Brand $49 / $649 / $1,049 a month","$49 tier trial","No","G2 4.6 (734)","Marketplace only","afluencer.com/pricing"],
+["Influencer database","BuzzGuru","Pages empty; third parties: $169/mo or discontinued","?","?","?","Unclear status","third-party only"],
+["Influencer database","Phlanx","Site down; third parties: $49","?","?","Capterra 3.4 (5)","Weak","third-party only"],
+["Influencer database","NoxInfluencer","No prices; third parties: $239+","Sign-up trial","Credit unlocks","G2 5.0 (2)","Free US rankings useful","noxinfluencer.com"],
+["Influencer database","Qoruz","Free; Premium by demo","Free plan","Credits","G2 4.5 (44)","India-focused","qoruz.com/pricing"],
+["Influencer database","Kolsquare","Quote only; 30% startup discount","—","?","G2 ~4.4","Enterprise","kolsquare.com/en/pricing"],
+["Influencer database","Influencer Hero","$649 / $1,049 / $2,490 a month","Demo only","Unclear","G2 4.8 (31)","Far over budget","influencer-hero.com/pricing"],
+["Influencer database","Insense","Trial month $650; Brand $500 quarterly / $400 yearly","Auto-upgrades","No","G2 ~4.5 (351+)","Wrong tool","insense.pro/pricing"],
+["Influencer database","Clickanalytic","Launch $79/mo ($59 yearly); Operate $189 ($129)","14 days, no card, 10 unlocks","100 / 500 a month","G2 4.8 (8)","Shortlist #3","clickanalytic.com/pricing"],
+["Influencer database","Snoopreport","$0.99/week, Instagram activity","—","No","Capterra 1.0 (2)","Wrong tool","snoopreport.com"],
+["Influencer database","StarNgage","Pages blocked; snippet $49–$199","?","?","G2 4.6 (20)","Unverifiable","—"],
+["Influencer database","trendHERO","Instagram only","1 free check","Pro Plus","G2 4.3 (127)","No YouTube","trendhero.io"],
+["Influencer database","Glimpse","Trends tool, not creators","10 lookups","—","—","Wrong tool","meetglimpse.com"],
+["Influencer database","Influencers.club","Starter from $140/mo; Pro $208","10 credits, no card","Every record (claim)","Trustpilot 3.9 (16)","Shortlist #4","influencers.club/pricing"],
+["Influencer database","GRIN","Free (20% fee); Starter $200/mo; Growth $500","30 days","Not on free plan","Vendr median $27k/yr (older)","Campaign tool","grin.co/pricing"],
+["Influencer database","Aspire","Demo only; Vendr median $15,588/yr","—","—","—","Enterprise","aspire.io"],
+["Influencer database","CreatorIQ","Quote only; Vendr $30–60k/yr","—","—","—","Enterprise","creatoriq.com/pricing"],
+["Influencer database","Tagger (Sprout)","Demo only","—","—","—","Enterprise","sproutsocial.com/pricing"],
+["Influencer database","Klear / Meltwater","Request pricing","—","—","—","Enterprise","meltwater.com"],
+["YouTube tool or email finder","ChannelCrawler","Starter $99/mo ($59 yearly, 50 emails); Power $195 ($117, 250 emails); export $0.024 a channel, emails 10x","Free filter preview","Public emails","Trustpilot 4.5 (31)","Shortlist #1","channelcrawler.com/pricing/credits"],
+["YouTube tool or email finder","CreatorDB","Pro $79 (3,160 credits); Premium $249; email = 15 credits","No credits included","About 210 a month on Pro","Thin","Backup to #1","creatordb.app/pricing"],
+["YouTube tool or email finder","vidIQ","Free; $19 / $49 a month","150 AI credits","No","Capterra 4.3 (61)","Not for prospecting","vidiq.com/pricing"],
+["YouTube tool or email finder","Social Blade","$59.99–$1,439.99/yr (third-party)","Free stats","No","Trustpilot 2/5 (34)","Stats only","outlierkit.com"],
+["YouTube tool or email finder","Playboard","$29 / $99 / $199 / $599 a month","40 results","No","None found","Stats only","playboard.co/en/plan"],
+["YouTube tool or email finder","Viewstats","Business $249+","Free extension","No","—","Ideas only","viewstats.com/pricing"],
+["YouTube tool or email finder","Tubular Labs","Quote only","—","No","—","Enterprise","tubularlabs.com"],
+["YouTube tool or email finder","Hunter","Free 50 credits; Starter $49 ($34 yearly)","50 a month","Needs a company website","G2 ~4.4","Only for creators with a site","hunter.io/pricing"],
+["YouTube tool or email finder","Apollo","Not readable on own page","Free tier","Business people data","G2 4.7 (~9,700)","Weak for creators","apollo.io/pricing"],
+["YouTube tool or email finder","Snov.io","Starter $39 ($29.25 yearly)","50 credits","Needs a website","G2 4.5","Same limit as Hunter","snov.io/pricing"],
+["YouTube tool or email finder","Clearout","No figures on own page","100 credits","Email checker","G2 ~4.6","Use to check emails","clearout.io"],
+["YouTube tool or email finder","NanoInfluencer","Launch $29/mo (3-day trial $1.99); $59; $299","3-day trial","300 a month","Chrome store 4.9 (1,925)","Shortlist #2","nanoinfluencer.ai"],
+["YouTube tool or email finder","TubeMailer","Free 5 a day; paid prices conflict","Yes","Public only; skips CAPTCHA","5.0 (9)","Too new","tubemailer.com"],
+["YouTube tool or email finder","LeadStal extension","Not stated","?","Public only","4.5 (2)","Too thin","Chrome store"],
+["YouTube tool or email finder","Get YouTube Hidden Email","?","?","Claims hidden email","1.0 (3): doesn't work","Avoid","extscope.org"],
+["YouTube tool or email finder","Instant Influencer Contact Info","Free / premium","Yes","Public only","5.0 (3)","Too thin","Chrome store"],
+["YouTube tool or email finder","Apify scrapers","~$0.035 a channel","Pay per use","20–35% hit rate (claim); skips CAPTCHA","0 ratings","Against YouTube terms","apify.com"],
+["Sponsorship marketplace","Collabstr","Free (10% fee); Pro $249/mo yearly (10%); Premium $333 (5%)","Free plan","Creators listed with prices","Trustpilot 4.5 (494)","Shortlist #5","collabstr.com/pricing"],
+["Sponsorship marketplace","ThoughtLeaders","~25% markup per deal; retainer from $6k/mo; smallest example $5k pilot","—","—","Trustpilot 0","Too big","thoughtleaders.io/pricing"],
+["Sponsorship marketplace","Agentio","Demo only","—","—","—","Too big","agentio.com"],
+["Sponsorship marketplace","Passionfroot","Brand fees unverified; creator side 5–15%","—","—","—","Worth a free look","third-party"],
+["Sponsorship marketplace","#paid","$449–$499/mo (third-party)","—","—","Capterra 4.6 (51)","Too big","third-party"],
+["Sponsorship marketplace","Spotter","Get in touch","—","—","—","Too big","spotter.com"],
+["Sponsorship marketplace","YouTube BrandConnect","Brand access not stated","—","—","—","Probably not","support.google.com/youtube/answer/9385307"],
+["Sponsorship marketplace","TikTok One","Brand fees unverified","—","—","—","Wrong platform","ads.tiktok.com"],
+["Affiliate directory","PartnerStack","Demo-quoted; own tracking","—","—","No evidence","No","partnerstack.com"],
+["Affiliate directory","Impact.com","Essentials $500/mo","—","—","No evidence","No","impact.com"],
+["Affiliate directory","Reditus","Scale Up $399/mo, 12-month commitment, B2B only","—","—","No evidence","No","getreditus.com"],
+["Affiliate directory","Dub Partners","Listing on Enterprise only","—","—","No evidence","No","dub.co"],
+["Affiliate directory","zPlatform / Find Affiliates / AffyList","Free","—","—","No evidence","Submit free (10 min each)","—"],
+["Affiliate directory","AI Afflist / SaaS Affiliate","Unpriced / $99 one-time","—","—","No evidence","Skip","—"]
+];
+const COLS=["Group","Tool","Price (own page)","Free / trial","Emails","Reviews","Verdict","Source"];
+let sortCol=-1,dir=1;
+const t=document.getElementById("t"),q=document.getElementById("q"),f=document.getElementById("f"),c=document.getElementById("c");
+function esc(s){return String(s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]))}
+function vcls(v){return /Shortlist/.test(v)?"vt s":/^(No|Avoid|Dead|Wrong|Too big|Skip|Enterprise|Overkill|Far over|Not shoestring)/.test(v)?"vt n":"vt"}
+function draw(){
+  const term=q.value.trim().toLowerCase(),g=f.value;
+  let rows=R.filter(r=>(!g||r[0]===g)&&(!term||r.join(" ").toLowerCase().includes(term)));
+  if(sortCol>=0) rows=[...rows].sort((a,b)=>a[sortCol].localeCompare(b[sortCol])*dir);
+  t.innerHTML="<thead><tr>"+COLS.map((h,i)=>`<th aria-sort="${i===sortCol?(dir>0?"ascending":"descending"):"none"}"><button type="button" data-i="${i}">${h}</button></th>`).join("")+"</tr></thead><tbody>"+
+    rows.map(r=>"<tr>"+r.map((x,i)=>i===6?`<td class="${vcls(x)}">${esc(x)}</td>`:i===1?`<td><strong>${esc(x)}</strong></td>`:`<td>${esc(x)}</td>`).join("")+"</tr>").join("")+"</tbody>";
+  c.textContent=rows.length+" of "+R.length+" tools shown";
+}
+t.addEventListener("click",e=>{const b=e.target.closest("button[data-i]");if(!b)return;const i=+b.dataset.i;dir=(i===sortCol)?-dir:1;sortCol=i;draw()});
+q.addEventListener("input",draw);f.addEventListener("change",draw);
+draw();
+</script>

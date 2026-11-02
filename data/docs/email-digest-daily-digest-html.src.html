@@ -1,0 +1,1162 @@
+<title>Morning Mail</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column. Airmail stripe, then "needs you", then every email in one sortable list. */
+:root {
+  --paper: #f5f7fa; --card: #ffffff; --ink: #172030; --muted: #5a6577; --line: #dce2eb;
+  --accent: #2646b5; --stamp: #c4372c; --money: #1d7650; --chip: #e8edf5;
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --body: "Source Sans 3", "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #0f141b; --card: #161d27; --ink: #e5eaf1; --muted: #97a2b2; --line: #273141;
+  --accent: #8fa7ff; --stamp: #ff7b6f; --money: #61d09c; --chip: #1f2835; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #0f141b; --card: #161d27; --ink: #e5eaf1; --muted: #97a2b2; --line: #273141;
+  --accent: #8fa7ff; --stamp: #ff7b6f; --money: #61d09c; --chip: #1f2835; color-scheme: dark }
+
+body { background: var(--paper); color: var(--ink); font: 17px/1.55 var(--body); }
+.stripe { height: 7px; background: repeating-linear-gradient(-45deg, var(--stamp) 0 12px, transparent 12px 24px, var(--accent) 24px 36px, transparent 36px 48px); }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 28px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 36px; }
+header { display: grid; gap: 6px; }
+.eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+h1 { font: 800 clamp(30px, 6vw, 46px)/1.05 var(--display); margin: 4px 0 0; text-wrap: balance; letter-spacing: -.01em; }
+h2 { font: 600 22px/1.2 var(--display); margin: 0; }
+.lede { color: var(--muted); margin: 0; }
+.lede b { color: var(--ink); font-weight: 600; }
+
+.inboxes { display: flex; flex-wrap: wrap; gap: 8px; }
+.inbox { display: flex; align-items: baseline; gap: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink);
+  border-radius: 999px; padding: 6px 14px; font: 600 15px/1.2 var(--body); cursor: pointer; }
+.inbox span { font: 500 13px/1 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.inbox[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.inbox[aria-pressed="true"] span { color: var(--paper); }
+.inbox:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, th button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+section { display: grid; gap: 14px; }
+.needs { display: grid; gap: 10px; list-style: none; margin: 0; padding: 0; }
+.needs li { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--stamp); border-radius: 6px;
+  padding: 12px 16px; display: grid; gap: 2px; }
+.needs .what { font-weight: 600; }
+.needs .meta { font: 13px/1.4 var(--mono); color: var(--muted); }
+.needs a { color: inherit; text-decoration: none; }
+.needs a:hover .what { text-decoration: underline; }
+.empty { color: var(--muted); font-style: italic; }
+
+.controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.controls input, .controls select { font: 16px var(--body); color: var(--ink); background: var(--card); border: 1px solid var(--line);
+  border-radius: 6px; padding: 8px 12px; }
+.controls input { flex: 1 1 240px; min-width: 0; }
+.count { font: 13px var(--mono); color: var(--muted); }
+
+.tablebox { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--card); }
+/* Fixed columns: the narrow ones get set widths, Subject takes everything left over. */
+table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+col.c-when { width: 170px; } col.c-from { width: 180px; } col.c-cat { width: 150px; }
+th.when button { display: inline-block; padding-right: 4px; }
+th.when button + button { padding-left: 4px; }
+th { text-align: left; border-bottom: 1px solid var(--line); padding: 0; }
+th button { all: unset; display: block; padding: 10px 12px; font: 500 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); cursor: pointer; white-space: nowrap; }
+th button[aria-sort]::after { content: " ↓"; }
+th button[aria-sort="ascending"]::after { content: " ↑"; }
+td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+/* Time and inbox share one column, stacked, so Subject gets the room. */
+td.when .time { display: block; font: 14px var(--mono); color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+td.when .acct { display: block; margin-top: 2px; }
+td.from { font-weight: 600; overflow-wrap: anywhere; }
+td.subj a { color: var(--ink); text-decoration: none; font-weight: 600; }
+td.subj a:hover { text-decoration: underline; }
+td.subj p { margin: 2px 0 0; color: var(--muted); font-size: 15px; }
+.pill { display: inline-block; font: 500 12px/1 var(--mono); padding: 5px 8px; border-radius: 4px; background: var(--chip); color: var(--muted); white-space: nowrap; }
+.pill.action { background: var(--stamp); color: var(--card); }
+.pill.money { color: var(--money); }
+.acct { font: 13px var(--mono); color: var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+footer { font: 13px/1.5 var(--mono); color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; }
+
+/* Clickable rows and the email detail panel */
+tbody tr[data-i], .needs li[data-id] { cursor: pointer; }
+tbody tr[data-i]:hover td, .needs li[data-id]:hover { background: var(--chip); }
+tbody tr:focus-visible, .needs li:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.subjtxt { font-weight: 600; }
+dialog#detail { border: 0; padding: 0; margin: 0 0 0 auto; height: 100%; max-height: 100%; width: min(620px, 100%); max-width: 100%;
+  background: var(--card); color: var(--ink); box-shadow: -12px 0 40px rgba(10, 16, 28, .25); }
+dialog#detail::backdrop { background: rgba(10, 16, 28, .45); }
+.dwrap { display: grid; grid-template-rows: auto 1fr auto; height: 100%; }
+.dbar { display: flex; align-items: center; gap: 8px; padding-block: calc(12px + env(safe-area-inset-top, 0px)) 12px;
+  padding-left: 20px; padding-right: max(20px, env(safe-area-inset-right, 0px)); border-bottom: 1px solid var(--line); }
+.dbar .spacer { flex: 1; }
+.dbtn { font: 600 15px var(--body); color: var(--ink); background: var(--chip); border: 1px solid var(--line); border-radius: 6px; padding: 7px 12px; cursor: pointer; }
+.dbtn:disabled { opacity: .4; cursor: default; }
+.dpos { font: 13px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.dbody { overflow-y: auto; padding-block: 20px 24px; padding-left: 20px; padding-right: max(20px, env(safe-area-inset-right, 0px)); display: grid; gap: 18px; align-content: start; }
+.dbody h3 { font: 600 24px/1.25 var(--display); margin: 0; text-wrap: balance; overflow-wrap: anywhere; }
+.dmeta { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin: 0; font-size: 15px; }
+.dmeta dt { font: 500 12px/1.9 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.dmeta dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.dmeta .addr { font: 13px var(--mono); color: var(--muted); }
+.dsum { font-weight: 600; margin: 0; padding: 12px 14px; background: var(--chip); border-radius: 6px; }
+.dtext { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; max-width: 65ch; }
+.dtext.thin { color: var(--muted); font-style: italic; }
+.dfoot { padding-block: 14px calc(14px + env(safe-area-inset-bottom, 0px)); padding-left: 20px; padding-right: max(20px, env(safe-area-inset-right, 0px));
+  border-top: 1px solid var(--line); display: flex; gap: 10px; flex-wrap: wrap; }
+.dfoot a { font: 600 15px var(--body); color: var(--card); background: var(--accent); border-radius: 6px; padding: 9px 16px; text-decoration: none; }
+@media (max-width: 640px) { dialog#detail { width: 100%; box-shadow: none; } }
+
+@media (max-width: 1023px) {
+  .tablebox { border: 0; background: none; overflow: visible; }
+  thead { display: none; }
+  table, tbody, tr, td { display: block; }
+  tr { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin-bottom: 10px;
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 10px; }
+  td { padding: 0; border: 0; }
+  td.when { grid-column: 1; min-width: 0; } td.cat { grid-column: 2; grid-row: 1; justify-self: end; align-self: start; }
+  td.from { grid-column: 1 / -1; white-space: normal; } td.subj { grid-column: 1 / -1; }
+}
+@media (prefers-reduced-motion: no-preference) { .inbox, th button { transition: background .15s, color .15s; } }
+</style>
+
+<div class="stripe" aria-hidden="true"></div>
+<main class="wrap">
+  <header>
+    <div class="eyebrow" id="eyebrow">Morning mail · all inboxes</div>
+    <h1 id="headline">Loading…</h1>
+    <p class="lede" id="lede"></p>
+  </header>
+
+  <div class="inboxes" id="inboxes" role="group" aria-label="Filter by inbox"></div>
+
+  <section aria-labelledby="needs-h">
+    <h2 id="needs-h">Needs you</h2>
+    <ul class="needs" id="needs"></ul>
+  </section>
+
+  <section aria-labelledby="all-h">
+    <h2 id="all-h">Every email</h2>
+    <div class="controls">
+      <input id="q" type="search" placeholder="Search sender, subject or summary" aria-label="Search emails">
+      <select id="cat" aria-label="Filter by type"></select>
+      <span class="count" id="count"></span>
+    </div>
+    <div class="tablebox">
+      <table>
+        <colgroup><col class="c-when"><col class="c-from"><col><col class="c-cat"></colgroup>
+        <thead><tr>
+          <th class="when"><button data-key="t" aria-sort="descending">Time</button><button data-key="acct">Inbox</button></th>
+          <th><button data-key="from">From</button></th>
+          <th><button data-key="subj">Subject</button></th>
+          <th><button data-key="cat">Type</button></th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer id="foot"></footer>
+</main>
+
+<dialog id="detail" aria-labelledby="d-subj">
+  <div class="dwrap">
+    <div class="dbar">
+      <button class="dbtn" id="d-prev" aria-label="Previous email">↑ Prev</button>
+      <button class="dbtn" id="d-next" aria-label="Next email">↓ Next</button>
+      <span class="dpos" id="d-pos"></span>
+      <span class="spacer"></span>
+      <button class="dbtn" id="d-close">Close</button>
+    </div>
+    <div class="dbody">
+      <div><span class="pill" id="d-cat"></span></div>
+      <h3 id="d-subj"></h3>
+      <dl class="dmeta">
+        <dt>From</dt><dd id="d-from"></dd>
+        <dt>To</dt><dd id="d-to"></dd>
+        <dt>Arrived</dt><dd id="d-time"></dd>
+      </dl>
+      <p class="dsum" id="d-sum"></p>
+      <p class="dtext" id="d-text"></p>
+    </div>
+    <div class="dfoot"><a id="d-open" href="#" target="_blank" rel="noopener">Open in Gmail</a></div>
+  </div>
+</dialog>
+
+<!-- DAILY DATA: the 9 am task replaces only the JSON inside this script tag. -->
+<script id="digest-data" type="application/json">
+{
+ "headline": "Saturday, October 31",
+ "window": "the last 24 hours, to 11:55 am",
+ "generated": "Oct 31, 2026, 11:55 am",
+ "note": "",
+ "accounts": [
+  {
+   "id": "p7",
+   "name": "protocol7",
+   "address": "protocol7.inc@gmail.com"
+  },
+  {
+   "id": "eb",
+   "name": "eddie.barna",
+   "address": "eddie.barna@gmail.com"
+  },
+  {
+   "id": "sup",
+   "name": "support@solorender",
+   "address": "support@solorender.com"
+  },
+  {
+   "id": "ed",
+   "name": "eddie@solorender",
+   "address": "eddie@solorender.com"
+  },
+  {
+   "id": "rru",
+   "name": "Reality Recaps",
+   "address": "realityrecapsunfiltered@gmail.com"
+  }
+ ],
+ "needs": [
+  {
+   "id": "1a1932c0e83cbfbe",
+   "tid": "1a1932c0e83cbfbe",
+   "acct": "p7",
+   "what": "PurchaseYour.com (GoDaddy reseller): can't bill your card, auto-renew products may expire",
+   "why": "Sign in to your PurchaseYour.com / domain account directly (not through the email's links), see which product is renewing, and update the card if you want to keep it."
+  }
+ ],
+ "emails": [
+  {
+   "id": "1a1932c0e83cbfbe",
+   "tid": "1a1932c0e83cbfbe",
+   "acct": "p7",
+   "from": "PurchaseYour.com",
+   "addr": "donotreply@secureserver.net",
+   "subj": "Alert: Your products are at risk.",
+   "sum": "PurchaseYour.com (a GoDaddy-run reseller) says it may not be able to bill your card, so products on auto-renew could expire unless you update your payment method.",
+   "detail": "Alert: Your products are at risk.\n\nTo avoid losing your items, update your payment method now. Action Required: Update your payment method to fix auto-renew.\n\nUrgent Notice: We may not be able to bill you. Your products are at risk. Update your payment method now to make sure you don't lose anything.\n\nPer our Universal Terms of Service Agreement, your products may be protected if we are able to apply an Alternate Payment Method. If attempts to bill your credit card are unsuccessful, your product(s) will expire.\n\nThis message confirms that during the checkout process you agreed to enroll your products in our automatic renewal service. If you wish to discontinue this service, you can cancel prior to the renewal date by visiting My Account.\n\nAddressed to: Edmond Barna.",
+   "cat": "action"
+  },
+  {
+   "id": "1a192b4ee05ff0f8",
+   "tid": "1a192b4daf828013",
+   "acct": "p7",
+   "from": "Cash App",
+   "addr": "cash@square.com",
+   "subj": "Payment scheduled for tomorrow",
+   "sum": "A $10.48 payment for your Foods Co purchase is scheduled for tomorrow, November 1.",
+   "detail": "You have a $10.48 payment for your Foods Co purchase scheduled for tomorrow, November 1.",
+   "cat": "money"
+  },
+  {
+   "id": "1a192b47a5163fc3",
+   "tid": "1a192b47a5163fc3",
+   "acct": "p7",
+   "from": "Cash App",
+   "addr": "cash@square.com",
+   "subj": "Payment scheduled in 3 days",
+   "sum": "A $23.38 payment for your Foods Co purchase is scheduled for November 3.",
+   "detail": "Heads up, you have a $23.38 payment for your Foods Co purchase scheduled for November 3.",
+   "cat": "money"
+  },
+  {
+   "id": "1a19284d17218be7",
+   "tid": "1a19284d17218be7",
+   "acct": "p7",
+   "from": "Cash App",
+   "addr": "cash@square.com",
+   "subj": "You made a payment",
+   "sum": "You paid $99.82 toward your Wasabi Japanese Restaurant purchase; the next payment is scheduled for November 7.",
+   "detail": "You made a $99.82 payment for your Wasabi Japanese Restaura purchase. Your next payment is scheduled on November 7.",
+   "cat": "money"
+  },
+  {
+   "id": "1a18e5b89fde816a",
+   "tid": "1a18e5b89fde816a",
+   "acct": "p7",
+   "from": "Cash App",
+   "addr": "cash@square.com",
+   "subj": "You withdrew $20 from an ATM in Verne Roberts Cr. We reimbursed the $2.50 fee…",
+   "sum": "You took $20 out of an ATM at Verne Roberts Cr on Oct 30 at 3:48 pm; Cash App waived its $2.50 fee because of your Green status.",
+   "detail": "You withdrew $20 from an ATM in Verne Roberts Cr. We reimbursed the $2.50 fee because you've got Green status.\n\nATM Withdrawal, today at 3:48 PM: $20.00. Status: Complete. Payment method: Cash App Card. Cash App fee (waived): $2.50. ATM operator fee: $0.00.",
+   "cat": "money"
+  },
+  {
+   "id": "1a192a3786652842",
+   "tid": "1a192a3786652842",
+   "acct": "eb",
+   "from": "Affirm",
+   "addr": "affirm-billing@affirm.com",
+   "subj": "Your AutoPay is set for Nov 3, 2026",
+   "sum": "Affirm AutoPay will take $12.90 for your Amazon plan on Nov 3 from your bank account ending 9717; make sure the money is there.",
+   "detail": "You'll pay $12.90 on Nov 3, 2026.\n\nHi Edmond, Friendly reminder: you're making a payment with AutoPay in just a few days. Make sure your Bank Account ending 9717 has enough money to avoid any overdraft charges from your bank.\n\nYour upcoming AutoPay details for Amazon: Payment amount $12.90. Payment date Nov 3, 2026. Payment method Bank Account ending 9717. Loan ID: [hidden].\n\nIf you need to make changes to this payment, you can do it in the app under 'Manage'.\n\nYour purchasing power is now $320.",
+   "cat": "money"
+  },
+  {
+   "id": "1a1934b330da37b9",
+   "tid": "1a1934b330da37b9",
+   "acct": "p7",
+   "from": "Binance",
+   "addr": "do_not_reply@smailer2.binance.com",
+   "subj": "Incident recovery update - 90% of affected assets now replenished, Proof of Reserves, and…",
+   "sum": "Binance says 90% of assets hit by its security incident are now replaced, a new Proof of Reserves check finishes about Nov 3, and withdrawals are on track to reopen Sunday, Nov 1.",
+   "detail": "Dear Binancian, we're writing with an update on the recent security incident and on the steps we've taken to keep your funds safe.\n\n90% of affected assets now replenished, up from 80%. All BTC, ETH, USDT, BNB, SOL, USDC, XRP, USD1, RLUSD and ZEC are fully backed at 100%. We'll keep purchasing the remaining assets until the covered amount reaches 100% for all tokens.\n\nFunded by a partial deployment of the Secure Asset Fund for Users (SAFU), a portion of the Futures Insurance Fund, and Binance's own corporate treasury. The outstanding 10% is less liquid tokens outside the top ten.\n\nA new Proof of Reserves snapshot was taken at 2026-10-31 00:00 UTC; the proof is estimated to finish Tuesday, 2026-11-03.\n\nWithdrawals: on track to reopen within the stated timeframe, Sunday, 2026-11-01. Binance will cover all direct losses associated with the incident.\n\nIf anyone contacts you claiming to be Binance and asking for your password, OTP codes or seed phrase, it's a scam.",
+   "cat": "updates"
+  },
+  {
+   "id": "1a18fca99c47b02d",
+   "tid": "1a18fca99c47b02d",
+   "acct": "p7",
+   "from": "X Money",
+   "addr": "noreply@x.com",
+   "subj": "X Money APY and ATM Operator Fee Reimbursement Updates",
+   "sum": "From Dec 1, X Money pays 6.00% APY only on the first $150,000 (4.00% above that), and refunds ATM operator fees up to $4, twice a month.",
+   "detail": "Date of notice: October 30, 2026. Dear Edmond,\n\nEffective December 1, 2026, X Money Stored Value Accounts that are eligible to earn 6.00% annual percentage yield (APY) will earn that rate on the first $150,000 of deposits. Any amount greater than $150,000 will earn 4.00% APY.\n\nIn addition, effective December 1, 2026, ATM operator fees will be reimbursed up to $4 per transaction, up to two times per calendar month. Thereafter, ATM operator fees will be deducted directly from funds associated with your Stored Value Account. X Money will continue to charge zero fees for ATM transactions.",
+   "cat": "updates"
+  },
+  {
+   "id": "1a19168c45bd22ca",
+   "tid": "1a19168c45bd22ca",
+   "acct": "sup",
+   "from": "Google DMARC",
+   "addr": "noreply-dmarc-support@google.com",
+   "subj": "Report domain: solorender.com Submitter: google.com Report-ID: 4005637711713851925",
+   "sum": "Google's automatic daily email-authentication (DMARC) report for solorender.com, attached as a zip file.",
+   "detail": "Automated DMARC report from Google for the domain solorender.com, covering Oct 30, 2026. The report itself is in the attached file google.com!solorender.com!1793318400!1793404799.zip. The email has no other text.",
+   "cat": "updates"
+  },
+  {
+   "id": "1a18f44d0119895c",
+   "tid": "1a18f44d0119895c",
+   "acct": "eb",
+   "from": "Los Medanos ASP",
+   "addr": "donotreply@parentsquare.com",
+   "subj": "Los Medanos ASP Weekly Update | November 2–6, 2026",
+   "sum": "No school and no After School Program on Monday, Nov 2; winter intersession is Dec 21–23 and 28–30, with registration coming soon.",
+   "detail": "Happening this week: No School / No ASP on Monday, November 2, 2026. Regular school and ASP activities resume Tuesday, November 3.\n\nCurrent Los Medanos enrichments and clubs: ASP Cheer; Keep Moving Forward with Mr. El. Registration for the 2026–2027 school year is open for TK–5 students through 6crickets.\n\nPlan ahead: no Thanksgiving intersession. Winter intersession December 21–23 and 28–30, 2026 (registration coming soon). Spring intersession March 30–April 2, 2027. Summer program June 7–July 2, 2027.\n\nSite coordinator: Ms. Naomi Rodriguez, 925-529-7889. PUSD After School Program Office: Mon–Fri 8:00 a.m.–4:30 p.m., 925-473-2322.",
+   "cat": "updates"
+  },
+  {
+   "id": "1a18f94f4a565428",
+   "tid": "1a18f94f4a565428",
+   "acct": "eb",
+   "from": "Pittsburg Unified (ParentSquare)",
+   "addr": "donotreply@parentsquare.com",
+   "subj": "Oct 30, 2026 Digest: 2 new messages from Pittsburg Unified School District today",
+   "sum": "The superintendent's Friday Connection is out, and Saturday Academy (free breakfast and lunch) is on Saturday, Nov 7, 9:00 am–1:15 pm; sign-up is required.",
+   "detail": "1. Superintendent Lowery's Friday Connection, October 30, 2026: Happy Friday, PUSD! Take a look at this week's Friday Connection from Superintendent Lowery (PDF link in the email).\n\n2. Saturday Academy, Saturday, November 7 (posted by Jennifer Davis): Enrichment and academic program (art, music, PE, science, math, reading, technology) at your child's home school, 9:00 am–1:15 pm. It also lets students make up an absence. Sign up by QR code or the sign-up link in the email.\n\nFree breakfast from 8:00 am and lunch; if you don't pre-order a meal, send your child with one. No transportation is provided. The post also says to pick up your child no later than 12:30 p.m.",
+   "cat": "updates"
+  },
+  {
+   "id": "1a18f8d6955722b1",
+   "tid": "1a18f8d6955722b1",
+   "acct": "eb",
+   "from": "Los Medanos Elementary (ParentSquare)",
+   "addr": "donotreply@parentsquare.com",
+   "subj": "Oct 30, 2026 Digest: 1 new message from Los Medanos Elementary School today",
+   "sum": "The Scholastic Book Fair is in the school library Nov 16–20; you can set up a cash-free eWallet beforehand or shop online.",
+   "detail": "LME Save the date! Book Fair is coming!\n\nThe Scholastic Book Fair will take place November 16 to November 20, 2026, in the Library. Every book bought earns rewards for the school.\n\nThis year you can set up eWallet, a digital payment account, before the Fair for cash-free purchases, and share it so friends and family can add funds. Cash, credit and debit cards are still accepted.\n\nIf your student can't make it, shop the school's Online Book Fair; orders ship to your home, free shipping on book orders over $25.\n\nHappy reading, Miren Doolittle, Principal, Los Medanos Elementary.",
+   "cat": "updates"
+  },
+  {
+   "id": "1a18e9ad4983d56c",
+   "tid": "1a18e9ad4983d56c",
+   "acct": "eb",
+   "from": "ClassDojo",
+   "addr": "parent@classdojo.com",
+   "subj": "Ms. Nailea shared a post in Indica's school",
+   "sum": "Ms. Nailea shared a new post in Indica's school on ClassDojo.",
+   "detail": "Ms. Nailea shared a post in Indica's school. (The email only has a View post button; the post itself is in the ClassDojo app.)",
+   "cat": "updates"
+  },
+  {
+   "id": "1a18f195aca9dd1a",
+   "tid": "1a18f195aca9dd1a",
+   "acct": "eb",
+   "from": "City of Pittsburg",
+   "addr": "webmaster@pittsburgca.gov",
+   "subj": "City of Pittsburg: *CANCELED* Public Safety Subcommittee",
+   "sum": "The Public Safety Subcommittee meeting set for Nov 4 at City Hall is canceled.",
+   "detail": "*CANCELED* Public Safety Subcommittee. Date: 11/04/2026. Location: Pittsburg City Hall, First Floor Conference Room, 65 Civic Avenue, Room 4B, Pittsburg, California 94565.\n\neNotice type: Calendar. Category: Ad-Hoc & Standing Committees.",
+   "cat": "updates"
+  },
+  {
+   "id": "1a18e3c25aa2f42c",
+   "tid": "1a18e3c25aa2f42c",
+   "acct": "eb",
+   "from": "City of Pittsburg",
+   "addr": "webmaster@pittsburgca.gov",
+   "subj": "City of Pittsburg: Special Meeting for Youth Advisory Commission Interviews and City Council Meeting",
+   "sum": "Updated notice: a special meeting for Youth Advisory Commission interviews plus the City Council meeting, Monday Nov 2 at 6:30 pm at City Hall.",
+   "detail": "Content updated: this event has been previously sent out. Special Meeting for Youth Advisory Commission Interviews and City Council Meeting. Date: 11/02/2026, 6:30 PM. Location: City Hall, Council Chambers.\n\neNotice type: Calendar. Category: City Council Meetings.",
+   "cat": "updates"
+  },
+  {
+   "id": "1a19312bc89d877b",
+   "tid": "1a19312bc89d877b",
+   "acct": "p7",
+   "from": "TikTok",
+   "addr": "notification@service.tiktok.com",
+   "subj": "✨Nicole✨ is in your phone contacts",
+   "sum": "TikTok suggests friends from your phone contacts for @protocol7media, including Nicole and Madison Paige.",
+   "detail": "Add people you may know as friends and watch their videos. People you may know (from your contacts): Nicole, Madison Paige, Sol Mar, hellodellison, allyson asf, marketplace-me... This email was generated for @protocol7media.",
+   "cat": "updates"
+  },
+  {
+   "id": "1a192eb8fd9d2478",
+   "tid": "1a192eb8fd9d2478",
+   "acct": "p7",
+   "from": "TikTok",
+   "addr": "notification@service.tiktok.com",
+   "subj": "maya🫶🏻🫶🏻 posted: people should know who i am #sue",
+   "sum": "TikTok says maya, who is in your contacts, posted a new video.",
+   "detail": "Protocol 7 Media, maya🫶🏻🫶🏻 is in your contacts.",
+   "cat": "updates"
+  },
+  {
+   "id": "1a18f776470e684c",
+   "tid": "1a18f776470e684c",
+   "acct": "eb",
+   "from": "Skool",
+   "addr": "noreply@skool.com",
+   "subj": "2 new notifications since 5:47 pm (Oct 29, 2026)",
+   "sum": "AI Automation Society: Nate Herk posted a new video explaining every Claude concept for non-coders.",
+   "detail": "AI Automation Society: 2 new notifications. Nate Herk (following) posted: New Video: Every Claude 2.0 Concept Explained for Non-Coders. In the last six weeks Anthropic shipped three new…",
+   "cat": "updates"
+  },
+  {
+   "id": "1a192688dfdb03ce",
+   "tid": "1a192688dfdb03ce",
+   "acct": "eb",
+   "from": "Skool",
+   "addr": "noreply@skool.com",
+   "subj": "Weekly digest for Sat, Oct 24 2026",
+   "sum": "Wanner Exclusive Community weekly digest: Wanner Aarts shares a 9-page Claude prompt for finding faceless YouTube channel ideas.",
+   "detail": "Wanner Exclusive Community Weekly Digest. Wanner Aarts: I built a 9-page Claude prompt that finds profitable faceless YouTube channels you can start today. Yes, it's actually 9 pages…",
+   "cat": "updates"
+  },
+  {
+   "id": "1a19037545d97b02",
+   "tid": "1a19037545d97b02",
+   "acct": "eb",
+   "from": "Nextdoor",
+   "addr": "no-reply@is.email.nextdoor.com",
+   "subj": "UNACCEPTABLE!! I'm gonna be a %^*+ KAREN about this...",
+   "sum": "A neighbor on Nextdoor is complaining that their street's freshly resealed road came out badly.",
+   "detail": "And on my street, we are extremely unhappy with the results! When I think freshly resealed road, I think beautiful flat asphalt...",
+   "cat": "updates"
+  },
+  {
+   "id": "1a192208eab7bd26",
+   "tid": "1a192208eab7bd26",
+   "acct": "eb",
+   "from": "GitHub",
+   "addr": "notifications@github.com",
+   "subj": "Re: [alirezarezvani/claude-skills] Data Science (Issue #1084)",
+   "sum": "claude-skills: issue #1084 was reopened.",
+   "detail": "Reopened #1084.",
+   "cat": "updates"
+  },
+  {
+   "id": "1a1921ea5f200cec",
+   "tid": "1a1921ea5f200cec",
+   "acct": "eb",
+   "from": "GitHub",
+   "addr": "notifications@github.com",
+   "subj": "[alirezarezvani/claude-skills] [DOCS] (Issue #1084)",
+   "sum": "claude-skills: Kamran1010m opened a documentation issue, #1084.",
+   "detail": "Kamran1010m created an issue (alirezarezvani/claude-skills#1084). Documentation Issue. File(s) Affected: (eg, README.md, CLAUDE.md, specific SKILL.md). Section: (eg, Installation, Quick Start, Roadmap).",
+   "cat": "updates"
+  },
+  {
+   "id": "1a191b5d50317c50",
+   "tid": "1a191b5d50317c50",
+   "acct": "eb",
+   "from": "GitHub",
+   "addr": "notifications@github.com",
+   "subj": "Re: [alirezarezvani/claude-skills] fix(security): audit every changed skill and clear the 36 that failed…",
+   "sum": "claude-skills PR #1083: the automatic skill security audit posted its results (passes shown).",
+   "detail": "github-actions[bot] left a comment (alirezarezvani/claude-skills#1083). Skill Security Audit Results: business-growth/skills/sales-engineer PASS, no findings. commercial/skills/channel-economics…",
+   "cat": "updates"
+  },
+  {
+   "id": "1a191ad6c671afff",
+   "tid": "1a191ad6c671afff",
+   "acct": "eb",
+   "from": "GitHub",
+   "addr": "notifications@github.com",
+   "subj": "[alirezarezvani/claude-skills] fix(agent-run-forensics): mark two security-auditor false positives (PR…",
+   "sum": "claude-skills PR #1083 opened: marks two security-audit false positives, following up on #1082.",
+   "detail": "Requested by Reza. Summary: This is a follow-up to #1082. Its Security audit check showed \"skipped\", so I ran the auditor by hand on the dev head (skill_security_auditor.py --…",
+   "cat": "updates"
+  },
+  {
+   "id": "1a1913ebcc835e8f",
+   "tid": "1a1913ebcc835e8f",
+   "acct": "eb",
+   "from": "GitHub",
+   "addr": "notifications@github.com",
+   "subj": "[alirezarezvani/claude-skills] feat(engineering): agent-run-forensics, answer about past runs from the…",
+   "sum": "claude-skills PR #1082 opened: a new agent-run-forensics plugin that explains past agent runs from their trace.",
+   "detail": "Requested by Reza. Summary: This adds a new engineering/agent-run-forensics plugin, built for the request in #1016. When someone asks \"why did the agent do X\", \"what did…",
+   "cat": "updates"
+  },
+  {
+   "id": "1a191361ab173a1d",
+   "tid": "1a191361ab173a1d",
+   "acct": "eb",
+   "from": "GitHub",
+   "addr": "notifications@github.com",
+   "subj": "[alirezarezvani/claude-skills] ci: read event text from env in the remaining workflow run steps (PR #1081)",
+   "sum": "claude-skills PR #1081 opened: a workflow safety fix following #1080.",
+   "detail": "Requested by Reza. Summary: This follows up on #1080, which fixed a PR title being pasted into a bash script in claude-code-review.yml. I scanned every workflow on dev and main for ${{…",
+   "cat": "updates"
+  },
+  {
+   "id": "1a1912f6046ebeb9",
+   "tid": "1a1912f6046ebeb9",
+   "acct": "eb",
+   "from": "GitHub",
+   "addr": "notifications@github.com",
+   "subj": "Re: [alirezarezvani/claude-skills] ci(tessl): score skills with tessl review run and a TESSL_TOKEN (PR #1080)",
+   "sum": "claude-skills PR #1080: alirezarezvani pushed one more commit.",
+   "detail": "@alirezarezvani pushed 1 commit. 20363d5 ci(tessl): wrap two report lines under the 160-char yamllint limit.",
+   "cat": "updates"
+  },
+  {
+   "id": "1a1912f3661be7d2",
+   "tid": "1a1912f3661be7d2",
+   "acct": "eb",
+   "from": "GitHub",
+   "addr": "notifications@github.com",
+   "subj": "[alirezarezvani/claude-skills] ci(tessl): score skills with `tessl review run` and a TESSL_TOKEN (PR #1080)",
+   "sum": "claude-skills PR #1080 opened: fixes the Tessl skill-scoring step that failed on every skill.",
+   "detail": "Requested by Reza. Summary: The Tessl step in skill-quality-review.yml reported \"tool error, not scored\" for every skill on #1079. The job log shows two causes: tessl skill…",
+   "cat": "updates"
+  },
+  {
+   "id": "1a190e85e8528443",
+   "tid": "1a190e85e8528443",
+   "acct": "eb",
+   "from": "GitHub",
+   "addr": "notifications@github.com",
+   "subj": "Re: [alirezarezvani/claude-skills] Proposal: commit-craft skill — commit-series hygiene…",
+   "sum": "claude-skills issue #1004: the maintainer thanked Hahaknight and says the commit-craft skill was built.",
+   "detail": "alirezarezvani left a comment (alirezarezvani/claude-skills#1004). Thanks for the proposal and the overlap analysis, @Hahaknight. You were right that the catalog had no commit-hygiene skill, so we built…",
+   "cat": "updates"
+  },
+  {
+   "id": "1a190bec5aba1404",
+   "tid": "1a190bec5aba1404",
+   "acct": "eb",
+   "from": "GitHub",
+   "addr": "notifications@github.com",
+   "subj": "[alirezarezvani/claude-skills] Release v2.14.5 - v2.14.5 — design-qa, commit-craft, skills that fit the…",
+   "sum": "claude-skills released version 2.14.5 (design-qa, commit-craft, skills that fit the listing budget).",
+   "detail": "v2.14.5 — design-qa, commit-craft, skills that fit the listing budget. Repository: alirezarezvani/claude-skills. Tag: v2.14.5. Commit: e4a1dc3. Released by: github-actions[bot].",
+   "cat": "updates"
+  },
+  {
+   "id": "1a190bbbf6253385",
+   "tid": "1a190bbbf6253385",
+   "acct": "eb",
+   "from": "GitHub",
+   "addr": "notifications@github.com",
+   "subj": "Re: [alirezarezvani/claude-skills] Release v2.14.5: dev → main (PR #1079)",
+   "sum": "claude-skills PR #1079: the VirusTotal security scan ran on the release files.",
+   "detail": "github-actions[bot] left a comment (alirezarezvani/claude-skills#1079). VirusTotal Security Scan. File analysis: product-team-skills.zip, product-team-design-qa.zip. Scanned with 70+…",
+   "cat": "updates"
+  },
+  {
+   "id": "1a190b998dcbcb25",
+   "tid": "1a190b998dcbcb25",
+   "acct": "eb",
+   "from": "GitHub",
+   "addr": "notifications@github.com",
+   "subj": "[alirezarezvani/claude-skills] docs(release): CHANGELOG and version for v2.14.5 (PR #1078)",
+   "sum": "claude-skills PR #1078 opened: changelog and version prep for v2.14.5.",
+   "detail": "Requested by Reza. Summary: Release prep for v2.14.5 (same pattern as #1068). CHANGELOG.md: the Unreleased section becomes [2.14.5] - 2026-10-31, with an intro and a Migration section…",
+   "cat": "updates"
+  },
+  {
+   "id": "1a190aefc5c76cac",
+   "tid": "1a190aefc5c76cac",
+   "acct": "eb",
+   "from": "GitHub",
+   "addr": "notifications@github.com",
+   "subj": "[alirezarezvani/claude-skills] docs: replace command namespaces that no plugin provides (PR #1077)",
+   "sum": "claude-skills PR #1077 opened: fixes documented commands whose prefixes no plugin provides.",
+   "detail": "Requested by Reza. Summary: Follow-up to #1075, generalized. Claude Code namespaces a plugin's commands by its plugin.json name. I scanned every /<prefix>:<name>…",
+   "cat": "updates"
+  },
+  {
+   "id": "1a190ab1bfd71fb3",
+   "tid": "1a190ab1bfd71fb3",
+   "acct": "eb",
+   "from": "GitHub",
+   "addr": "notifications@github.com",
+   "subj": "[alirezarezvani/claude-skills] feat(engineering): commit-craft, a clean commit series from a mixed tree…",
+   "sum": "claude-skills PR #1076 opened: a new commit-craft plugin that turns messy changes into a clean series of commits.",
+   "detail": "Requested by Reza. Summary: New engineering/commit-craft plugin for the gap named in #1004: turn a tangled working tree into a reviewable commit series. Built independently from public…",
+   "cat": "updates"
+  },
+  {
+   "id": "1a190a64f7e3e414",
+   "tid": "1a190a64f7e3e414",
+   "acct": "eb",
+   "from": "GitHub",
+   "addr": "notifications@github.com",
+   "subj": "[alirezarezvani/claude-skills] docs(autoresearch-agent): replace nonexistent /ar: command namespace…",
+   "sum": "claude-skills PR #1075 opened: corrects the documented /ar: commands for autoresearch-agent.",
+   "detail": "Requested by Reza. Summary: Follow-up to #1074. Claude Code namespaces a plugin's commands by its plugin.json name, which is autoresearch-agent, so the documented /ar:run, /ar:loop…",
+   "cat": "updates"
+  },
+  {
+   "id": "1a190a09dd80fe52",
+   "tid": "1a190a09dd80fe52",
+   "acct": "eb",
+   "from": "GitHub",
+   "addr": "notifications@github.com",
+   "subj": "[alirezarezvani/claude-skills] refactor(autoresearch-agent): rename loop skill to ar-loop (PR #1074)",
+   "sum": "claude-skills PR #1074 opened: renames the loop skill to ar-loop so it stops hiding Claude Code's built-in /loop.",
+   "detail": "Requested by Reza. Summary: Follow-up to #1073. autoresearch-agent's skill was named loop, which shadowed Claude Code's built-in /loop scheduler. It is renamed to ar-loop…",
+   "cat": "updates"
+  },
+  {
+   "id": "1a1909bb25e8e02a",
+   "tid": "1a1909bb25e8e02a",
+   "acct": "eb",
+   "from": "GitHub",
+   "addr": "notifications@github.com",
+   "subj": "[alirezarezvani/claude-skills] refactor(engineering): rename skill-doctor to skill-retro (PR #1073)",
+   "sum": "claude-skills PR #1073 opened: renames skill-doctor to skill-retro because Claude Code now has its own /skill-doctor.",
+   "detail": "Requested by Reza. Summary: Claude Code 2.1.314 ships a built-in /skill-doctor (unused skills and their context cost). Our engineering/skill-doctor plugin skill had the same name and hid…",
+   "cat": "updates"
+  },
+  {
+   "id": "1a18e78124dec880",
+   "tid": "1a18e78124dec880",
+   "acct": "eb",
+   "from": "GitHub",
+   "addr": "notifications@github.com",
+   "subj": "[alirezarezvani/claude-skills] fix(engineering): move universal-scraping-architect Firecrawl example to…",
+   "sum": "claude-skills PR #1072 opened by Juampi from Firecrawl: updates a scraping example to Firecrawl's v2 SDK.",
+   "detail": "Hey, I'm Juampi from the Firecrawl team. Summary: The Firecrawl example in universal-scraping-architect still calls FirecrawlApp(...).scrape_url(...). Current firecrawl-py (4.54.0) marks that v1-…",
+   "cat": "updates"
+  },
+  {
+   "id": "1a190515a9103346",
+   "tid": "1a18ddeef6ada20d",
+   "acct": "eb",
+   "from": "GitHub",
+   "addr": "notifications@github.com",
+   "subj": "Re: [alirezarezvani/claude-skills] fix(skills): make skills trigger and fit Claude Code's listing budget…",
+   "sum": "claude-skills PR #1071 was merged into dev.",
+   "detail": "Merged #1071 into dev.",
+   "cat": "updates"
+  },
+  {
+   "id": "1a1932fbd4f58622",
+   "tid": "1a18afaabb55c1a6",
+   "acct": "eb",
+   "from": "GitHub",
+   "addr": "notifications@github.com",
+   "subj": "Re: [obra/superpowers] fix(using-superpowers): enforce planning and Antigravity task.md… (PR #2647)",
+   "sum": "superpowers PR #2647: the author, ravindranath-sawane, answered review points.",
+   "detail": "ravindranath-sawane left a comment (obra/superpowers#2647). Both points are accounted for within this repo's architecture: Workflow gate: This PR does not just update antigravity-tools.md — skills/…",
+   "cat": "updates"
+  },
+  {
+   "id": "1a1913e80120248c",
+   "tid": "1a18d5dfd2832117",
+   "acct": "eb",
+   "from": "GitHub",
+   "addr": "notifications@github.com",
+   "subj": "Re: [obra/superpowers] Add harnessator source manifest for superpowers (pure data, no behavior change)…",
+   "sum": "superpowers PR #2649: an automated review bot (Audit Bench Ai) commented.",
+   "detail": "@auditbenchai commented on this pull request. Automated review by Audit Bench Ai, not a personal review. It was posted through the GitHub account connected to Audit Bench Ai.",
+   "cat": "updates"
+  },
+  {
+   "id": "1a18f5d63e7b47cc",
+   "tid": "1a18f5d63e7b47cc",
+   "acct": "eb",
+   "from": "GitHub",
+   "addr": "notifications@github.com",
+   "subj": "Re: [obra/superpowers] Pi extension bootstrap only injected on the first turn… (Issue #2083)",
+   "sum": "superpowers issue #2083: reximus-bbs confirmed the bug on Pi 1.4.0 / Windows 11.",
+   "detail": "reximus-bbs left a comment (obra/superpowers#2083). Confirming this on Pi 1.4.0 / Windows 11 with superpowers 7.0.1 (2ce8aa1). I captured before_provider_request payloads for three prompts in one RPC…",
+   "cat": "updates"
+  },
+  {
+   "id": "1a18efcc0fed3cfc",
+   "tid": "1a18efcc0fed3cfc",
+   "acct": "eb",
+   "from": "GitHub",
+   "addr": "notifications@github.com",
+   "subj": "[obra/superpowers] subagent-driven-development: task reviewer isn't told to flag a report with no RED…",
+   "sum": "superpowers: swmacdonald opened issue #2651 about the task reviewer not flagging reports that lack test evidence.",
+   "detail": "swmacdonald created an issue (obra/superpowers#2651). I searched existing issues and this has not been proposed before (related: #994, fixed by #1065, which made implementers report RED evidence; #1961;…",
+   "cat": "updates"
+  },
+  {
+   "id": "1a18ed651a7829f1",
+   "tid": "1a18ed651a7829f1",
+   "acct": "eb",
+   "from": "GitHub",
+   "addr": "notifications@github.com",
+   "subj": "[obra/superpowers] feat(writing-plans): dispatched session inherits parent env/config (PR #2650)",
+   "sum": "superpowers PR #2650 opened: a new rule that a handed-off session must use the same account and settings as the one that wrote the plan.",
+   "detail": "What: writing-plans Execution Handoff gains a hard rule: the dispatched fresh session must inherit the authoring session's env/config (endpoint, provider, credentials) — never a different account/…",
+   "cat": "updates"
+  },
+  {
+   "id": "1a18ee6e01928cdf",
+   "tid": "1a18a09adebf8225",
+   "acct": "eb",
+   "from": "GitHub",
+   "addr": "notifications@github.com",
+   "subj": "Re: [obra/superpowers] v7's brainstorm questions are rather annoying (Issue #2530)",
+   "sum": "superpowers issue #2530: dosaki thanked the team and will try the fix.",
+   "detail": "dosaki left a comment (obra/superpowers#2530). Thanks for the effort. I'll get it installed to try it!",
+   "cat": "updates"
+  },
+  {
+   "id": "1a192f688749cf05",
+   "tid": "1a192f688749cf05",
+   "acct": "eb",
+   "from": "Techpresso",
+   "addr": "techpresso@dupple.com",
+   "subj": "☕️ Five tech giants pledge over $3T for AI",
+   "sum": "Tech newsletter: five tech giants' $3 trillion AI pledges, Google's space chip, and more.",
+   "detail": "Tech giants' $3T AI bets, Google's space chip, and more.",
+   "cat": "news"
+  },
+  {
+   "id": "1a19278119d9c0ba",
+   "tid": "1a19278119d9c0ba",
+   "acct": "p7",
+   "from": "Zephyr",
+   "addr": "zephyr@mail.beehiiv.com",
+   "subj": "Record your next meeting, then ask it what you missed",
+   "sum": "AI newsletter: Gemini Notebook's phone app can record up to an hour of a meeting and pull out decisions and to-dos.",
+   "detail": "Gemini Notebook's phone app records up to an hour. Then ask it for decisions and to-dos.",
+   "cat": "news"
+  },
+  {
+   "id": "1a192c5dcae95058",
+   "tid": "1a192c5dcae95058",
+   "acct": "p7",
+   "from": "Quora (Another Point of View)",
+   "addr": "anotherpointofview-space@quora.com",
+   "subj": "BAD NEWS ON THE RECRUITING FRONT Russia just received some bad news on the recruiting…",
+   "sum": "Quora space post saying Russia has recruited over 46,000 foreigners to fight its war.",
+   "detail": "BAD NEWS ON THE RECRUITING FRONT. Russia just received some bad news on the recruiting. Crane just issued an press release indicating that Russia has recruited over 46000 foreigners to fight its war in…",
+   "cat": "news"
+  },
+  {
+   "id": "1a192673de287345",
+   "tid": "1a192673de287345",
+   "acct": "p7",
+   "from": "Medium",
+   "addr": "noreply@medium.com",
+   "subj": "The Most Popular Song You've Never Heard | Daniel Parris in Fanfare",
+   "sum": "Medium daily digest for Protocol Inc, led by Daniel Parris's 'The Most Popular Song You've Never Heard'.",
+   "detail": "Stories for Protocol Inc (@protocol7.inc). Medium daily digest. Today's highlights: Daniel Parris in Fanfare, The Most Popular Song You've Never Heard.",
+   "cat": "news"
+  },
+  {
+   "id": "1a1925ec2b6cd79e",
+   "tid": "1a1925ec2b6cd79e",
+   "acct": "eb",
+   "from": "Medium",
+   "addr": "noreply@medium.com",
+   "subj": "I've Managed People for 20 Years. Here Are Five Things I No Longer Care About. | Tobias Charles",
+   "sum": "Medium daily digest for Edmond Barna, led by Tobias Charles on five things a 20-year manager stopped caring about.",
+   "detail": "Stories for Edmond Barna (@eddie.barna). Medium daily digest. Today's highlights: Tobias Charles, I've Managed People for 20 Years. Here Are Five Things I…",
+   "cat": "news"
+  },
+  {
+   "id": "1a1920ef8a2cf1bf",
+   "tid": "1a1920ef8a2cf1bf",
+   "acct": "p7",
+   "from": "Lark Davis",
+   "addr": "larkdavis@mail.beehiiv.com",
+   "subj": "Binance: The Biggest Robbery in History",
+   "sum": "Crypto newsletter: Binance hit hard as the US investigates North Korea, stocks falling, and a Wall Street boost for Hyperliquid.",
+   "detail": "Binance hit hard as US investigates North Korea, stocks dump like memecoins, Hyperliquid gets groundbreaking Wall Street boost.",
+   "cat": "news"
+  },
+  {
+   "id": "1a191d4daaf79d37",
+   "tid": "1a191d4daaf79d37",
+   "acct": "p7",
+   "from": "Elliott Wave International",
+   "addr": "customercare@surf.elliottwave.com",
+   "subj": "Updated Report: The Most Dangerous Market in History?",
+   "sum": "Weekly wrap-up pushing a limited-time report with 18 charts on whether this is 'the most dangerous market in history'.",
+   "detail": "Here's Your Weekly Wrap-Up, October 31, 2026. Investor optimism is through the roof! In our just-updated, limited-time report, The Most Dangerous Market in History?, 18 compelling charts expose…",
+   "cat": "news"
+  },
+  {
+   "id": "1a18f7933d02fa57",
+   "tid": "1a18f7933d02fa57",
+   "acct": "p7",
+   "from": "The Daily Beast",
+   "addr": "emails@thedailybeast.com",
+   "subj": "Trump Cooks Up Wild Excuse for His Red State Rally U-Turn / 4 days until America decides",
+   "sum": "Daily Beast digest: Trump says his phone blew up after he canceled two rallies; 4 days to the election.",
+   "detail": "The president says his phone blew up after he canceled a pair of in-person rallies in the MAGA heartland. Beast Digest: Trump Cooks Up Wild Excuse for…",
+   "cat": "news"
+  },
+  {
+   "id": "1a18f242af030d50",
+   "tid": "1a18f242af030d50",
+   "acct": "eb",
+   "from": "City of Pittsburg",
+   "addr": "comms-pittsburgca.gov@shared1.ccsend.com",
+   "subj": "November 2026 Anchor Newsletter: Fall Fun Awaits in Pittsburg!",
+   "sum": "The city's November newsletter, opening with the City Manager's message.",
+   "detail": "2026 NOVEMBER MONTHLY NEWSLETTER (Spanish version below). City Manager's Message: Hello Pittsburg, As we welcome November, a month of remembrance and gratitude, we honor our…",
+   "cat": "news"
+  },
+  {
+   "id": "1a192265b1da2540",
+   "tid": "1a192265b1da2540",
+   "acct": "eb",
+   "from": "Social Security",
+   "addr": "information@update.ssa.gov",
+   "subj": "Best Performance Ever in SSA's 91-Year History",
+   "sum": "SSA announcement claiming record service in 2026: 800-number waits under six minutes and field-office waits down over 30%.",
+   "detail": "Social Security Delivers Historic Customer Service Improvements. In 2026, SSA says it gave Americans back 200 million hours of time they previously would have spent waiting for service.\n\nFiscal year 2026 produced the best performance in the agency's 91-year history: average wait times on the National 800 Number under six minutes, an 80 percent improvement compared to FY 2024; field office wait times cut by more than 30 percent while serving nearly 30 million visitors; more than 571 million online transactions; more than 105 million people now have a my Social Security account; disability processing times and backlogs reduced.\n\nFrank J. Bisignano, Commissioner, Social Security Administration.",
+   "cat": "news"
+  },
+  {
+   "id": "1a190faba9e33757",
+   "tid": "1a190faba9e33757",
+   "acct": "eb",
+   "from": "AI with Kyle",
+   "addr": "aiwithkyle@mail.beehiiv.com",
+   "subj": "🟣 my journey to  pilates princess starts now",
+   "sum": "Kyle's Oct 31 newsletter, a year-end personal update.",
+   "detail": "October 31, 2026. my journey to become a pilates princess starts now. Well then! 2026 disappeared pretty quickly eh?? We're rounding out to the end of the year and into the frankly…",
+   "cat": "news"
+  },
+  {
+   "id": "1a1917fbf4128be7",
+   "tid": "1a1917fbf4128be7",
+   "acct": "eb",
+   "from": "AI with Kyle (Harminder)",
+   "addr": "harminder@aiwithkyle.com",
+   "subj": "The next AI Workshop Kit cohort is starting",
+   "sum": "Sales email: the last 2026 AI Workshop Kit cohort closes enrolment Tuesday, Nov 3.",
+   "detail": "Hi Eddie, I wanted to give you a quick heads-up because the next cohort is about to start. The official deadline to enrol is next Tuesday, 3 November. Because this is the final cohort of 2026, we…",
+   "cat": "promo"
+  },
+  {
+   "id": "1a192f84d7182a17",
+   "tid": "1a192f84d7182a17",
+   "acct": "p7",
+   "from": "EcomSuccess Academy",
+   "addr": "support@accessadrian.com",
+   "subj": "[⚠️ Not Confirmed] free store access",
+   "sum": "Marketing email styled as an alert, saying your 'store-building spot' is still waiting; not a real account warning.",
+   "detail": "Your store-building spot is still waiting. (The rest of the email is the unsubscribe footer from EcomSuccess Academy, Madison, MS.)",
+   "cat": "promo"
+  },
+  {
+   "id": "1a19312f8845a018",
+   "tid": "1a19312f8845a018",
+   "acct": "eb",
+   "from": "OpenTable",
+   "addr": "opentable@em.opentable.com",
+   "subj": "East Bay's top viewed, saved, and booked restaurants in October",
+   "sum": "OpenTable's list of the East Bay's most popular restaurants in October.",
+   "detail": "Tables are booking fast.",
+   "cat": "promo"
+  },
+  {
+   "id": "1a192e8fc7b86619",
+   "tid": "1a192e8fc7b86619",
+   "acct": "eb",
+   "from": "Apple TV",
+   "addr": "appletv@insideapple.apple.com",
+   "subj": "The hunt for MLS playoff spots is on.",
+   "sum": "Apple TV ad for MLS games during the end of the 2026 season.",
+   "detail": "Catch every clash as the '26 MLS season hits the stretch run. It's go time: The road…",
+   "cat": "promo"
+  },
+  {
+   "id": "1a18ebb42eba068d",
+   "tid": "1a18ebb42eba068d",
+   "acct": "eb",
+   "from": "Kalshi",
+   "addr": "no-reply@kalshi.com",
+   "subj": "The NBA Cup starts tonight. Ten games, trading now.",
+   "sum": "Kalshi pitch to trade on NBA Cup games; Knicks at Philly 7:30 ET, Lakers–Warriors at 10.",
+   "detail": "The Knicks open their title defense in Philly at 7:30 ET. Lakers–Warriors closes the night at 10.",
+   "cat": "promo"
+  },
+  {
+   "id": "1a18fe914fdb4ed3",
+   "tid": "1a18fe914fdb4ed3",
+   "acct": "eb",
+   "from": "No Sale Profit System (Chris)",
+   "addr": "chris@em.nosaleprofitsystem.com",
+   "subj": "Big lesson for affiliates…",
+   "sum": "Affiliate-marketing sales email.",
+   "detail": "Don't harvest in spring…",
+   "cat": "promo"
+  },
+  {
+   "id": "1a1931ee3715f798",
+   "tid": "1a1931ee3715f798",
+   "acct": "eb",
+   "from": "Lucid Poker (Doug Polk)",
+   "addr": "dougpolk@lucidpoker.com",
+   "subj": "Trick or Treat? Here's Your Treat 🎃",
+   "sum": "Halloween sale: 25% off Lucid Pro.",
+   "detail": "No tricks. Just 25% off Lucid Pro. Happy Halloween, Eddie! I was going to tell you another scary poker story, but let's be honest. You've probably seen enough bad beats for one lifetime. So…",
+   "cat": "promo"
+  },
+  {
+   "id": "1a18eb19a4552709",
+   "tid": "1a18eb19a4552709",
+   "acct": "eb",
+   "from": "Lucid Poker (Doug Polk)",
+   "addr": "dougpolk@lucidpoker.com",
+   "subj": "Bury your leaks before they bury you 🪦",
+   "sum": "Halloween-themed pitch for Lucid poker training.",
+   "detail": "There's a cheaper way to learn than punting at the table. Hey Eddie, Halloween is tomorrow, you know what deserves a proper burial? That \"there's no way he has it AGAIN\" river call.",
+   "cat": "promo"
+  },
+  {
+   "id": "1a192cb4d7336c08",
+   "tid": "1a192cb4d7336c08",
+   "acct": "eb",
+   "from": "Coursera",
+   "addr": "coursera@m.learn.coursera.org",
+   "subj": "Learn with Google Career Certificates to reach your career goals",
+   "sum": "Coursera ad for Google Career Certificates.",
+   "detail": "Learn in-demand skills from Google experts by enrolling today.",
+   "cat": "promo"
+  },
+  {
+   "id": "1a192bce7d319924",
+   "tid": "1a192bce7d319924",
+   "acct": "eb",
+   "from": "Costco",
+   "addr": "costco@digital.costco.com",
+   "subj": "Transform Your Home For the Holidays",
+   "sum": "Costco holiday deals on furniture, kitchen, home improvement and appliances.",
+   "detail": "Uncover offers on furniture, home & kitchen, home improvement, appliances and more.",
+   "cat": "promo"
+  },
+  {
+   "id": "1a18e6fb27894517",
+   "tid": "1a18e6fb27894517",
+   "acct": "eb",
+   "from": "Costco",
+   "addr": "costco@digital.costco.com",
+   "subj": "Discover Holiday Savings Waiting Inside",
+   "sum": "Costco holiday savings on tech and home items, including iPad Pro.",
+   "detail": "Explore quality tech, cozy home finds, seasonal favorites and more. Top deals, member-only savings, online savings, holiday savings: iPad Pro 11-inch or 13-inch M5 chip starting…",
+   "cat": "promo"
+  },
+  {
+   "id": "1a1911664bb8669e",
+   "tid": "1a1911664bb8669e",
+   "acct": "eb",
+   "from": "MEXC",
+   "addr": "news@info.mexc.com",
+   "subj": "Surprise! A 300 USDT Position Airdrop Is Yours!",
+   "sum": "Crypto exchange promo offering a 300 USDT futures 'airdrop' reward to claim.",
+   "detail": "Claim your reward before it expires! Dear MEXCer, Luck is truly on your side today! With a 300 USDT Futures Position Airdrop reward, you're set to pave the way for Futures trading success…",
+   "cat": "promo"
+  },
+  {
+   "id": "1a18f679812a8f33",
+   "tid": "1a18f679812a8f33",
+   "acct": "eb",
+   "from": "Netflix",
+   "addr": "info@members.netflix.com",
+   "subj": "Coming Sunday, November 1st...The Day After Tomorrow",
+   "sum": "Netflix says The Day After Tomorrow arrives Sunday, Nov 1.",
+   "detail": "Get a first look today.",
+   "cat": "promo"
+  },
+  {
+   "id": "1a18ea4447f69980",
+   "tid": "1a18ea4447f69980",
+   "acct": "eb",
+   "from": "Affirm",
+   "addr": "email@e.affirm.com",
+   "subj": "Find out where you can pay over time",
+   "sum": "Affirm ad for using its card to pay over time.",
+   "detail": "Set up a plan in-app, then swipe with your Affirm Card.",
+   "cat": "promo"
+  },
+  {
+   "id": "1a18e93ff01b5cc4",
+   "tid": "1a18e93ff01b5cc4",
+   "acct": "p7",
+   "from": "MetaWin",
+   "addr": "mw@metawin.com",
+   "subj": "🎃 Last chance for your Halloween treats",
+   "sum": "Gambling-site promo: Halloween specials end Sunday.",
+   "detail": "Spooky Specials end Sunday. Claim your exclusive reward before it's gone for good.",
+   "cat": "promo"
+  },
+  {
+   "id": "1a18e87b25da1e95",
+   "tid": "1a18e87b25da1e95",
+   "acct": "p7",
+   "from": "MetaWin",
+   "addr": "mw@metawin.com",
+   "subj": "⏳ 1 Day Until $250,000 Is Won",
+   "sum": "Gambling-site promo for a free-entry $250,000 prize draw.",
+   "detail": "Log in or play today to earn entries. It's free to enter!",
+   "cat": "promo"
+  },
+  {
+   "id": "1a18e594d2b2aee5",
+   "tid": "1a18e594d2b2aee5",
+   "acct": "eb",
+   "from": "Amazon Pharmacy",
+   "addr": "hello@email.pharmacy.amazon.com",
+   "subj": "Have your medication delivered, just like everything else",
+   "sum": "Amazon Pharmacy ad for prescription delivery.",
+   "detail": "Prescriptions have never been this easy. Amazon Pharmacy: from the doctor to your doorstep. Never stand in line at the pharmacy again.",
+   "cat": "promo"
+  },
+  {
+   "id": "1a18e4b8ff5b6054",
+   "tid": "1a18e4b8ff5b6054",
+   "acct": "p7",
+   "from": "Unusual Whales",
+   "addr": "unusualwhales@substack.com",
+   "subj": "The Sale Is Coming From Inside the House!!!",
+   "sum": "Unusual Whales subscription sale announcement.",
+   "detail": "Readers Bewhale, You're in for a SAAALE!",
+   "cat": "promo"
+  }
+ ]
+}
+</script>
+
+<script>
+(function () {
+  const D = JSON.parse(document.getElementById("digest-data").textContent);
+  const CATS = { action: "Needs you", money: "Money", updates: "Account updates", news: "Newsletters", promo: "Promotions" };
+  const CAT_ORDER = ["action", "money", "updates", "news", "promo"];
+  const HUB = "protocol7.inc@gmail.com";
+  const acctName = Object.fromEntries(D.accounts.map(a => [a.id, a.name]));
+
+  // A Gmail message ID starts with the time it arrived (milliseconds), so the page can show it without extra data.
+  const arrived = id => Number(BigInt("0x" + id) >> 20n);
+  const link = tid => "https://mail.google.com/mail/?authuser=" + HUB + "#all/thread-f:" + BigInt("0x" + tid).toString();
+  const fmt = new Intl.DateTimeFormat("en-US", { timeZone: "America/Los_Angeles", weekday: "short", hour: "numeric", minute: "2-digit" });
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  const emails = D.emails.map(e => ({ ...e, t: arrived(e.id), acctName: acctName[e.acct] || e.acct }));
+  let state = { acct: "all", q: "", cat: "all", key: "t", dir: -1 };
+
+  document.getElementById("headline").textContent = D.headline;
+  const nNeeds = D.needs.length;
+  document.getElementById("lede").innerHTML =
+    "<b>" + emails.length + " emails</b> across " + D.accounts.length + " inboxes in " + esc(D.window) + ". " +
+    (nNeeds ? "<b>" + nNeeds + (nNeeds === 1 ? " thing needs" : " things need") + " you.</b>" : "Nothing needs you today.");
+  document.getElementById("foot").innerHTML = "Built " + esc(D.generated) + ". " + (D.note ? esc(D.note) + " " : "") +
+    "Everything forwards into " + HUB + ". Links open the email there.";
+
+  const inboxes = document.getElementById("inboxes");
+  function renderInboxes() {
+    const counts = {}; emails.forEach(e => counts[e.acct] = (counts[e.acct] || 0) + 1);
+    const items = [{ id: "all", name: "All inboxes", n: emails.length }].concat(D.accounts.map(a => ({ id: a.id, name: a.name, n: counts[a.id] || 0, title: a.address })));
+    inboxes.innerHTML = items.map(a => '<button class="inbox" id="ib-' + a.id + '" data-acct="' + a.id + '" aria-pressed="' + (state.acct === a.id) + '"' +
+      (a.title ? ' title="' + esc(a.title) + '"' : "") + ">" + esc(a.name) + " <span>" + a.n + "</span></button>").join("");
+  }
+  inboxes.addEventListener("click", ev => { const b = ev.target.closest("button"); if (!b) return; state.acct = b.dataset.acct; renderInboxes(); render(); });
+
+  const needs = document.getElementById("needs");
+  function renderNeeds() {
+    const list = D.needs.filter(n => state.acct === "all" || n.acct === state.acct);
+    needs.innerHTML = list.length ? list.map(n => '<li data-id="' + esc(n.id) + '" tabindex="0" role="button"><div class="what">' + esc(n.what) + "</div>" +
+      (n.why ? "<div>" + esc(n.why) + "</div>" : "") + '<div class="meta">' + esc(acctName[n.acct] || n.acct) + " · " + fmt.format(arrived(n.id)) + "</div></li>").join("")
+      : '<li class="empty" style="border-left-color:var(--line)">Nothing here needs you.</li>';
+  }
+
+  const sel = document.getElementById("cat");
+  sel.innerHTML = '<option value="all">All types</option>' + CAT_ORDER.map(c => '<option value="' + c + '">' + CATS[c] + "</option>").join("");
+  sel.addEventListener("change", () => { state.cat = sel.value; render(); });
+  const q = document.getElementById("q");
+  q.addEventListener("input", () => { state.q = q.value.trim().toLowerCase(); render(); });
+
+  document.querySelectorAll("th button").forEach(b => b.addEventListener("click", () => {
+    const k = b.dataset.key;
+    state.dir = state.key === k ? -state.dir : (k === "t" ? -1 : 1); state.key = k;
+    document.querySelectorAll("th button").forEach(x => x.removeAttribute("aria-sort"));
+    b.setAttribute("aria-sort", state.dir === 1 ? "ascending" : "descending");
+    render();
+  }));
+
+  const rows = document.getElementById("rows");
+  function render() {
+    renderNeeds();
+    let list = emails.filter(e => (state.acct === "all" || e.acct === state.acct) && (state.cat === "all" || e.cat === state.cat) &&
+      (!state.q || (e.from + " " + e.subj + " " + e.sum).toLowerCase().includes(state.q)));
+    const val = e => state.key === "cat" ? CAT_ORDER.indexOf(e.cat) : state.key === "acct" ? e.acctName.toLowerCase() : state.key === "t" ? e.t : String(e[state.key]).toLowerCase();
+    list.sort((a, b) => (val(a) > val(b) ? 1 : val(a) < val(b) ? -1 : b.t - a.t) * (val(a) === val(b) ? 1 : state.dir));
+    current = list;
+    rows.innerHTML = list.map((e, i) => '<tr data-i="' + i + '" tabindex="0" aria-label="Open email: ' + esc(e.subj) + '"><td class="when"><span class="time">' + fmt.format(e.t) + '</span><span class="acct">' + esc(e.acctName) + '</span>' +
+      '</td><td class="from">' + esc(e.from) + '</td><td class="subj"><span class="subjtxt">' + esc(e.subj) +
+      "</span><p>" + esc(e.sum) + '</p></td><td class="cat"><span class="pill ' + e.cat + '">' + CATS[e.cat] + "</span></td></tr>").join("") ||
+      '<tr><td colspan="4" class="empty">No emails match.</td></tr>';
+    document.getElementById("count").textContent = list.length + " of " + emails.length;
+  }
+
+  // Detail panel: click any row (or a "needs you" item) to read that email; Prev/Next walk the list as currently filtered and sorted.
+  let current = [], pos = -1, list = [];
+  const dlg = document.getElementById("detail");
+  const $ = id => document.getElementById(id);
+  const full = new Intl.DateTimeFormat("en-US", { timeZone: "America/Los_Angeles", weekday: "long", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+  const acctAddr = Object.fromEntries(D.accounts.map(a => [a.id, a.address]));
+  function show(i) {
+    pos = i; const e = list[i];
+    $("d-cat").className = "pill " + e.cat; $("d-cat").textContent = CATS[e.cat];
+    $("d-subj").textContent = e.subj;
+    $("d-from").innerHTML = esc(e.from) + (e.addr ? '<br><span class="addr">' + esc(e.addr) + "</span>" : "");
+    $("d-to").innerHTML = esc(e.acctName) + '<br><span class="addr">' + esc(acctAddr[e.acct] || "") + "</span>";
+    $("d-time").textContent = full.format(e.t);
+    $("d-sum").textContent = e.sum;
+    const t = $("d-text");
+    if (e.detail) { t.textContent = e.detail; t.className = "dtext"; }
+    else { t.textContent = "No extra text saved for this email. Open it in Gmail to read all of it."; t.className = "dtext thin"; }
+    $("d-open").href = link(e.tid);
+    $("d-pos").textContent = (i + 1) + " of " + list.length;
+    $("d-prev").disabled = i === 0; $("d-next").disabled = i === list.length - 1;
+    dlg.querySelector(".dbody").scrollTop = 0;
+  }
+  function openList(l, i) { list = l; show(i); if (!dlg.open) dlg.showModal(); }
+  rows.addEventListener("click", ev => { const tr = ev.target.closest("tr[data-i]"); if (tr) openList(current, +tr.dataset.i); });
+  rows.addEventListener("keydown", ev => { const tr = ev.target.closest("tr[data-i]"); if (tr && (ev.key === "Enter" || ev.key === " ")) { ev.preventDefault(); openList(current, +tr.dataset.i); } });
+  function openNeed(li) {
+    const id = li.dataset.id, i = current.findIndex(e => e.id === id);
+    if (i >= 0) openList(current, i); else { const e = emails.find(x => x.id === id); if (e) openList([e], 0); }
+  }
+  needs.addEventListener("click", ev => { const li = ev.target.closest("li[data-id]"); if (li) openNeed(li); });
+  needs.addEventListener("keydown", ev => { const li = ev.target.closest("li[data-id]"); if (li && (ev.key === "Enter" || ev.key === " ")) { ev.preventDefault(); openNeed(li); } });
+  $("d-prev").addEventListener("click", () => pos > 0 && show(pos - 1));
+  $("d-next").addEventListener("click", () => pos < list.length - 1 && show(pos + 1));
+  $("d-close").addEventListener("click", () => dlg.close());
+  dlg.addEventListener("click", ev => { if (ev.target === dlg) dlg.close(); });
+  dlg.addEventListener("keydown", ev => {
+    if (ev.key === "ArrowDown" || ev.key === "j") { ev.preventDefault(); $("d-next").click(); }
+    if (ev.key === "ArrowUp" || ev.key === "k") { ev.preventDefault(); $("d-prev").click(); }
+  });
+  renderInboxes(); render();
+})();
+</script>

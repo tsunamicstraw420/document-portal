@@ -1,0 +1,643 @@
+<title>Solorender Investor Letter (share copy)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: full-width letterhead and summary band, then three columns on wide screens:
+   sticky section list | reading column (~70 characters) | sticky key-numbers panel.
+   Collapses to reading column + panel, then to one column on phones. */
+:root {
+  color-scheme: dark;
+  --bg: #0a0a0a;
+  --surface: #151412;
+  --surface-2: #1c1b18;
+  --line: #2a2823;
+  --ink: #ffffff;
+  --leaf: #6ee05a;
+  --orange: #f7931a;
+  --display: "Syne", "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+  --body: "Manrope", "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 1.0625rem; line-height: 1.7; padding-inline: 24px; padding-block: 0 80px; -webkit-font-smoothing: antialiased; margin: 0; }
+.shell { max-width: 1440px; margin-inline: auto; }
+a { color: var(--leaf); text-underline-offset: 3px; }
+a:focus-visible { outline: 2px solid var(--leaf); outline-offset: 3px; border-radius: 2px; }
+strong { font-weight: 700; }
+p { margin: 14px 0 0; }
+
+/* letterhead */
+.letterhead { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; padding-block: 40px 20px; border-bottom: 1px solid var(--line); }
+.wordmark { font-family: var(--display); font-size: 2rem; line-height: 1; white-space: nowrap; letter-spacing: .02em; }
+.wordmark .light { font-weight: 500; } .wordmark .heavy { font-weight: 800; }
+.wordmark svg { height: .82em; width: .82em; vertical-align: -.10em; margin-inline: .02em; color: var(--leaf); }
+.meta { font-size: .8125rem; line-height: 1.5; text-align: right; }
+.meta b { display: block; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--leaf); font-size: .75rem; }
+
+/* headings: the headline is the largest text; section titles one step below */
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(1.1rem, 2.2vw, 1.45rem); line-height: 1.2; letter-spacing: -.01em; margin: 32px 0 0; text-wrap: balance; max-width: 46rem; }
+h1 em { font-style: normal; color: var(--orange); }
+h2 { font-family: var(--display); font-weight: 700; font-size: 1.125rem; line-height: 1.3; margin: 0 0 4px; text-wrap: balance; display: flex; gap: 10px; align-items: baseline; }
+h2 .no { color: var(--orange); font-size: .9rem; font-variant-numeric: tabular-nums; }
+h3 { font-family: var(--display); font-weight: 700; font-size: 1rem; line-height: 1.4; margin: 0; }
+.label { font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--leaf); }
+.note { font-size: .8125rem; line-height: 1.55; margin-top: 10px; }
+
+/* summary band */
+.summary { margin-top: 24px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 22px 24px; }
+.summary .purpose { font-family: var(--display); font-weight: 700; font-size: 1.05rem; line-height: 1.45; margin: 6px 0 0; max-width: 60rem; }
+.cards4 { margin-top: 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+.scard { background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 22px 24px; min-width: 0; display: grid; gap: 10px; align-content: start; }
+.scard .big { font-family: var(--display); font-weight: 800; font-size: 2rem; line-height: 1.1; color: var(--orange); font-variant-numeric: tabular-nums; }
+.scard p { margin: 0; font-size: 1.0625rem; line-height: 1.6; }
+.scard ul { margin: 0; padding-left: 20px; font-size: 1.0625rem; line-height: 1.6; display: grid; gap: 6px; }
+.feature { margin-top: 18px; display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 18px 32px; align-items: center; border: 1px solid var(--orange); border-radius: 8px; background: var(--surface-2); padding: 24px 26px; }
+.feature .ftitle { font-family: var(--display); font-weight: 800; font-size: 1.35rem; line-height: 1.2; margin: 6px 0 0; color: var(--orange); }
+.feature p { margin: 10px 0 0; font-size: 1.0625rem; line-height: 1.6; }
+.fstats { display: grid; gap: 10px; }
+.fstats div { display: flex; align-items: baseline; gap: 12px; font-size: 1rem; }
+.fstats b { font-family: var(--display); font-weight: 800; font-size: 1.6rem; color: var(--ink); min-width: 3.4ch; text-align: right; font-variant-numeric: tabular-nums; }
+@media (max-width: 760px) { .feature { grid-template-columns: 1fr; } }
+
+/* three-column body */
+.grid { margin-top: 40px; display: grid; grid-template-columns: 200px minmax(0, 44rem) minmax(260px, 320px); column-gap: 48px; justify-content: center; align-items: start; }
+.toc { position: sticky; top: 24px; font-size: .875rem; line-height: 1.4; }
+.toc ol { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 2px; }
+.toc a { display: grid; grid-template-columns: 1.6rem 1fr; padding: 5px 6px; border-radius: 4px; color: var(--ink); text-decoration: none; }
+.toc a span { color: var(--orange); font-variant-numeric: tabular-nums; }
+.toc a:hover { background: var(--surface); }
+.main { min-width: 0; }
+.main > section { padding-block: 8px 44px; scroll-margin-top: 20px; }
+.main > section + section { border-top: 1px solid var(--line); padding-top: 36px; }
+.aside { position: sticky; top: 24px; display: grid; gap: 14px; min-width: 0; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; }
+.panel dl { margin: 10px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: .875rem; line-height: 1.4; }
+.panel dt { font-family: var(--display); font-weight: 800; color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
+.panel dd { margin: 0; }
+.panel .row { display: flex; justify-content: space-between; gap: 10px; font-size: .875rem; padding-block: 6px; border-top: 1px dashed var(--line); }
+.panel .row:first-of-type { border-top: 0; }
+.panel .row b { color: var(--orange); white-space: nowrap; font-variant-numeric: tabular-nums; }
+@media (max-width: 1180px) { .grid { grid-template-columns: minmax(0, 44rem) minmax(240px, 300px); } .toc { display: none; } }
+@media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } .aside { position: static; order: -1; margin-bottom: 32px; } }
+
+/* content parts */
+ul.plain { margin: 14px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+ul.plain li { padding-left: 22px; position: relative; }
+ul.plain li::before { content: ""; position: absolute; left: 2px; top: .72em; width: 9px; height: 2px; background: var(--orange); }
+.pieces { margin-top: 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.piece { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; min-width: 0; }
+.piece p { margin: 6px 0 0; font-size: .9375rem; line-height: 1.55; }
+.table-wrap { margin-top: 18px; overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; }
+table { width: 100%; border-collapse: collapse; font-size: .9rem; line-height: 1.45; min-width: 30rem; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+tr:last-child td { border-bottom: 0; }
+th { font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--leaf); background: var(--surface); }
+td:first-child { font-weight: 700; }
+td.case { background: var(--surface-2); }
+.ledger { margin-top: 18px; border-left: 2px solid var(--line); display: grid; }
+.mile { display: grid; grid-template-columns: 5.2rem 1fr; gap: 14px; padding: 8px 0 8px 18px; position: relative; font-size: .9375rem; line-height: 1.55; }
+.mile::before { content: ""; position: absolute; left: -6px; top: 15px; width: 10px; height: 10px; border-radius: 50%; background: var(--bg); border: 2px solid var(--leaf); }
+.mile.big::before { background: var(--orange); border-color: var(--orange); }
+.mile time { font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--leaf); padding-top: 2px; }
+.risks { margin-top: 16px; display: grid; gap: 12px; }
+.risk { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 4px 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+.risk p { margin: 0; font-size: .9375rem; line-height: 1.55; }
+@media (max-width: 620px) { .risk { grid-template-columns: 1fr; } }
+.use { margin-top: 14px; border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px; background: var(--surface); }
+.use h3 { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 16px; }
+.use h3 .usd { color: var(--orange); font-variant-numeric: tabular-nums; }
+.use p { margin: 8px 0 0; font-size: .9375rem; }
+.how { list-style: none; margin: 10px 0 0; padding: 0; display: grid; font-size: .9rem; line-height: 1.5; }
+.how li { display: flex; justify-content: space-between; align-items: baseline; gap: 4px 16px; padding-block: 7px; border-top: 1px dashed var(--line); }
+.how li span { min-width: 0; }
+.how li b { color: var(--orange); white-space: nowrap; font-variant-numeric: tabular-nums; }
+@media (max-width: 560px) { .how li { flex-direction: column; } }
+.terms { border: 1px solid var(--orange); border-radius: 8px; padding: 18px 20px; background: var(--surface); }
+.sign { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 18px; }
+.sign .name { font-family: var(--display); font-weight: 800; font-size: 1.125rem; line-height: 1.3; }
+.sign .role { font-size: .9375rem; }
+.contact { font-size: .9375rem; line-height: 1.6; }
+sup { font-size: .7em; line-height: 0; margin-left: 1px; }
+sup a { text-decoration: none; }
+.sources-wrap { margin-top: 56px; padding-top: 28px; border-top: 1px solid var(--line); }
+.sources { margin: 14px 0 0; padding-left: 26px; font-size: .78rem; line-height: 1.5; columns: 3 300px; column-gap: 36px; }
+.sources li { break-inside: avoid; margin-bottom: 8px; overflow-wrap: anywhere; }
+</style>
+
+<div class="shell">
+
+<header class="letterhead">
+  <div class="wordmark" aria-label="Solorender"><span class="light">s</span><svg viewBox="12 12 72 72" aria-hidden="true"><path d="M65.2 23.4 A30 30 0 1 0 65.2 72.6" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round"/><path d="M65.2 72.6 A30 30 0 0 0 75.2 35.3" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg><span class="light">lo</span><span class="heavy">render</span></div>
+  <div class="meta"><b>Letter to investors</b>October 29, 2026 · Solorender, Inc.</div>
+</header>
+
+<h1>Seven weeks ago, Solorender's first version went live. Today it is <em>a complete AI film studio</em>, built by one founder.</h1>
+
+<section class="summary" aria-label="Summary">
+  <div class="label">In one minute</div>
+  <p class="purpose">Solorender puts the leading AI image, video, voice and music models in one studio and one wallet, with credits that never expire, and turns a single product photo into a finished ad film.</p>
+  <div class="feature">
+    <div>
+      <div class="label">How I'll win customers for at least the next 60 days</div>
+      <div class="ftitle">The AI Filmmaking course</div>
+      <p>25 lessons that take a customer from an idea to a published film, using Solorender for every step. It comes with the Studio plan and up, so every customer it brings in pays at least $40 a month. Affiliates and content creators on YouTube and X lead with it; ads come third (section 2).</p>
+    </div>
+    <div class="fstats">
+      <div><b>25</b><span>lessons in 5 modules</span></div>
+      <div><b>$40</b><span>a month at least: the plan it comes with</span></div>
+      <div><b>4</b><span>finished course ads, wide and tall</span></div>
+    </div>
+  </div>
+  <div class="cards4">
+    <div class="scard">
+      <div class="label">The ask</div>
+      <div class="big">Up to $200,000</div>
+      <p>Terms available on request.</p>
+      <p>For lower prices, affiliates and content creators on YouTube and X, a small ad test, growth money with a buffer, legal and accounting, a $600 video editor upgrade, and 18 months of founder pay.</p>
+    </div>
+    <div class="scard">
+      <div class="label">What's built</div>
+      <ul>
+        <li>Live since September 10; card payments switched on September 18</li>
+        <li>56 AI models from 15 labs, a video editor, 54 one-click recipes</li>
+        <li>One founder, no outside money, $0 spent on ads</li>
+      </ul>
+    </div>
+    <div class="scard">
+      <div class="label">The honest numbers</div>
+      <ul>
+        <li>Card payments have worked since September 18; the sales history is only weeks old</li>
+        <li>On published rates, a Meta-ad customer on the cheapest plan costs $172 to win and brings back $28 in year one in the cautious case, and $57 to win for $58 back in the best case</li>
+        <li>That's why affiliates come first: they cost nothing until a customer pays. Ads come later, tested before they scale</li>
+      </ul>
+    </div>
+    <div class="scard">
+      <div class="label">The goal</div>
+      <div class="big">$1M in year one</div>
+      <p>Collected by October 2027. A breakout path that two-founder teams like Arcads and HeyGen have run (section 10).</p>
+    </div>
+  </div>
+</section>
+
+<div class="grid">
+
+<nav class="toc" aria-label="Sections">
+  <div class="label">Contents</div>
+  <ol>
+    <li><a href="#what"><span>1</span>What Solorender is</a></li>
+    <li><a href="#course"><span>2</span>The AI Filmmaking course</a></li>
+    <li><a href="#proof"><span>3</span>Proof the category works</a></li>
+    <li><a href="#built"><span>4</span>What I have built</a></li>
+    <li><a href="#worth"><span>5</span>What a customer is worth</a></li>
+    <li><a href="#affiliates"><span>6</span>Affiliates</a></li>
+    <li><a href="#costs"><span>7</span>Running costs and the tech</a></li>
+    <li><a href="#me"><span>8</span>About me</a></li>
+    <li><a href="#risks"><span>9</span>Risks and how I reduce them</a></li>
+    <li><a href="#goal"><span>10</span>The next 12 months</a></li>
+    <li><a href="#raise"><span>11</span>What I am raising</a></li>
+    
+    <li><a href="#company"><span>12</span>The company</a></li>
+    <li><a href="#sources"><span>·</span>Sources</a></li>
+  </ol>
+</nav>
+
+<div class="main">
+
+<section id="what">
+  <h2><span class="no">1</span>What Solorender is</h2>
+  <p>On September 10, 2026, the first version of Solorender went live at <a href="https://solorender.com">solorender.com</a>: one studio page, a simple canvas and a library. Eight days later it could take real card payments. I built it alone, directing AI coding tools that write the code, and everything since has been built in the open, on the live site: about 11 of every 12 lines of today's code were written after that first version went live.<sup><a href="#s3">3</a></sup></p>
+  <p>Creators and small businesses today juggle several AI subscriptions: one app for pictures, another for video, another for voices, another for music, another for editing. Each has its own monthly plan, and most of them wipe unused credits at the end of the month.</p>
+  <p>Solorender replaces that pile with one studio and one wallet. Customers buy credits and use them on any model I carry: Google's Veo and Nano Banana, OpenAI's GPT Image, Kling, Seedance, ElevenLabs, FLUX and more. Their credits never expire, and the $8 starter offer and the bulk Super Max pack need no subscription at all.</p>
+  <p><strong>The prices.</strong> One credit is worth 1 cent at retail. The $8 starter offer buys 1,100 credits once. The Solo plan is $20 a month for 2,000 credits; Studio is $40 for 4,450; Max is $80 for 9,450. Super Max is a one-time $300 pack of 42,750 credits. The bigger plans include bonus credits, and Studio, Max and Super Max include the AI Filmmaking course. Yearly plans cost about 15% less.<sup><a href="#s3">3</a></sup></p>
+  <p><strong>How that compares.</strong> Of 10 image and video studios I checked on their own pages on October 28, 7 let unused plan credits expire: OpenArt, Higgsfield, Magnific, VEED, Artlist, Midjourney and Sunra. The 3 that carry credits over put a limit on it: Leonardo keeps up to 3 months, Runway keeps 1 month on its $95 plan, and Krea only on business plans. None keeps plan credits forever, as Solorender does.<sup><a href="#s26">26</a></sup></p>
+  <p>On October 20 I cut the menu from 112 models to 56, keeping a top choice, a value choice and a cheap draft for each kind of job, so a newcomer isn't facing a wall of names.</p>
+</section>
+
+<section id="course">
+  <h2><span class="no">2</span>How I'll win customers: the AI Filmmaking course</h2>
+  <p>For at least the next 60 days, the AI Filmmaking course is the main way I'll bring in customers. Affiliates and content creators on YouTube and X come first and lead with it; ads come third and lead with it too.</p>
+  <div class="pieces">
+    <div class="piece"><div class="label">What it is</div><p>25 lessons in 5 modules: plan your film, make your pictures, shoot your clips, edit and finish, publish and grow. Every lesson ends with something the student has made. One running example, Agnes, an 84-year-old who secretly wins her town's downhill soapbox derby, is built step by step inside Solorender.</p></div>
+    <div class="piece"><div class="label">It sells the bigger plans</div><p>The course comes with the Studio plan ($40 a month), Max and Super Max. Solo customers see the full outline and an upgrade button. So a customer who comes for the course is worth about twice a Solo customer.</p></div>
+    <div class="piece"><div class="label">Ready to promote</div><p>Four finished course ads, each in wide and tall versions, all made in Solorender itself; two are already posted as Shorts on Solorender's YouTube channel. A video of an ad being built step by step is live on the site.</p></div>
+  </div>
+  <p>The table below uses the three cases explained in section 5. The cautious case uses the least favorable published benchmarks and the best case the most favorable. "What they leave me" is what a customer pays in their first year, minus my AI cost and card fees.</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Case</th><th>Cost to win one paying customer on Meta</th><th>What they leave me in year one, Solo plan ($20)</th><th>What they leave me in year one, Studio plan ($40, with the course)</th></tr></thead>
+    <tbody>
+      <tr><td>Cautious</td><td>$172</td><td>$28</td><td>$53</td></tr>
+      <tr><td>Middle</td><td>$92</td><td>$40</td><td>$74</td></tr>
+      <tr><td>Best</td><td>$57</td><td>$58</td><td>$109</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="note">Studio: $40, minus my AI cost if every credit is used ($17.80), minus the card fee ($1.74), leaves $20.46 a month. That is multiplied by the same months-paying as section 5.<sup><a href="#s3">3</a>, <a href="#s29">29</a></sup> This assumes a course customer costs the same to win and stays as long as any other customer. The ad test will show what a paying customer really costs (200 sign-ups should give about 21–35 paying customers). How long course customers stay will take months of real data to show.</p>
+  <p>In the middle case, a course customer comes close to paying back the cost of an ad within a year ($74 against $92). In the best case, they bring back nearly twice what they cost. That is why the course leads.</p>
+</section>
+
+<section id="proof">
+  <h2><span class="no">3</span>Proof the category works</h2>
+  <p>Solorender is a multi-model studio: it resells the best models from many AI labs in one app instead of training its own. Every figure below appears in at least two published sources, though most are figures the companies reported about themselves.</p>
+  <ul class="plain">
+    <li><strong>Magnific</strong> (formerly Freepik) uses, in its own words, "the same frontier models as our competitors." It reports $230 million in yearly recurring revenue and more than 1 million paying subscribers, with no venture capital.<sup><a href="#s37">37</a></sup></li>
+    <li><strong>Higgsfield</strong> is described by the research firm Sacra as "a model-agnostic aggregator." It reports a $1 billion annualized revenue run rate (one month's revenue times 12) and was valued at $5.4 billion in August 2026.<sup><a href="#s38">38</a></sup></li>
+    <li><strong>OpenArt</strong> also builds on other labs' models. It reports growing from $10.5 million to over $70 million in yearly recurring revenue during 2025.<sup><a href="#s39">39</a></sup></li>
+    <li><strong>Buyers and backers:</strong> Figma bought Weavy, a canvas that combines different AI models. Redpoint led a $42 million round in Flora, built to "stitch different models together." Krea, a layer over many models, raised at a $500 million valuation.<sup><a href="#s40">40</a></sup></li>
+    <li><strong>Small teams can break out:</strong> Arcads, an AI ad-video tool started by two founders, reached about $6 million in yearly revenue in 2025 with a team of five engineers, before taking any outside money. Its founder names paid Meta ads as the most important channel.<sup><a href="#s42">42</a></sup></li>
+    <li><strong>The suppliers are well funded:</strong> fal raised at a $4.5 billion valuation, and Runware raised a $50 million Series A (a company's first large venture round).<sup><a href="#s41">41</a></sup></li>
+  </ul>
+</section>
+
+<section id="built">
+  <h2><span class="no">4</span>What I have built</h2>
+  <div class="pieces">
+    <div class="piece"><div class="label">Pictures</div><p>Create images from a sentence, then edit them by describing the change. Erase objects, enlarge and sharpen, grow a square into a banner, and keep the same person across new scenes. 22 picture models and editors, from one-credit drafts to studio-grade.</p></div>
+    <div class="piece"><div class="label">Video</div><p>Turn a picture into a moving clip, or go straight from a written scene in wide, tall or square. Clips up to 30 seconds, many with sound built in, and several camera shots in a single clip.</p></div>
+    <div class="piece"><div class="label">Clip tools</div><p>Add seconds, upscale to 4K, rewrite a scene by typing, change a clip's shape while the AI fills the new space, give a silent clip its sound, or grab any frame to start the next shot. <strong>Act It Out:</strong> film yourself acting, and a character copies your moves.</p></div>
+    <div class="piece"><div class="label">Voice, music &amp; sound</div><p>Professional voiceovers in 29 languages, full songs with vocals, background music and sound effects from a description, all from the same wallet.</p></div>
+    <div class="piece"><div class="label">Talking photos</div><p>Pick a face and a voice and the person speaks, with matching lip movement. Customers can also re-sync any clip to a new voice track, including a recording of their own voice.</p></div>
+    <div class="piece"><div class="label">Video editor</div><p>My own timeline editor, open to customers on any plan since October 22: trim, titles, voice and music, captions written automatically from the speech, and free export.</p></div>
+    <div class="piece"><div class="label">Make vertical</div><p>One click turns a wide clip into a tall 9:16 copy for TikTok, Reels and Shorts, following the faces. It runs in the customer's browser, so it uses no credits and costs me nothing. Studio plan and up.</p></div>
+    <div class="piece"><div class="label">Flow &amp; films</div><p>A visual canvas for whole projects. One button, <em>Render film</em>, stitches clips, voice, captions and sound into a finished video, with the sound levelled the way a broadcast editor would.</p></div>
+    <div class="piece"><div class="label">Recipes</div><p>54 ready-made productions: a narrated product ad from one photo, a creator testimonial, a two-host podcast clip, a shop listing set, a headshot pack and more, in Saver, Standard and Best price levels. A recipe that kept failing my checks was dropped.</p></div>
+    <div class="piece"><div class="label">Characters &amp; products</div><p>Save a person, character or product once, then call it by name in any prompt. The video models keep that face or product the same from shot to shot, the hardest problem in AI video and the one brands care about most.</p></div>
+    <div class="piece"><div class="label">Prompt Library &amp; styles</div><p>173 published ready-to-use prompts in 17 categories (145 more in testing), each with a public page Google can find, and 198 original visual styles customers can apply or make from their own pictures.</p></div>
+    <div class="piece"><div class="label">Direct button &amp; AI agents</div><p>One click turns a rough idea into a full prompt, including how characters act and what to avoid. Customers can also run Solorender from inside Claude and other AI assistants.</p></div>
+    <div class="piece"><div class="label">Learning</div><p>A 25-lesson AI filmmaking course for the larger plans, 24 public model and tool guides with real results, a "How to prompt" guide with videos, a help center of about 50 pages, and the Solorender YouTube channel.</p></div>
+    <div class="piece"><div class="label">Plans that scale</div><p>Bigger plans run more jobs at once, jump the queue for films and get more storage, from 5 GB up to 2 TB. The product itself enforces these limits.</p></div>
+  </div>
+
+  <h3 style="margin-top:30px">How I got here</h3>
+  <p class="note">Each date is when the work first appears in the code history.<sup><a href="#s3">3</a></sup></p>
+  <div class="ledger">
+    <div class="mile"><time>August</time><div>Groundwork: the plan, a first prototype, accounts and a test checkout.</div></div>
+    <div class="mile big"><time>Sep 10</time><div><strong>First version live at solorender.com.</strong> The start of the work shown in this letter.</div></div>
+    <div class="mile"><time>Sep 12</time><div>Round-the-clock watchdog on the live site.</div></div>
+    <div class="mile big"><time>Sep 18</time><div><strong>Real payments switched on</strong> for plans and offers. Six pro tools: expand, video upscale, extend, edit by typing, restyle, talking photos.</div></div>
+    <div class="mile"><time>Sep 20</time><div>Top-up packs for plan holders.</div></div>
+    <div class="mile"><time>Sep 21</time><div>AI-agent access. Characters saved in Flow.</div></div>
+    <div class="mile big"><time>Sep 30</time><div><strong>Solorender, Inc. filed</strong> (approved October 2).</div></div>
+    <div class="mile"><time>Oct 7</time><div>Google sign-in and the Direct button.</div></div>
+    <div class="mile"><time>Oct 9</time><div>Characters and products called by name. Owner console. Partner tracking. Refund and dispute protection. Built-in style library.</div></div>
+    <div class="mile"><time>Oct 10–12</time><div>Automatic supplier sale prices. Phone alerts. Styles page and make-your-own styles.</div></div>
+    <div class="mile"><time>Oct 14–18</time><div>New home page and pricing, a second AI supplier, Prompt Library, recipe price levels, the course, multi-shot clips, own file storage, plan perks enforced.</div></div>
+    <div class="mile big"><time>Oct 20</time><div><strong>Google's models bought direct from Google, at lower prices.</strong> Menu cut from 112 models to 56.</div></div>
+    <div class="mile big"><time>Oct 22</time><div><strong>Video editor opens to customers on any plan.</strong></div></div>
+    <div class="mile"><time>Oct 23–27</time><div>Sound effects, Add Sound, Act It Out, frame grab, Make vertical, Reframe, film assembly on Google Cloud, 24 public guides, the YouTube channel.</div></div>
+  </div>
+</section>
+
+<section id="worth">
+  <h2><span class="no">5</span>What a customer is worth, honestly</h2>
+  <p>An investor will ask what it costs to win a paying customer, and whether that customer pays it back. My own sales history is too young to measure this, so I built both answers from published benchmarks, using at least two sources for each input and three cases wherever the sources disagree. The cases describe the outlook, not the price: the cautious case uses the least favorable published figures (customers cost the most to win and leave the fastest), the best case the most favorable.</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Case</th><th>Cost to win one paying customer on Meta</th><th>Still paying after 6 months</th><th>After 12 months</th><th>What they leave me in year one, after AI and card costs</th></tr></thead>
+    <tbody>
+      <tr><td>Cautious</td><td>$172</td><td>13 in 100</td><td>about 5 in 100</td><td>$28</td></tr>
+      <tr><td>Middle</td><td>$92</td><td>23 in 100</td><td>about 12 in 100</td><td>$40</td></tr>
+      <tr><td>Best</td><td>$57</td><td>40 in 100</td><td>about 26 in 100</td><td>$58</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <ul class="plain">
+    <li><strong>Cost to win a customer</strong> = Meta's cost per click ÷ the share of visitors who sign up and then pay. All three cases use WordStream's $0.70 a click (554 campaigns); Madgicx's $0.53 (October 2026) would make every case about 25% cheaper.<sup><a href="#s6">6</a>, <a href="#s7">7</a></sup> Sign-up rates: Unbounce's software median and First Page Sage's paid-traffic figure.<sup><a href="#s9">9</a>, <a href="#s10">10</a></sup> Pay rates: RevenueCat's figure for apps that ask for payment up front, as Solorender does. The best case uses First Page Sage's figure, which comes from companies that offer a free trial, so treat it as the upper end. Apps with a free plan convert lower still.<sup><a href="#s9">9</a>, <a href="#s11">11</a>, <a href="#s12">12</a></sup> For comparison, First Page Sage puts the cost to win a consumer software customer at $178 (entertainment) to $274 (design).<sup><a href="#s13">13</a></sup></li>
+    <li><strong>How long they stay</strong> comes from 4 sources side by side: RevenueCat (115,000+ apps), ChartMogul (2,500+ subscription companies, plus a study of AI tools), Baremetrics (800+ startups) and Earnest card-spending data.<sup><a href="#s11">11</a>, <a href="#s19">19</a>, <a href="#s20">20</a>, <a href="#s21">21</a></sup> AI apps lose customers faster than other apps, so even the middle case sits below the "good" bar in Lenny Rachitsky's survey of growth experts: about 40 in 100 subscribers still paying after 6 months.<sup><a href="#s22">22</a></sup></li>
+    <li><strong>What a customer leaves me</strong> on the $20 Solo plan: $20, minus my AI cost if every credit is used ($8), minus card fees ($1.02). That is about $11 a month, times the months they stay in year one.</li>
+  </ul>
+  <p><strong>What this means.</strong> On published averages, a customer won through Meta ads on the cheapest plan pays back within a year only in the best case, and there only just ($58 back for $57 spent). It shapes the plan:</p>
+  <ul class="plain">
+    <li><strong>Affiliates first, ads later.</strong> An affiliate customer costs nothing until they pay, so affiliates and content creators launch first (section 6). Ads get only a small test. More money goes to ads only if a customer costs less than they bring back within 12 months; otherwise the growth money goes to the creators who are selling (section 11).</li>
+    <li><strong>The levers are already built into the product:</strong> yearly plans, which in ChartMogul's data keep far more customers (62 in 100 against 41 in 100 a year for products under $25) and collect a year up front;<sup><a href="#s19">19</a></sup> bigger plans, which leave more per customer; and unused credits. These numbers assume every credit is used, so any credit a customer doesn't use is extra margin.</li>
+    <li><strong>A simple, fair margin.</strong> Every model is priced at 2.5 times what it costs me. The bigger plans add bonus credits (Studio's $40 buys 4,450 credits instead of 4,000), so on those plans my margin is a little lower. When my cost drops, the customer's price drops with it, so supplier savings make Solorender cheaper to choose rather than fattening my margin: buying Google's models direct cut Veo 3.1 Fast's cost from $0.15 to $0.10 a second,<sup><a href="#s4">4</a></sup> and Runware cut a 5-second Seedance 2.0 clip from $1.52 to $0.79.<sup><a href="#s5">5</a></sup> Supplier sales on fal.ai are passed on automatically three times a day.</li>
+  </ul>
+</section>
+
+<section id="affiliates">
+  <h2><span class="no">6</span>Affiliates: customers with no upfront cost</h2>
+  <p>Affiliates are my first channel, and they have been the plan from the start. An ad has to be paid for before anyone buys. An affiliate customer costs me nothing until they pay, and the affiliate's share comes out of that payment.</p>
+  <p class="note">Two words used in this letter: <strong>affiliates</strong> are anyone who signs up for a personal link and earns a share of what their customers pay. <strong>Content creators</strong> are a smaller group of AI creators on YouTube and X, people who post how-tos and workflows, whom I pay to show Solorender in a video or a thread and give a free Studio plan, to find the few who sell. The ones who sell keep earning as affiliates.</p>
+  <ul class="plain">
+    <li><strong>How it works.</strong> Anyone can join at solorender.com/affiliates and get a personal link. A visitor who clicks it has 60 days to make a first purchase; the affiliate then earns 25% of the plans, Super Max packs and $8 starter offers that customer buys for 12 months. Top-up packs earn nothing.</li>
+    <li><strong>Paid only from money already in.</strong> Commissions are paid 30 days after each month ends, once an affiliate reaches $50. A refund reverses the commission automatically, which I tested with a real purchase and refund on October 10.</li>
+    <li><strong>Affiliates who bring in other affiliates</strong> can earn 5% of what their recruits bring in, from my share; the recruit still gets the full 25%.</li>
+    <li><strong>Live and ready.</strong> Tracking has run since October 9, and I've listed 303 creators, newsletters and communities to invite, with invitations written.</li>
+    <li><strong>How the terms compare.</strong> Higgsfield pays "up to 25%" for up to 12 months, Arcads 25% for 12 months, Synthesia 25%, Hedra 15% for a year, and Magnific 10% of the first payment only. Runway pays $15 per new subscriber and gives partners a free Max plan.<sup><a href="#s25">25</a></sup> Software affiliate programs typically pay 20–25%.<sup><a href="#s23">23</a>, <a href="#s24">24</a></sup></li>
+  </ul>
+  <p><strong>Every affiliate sale stays profitable,</strong> even if the customer uses every credit they bought:</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Sale</th><th>Affiliate earns</th><th>My AI cost at most</th><th>Card fee</th><th>I keep at least</th></tr></thead>
+    <tbody>
+      <tr><td>$8 starter offer</td><td>$2.00</td><td>$4.40</td><td>$0.53</td><td>$1.07</td></tr>
+      <tr><td>Solo plan, $20 a month</td><td>$5.00</td><td>$8.00</td><td>$1.02</td><td>$5.98</td></tr>
+      <tr><td>Studio plan, $40 a month</td><td>$10.00</td><td>$17.80</td><td>$1.74</td><td>$10.46</td></tr>
+      <tr><td>Max plan, $80 a month</td><td>$20.00</td><td>$37.80</td><td>$3.18</td><td>$19.02</td></tr>
+      <tr><td>Super Max pack, $300</td><td>$75.00</td><td>$171.00</td><td>$9.00</td><td>$45.00</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="note">AI cost: the offer's credits at my price list ÷ 2.5, what I pay suppliers if every credit is used.<sup><a href="#s3">3</a></sup> Card fee: Stripe's 2.9% + 30¢, plus Stripe's 0.7% subscription fee on monthly plans.<sup><a href="#s29">29</a></sup> A 5% recruiter cut comes off "I keep"; the thinnest row, the $8 offer, still keeps $0.67.</p>
+  <p><strong>Being realistic.</strong> In Rewardful's study of 2,847 software affiliate programs, only about 1 affiliate in 80 ever made a sale, and the revenue came from about a tenth of affiliates.<sup><a href="#s23">23</a></sup> A program grows by finding the few creators who sell, which is what the content creator budget pays for (section 11).</p>
+</section>
+
+<section id="costs">
+  <h2><span class="no">7</span>Running costs and the tech behind them</h2>
+  <p>Every service in the stack charges by use, so the bill grows with customers. I worked out what each paying customer costs to serve from what each service charges and what Solorender actually used in October.<sup><a href="#s30">30</a></sup> These figures hold whichever channel brings the customer in. Every customer is assumed to use every credit, so AI costs are as high as they can be.</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Plan</th><th>Price a month</th><th>AI suppliers, at most</th><th>Card fees</th><th>Tech (serving and a year of stored files)</th><th>Left after all of it</th></tr></thead>
+    <tbody>
+      <tr><td>Solo</td><td>$20</td><td>$8.00</td><td>$1.02</td><td>$0.11</td><td>$10.87</td></tr>
+      <tr><td>Studio</td><td>$40</td><td>$17.80</td><td>$1.74</td><td>$0.25</td><td>$20.21</td></tr>
+      <tr><td>Max</td><td>$80</td><td>$37.80</td><td>$3.18</td><td>$0.53</td><td>$38.49</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>On top of that, a few services cost the same at any size: about $62 a month for the website plan, database, company email, releases and domain. Six paying Solo customers cover them. The table below shows the whole monthly bill at three sizes, counting every customer on the Solo plan and a full year of their files in storage:</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Paying customers</th><th>Money in</th><th>AI suppliers</th><th>Card fees</th><th>Tech services</th><th>Left before marketing and my pay</th></tr></thead>
+    <tbody>
+      <tr><td>100</td><td>$2,000</td><td>$800</td><td>$102</td><td>$66</td><td>$1,032</td></tr>
+      <tr><td>1,000</td><td>$20,000</td><td>$8,000</td><td>$1,020</td><td>$155</td><td>$10,825</td></tr>
+      <tr><td>10,000</td><td>$200,000</td><td>$80,000</td><td>$10,200</td><td>$1,173</td><td>$108,627</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p><strong>What this shows:</strong> AI suppliers are the only large cost, and they are paid out of each sale. Tech services grow from $66 a month at 100 customers to about $1,173 at 10,000, mostly file storage and website serving. The raise pays for growth, founder pay, and legal and accounting, not for keeping the site running.</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Piece</th><th>What it does</th><th>Provider</th><th>Cost per month</th></tr></thead>
+    <tbody>
+      <tr><td>Website &amp; app</td><td>The studio itself, built in Next.js</td><td>Vercel</td><td>$20 plan, which includes $20 of usage; serving cost about 3¢ per 1,000 credits spent in October<sup><a href="#s30">30</a>, <a href="#s31">31</a></sup></td></tr>
+      <tr><td>Accounts &amp; data</td><td>Logins, the credit ledger, libraries</td><td>Supabase</td><td>$25 Pro plan with daily backups; database 26 MB of 8 GB<sup><a href="#s32">32</a></sup></td></tr>
+      <tr><td>Payments</td><td>Checkout, subscriptions, refunds</td><td>Stripe</td><td>2.9% + 30¢ per card payment, plus 0.7% on subscriptions<sup><a href="#s29">29</a></sup></td></tr>
+      <tr><td>AI models</td><td>Image, video, voice and music, bought at supplier (wholesale) prices</td><td>Google, fal.ai, Runware</td><td>Paid from each sale (price = cost × 2.5)</td></tr>
+      <tr><td>Storage</td><td>Every file, about 0.14 MB per credit</td><td>Cloudflare R2</td><td>First 10 GB free, then $0.015 per GB a month<sup><a href="#s33">33</a></sup></td></tr>
+      <tr><td>Film assembly</td><td>Stitches clips, voice and captions</td><td>Google Cloud</td><td>About 0.1¢ per film, inside a free allowance<sup><a href="#s34">34</a></sup></td></tr>
+      <tr><td>Email</td><td>Company email, 2 users</td><td>Google Workspace</td><td>$14 on a yearly plan<sup><a href="#s35">35</a></sup></td></tr>
+      <tr><td>Builds &amp; domain</td><td>Two releases a day; solorender.com</td><td>Vercel, Cloudflare</td><td>About $1.68; domain $10.46 a year<sup><a href="#s36">36</a></sup></td></tr>
+      <tr><td>Free at this size</td><td>Code hosting, phone alerts, video toolkit</td><td>GitHub, Telegram, Remotion</td><td>$0 (Remotion is free up to three people; its $600 editor kit is a one-time purchase, section 11)<sup><a href="#s35">35</a></sup></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <ul class="plain">
+    <li>A watchdog has checked the live site every 30 minutes since September 12, and every 5 minutes the system checks for stuck films and supplier refusals, messaging my phone only when something breaks.</li>
+    <li>Refunds and card disputes take the credits back. A failed job refunds the customer automatically and is never quietly re-run somewhere else. Uploaded clips are billed on their real length.</li>
+    <li>Long video jobs finish and save even if the customer closes the browser, and every file is copied into my own storage instead of relying on a supplier's short-lived links.</li>
+    <li>Because I buy AI wholesale instead of training my own models, I can add a new model within days of its release and move each model to whichever supplier sells it cheapest.</li>
+  </ul>
+</section>
+
+<section id="me">
+  <h2><span class="no">8</span>About me</h2>
+  <p>I'm the only person behind Solorender, so you should know who you'd be backing.</p>
+  <div class="ledger">
+    <div class="mile"><time>2001–2004</time><div><strong>Software.</strong> I worked for a software company that made check-imaging software for the high-net-worth clients of regional banks in California, working in MySQL, JSP, JavaScript, Flash and Java.</div></div>
+    <div class="mile"><time>2004–2006</time><div><strong>Building from zero.</strong> I started a home remodeling business in California with simple bathroom remodels. It quickly grew into kitchen renovations, house additions, exterior work and commercial jobs for four wholesale tile companies, and brought in $1 million in sales in its first year.</div></div>
+    <div class="mile"><time>2006–2008</time><div><strong>Indiana.</strong> A tile executive hired me to help him open and run a flooring store in southern Indiana. It reached $1 million in sales within nine months, mostly big commercial jobs for auto dealerships, churches, schools and colleges.</div></div>
+    <div class="mile"><time>2008–2023</time><div><strong>Cannabis.</strong> I came back to California for family reasons in early 2008, in the middle of the housing crash, when home remodeling work had all but disappeared. Through a series of happy coincidences I ended up in the cannabis industry, working mainly as a broker. It was very lucrative until late 2023, when the California market became supersaturated.</div></div>
+    <div class="mile"><time>2024–2025</time><div><strong>A break.</strong> Part-time broker, full-time dad, taking a break from the grind.</div></div>
+    <div class="mile big"><time>2025</time><div>In October 2025, I lost my son, EJ. It destroyed me mentally and emotionally, and for most of a year I wasn't able to work.</div></div>
+    <div class="mile"><time>2026</time><div>In July of this year, I started learning about AI and looking for opportunities in it. This corner of the industry has a low barrier to entry, which brings a lot of competition. That's OK. I've helped take two businesses from nothing to $1 million in sales within a year, and I know what starting from zero takes.</div></div>
+  </div>
+</section>
+
+<section id="risks">
+  <h2><span class="no">9</span>Risks and how I reduce them</h2>
+  <p>These are the risks I would ask about in your place.</p>
+  <div class="risks">
+    <div class="risk"><h3>One founder</h3><p>Everything here was built and is run by one person. The site runs on automated checks (a watchdog every 30 minutes, and checks every 5 minutes that message my phone only when something breaks), and the raise funds 18 months of full-time founder pay.</p></div>
+    <div class="risk"><h3>A short sales history</h3><p>Solorender is newly launched, so there are only weeks of sales to judge by. The launch leads with affiliates, who are paid only from sales, content creators on YouTube and X, and an $8 no-subscription starter offer. Ads get only a small test at first.</p></div>
+    <div class="risk"><h3>Weak payback on published averages</h3><p>On the cheapest plan, an ad-won customer pays back within a year only in the best case (section 5). That is why affiliates come first and ads scale only if Solorender's own test beats that. Yearly plans, bigger plans and unused credits all improve it.</p></div>
+    <div class="risk"><h3>Rivals sell below my cost</h3><p>Some competitors price below what suppliers charge me. I lead with what they don't offer: credits that never expire and no-subscription buying. The Runware deposit and buying direct from Google lower my prices further.</p></div>
+    <div class="risk"><h3>Dependence on AI suppliers</h3><p>I buy from three suppliers (Google, fal.ai and Runware) and can move a model between them. I read each supplier's terms before reselling a model, and keep a model hidden until its terms allow resale.</p></div>
+    <div class="risk"><h3>A fast-moving market</h3><p>Models improve every few weeks. Because I resell rather than train, I can add a new model within days and drop one that falls behind, as the October menu cut did.</p></div>
+  </div>
+</section>
+
+<section id="goal">
+  <h2><span class="no">10</span>The next 12 months</h2>
+  <p><strong>My goal is $1 million in revenue by October 2027, one year from now.</strong> That is 11 months of sales after a December launch, with monthly sales growing by the same amount each month from a $2,500 start:</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Month</th><th>Monthly sales goal</th><th>Collected so far</th><th>Paying customers it takes</th></tr></thead>
+    <tbody>
+      <tr><td>Dec 2026</td><td>$2,500</td><td>$2,500</td><td>about 60–125</td></tr>
+      <tr><td>Jan 2027</td><td>$20,182</td><td>$22,682</td><td>about 500–1,000</td></tr>
+      <tr><td>Apr 2027</td><td>$73,227</td><td>$189,318</td><td>about 1,800–3,700</td></tr>
+      <tr><td>Jul 2027</td><td>$126,273</td><td>$515,091</td><td>about 3,200–6,300</td></tr>
+      <tr><td>Oct 2027</td><td>$179,318</td><td>$1,000,000</td><td>about 4,500–9,000</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="note">Customers: monthly sales ÷ $40 (Studio) to ÷ $20 (Solo).</p>
+  <p><strong>This is a breakout goal, and I'm stating it as one.</strong></p>
+  <ul class="plain">
+    <li>Reaching even a $1 million yearly pace (one month's sales times 12) in the first year puts a company in roughly the top 3 in 100: of 6,525 software companies ChartMogul tracked, about 3 in 100 got there in under a year.<sup><a href="#s44">44</a></sup> The top 100 AI companies on Stripe took a median 11.5 months.<sup><a href="#s43">43</a></sup></li>
+    <li>My goal is harder than that. Collecting $1 million means ending at about $179,000 a month, a pace of about $2.15 million a year.</li>
+    <li>Small teams have run this path. Arcads, with two founders, made about $5,000 in its first week, reached a $1 million yearly pace in 5 months and a $5 million pace by month 15 (April 2025).<sup><a href="#s42">42</a></sup> HeyGen, also two founders, reached a $1 million yearly pace in about 6 months.<sup><a href="#s45">45</a></sup></li>
+    <li>The customers have to come mostly from my first two channels: affiliates, and content creators on YouTube and X who post how-tos and workflows, all leading with the AI Filmmaking course. Then search visitors to the public prompt and guide pages, word of mouth from finished films, and new models on their release day. Ads come third. None of these channels is proven for Solorender yet; the first months of the raise are spent finding out which ones sell, and the growth money goes to those (section 11).</li>
+  </ul>
+</section>
+
+<section id="raise">
+  <h2><span class="no">11</span>What I am raising</h2>
+  <p>I am raising <strong>up to $200,000</strong> for seven things. I priced each one on its own and added them up. Some prices are published as ranges, so I show both ends. With every price at its high end, the plan costs $182,084. The rest is a buffer for surprises, inside the 5–15% that startup budgeting guides advise.<sup><a href="#s54">54</a></sup> Either way the total is $200,000. The buffer sits in the growth money and is spent only on what is already selling.</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Use</th><th>If prices come in low</th><th>If prices come in high</th></tr></thead>
+    <tbody>
+      <tr><td>1 · Lower prices for customers</td><td>$25,000</td><td>$25,000</td></tr>
+      <tr><td>2 · Affiliates and content creators (first)</td><td>$9,404</td><td>$25,824</td></tr>
+      <tr><td>3 · Ads (a small test)</td><td>$2,861</td><td>$9,846</td></tr>
+      <tr><td>4 · Growth money (a goal, plus the buffer)</td><td>$65,572</td><td>$33,847</td></tr>
+      <tr><td>5 · Legal and accounting</td><td>$6,563</td><td>$14,883</td></tr>
+      <tr><td>6 · Video editor upgrade</td><td>$600</td><td>$600</td></tr>
+      <tr><td>7 · Founder runway (18 months)</td><td>$90,000</td><td>$90,000</td></tr>
+      <tr><td><strong>Total</strong></td><td><strong>$200,000</strong></td><td><strong>$200,000</strong></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="use">
+    <h3><span>1 · Lower prices for customers</span><span class="usd">$25,000</span></h3>
+    <p>Because my price is always 2.5 times my cost, every dollar I save takes $2.50 off what the customer pays. That matters because some rivals already sell below what I pay suppliers today (section 9).</p>
+    <ul class="how">
+      <li><span>Deposit with Runware: $25,000 becomes $35,000 of credit that never expires, 30% off what I buy there. Non-refundable; customer sales use up the credit over time. I pay it as soon as the raise comes in, so customers get the lower prices from the start.<sup><a href="#s1">1</a></sup></span><b>$25,000</b></li>
+      <li><span>Two cuts that cost nothing. Google sells its Nano Banana picture models at half price when the customer can wait for the result, so a Nano Banana Pro picture could drop from 35 credits to 17. And fal sells a 720p version of Kling 2.5 Turbo at $0.21 a clip against $0.35 for 1080p, so it could sell for 53 credits instead of 88.<sup><a href="#s49">49</a></sup></span><b>$0</b></li>
+      <li><span>Free startup credit programs (Cloudflare, Microsoft, Google, Runware, AWS). I've applied to Google's and to Runware's free Starter program, which is separate from the deposit above.<sup><a href="#s2">2</a></sup></span><b>$0</b></li>
+    </ul>
+  </div>
+
+  <div class="use">
+    <h3><span>2 · Affiliates and content creators (first)</span><span class="usd">$9,404–$25,824</span></h3>
+    <p>Affiliates and content creators are my first two channels and have been the plan from the start. The idea came from X, where AI creators post how-tos and workflows built on specific AI apps every day; Solorender gives them one studio to show. Affiliate commissions come out of sales, not this budget. This first round finds the creators who sell. Each one has their own tracked link, so I can see which of them bring paying customers.</p>
+    <ul class="how">
+      <li><span>10 sponsored trial segments with AI YouTube channels of 50,000–250,000 subscribers, at published estimates of $325–$867 each.<sup><a href="#s17">17</a>, <a href="#s18">18</a></sup></span><b>$3,250–$8,670</b></li>
+      <li><span>10 sponsored how-to threads on X from AI creators with 10,000–100,000 followers, at published estimates of $100–$1,200 a thread.<sup><a href="#s48">48</a></sup></span><b>$1,000–$12,000</b></li>
+      <li><span>A free Studio plan for 20 active creators on either platform for a year, as Runway does, so they can take the course and teach from it; at most $17.80 a month each.<sup><a href="#s3">3</a>, <a href="#s25">25</a></sup></span><b>up to $4,272</b></li>
+      <li><span>Creator search tool for YouTube (Heepsy Starter), 6 months at $89.<sup><a href="#s27">27</a></sup></span><b>$534</b></li>
+      <li><span>Affiliate tracking (PromoteKit), a year paid upfront at $29 a month.<sup><a href="#s28">28</a></sup></span><b>$348</b></li>
+    </ul>
+  </div>
+
+  <div class="use">
+    <h3><span>3 · Ads (a small test)</span><span class="usd">$2,861–$9,846</span></h3>
+    <p>Ads are my third channel. A small test measures what a paying customer really costs on each platform, sized to Meta's rule that an ad set settles after "about 50 results in the week."<sup><a href="#s14">14</a></sup> The ads promote the AI Filmmaking course, using the four finished course ads.</p>
+    <ul class="how">
+      <li><span>Meta ads, 4 weeks, 200 sign-ups. The budget covers the lowest and highest published click prices, $0.53–$0.75.<sup><a href="#s6">6</a>, <a href="#s7">7</a>, <a href="#s9">9</a>, <a href="#s10">10</a></sup></span><b>$1,493–$3,947</b></li>
+      <li><span>TikTok ads, 200 sign-ups, at $0.26–$1.00 a click (all-industry figures).<sup><a href="#s8">8</a></sup></span><b>$732–$5,263</b></li>
+      <li><span>AI tool directories: There's An AI For That $437, Toolify $99 plus 500 clicks for $100.<sup><a href="#s15">15</a>, <a href="#s16">16</a></sup></span><b>$636</b></li>
+    </ul>
+  </div>
+
+  <div class="use">
+    <h3><span>4 · Growth money (a goal, plus the buffer)</span><span class="usd">$33,847–$65,572</span></h3>
+    <p>Held back until a channel proves itself. It goes first to more segments, threads and free plans for the creators whose links bring paying customers. It goes to ads only if the ad test shows a customer pays back within 12 months.</p>
+    <ul class="how">
+      <li><span>Sized for a goal: by month 12, enough customers paying at once that sales cover my $5,000 a month and the fixed services. That is about 251 Studio customers, who leave $20.21 a month each after AI, card and tech costs (section 7). The course comes with every plan except Solo, so I sized for Studio, the smallest plan that includes it. $15,931 is the most cash that takes at any one point if every customer came from ads at the middle-case costs in section 5, counting what customers pay back along the way. Ads are the only channel with a published cost per customer; affiliates and creators may cost less.</span><b>$15,931</b></li>
+      <li><span>The buffer: held back for surprises, then put into whichever channel is selling.<sup><a href="#s54">54</a></sup></span><b>$17,916–$49,641</b></li>
+    </ul>
+  </div>
+
+  <div class="use">
+    <h3><span>5 · Legal and accounting</span><span class="usd">$6,563–$14,883</span></h3>
+    <ul class="how">
+      <li><span>A startup lawyer checks the standard SAFE and the securities filings, at published prices for a SAFE round with few changes.<sup><a href="#s50">50</a></sup></span><b>$2,500–$7,000</b></li>
+      <li><span>Securities notices: the federal Form D is free; California charges $50 or $300, depending on the exemption used.<sup><a href="#s51">51</a></sup></span><b>$50–$300</b></li>
+      <li><span>Bookkeeping for the first 12 months, at $99–$359 a month.<sup><a href="#s52">52</a></sup></span><b>$1,188–$4,308</b></li>
+      <li><span>The company's federal tax return, at published starting prices.<sup><a href="#s52">52</a></sup></span><b>$2,000–$2,450</b></li>
+      <li><span>California's $800 minimum tax in year two (a new corporation's first year is exempt) and the $25 yearly company statement.<sup><a href="#s53">53</a></sup></span><b>$825</b></li>
+    </ul>
+  </div>
+
+  <div class="use">
+    <h3><span>6 · Video editor upgrade</span><span class="usd">$600</span></h3>
+    <ul class="how"><li><span>Remotion's Editor Starter, a one-time purchase: the maker's own ready-made video editor (timeline, on-screen canvas, font picker, uploads), built on the same toolkit as my editor. I'll use it to upgrade the editor customers already use. Remotion itself stays free while Solorender has three people or fewer.<sup><a href="#s35">35</a></sup></span><b>$600</b></li></ul>
+  </div>
+
+  <div class="use">
+    <h3><span>7 · Founder runway (18 months)</span><span class="usd">$90,000</span></h3>
+    <ul class="how"><li><span>Founder pay of $5,000 a month for the first 18 months, the length most investor guides advise a seed raise to last.<sup><a href="#s55">55</a></sup> After month 12, or sooner, my pay rises to $7,333 a month ($88,000 a year, Pilot's 2026 average for founders without investors) only once monthly sales, after AI, card and tech costs, cover it. The raise itself never pays me more than $5,000 a month.<sup><a href="#s46">46</a></sup></span><b>$90,000</b></li></ul>
+    <p class="note">$60,000 a year is at or below every published founder-pay figure I found. The middle founder in Pilot's 2025 survey of 1,844 founders paid themselves $75,000. In its 2026 survey, founders without outside money averaged $88,000 and founders with investors averaged $131,000. Kruze puts the average at the seed stage at $153,000, and Creandum's 2025 survey puts founders at my stage at about €60,000.<sup><a href="#s46">46</a>, <a href="#s47">47</a></sup></p>
+  </div>
+</section>
+
+
+
+<section id="company">
+  <h2><span class="no">12</span>The company</h2>
+  <p>Solorender is operated by <strong>Solorender, Inc.</strong>, a California corporation filed on September 30, 2026 and approved on October 2. Founding documents, including the assignment of all technology to the company, were signed on October 4, and the company received its federal tax ID on October 13. It is set up the standard way for a startup that plans to raise money: one class of common stock, held by the founder, with all the technology owned by the company. Card payments now run under the company's name.</p>
+  <p>I would welcome the chance to show you the studio live. Give me fifteen minutes and one photo of a product you like, and I will turn it into a finished ad film in front of you.</p>
+  <p>Thank you for reading.</p>
+  <div class="sign">
+    <div><div class="name">Edmond "Eddie" Barna</div><div class="role">Founder &amp; CEO, Solorender, Inc.</div></div>
+    <div class="contact"><span class="label">Get in touch</span><br>eddie@solorender.com<br><a href="https://solorender.com">solorender.com</a></div>
+  </div>
+</section>
+
+</div>
+
+<aside class="aside" aria-label="Key numbers">
+  <div class="panel">
+    <div class="label">Key numbers</div>
+    <dl>
+      <dt>49</dt><dd>days since the first version went live</dd>
+      <dt>640</dt><dd>code updates shipped</dd>
+      <dt>56</dt><dd>AI models from 15 labs</dd>
+      <dt>25</dt><dd>lessons in the AI Filmmaking course</dd>
+      <dt>54</dt><dd>one-click recipes</dd>
+      <dt>173</dt><dd>published prompts</dd>
+      <dt>198</dt><dd>built-in styles</dd>
+      <dt>$0</dt><dd>spent on ads so far</dd>
+    </dl>
+    <p class="note">Counted on October 29, 2026.<sup><a href="#s3">3</a></sup></p>
+  </div>
+  <div class="panel">
+    <div class="label">Use of the $200,000</div>
+    <div class="row"><span>Lower prices</span><b>$25,000</b></div>
+    <div class="row"><span>Affiliates and creators (first)</span><b>$9,404–$25,824</b></div>
+    <div class="row"><span>Ads (a small test)</span><b>$2,861–$9,846</b></div>
+    <div class="row"><span>Growth money (goal + buffer)</span><b>$33,847–$65,572</b></div>
+    <div class="row"><span>Legal and accounting</span><b>$6,563–$14,883</b></div>
+    <div class="row"><span>Video editor upgrade</span><b>$600</b></div>
+    <div class="row"><span>Founder runway (18 months)</span><b>$90,000</b></div>
+    <p class="note">Every item is priced on its own; the buffer sits in the growth money, so the total is always $200,000 (section 11).</p>
+    <p class="note">Terms available on request.</p>
+  </div>
+  <div class="panel">
+    <div class="label">Contact</div>
+    <p style="margin-top:6px;font-size:.9rem">Eddie Barna<br>eddie@solorender.com<br><a href="https://solorender.com">solorender.com</a></p>
+  </div>
+</aside>
+
+</div>
+
+<section class="sources-wrap" id="sources">
+  <h2>Sources: Where the numbers come from</h2>
+  <p class="note">All pages read October 28–29, 2026 unless noted. Benchmarks published by companies that sell software or services are marked "vendor data".</p>
+  <ol class="sources">
+    <li id="s1">Runware startup program ("Deposit $25,000, start with $35,000"; "Credits do not expire"; deposit and bonus "not refundable and not transferable"; exact cut 28.6%): <a href="https://runware.ai/startup-program">runware.ai/startup-program</a>; Runware terms §9: <a href="https://runware.ai/terms">runware.ai/terms</a></li>
+    <li id="s2">Solorender supplier research, October 18, 2026: 47 suppliers and credit programs read in depth, including rented-server prices for open voice and music models.</li>
+    <li id="s3">Solorender's live price list, database and code history (git), October 29, 2026.</li>
+    <li id="s4">Google Cloud pricing, Veo 3.1 Fast with audio at 720p, $0.10: <a href="https://cloud.google.com/vertex-ai/generative-ai/pricing">cloud.google.com</a>; fal.ai Veo 3.1 Fast, $0.15 a second with audio: <a href="https://fal.ai/models/fal-ai/veo3.1/fast">fal.ai</a></li>
+    <li id="s5">Runware Seedance 2.0, $0.16 a second at 720p: <a href="https://runware.ai/seedance-2-0">runware.ai</a>; fal.ai Seedance 2.0, $0.3034 a second: <a href="https://fal.ai/models/bytedance/seedance-2.0/text-to-video">fal.ai</a>; Solorender's real Runware bill, October 14 ($0.79).</li>
+    <li id="s6">WordStream / LocaliQ, Facebook ads benchmarks 2025 (554 US campaigns; $0.70 all industries, $0.75 business services; vendor data): <a href="https://www.wordstream.com/blog/facebook-ads-benchmarks-2025">wordstream.com</a></li>
+    <li id="s7">Madgicx, Meta ads benchmarks, October 2026 ($0.53 median link click; vendor data): <a href="https://madgicx.com/research/meta-ads-benchmarks">madgicx.com</a></li>
+    <li id="s8">TikTok cost per click: Top Growth Marketing ($0.26), Varos via DataSlayer ($0.50), ICUC via Shno (about $1.00) (vendor data): <a href="https://topgrowthmarketing.com/dtc-ecommerce-benchmarks/tiktok-ads-benchmarks/">topgrowthmarketing.com</a>, <a href="https://www.dataslayer.ai/blog/tiktok-ads-reporting-metrics-dashboards-2025">dataslayer.ai</a>, <a href="https://www.shno.co/marketing-statistics/tiktok-ads-statistics">shno.co</a></li>
+    <li id="s9">First Page Sage, software free-trial benchmarks, September 5, 2025 (86 companies; paid traffic: 7.1% of visitors sign up, 17.4% of no-card trial users pay; vendor data): <a href="https://firstpagesage.com/seo-blog/saas-free-trial-conversion-rate-benchmarks/">firstpagesage.com</a></li>
+    <li id="s10">Unbounce Conversion Benchmark Report (41,000 landing pages; software median 3.8%): <a href="https://unbounce.com/conversion-benchmark-report/saas-conversion-rate/">unbounce.com</a></li>
+    <li id="s11">RevenueCat, State of Subscription Apps 2026 (115,000+ apps; hard-paywall apps: 10.7% median of downloads pay; monthly-plan first renewal 42–61%; 6.1% of AI-app monthly subscribers still paying after 12 months; mostly mobile): <a href="https://www.revenuecat.com/state-of-subscription-apps/">revenuecat.com</a></li>
+    <li id="s12">Lenny Rachitsky and Kyle Poyar, free-to-paid conversion (3–5% "good" for self-serve freemium): <a href="https://www.lennysnewsletter.com/p/what-is-a-good-free-to-paid-conversion">lennysnewsletter.com</a></li>
+    <li id="s13">First Page Sage, cost to win a software customer by industry, August 29, 2025 (consumer: entertainment $178, design $274; vendor data): <a href="https://firstpagesage.com/marketing/average-cac-for-saas-businesses-by-industry-and-customer-type-fc/">firstpagesage.com</a></li>
+    <li id="s14">Meta Business Help Center, "About the learning phase": <a href="https://www.facebook.com/business/help/112167992830700">facebook.com/business/help</a></li>
+    <li id="s15">There's An AI For That launch pricing ($49 basic, $437 maximum exposure): <a href="https://theresanaiforthat.com/launch/">theresanaiforthat.com/launch</a></li>
+    <li id="s16">Toolify submit ($99) and advertising (500 clicks for $100): <a href="https://www.toolify.ai/submit">toolify.ai/submit</a>, <a href="https://www.toolify.ai/advertise">toolify.ai/advertise</a></li>
+    <li id="s17">SponsorRadar, AI-channel sponsorship estimates for 50,000–250,000 subscribers ($325–$650 and $433–$867; vendor data): <a href="https://sponsorradar.com/sponsorship-rates/ai">rates page</a>, <a href="https://sponsorradar.com/youtube-sponsors/ai">sponsors page</a></li>
+    <li id="s18">Agency price lists: impact.com (vendor data): <a href="https://impact.com/influencer/how-much-do-influencers-charge-per-post/">impact.com</a>; Influencer Marketing Hub: <a href="https://influencermarketinghub.com/youtube-influencer-rates/">influencermarketinghub.com</a></li>
+    <li id="s19">ChartMogul SaaS Billing Report (2,500+ companies; under $25 a month: 62% of yearly-plan and 41% of monthly-plan customers kept a year): <a href="https://chartmogul.com/reports/saas-billing-report/">chartmogul.com</a>; "The AI churn wave": <a href="https://chartmogul.com/reports/saas-retention-the-ai-churn-wave/">chartmogul.com</a> (vendor data)</li>
+    <li id="s20">Baremetrics Open Benchmarks (800+ startups): <a href="https://baremetrics.com/blog/saas-financial-benchmarks-by-baremetrics">baremetrics.com</a> (vendor data)</li>
+    <li id="s21">Earnest Analytics, card data on paid AI tools: <a href="https://www.earnestanalytics.com/insights/chatgpt-and-anthropic-top-paid-ai-tools-by-retention">earnestanalytics.com</a></li>
+    <li id="s22">Lenny Rachitsky, "What is good retention" (consumer subscriptions: about 40% still paying after 6 months is "good", about 70% "great"): <a href="https://www.lennysnewsletter.com/p/what-is-good-retention-issue-29">lennysnewsletter.com</a></li>
+    <li id="s23">Rewardful, State of SaaS Affiliate Programs (2,847 programs; 1.28% of affiliates make a sale; average commission 24.16%; vendor data): <a href="https://rewardful.com/articles/state-of-saas-affiliate-programs-report">rewardful.com</a></li>
+    <li id="s24">Commission benchmarks: PartnerStack research ("20–25%"); LinkJolt (121 campaigns, median 20%) (vendor data)</li>
+    <li id="s25">Competitors' own affiliate pages: <a href="https://higgsfield.ai/affiliate">Higgsfield</a>, <a href="https://arcads.ai/affiliate">Arcads</a>, <a href="https://www.synthesia.io/partners/affiliates">Synthesia</a>, <a href="https://partners.dub.co/hedra">Hedra</a>, <a href="https://magnific.com/affiliates">Magnific</a>, <a href="https://runway.com/affiliate-program">Runway</a></li>
+    <li id="s26">Credit rollover, each studio's own pricing or help page: OpenArt, Higgsfield, Magnific, VEED, Artlist, Midjourney, Sunra; Leonardo, Runway, Krea.</li>
+    <li id="s27">Heepsy pricing (Starter $89 a month, $69 billed yearly): <a href="https://www.heepsy.com/pricing">heepsy.com/pricing</a></li>
+    <li id="s28">PromoteKit pricing (Pro $29 a month on yearly billing, against $39 monthly): <a href="https://www.promotekit.com/pricing">promotekit.com/pricing</a></li>
+    <li id="s29">Stripe pricing (2.9% + 30¢ domestic cards; Billing 0.7% on subscriptions, so a $20 plan pays $1.02, $40 pays $1.74, $80 pays $3.18): <a href="https://stripe.com/pricing">stripe.com/pricing</a></li>
+    <li id="s30">Solorender's own usage: Vercel billing October 16–27, 2026 ($0.66 of serving charges for 20,618 credits; build on October 28, $0.028), and the database's last 30 days (6.2 GB of file storage for 45,419 credits).</li>
+    <li id="s31">Vercel Pro plan and Flat Rate CDN: <a href="https://vercel.com/docs/plans/pro-plan">vercel.com/docs/plans/pro-plan</a></li>
+    <li id="s32">Supabase pricing: <a href="https://supabase.com/pricing">supabase.com/pricing</a></li>
+    <li id="s33">Cloudflare R2 pricing: <a href="https://developers.cloudflare.com/r2/pricing/">developers.cloudflare.com/r2/pricing</a></li>
+    <li id="s34">Google Cloud Run pricing: <a href="https://cloud.google.com/run/pricing">cloud.google.com/run/pricing</a></li>
+    <li id="s35">Remotion licence (free for companies of up to 3 people): <a href="https://www.remotion.pro/license">remotion.pro/license</a>; Remotion Editor Starter, $600, usable "indefinitely" after "a one-time purchase" under the free licence: <a href="https://www.remotion.dev/docs/editor-starter/buy">remotion.dev buy page</a>, <a href="https://www.remotion.dev/docs/editor-starter/faq">FAQ</a>, <a href="https://www.remotion.pro/editor-starter">remotion.pro/editor-starter</a>; Google Workspace Business Starter ($7 yearly): <a href="https://workspace.google.com/pricing">workspace.google.com/pricing</a></li>
+    <li id="s36">.com renewal at Cloudflare, $10.46 (two trackers): <a href="https://costgoat.com/compare/domains">costgoat.com</a>, <a href="https://domainoffer.net/tld/com/cloudflare">domainoffer.net</a>; Verisign wholesale rise November 1, 2026: <a href="https://domainnamewire.com/2026/04/23/breaking-verisign-raising-wholesale-com-prices">domainnamewire.com</a></li>
+    <li id="s37">Magnific: <a href="https://www.magnific.com/blog/from-freepik-to-magnific-the-story-of-europes-largest-ai-creative-platform">magnific.com blog</a>; <a href="https://es.euronews.com/2026/04/28/freepik-ahora-es-magnific">Euronews</a></li>
+    <li id="s38">Higgsfield: <a href="https://higgsfield.ai/blog/higgsfield-1b-annualized-revenue-run-rate">higgsfield.ai blog</a>; <a href="https://sacra.com/research/openart-vs-higgsfield">Sacra</a>; BNN Bloomberg, August 17, 2026</li>
+    <li id="s39">OpenArt: <a href="https://openart.ai/blog/the-openart-story">openart.ai blog</a>; <a href="https://sacra.com/research/openart">Sacra</a></li>
+    <li id="s40">TechCrunch: <a href="https://techcrunch.com/2025/10/30/figma-acquires-ai-powered-media-generation-company-weavy">Figma acquires Weavy</a>; <a href="https://techcrunch.com/2026/01/27/node-based-design-tool-flora-raises-42m-from-redpoint-ventures">Flora raises $42M</a>; <a href="https://techcrunch.com/2025/04/07/kreas-founders-snubbed-postgrad-grants-from-the-king-to-build-their-ai-company/">Krea at $500M</a></li>
+    <li id="s41">fal: TechCrunch and Yahoo Finance, December 9, 2025; Runware: <a href="https://runware.ai/blog/runware-raises-50m-series-a-to-power-all-intelligent-applications">Runware blog</a>, <a href="https://siliconangle.com/2025/12/11/ai-inference-startup-runware-raises-50m-make-ai-run-faster">SiliconANGLE</a></li>
+    <li id="s42">Arcads founder interviews (about $5,000 in week one; $1M yearly pace June 2024; $5M April 2025; $10M November 2025; about $6M at the time of a 2025 interview): <a href="https://getlatka.com/blog/arcads-revenue-ceo">Latka</a>, <a href="https://founderpath.com/resources/romain-torres-arcads-10m-arr-ai-video-ads-sales">Founderpath</a></li>
+    <li id="s43">Stripe, top 100 AI companies reached $1M annualized revenue in a median 11.5 months: <a href="https://stripe.com/blog/inside-the-growth-of-the-top-ai-companies-on-stripe">stripe.com/blog</a>, <a href="https://stripe.com/guides/indexing-the-ai-economy">Stripe guide</a></li>
+    <li id="s44">ChartMogul via Kyle Poyar, 6,525 software companies: 3.3% reach $1M yearly revenue in under a year (vendor data): <a href="https://www.growthunhinged.com/p/the-odds-of-making-it">growthunhinged.com</a>, <a href="https://chartmogul.com/reports/saas-growth-the-odds-of-making-it/">chartmogul.com</a></li>
+    <li id="s45">HeyGen, $1M yearly pace in about 6 months: <a href="https://www.heygen.com/blog/0-1m-arr-in-7-months">heygen.com blog</a>, <a href="https://www.indiehackers.com/post/how-we-hit-1m-arr-in-7-months-245421255b">Indie Hackers</a> (both founder-reported)</li>
+    <li id="s46">Pilot Founder Salary Reports: 2025 (1,844 founders, January 2025: average $98,000, median $75,000) <a href="https://pilot.com/founder-salary-report-2025">pilot.com</a>; 2026 (1,623 founders, early 2026: average $118,000; bootstrapped $88,000; venture-backed $131,000) <a href="https://pilot.com/founder-salary-report-2026">pilot.com</a> (vendor data)</li>
+    <li id="s47">Kruze Consulting, startup CEO salary report 2026 (seed-stage average $153,000, from client payroll; vendor data): <a href="https://kruzeconsulting.com/blog/startup-ceo-salary-report">kruzeconsulting.com</a>; Creandum, Founder Compensation 4.0 (700+ founders, October 2025: seed median €89,000; bootstrapped €77,500; pre-seed 23% lower, about €59,700 by my calculation): <a href="https://creandum.com/stories/founder-compensation-4-0">creandum.com</a></li>
+    <li id="s48">X (Twitter) sponsored-post rates for creators with 10,000–100,000 followers, two independent estimates (vendor data): InfluencerFee, sponsored post $50–$500, thread $150–$1,200: <a href="https://influencerfee.com/blog/twitter-x-influencer-pricing/">influencerfee.com</a>; Nowix, post $50–$500, thread $100–$1,000, updated October 8, 2026: <a href="https://nowix.ai/blog/twitter-influencer-rates/">nowix.ai</a>. Neither names its data source.</li>
+    <li id="s49">Half-price and cheaper versions, read October 29, 2026: Gemini API pricing (Nano Banana Pro $0.134 a picture, $0.067 in Batch; Nano Banana 2 $0.067, $0.034 in Batch): <a href="https://ai.google.dev/gemini-api/docs/pricing">ai.google.dev</a>; Gemini Batch API ("50% of the standard cost"; "target turnaround time is 24 hours"): <a href="https://ai.google.dev/gemini-api/docs/batch-api">ai.google.dev</a>; fal.ai Kling 2.5 Turbo, $0.21 per 5 seconds at 720p (Standard) against $0.35 at 1080p (Pro): <a href="https://fal.ai/models/fal-ai/kling-video/v2.5-turbo/standard/image-to-video">fal.ai Standard</a>, <a href="https://fal.ai/models/fal-ai/kling-video/v2.5-turbo/pro/image-to-video">fal.ai Pro</a></li>
+    <li id="s50">Legal fees for a SAFE round with few changes: Acevedo Venture Law, "typically costs $2,500–$5,000" (June 2026): <a href="https://www.acevedoventurelaw.com/articles/how-much-does-startup-lawyer-cost/">acevedoventurelaw.com</a>; Silicon Hills Lawyer, "$2.5K-$5K… rarely more than $10K" (May 2023): <a href="https://siliconhillslawyer.com/2023/05/17/seed-round-costs-expenses/">siliconhillslawyer.com</a>; LeanLaw, "typically range from $3,000 to $7,000" (January 2026): <a href="https://www.leanlaw.co/blog/a-guide-to-series-seed-fixed-fees-defining-the-scope-clearly-e-g-standard-nvca-docs-only/">leanlaw.co</a></li>
+    <li id="s51">Securities notice fees: SEC, "The SEC does not charge any filing fee for a Form D notice": <a href="https://www.sec.gov/info/smallbus/secg/formdguide">sec.gov</a>; California DFPI FAQ, 25102(f) notice $50 for offerings of $100,001–$500,000, and the Rule 506 notice under 25102.1(d) "A filing fee of $300": <a href="https://dfpi.ca.gov/rules-enforcement/laws-and-regulations/law-and-regulations-corporate-securities-law/securities-frequently-asked-questions-and-answers/">dfpi.ca.gov</a>; California Corporations Code <a href="https://california.public.law/codes/ca_corp_code_section_25608">25608</a> and <a href="https://california.public.law/codes/ca_corp_code_section_25608.1">25608.1</a></li>
+    <li id="s52">Bookkeeping and tax prices (each firm's own price page): Pilot, bookkeeping "Essentials $99/month", C-corporation tax "Starts at $2,450+ /year": <a href="https://pilot.com/pricing">pilot.com</a>; SDO CPA, bookkeeping "$359/month billed annually", "Form 1120 (C-Corporation) Starting at $2,000": <a href="https://sdocpa.com/pricing">sdocpa.com</a>. A California return is extra and not priced separately by either.</li>
+    <li id="s53">California costs: Legislative Analyst's Office, new corporations "exempted from paying the $800 minimum franchise tax in their first year" (March 2020): <a href="https://www.lao.ca.gov/Publications/Report/4207">lao.ca.gov</a>; LegalZoom (July 2024): <a href="https://legalzoom.com/articles/what-is-the-annual-california-franchise-tax">legalzoom.com</a>; Secretary of State, Statement of Information "$25 for California stock and foreign corporations": <a href="https://www.sos.ca.gov/business-programs/customer-alerts/misleading-statement-information-solicitations">sos.ca.gov</a>; Zenind: <a href="https://www.zenind.com/help/post/california-statement-of-information-filing-requirements-for-llcs-and-corporations">zenind.com</a></li>
+    <li id="s54">Budget buffer: Stripe, "allocate 5%–10% of your total budget" (January 2026): <a href="https://stripe.com/en-mt/resources/more/how-to-create-a-business-budget-for-your-startup-a-guide">stripe.com</a>; Eagle Rock CFO, "Add 10-15% to your total for unexpected costs": <a href="https://www.eaglerockcfo.com/blog/startup-budgeting/first-annual-budget">eaglerockcfo.com</a>; Operations Optimist, "Add 10-15% buffer" (March 2025): <a href="https://operationsoptimist.substack.com/p/the-exact-math-behind-your-fundraise">substack.com</a></li>
+    <li id="s55">How long a seed raise should last: NextView Ventures, "raise 18 months of runway" (2015): <a href="https://nextview.vc/blog/how-much-seed-capital-should-you-actually-raise/">nextview.vc</a>; Coding VC, "Eighteen months is a good default" (2014): <a href="https://www.codingvc.com/how-much-runway-should-you-raise/">codingvc.com</a>; CRV, pre-seed and seed "a target of 18 to 24 months" (August 2026): <a href="https://www.crv.com/content/startup-runway">crv.com</a>; TechCrunch, "at least 12 to 18 months" (2022): <a href="https://techcrunch.com/2022/04/08/does-your-startup-have-enough-runway-5-factors-to-consider/amp/">techcrunch.com</a></li>
+  </ol>
+</section>
+
+</div>

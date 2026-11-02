@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Customer Emails Built</title>
+<style>
+  :root { --bg:#0a0a0a; --card:#141414; --line:#262626; --text:#ffffff; --green:#6ee05a; --orange:#f7931a; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:Manrope,system-ui,-apple-system,"Segoe UI",sans-serif; font-size:16px; line-height:1.6; }
+  .wrap { max-width:900px; margin:0 auto; padding:32px 16px 64px; }
+  h1 { font-size:32px; line-height:1.2; margin:0 0 8px; }
+  h2 { font-size:22px; margin:40px 0 10px; }
+  .label { font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--green); margin:0 0 6px; }
+  .box { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 20px; margin:14px 0; }
+  .wait { border-color:var(--orange); }
+  table { width:100%; border-collapse:collapse; }
+  th, td { text-align:left; vertical-align:top; padding:10px 8px; border-bottom:1px solid var(--line); }
+  th { font-size:12px; letter-spacing:1.5px; text-transform:uppercase; color:var(--green); }
+  .ok { color:var(--green); font-weight:800; }
+  code { font-size:14px; }
+  @media (max-width:640px) { thead { display:none; } tr { display:block; border-bottom:1px solid var(--line); padding:6px 0; } td { display:block; border:0; padding:3px 0; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+<p class="label">Solorender · October 30, 2026 · commit 8a6cf71</p>
+<h1>Customer emails, low-credit bar and automatic refill</h1>
+<p>Built, tested on this Mac, and saved to GitHub. It reaches the live site at the next scheduled update (1 pm). The emails themselves start once you say yes to the 15-minute email check (below).</p>
+
+<h2>What customers get</h2>
+<div class="box">
+<table>
+<thead><tr><th>Email</th><th>When</th><th>Picture and cards</th></tr></thead>
+<tbody>
+<tr><td>Welcome: new sign-up</td><td>30 minutes after joining, if they've bought nothing</td><td>Golden retriever hero · 6 recipe cards</td></tr>
+<tr><td>Welcome: first payment</td><td>After their first payment</td><td>Golden retriever hero · 6 cards, course first for Studio and up</td></tr>
+<tr><td>Low credits</td><td>A run takes them below 200 credits; once a month at most; not while refill is on</td><td>"Don't stall mid-chase" motorbike · fuel gauge · 3 "still make" tiles · 4 cards</td></tr>
+<tr><td>Your credits are still here</td><td>30 and 60 days after a plan ends, then stop</td><td>"The door's still open" laundromat portal · 6 cards, then 4</td></tr>
+<tr><td>Automatic refill receipt</td><td>Each refill</td><td>"Refuelled. Keep flying." starship · 4 cards</td></tr>
+<tr><td>Refill didn't go through</td><td>Card declined or the bank asks to confirm</td><td>Motorbike hero · 4 cards</td></tr>
+</tbody>
+</table>
+<p>Every email has your Concord address and an "Email settings" link that works without logging in. Mail apps also get a one-click unsubscribe. All 25 card links and pictures open on the live site. Preview every email anytime: Admin → <b>Customer emails</b>.</p>
+</div>
+<div class="box">
+<p style="margin-top:0"><b>In the app:</b> a low-credit bar at the top below 200 credits ("150 credits left · about 2 clips with sound"). Plan-holders see "Top up"; everyone else sees "See plans". It's hidden while automatic refill is on.</p>
+<p style="margin-bottom:0"><b>Credits &amp; billing:</b> an Automatic refill card. "Turn on" only works after ticking "I agree Solorender may charge my card $25 for each automatic refill, up to 2 a month, until I turn it off." It shows the customer's own pack size (2,750 credits on Studio monthly). There's also a "Tips and reminders" email switch.</p>
+</div>
+
+<h2>What I tested</h2>
+<div class="box">
+<table>
+<thead><tr><th>Test</th><th>Result</th></tr></thead>
+<tbody>
+<tr><td>Refill with a good test card</td><td class="ok">One $25 charge, +2,750 credits (150 → 2,900)</td></tr>
+<tr><td>Running the check again right after</td><td class="ok">No second charge</td></tr>
+<tr><td>Card whose bank asks to confirm</td><td class="ok">Nothing charged, refill switched itself off</td></tr>
+<tr><td>Card fixed, refill turned back on</td><td class="ok">Charged. This test found a bug and I fixed it: Stripe remembered the decline for 24 hours.</td></tr>
+<tr><td>A third refill in the same month</td><td class="ok">Blocked by the 2-a-month limit</td></tr>
+<tr><td>Stripe's own records</td><td class="ok">Two $25 succeeded, one failed, matching our credit history</td></tr>
+<tr><td>Billing page: tick, turn on, turn off; emails off and on</td><td class="ok">Each saved to the database</td></tr>
+<tr><td>Email settings link, one-click unsubscribe, a fake link</td><td class="ok">Works, works, refused</td></tr>
+<tr><td>The email check on real data</td><td class="ok">Runs, nothing due (all 9 existing accounts count as already welcomed)</td></tr>
+</tbody>
+</table>
+<p style="margin-bottom:0">All Stripe tests used test mode and test cards. <b>Not tested:</b> a real email arriving, because this Mac can't send mail. The first real proof is the first live send, and Google's acceptance is checked on every send. Refunding a refill takes its credits back through the same path as packs; that path wasn't run end to end.</p>
+</div>
+
+<h2>Waiting on you</h2>
+<div class="box wait">
+<p style="margin-top:0"><b>1. The 15-minute email check.</b> The safety check blocked creating this schedule because it's a standing rule. Until it exists, no email goes out. Refills still work, because they also run right after each charge in the Studio.</p>
+<p style="margin-bottom:0"><b>2. Cleaning the test account.</b> Its balance, card and settings are back exactly as before (2,483 credits). Two leftovers remain: two refill lines in its credit history and a canceled test-plan row. Deleting them needs the backup database route, and your OK.</p>
+</div>
+
+<h2>Money</h2>
+<div class="box">
+<p style="margin:0">Each $25 Studio refill leaves you $12.97 after the AI cost and Stripe's fee (retention page, October 29). Sending the emails costs nothing: Google Workspace mail, about 2,000 a day. No published figure tells us how many customers will turn refill on or come back from the emails. The Keeping customers page will show it.</p>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,675 @@
+<title>Matching Rival Prices</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one reading column with wide tables that scroll inside their own frames; a sticky contents strip on top. Always dark (Solorender's look). */
+:root {
+  --bg: #0a0a0a;
+  --panel: #141414;
+  --panel-2: #1b1b1a;
+  --line: #2b2a27;
+  --ink: #ffffff;
+  --green: #6ee05a;
+  --orange: #f7931a;
+  --red: #ff6b5a;
+  --display: "Syne", "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+  --body: "Manrope", "Helvetica Neue", Arial, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 16px/1.6 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 28px 80px; display: grid; gap: 44px; }
+.col { max-width: 46rem; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: clamp(26px, 4vw, 32px); line-height: 1.15; }
+h2 { font-size: 22px; line-height: 1.25; display: flex; gap: 12px; align-items: baseline; }
+h2 .n { color: var(--green); font-size: 15px; font-weight: 700; }
+h3 { font-size: 17px; }
+p { margin: 0; }
+.stack { display: grid; gap: 14px; }
+.eyebrow { color: var(--green); font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+.intro { font-size: 15px; }
+a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--green); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, input:focus-visible, th:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+strong { font-weight: 700; }
+.or { color: var(--orange); }
+.gr { color: var(--green); }
+
+nav.toc { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); padding-block: 10px; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; }
+nav.toc a { text-decoration: none; font-weight: 600; }
+nav.toc a:hover { color: var(--green); }
+
+.minute { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 22px; display: grid; gap: 14px; }
+.minute ol { margin: 0; padding-left: 20px; display: grid; gap: 10px; }
+.big { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.big > div { border-top: 3px solid var(--orange); background: var(--panel-2); padding: 14px 16px; display: grid; gap: 4px; align-content: start; }
+.big .v { font-family: var(--display); font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.big .l { font-size: 14px; }
+
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
+th, td { padding: 9px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+th { background: var(--panel-2); font-weight: 700; font-size: 13px; white-space: nowrap; position: sticky; top: 0; }
+table.sortable th { cursor: pointer; user-select: none; }
+table.sortable th::after { content: " ↕"; color: var(--green); font-size: 11px; }
+table.sortable th[aria-sort="ascending"]::after { content: " ↑"; }
+table.sortable th[aria-sort="descending"]::after { content: " ↓"; }
+td.num, th.num { text-align: right; white-space: nowrap; }
+tr.grp td { background: #10140f; font-weight: 700; color: var(--green); font-size: 13px; letter-spacing: 0.03em; }
+.below { color: var(--orange); font-weight: 700; }
+.tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.tools input { background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; font: 14px var(--body); min-width: 0; width: 280px; max-width: 100%; }
+.tools label { font-size: 13px; font-weight: 600; }
+
+.chip { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--green); color: var(--green); white-space: nowrap; }
+.chip.one { border-color: var(--orange); color: var(--orange); }
+.chip.guess { border-color: var(--ink); color: var(--ink); }
+.chip.no { border-color: var(--red); color: var(--red); }
+
+.mech { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+.mech article { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.mech article header { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.mech ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 14px; }
+blockquote { margin: 0; border-left: 3px solid var(--green); padding: 2px 0 2px 12px; font-size: 14px; }
+.callout { border: 1px solid var(--orange); border-radius: 8px; padding: 16px 18px; display: grid; gap: 8px; background: #17110a; }
+.opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.opts > div { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.opts > div.pick { border-color: var(--green); }
+.opts .tag { font-size: 12px; font-weight: 700; color: var(--green); letter-spacing: 0.08em; text-transform: uppercase; }
+.opts .amt { font-family: var(--display); font-size: 22px; font-weight: 800; }
+ol.src { margin: 0; padding-left: 22px; display: grid; gap: 6px; font-size: 14px; }
+ul.plain { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 14px; }
+.small { font-size: 14px; }
+.strip { position: relative; height: 22px; min-width: 240px; margin-top: 4px; }
+.strip::before { content: ""; position: absolute; left: 3%; right: 3%; top: 10px; height: 2px; background: var(--line); }
+.strip i { position: absolute; top: 50%; transform: translate(-50%, -50%); border-radius: 50%; }
+.strip i.r { width: 9px; height: 9px; background: #8a8780; opacity: .85; }
+.strip i.avg { width: 2px; height: 20px; border-radius: 0; background: var(--ink); }
+.strip i.me { width: 15px; height: 15px; background: var(--orange); box-shadow: 0 0 0 2px var(--bg); z-index: 2; }
+.strip i.after { width: 15px; height: 15px; border: 2px solid var(--orange); background: transparent; z-index: 1; }
+.ends { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; color: #b9b6ae; min-width: 240px; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 13px; align-items: center; }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.legend i { display: inline-block; border-radius: 50%; }
+@media (max-width: 520px) { body { font-size: 15px; } .big .v { font-size: 22px; } }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<div class="wrap">
+  <header class="col stack">
+    <div class="eyebrow">Solorender · AI cost research · read live 29 October 2026</div>
+    <h1>Can Solorender get its AI costs down to rival prices?</h1>
+    <p class="intro">Your investor letter (section 9) admits some rivals sell below what suppliers charge Solorender. This page checks which rivals, on which models, how they likely do it, and the steps that would cut Solorender's own costs. It covers what each step costs up front, what it saves, and when it opens up. Nothing was bought, switched or repriced. Every price was read live today unless marked.</p>
+  </header>
+
+  <nav class="toc" aria-label="Contents">
+    <a href="#minute">In one minute</a>
+    <a href="#gap">1 · Who sells below our cost</a>
+    <a href="#how">2 · How they get there</a>
+    <a href="#ladder">3 · The cost-cutting ladder</a>
+    <a href="#after">4 · Where the ladder leaves us</a> <a href="#where">4b · Where we sit</a>
+    <a href="#raise">5 · The $150,000 raise</a>
+    <a href="#unused">6 · Unused credits</a>
+    <a href="#decide">Your decisions</a>
+    <a href="#sources">Sources</a>
+  </nav>
+
+  <section id="minute" class="minute">
+    <div class="eyebrow">In one minute</div>
+    <div class="big">
+      <div><span class="v">8 of 9</span><span class="l">most-used models have at least one rival selling below our supplier cost (the 9th, Grok, only on a different Grok model)</span></div>
+      <div><span class="v">$0</span><span class="l">up front for the biggest cut found: Google's own half-price lane on Nano Banana 2 and Pro</span></div>
+      <div><span class="v">30–40% off</span><span class="l">on everything bought from Runware, for a $25,000 or $50,000 deposit</span></div>
+      <div><span class="v">2–5×</span><span class="l">rivals' cheapest yearly price is still below ours on most models, even after every cut, at the 2.5× rule</span></div>
+    </div>
+    <ol>
+      <li><strong>No outside customer has run a model yet.</strong> All 1,804 creations in the database are from your account or a test account. So "top-selling" here means your own most-used models, and no supplier volume discount is open to us on usage today.</li>
+      <li><strong>Rivals mostly don't buy cheaper. They sell at about the supplier's list price on monthly plans, then far below it on yearly plans.</strong> That only works if customers leave credits unused (every rival's credits reset or vanish), if investor money covers the loss, or if they have a private deal. Each of these has evidence (section 2). Only the arithmetic is certain.</li>
+      <li><strong>The best step costs nothing:</strong> Google sells Nano Banana Pro at $0.067 instead of $0.134, and Nano Banana 2 at $0.034 instead of $0.067, if the customer can wait (Google aims at under 24 hours). That would take Nano Banana Pro from 35 to 17 credits.</li>
+      <li><strong>The Runware deposit is real, but it pays back only with sales.</strong> $25,000 buys $35,000 of credit (30% off). In October we spent about $20 at Runware. The credit never expires, so the $10,000 bonus isn't lost, but the cash sits idle until customers arrive.</li>
+      <li><strong>Cost cuts alone can't reach rival yearly prices</strong> while Solorender keeps the 2.5× rule and credits that never expire. Matching them means changing the price rule or the credit rule, and both are your call. I recommend neither yet (section 4).</li>
+    </ol>
+  </section>
+
+  <!-- 1 -->
+  <section id="gap" class="stack">
+    <h2><span class="n">1</span>Who sells below our cost</h2>
+    <div class="col stack">
+      <p>For each of your most-used models (the database ranks them by credits used in the last 60 days), this table puts our <strong>real cost per job</strong> (from supplier bills) beside each rival's <strong>retail price for the same job</strong>. "Entry" is the rival's cheapest monthly plan that carries the model. "Cheapest" is the lowest price per credit anyone can buy, usually the biggest yearly plan. <span class="below">Orange</span> means below our cost.</p>
+      <p class="small">Our own prices are shown at Solo (1¢ a credit) and Super Max (0.70¢ a credit, our lowest). Click any column heading to sort. Type in the box to filter.</p>
+    </div>
+    <div class="tools">
+      <label for="q">Filter</label>
+      <input id="q" type="search" placeholder="Model or rival, e.g. Kling or Sunra">
+    </div>
+    <div class="tbl">
+      <table class="sortable" id="gapTable">
+        <thead><tr>
+          <th>Model and job</th><th>Rival</th><th class="num">Rival entry $</th><th class="num">Rival cheapest $</th><th class="num">Our cost $</th><th>Below our cost?</th><th class="num">Ours, Solo $</th><th class="num">Ours, Super Max $</th>
+        </tr></thead>
+        <tbody>
+<tr><td>Kling 2.5 Turbo, 5 s 1080p</td><td>Magnific (720p only)</td><td class="num">0.140</td><td class="num">0.092</td><td class="num">0.350</td><td class="below">Yes, and "unlimited"</td><td class="num">0.88</td><td class="num">0.618</td></tr>
+<tr><td>Kling 2.5 Turbo, 5 s 1080p</td><td>Krea (derived)</td><td class="num">0.281</td><td class="num">0.155</td><td class="num">0.350</td><td class="below">Yes</td><td class="num">0.88</td><td class="num">0.618</td></tr>
+<tr><td>Kling 2.5 Turbo, 5 s 1080p</td><td>OpenArt</td><td class="num">0.350</td><td class="num">0.165</td><td class="num">0.350</td><td class="below">Yes</td><td class="num">0.88</td><td class="num">0.618</td></tr>
+<tr><td>Kling 2.5 Turbo, 5 s 1080p</td><td>Higgsfield</td><td class="num">0.295</td><td class="num">0.180</td><td class="num">0.350</td><td class="below">Yes</td><td class="num">0.88</td><td class="num">0.618</td></tr>
+<tr><td>Kling 2.5 Turbo, 5 s 1080p</td><td>Artlist</td><td class="num">0.909</td><td class="num">0.391</td><td class="num">0.350</td><td>No</td><td class="num">0.88</td><td class="num">0.618</td></tr>
+<tr><td>Kling 2.5 Turbo, 5 s 1080p</td><td>VEED</td><td class="num">2.000</td><td class="num">0.507</td><td class="num">0.350</td><td>No</td><td class="num">0.88</td><td class="num">0.618</td></tr>
+<tr><td>Seedance 2.0, 5 s 720p</td><td>Sunra</td><td class="num">0.720</td><td class="num">0.264</td><td class="num">0.795</td><td class="below">Yes</td><td class="num">2.00</td><td class="num">1.404</td></tr>
+<tr><td>Seedance 2.0, 5 s 720p</td><td>Higgsfield</td><td class="num">1.082</td><td class="num">0.660</td><td class="num">0.795</td><td class="below">Yes</td><td class="num">2.00</td><td class="num">1.404</td></tr>
+<tr><td>Seedance 2.0, 5 s 720p</td><td>OpenArt</td><td class="num">1.400</td><td class="num">0.660</td><td class="num">0.795</td><td class="below">Yes</td><td class="num">2.00</td><td class="num">1.404</td></tr>
+<tr><td>Seedance 2.0, 5 s 720p</td><td>Artlist</td><td class="num">1.817</td><td class="num">0.781</td><td class="num">0.795</td><td class="below">Yes, by 1¢</td><td class="num">2.00</td><td class="num">1.404</td></tr>
+<tr><td>Seedance 2.0, 5 s 720p</td><td>Magnific (Seedance 2 Pro)</td><td class="num">1.400</td><td class="num">0.924</td><td class="num">0.795</td><td>No</td><td class="num">2.00</td><td class="num">1.404</td></tr>
+<tr><td>Seedance 2.0, 5 s 720p</td><td>VEED</td><td class="num">9.450</td><td class="num">2.394</td><td class="num">0.795</td><td>No</td><td class="num">2.00</td><td class="num">1.404</td></tr>
+<tr><td>Veo 3.1 Fast, 8 s with sound</td><td>Sunra</td><td class="num">0.800</td><td class="num">0.293</td><td class="num">0.800</td><td class="below">Yes</td><td class="num">2.00</td><td class="num">1.404</td></tr>
+<tr><td>Veo 3.1 Fast, 8 s with sound</td><td>OpenArt</td><td class="num">0.980</td><td class="num">0.462</td><td class="num">0.800</td><td class="below">Yes</td><td class="num">2.00</td><td class="num">1.404</td></tr>
+<tr><td>Veo 3.1 Fast, 8 s with sound</td><td>Artlist</td><td class="num">1.938</td><td class="num">0.833</td><td class="num">0.800</td><td>No</td><td class="num">2.00</td><td class="num">1.404</td></tr>
+<tr><td>Veo 3.1 Fast, 8 s with sound</td><td>Higgsfield</td><td class="num">1.573</td><td class="num">0.960</td><td class="num">0.800</td><td>No</td><td class="num">2.00</td><td class="num">1.404</td></tr>
+<tr><td>Veo 3.1 Fast, 8 s with sound</td><td>VEED</td><td class="num">7.500</td><td class="num">1.900</td><td class="num">0.800</td><td>No</td><td class="num">2.00</td><td class="num">1.404</td></tr>
+<tr><td>Nano Banana Pro, 1 picture</td><td>Magnific</td><td class="num">0.075</td><td class="num">0.050</td><td class="num">0.134</td><td class="below">Yes, and "unlimited" on Pro</td><td class="num">0.35</td><td class="num">0.246</td></tr>
+<tr><td>Nano Banana Pro, 1 picture</td><td>Sunra</td><td class="num">0.140</td><td class="num">0.051</td><td class="num">0.134</td><td class="below">Yes</td><td class="num">0.35</td><td class="num">0.246</td></tr>
+<tr><td>Nano Banana Pro, 1 picture</td><td>Higgsfield</td><td class="num">0.098</td><td class="num">0.060</td><td class="num">0.134</td><td class="below">Yes</td><td class="num">0.35</td><td class="num">0.246</td></tr>
+<tr><td>Nano Banana Pro, 1 picture</td><td>OpenArt</td><td class="num">0.140</td><td class="num">0.066</td><td class="num">0.134</td><td class="below">Yes</td><td class="num">0.35</td><td class="num">0.246</td></tr>
+<tr><td>Nano Banana Pro, 1 picture</td><td>Krea (derived)</td><td class="num">0.140</td><td class="num">0.077</td><td class="num">0.134</td><td class="below">Yes</td><td class="num">0.35</td><td class="num">0.246</td></tr>
+<tr><td>Nano Banana Pro, 1 picture</td><td>Artlist</td><td class="num">0.194</td><td class="num">0.083</td><td class="num">0.134</td><td class="below">Yes</td><td class="num">0.35</td><td class="num">0.246</td></tr>
+<tr><td>Nano Banana 2, 1 picture</td><td>Sunra</td><td class="num">0.070</td><td class="num">0.026</td><td class="num">0.067</td><td class="below">Yes</td><td class="num">0.17</td><td class="num">0.119</td></tr>
+<tr><td>Nano Banana 2, 1 picture</td><td>OpenArt</td><td class="num">0.070</td><td class="num">0.033</td><td class="num">0.067</td><td class="below">Yes</td><td class="num">0.17</td><td class="num">0.119</td></tr>
+<tr><td>Nano Banana 2, 1 picture</td><td>Krea (derived)</td><td class="num">0.080</td><td class="num">0.044</td><td class="num">0.067</td><td class="below">Yes</td><td class="num">0.17</td><td class="num">0.119</td></tr>
+<tr><td>Nano Banana 2, 1 picture</td><td>Artlist</td><td class="num">0.109</td><td class="num">0.047</td><td class="num">0.067</td><td class="below">Yes</td><td class="num">0.17</td><td class="num">0.119</td></tr>
+<tr><td>Nano Banana 2, 1 picture</td><td>Magnific</td><td class="num">0.075</td><td class="num">0.050</td><td class="num">0.067</td><td class="below">Yes, and "unlimited"</td><td class="num">0.17</td><td class="num">0.119</td></tr>
+<tr><td>Nano Banana 2, 1 picture</td><td>Higgsfield</td><td class="num">0.098</td><td class="num">0.060</td><td class="num">0.067</td><td class="below">Yes</td><td class="num">0.17</td><td class="num">0.119</td></tr>
+<tr><td>Grok video, 5 s 720p</td><td>Higgsfield ("Grok Video", version not named)</td><td class="num">0.344</td><td class="num">0.210</td><td class="num">0.160</td><td>No</td><td class="num">0.40</td><td class="num">0.281</td></tr>
+<tr><td>Grok video, 5 s 720p</td><td>Sunra (full Grok Imagine, a dearer model)</td><td class="num">0.350</td><td class="num">0.128</td><td class="num">0.160</td><td class="below">Yes, on a model that costs xAI's buyers $0.07/s</td><td class="num">0.40</td><td class="num">0.281</td></tr>
+<tr><td>Grok video, 5 s 720p</td><td>OpenArt</td><td class="num">0.700</td><td class="num">0.330</td><td class="num">0.160</td><td>No</td><td class="num">0.40</td><td class="num">0.281</td></tr>
+<tr><td>Grok video, 5 s 720p</td><td>Artlist</td><td class="num">1.060</td><td class="num">0.456</td><td class="num">0.160</td><td>No</td><td class="num">0.40</td><td class="num">0.281</td></tr>
+<tr><td>GPT Image 2.5 high, 1 picture</td><td>Sunra</td><td class="num">0.060</td><td class="num">0.022</td><td class="num">0.053</td><td class="below">Yes</td><td class="num">0.14</td><td class="num">0.098</td></tr>
+<tr><td>GPT Image 2.5 high, 1 picture</td><td>Artlist</td><td class="num">0.206</td><td class="num">0.089</td><td class="num">0.053</td><td>No</td><td class="num">0.14</td><td class="num">0.098</td></tr>
+<tr><td>GPT Image 2.5 high, 1 picture</td><td>VEED</td><td class="num">0.350</td><td class="num">0.089</td><td class="num">0.053</td><td>No</td><td class="num">0.14</td><td class="num">0.098</td></tr>
+<tr><td>GPT Image 2.5 high, 1 picture</td><td>OpenArt</td><td class="num">0.368</td><td class="num">0.173</td><td class="num">0.053</td><td>No</td><td class="num">0.14</td><td class="num">0.098</td></tr>
+<tr><td>Kling Lip Sync, 5 s</td><td>OpenArt</td><td class="num">0.070</td><td class="num">0.033</td><td class="num">0.070</td><td class="below">Yes</td><td class="num">0.18</td><td class="num">0.126</td></tr>
+<tr><td>ElevenLabs voice, 1,000 characters</td><td>Sunra (v4)</td><td class="num">0.080</td><td class="num">0.029</td><td class="num">0.100</td><td class="below">Yes</td><td class="num">0.25</td><td class="num">0.175</td></tr>
+<tr><td>ElevenLabs voice, 1,000 characters</td><td>Artlist</td><td class="num">0.242</td><td class="num">0.104</td><td class="num">0.100</td><td>No</td><td class="num">0.25</td><td class="num">0.175</td></tr>
+<tr><td>ElevenLabs voice, 1,000 characters</td><td>OpenArt</td><td class="num">0.350</td><td class="num">0.165</td><td class="num">0.100</td><td>No</td><td class="num">0.25</td><td class="num">0.175</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col stack small">
+      <p><strong>How the dollars were worked out:</strong> credits per job × the plan's price per credit. Price per credit, cheapest plan: Magnific Pro Starter yearly $990 ÷ 1,500,000 = $0.00066 · Higgsfield Ultra 9,000 yearly $270 ÷ 9,000 = $0.03 · OpenArt Wonder yearly $175 ÷ 106,000 = $0.00165 · Sunra biggest Creator yearly $1,025 ÷ 280,000 = $0.00366 · Artlist AI Creator yearly $41.67 ÷ 80,000 = $0.00052 · VEED Pro yearly $228 ÷ 18,000 = $0.0127 · Krea Max yearly $99 ÷ 100,000 = $0.00099. Entry uses each rival's cheapest monthly plan that carries the model; for Higgsfield that is Plus ($59 ÷ 1,200), because Starter leaves models out.</p>
+      <p><strong>How sure each number is:</strong> rival plan prices were read on two pages each (the pricing page plus a docs page or the site's own price data). Credits per model exist in only one place for each rival (its own rate table or code), so those are <span class="chip one">one source</span> by nature. I re-read Magnific, Higgsfield and Sunra myself today; OpenArt, Artlist, VEED and Krea were read today by a research helper. Krea doesn't publish per-model costs, so its figures are worked back from "about N videos per plan" and are approximate. Higgsfield marks its video costs with "~".</p>
+      <p><strong>Our cost</strong> comes from real supplier bills stored with each job (Runware and Google), or fal's own page where fal is the supplier. Kling is on Runware at fal's price, $0.35 per 5 s. Nano Banana Pro is $0.134 on Google's page; our bills averaged $0.139.</p>
+      <p><strong>Not in the table:</strong> Grok "1.5 Lite" itself is sold by nobody else I checked. Kling Lip Sync isn't sold by Sunra, Artlist or VEED. Magnific and VEED don't sell 720p Seedance 2.0 at the same settings, so their nearest versions are shown and named.</p>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section id="how" class="stack">
+    <h2><span class="n">2</span>How they get there</h2>
+    <div class="col stack">
+      <p>Kling, Veo, Nano Banana, Seedance, Grok and ElevenLabs are closed models: only the maker or its licensed resellers can run them. So a rival can't get below our cost on them by running its own computers. Only five things can explain it. Each is marked by how strong its evidence is:</p>
+      <p class="small"><span class="chip">Proven</span> a page says it outright · <span class="chip one">One source</span> one page says it · <span class="chip guess">Guess</span> it fits the facts, but no page says it for that rival</p>
+    </div>
+
+    <div class="callout col">
+      <h3>The arithmetic that is certain</h3>
+      <p>Sunra says on its own site that it sells "every model at its maker's API price", and its list prices match what we pay (Nano Banana Pro 14 credits = $0.14; Google charges $0.134). Its biggest yearly plan then sells each credit for $0.00366, about <strong>37¢ on the dollar</strong>. OpenArt's monthly Starter plan sells Kling at $0.35, exactly fal's list price, and its yearly Wonder plan at $0.165, about <strong>47¢ on the dollar</strong>.</p>
+      <p>So on their cheapest plans these rivals charge about a third to a half of the supplier's list price. If customers used every credit, they would lose money on every job unless they buy far below list. Every one of them makes plan credits disappear: Sunra "do not roll over", OpenArt "do not carry over" and are lost on cancel, Higgsfield "don't roll over", Artlist "set to zero" when the plan ends, Krea and VEED "do not roll over". Solorender's credits never expire, so this cushion isn't open to us.</p>
+    </div>
+
+    <div class="mech">
+      <article>
+        <header><h3>Credits customers never use</h3><span class="chip">Proven policy</span></header>
+        <p class="small">The rules are proven on each rival's own page (quoted above). How much goes unused is <span class="chip guess">unknown</span>. No AI studio publishes it, and the only general figures the research found came from vendor blogs about gift cards (a few percent up to 15%), which aren't data about AI studios.</p>
+        <ul>
+          <li>Magnific: yearly credits "valid for 1 year"; bought top-up credits are "forfeited" if you cancel.</li>
+          <li>Higgsfield and Krea: bought packs expire after 90 days.</li>
+        </ul>
+      </article>
+      <article>
+        <header><h3>"Unlimited" that slows down</h3><span class="chip">Proven</span></header>
+        <p class="small">Magnific sells Kling 2.5 and Nano Banana 2 as "unlimited". Its own help text says that after a hidden priority allowance "generations run one at a time, and speed varies". It is <strong>moving Nano Banana Pro, GPT Image and Flux.2 Max out of Unlimited</strong> at each customer's next renewal. Higgsfield: unlimited runs "in the standard queue", "personal, human use" only, capped at 720p and 8 s for Seedance. Higgsfield's own pricing page also says unlimited is "subject to dynamic speed adjustments".</p>
+        <p class="small">Pulling its most expensive model out of Unlimited suggests unlimited Nano Banana Pro cost Magnific too much. That last step is my reading, not their words.</p>
+      </article>
+      <article>
+        <header><h3>Investor money</h3><span class="chip">Proven for Higgsfield</span></header>
+        <ul>
+          <li>Higgsfield raised $400M at a $5.4B value in August 2026 (TNW, BNN Bloomberg, Pulse 2.0) and claims a $700M yearly revenue pace. No outlet reports a profit.</li>
+          <li>A Chinese tech outlet (36Kr) says Higgsfield sells model calls "at near-cost" and profits elsewhere. <span class="chip one">One source</span></li>
+          <li>OpenArt $30M (January 2026) and Krea $47M were found only in search snippets. <span class="chip one">Not confirmed</span></li>
+          <li>Sunra: no funding found. Its yearly prices at 37¢ on the dollar have no visible means of support beyond unused credits. <span class="chip guess">Guess</span></li>
+        </ul>
+      </article>
+      <article>
+        <header><h3>Volume deals with the makers</h3><span class="chip guess">Guess for any rival</span></header>
+        <p class="small">The discounts exist. Google's price page offers "Volume-based discounts (based on usage)" on its Enterprise tier. fal's docs say enterprise customers "can receive custom per-endpoint pricing and volume discounts". Runware says high-usage customers "can contact sales for custom pricing". None publish numbers. No page shows a rival's contract terms. Fortune says Magnific (formerly Freepik) offers Veo 3.1 and Seedance 2.0, about $230M a year in sales, and "profitable" (the founder's own claim) with no venture money. A profitable company selling Nano Banana Pro at $0.05 suggests it pays Google less than list. That is an inference.</p>
+        <p class="small">A Higgsfield–ByteDance (BytePlus) partnership for Seedance appears only in secondary write-ups, with no announcement found. <span class="chip one">Not confirmed</span></p>
+      </article>
+      <article>
+        <header><h3>Yearly cash up front</h3><span class="chip">Proven</span></header>
+        <p class="small">Every rival pushes yearly plans: Krea "Save 40%", Magnific "Save 25%", Higgsfield up to 30%, OpenArt about 30% (its page says "up to 27%"). The cash arrives before the work does, which pays for deposits like Runware's. It doesn't lower the cost of a job by itself.</p>
+      </article>
+      <article>
+        <header><h3>Running their own computers</h3><span class="chip no">Can't explain closed models</span></header>
+        <p class="small">Freepik/Magnific runs open FLUX models on up to 500 rented GPUs, according to a case study by its GPU provider Verda. That helps only on open models. On Kling, Veo, Nano Banana or Seedance it is impossible without a licence deal, and none was found.</p>
+      </article>
+    </div>
+    <p class="col small"><strong>Most likely explanation, in order:</strong> (1) unused credits plus throttled "unlimited", which every rival has; (2) investor money, proven for Higgsfield; (3) private volume deals, likely for the biggest (Magnific, Higgsfield) but not shown anywhere; (4) yearly cash, which helps but can't explain it alone; (5) own computers, which can't apply to these models.</p>
+    <div class="col stack" id="money">
+      <h3>Deeper dig (30 October, your comment): how do Sunra and OpenArt make money at the maker's price?</h3>
+      <div class="callout"><p><strong>In short:</strong> neither company publishes its margins, so no page proves how they make money. What the pages do show: both sell only a little below the maker's price unless you buy a yearly or big plan, and those cheap credits vanish every month if you don't use them. For pictures there is a real, published half-price route (Google's Flex and Batch tiers, which Solorender now uses for Saver). For video there isn't one: the deepest published discount from Kling, ByteDance, xAI or MiniMax is 10–20% off. So anyone selling video at half the maker's price is either on a private deal, spending investor or startup credits, or losing money on heavy users and making it back on light users' expired credits.</p></div>
+      <h3>Sunra</h3>
+      <ul class="plain">
+        <li><strong>Who it is:</strong> a small company, Second Enlightenment Global Private Limited, registered in Singapore (its own terms page). LinkedIn lists it as London-based, founded 2025, 2–10 staff. No funding, revenue or user numbers found anywhere. <span class="chip one">one source</span> for size</li>
+        <li><strong>A 5% fee on its developer API.</strong> The API page says Sunra charges the maker's price "with no fees on top". Its terms (6.2) add "a service fee, currently 5%" to every top-up, shown before you pay and non-refundable. I read both pages myself. <span class="chip">proven</span></li>
+        <li><strong>Pay-as-you-go credits sit at the maker's price.</strong> A credit costs $0.01, so its Nano Banana Pro is $0.14 against Google's $0.134. The monthly Basic plan is also $0.01 a credit. Only yearly and bigger plans go well below: Creator yearly works out to $0.0037. <span class="chip">proven</span></li>
+        <li><strong>Plan credits die monthly, even on yearly plans:</strong> "Credits not used before they expire are lost" (terms 5.2). <span class="chip">proven</span></li>
+        <li><strong>It offers big buyers "up to 40% off models' API prices"</strong> (API page). So it can sell, or is willing to sell, well below list. The page doesn't say how. <span class="chip">proven</span> claim, <span class="chip guess">guess</span> as to how</li>
+        <li><strong>No partner deals found:</strong> no "official partner" badge, launch-partner claim or maker deal. Logos of Google, ByteDance and others appear with no stated relationship.</li>
+      </ul>
+      <h3>OpenArt</h3>
+      <ul class="plain">
+        <li><strong>Funding and size:</strong> $30M Series A in January 2026, led by Canaan with Basis Set and DCM. At that point it had "8M MAU and $70M+ ARR", grown 7× in 2025 with about 20 people (Canaan's own post, which I read; OpenArt's blog gives the same figures). <span class="chip">proven</span></li>
+        <li><strong>Now claims "close to $200M ARR"</strong> in a paid press release (21–22 October 2026), still with "more than 8 million" monthly users. A research firm (Sacra) estimated $100M in June. <span class="chip one">one source</span>, unaudited</li>
+        <li><strong>Profitable?</strong> Only secondary write-ups say so; Canaan's post doesn't. <span class="chip guess">not confirmed</span></li>
+        <li><strong>Its supplier is Runware, the same as ours</strong> (Runware's case study quotes OpenArt's founder on "incredibly competitive pricing", with no number). It started as self-hosted Stable Diffusion on rented computers. <span class="chip one">one source</span></li>
+        <li><strong>Credits:</strong> "Subscription credits do not carry over to the next month", and paid credits are lost when the plan ends (its FAQ). Its terms let it change how many credits a job costs mid-subscription. <span class="chip">proven</span></li>
+        <li><strong>"Unlimited" is a rotating promotion,</strong> mostly on cheap open models (FLUX, Wan). The one closed-model "unlimited" (Seedance 2.5) ran for 7 days. <span class="chip">proven</span> on its What's New page</li>
+      </ul>
+      <h3>Every published way to buy below the maker's list price</h3>
+      <div class="tbl"><table class="sortable">
+        <thead><tr><th>Maker</th><th>Route</th><th class="num">Price vs list</th><th>Catch</th></tr></thead>
+        <tbody>
+<tr><td>Google (Nano Banana Pro, 2)</td><td>Flex / Batch</td><td class="num">50%</td><td>Flex: slower, can be refused when busy (Solorender's Saver). Batch: up to 24 hours, 1K only.</td></tr>
+<tr><td>Google (Nano Banana)</td><td>Provisioned Throughput, 1-year</td><td class="num">77%</td><td>Fixed ~$2,000 a month per unit, paid whether used or not; the 77% assumes it runs flat out. Never beats Flex.</td></tr>
+<tr><td>Google (Veo 3.1)</td><td>Provisioned Throughput, 1-year</td><td class="num">64–100%</td><td>No Flex or Batch for Veo. Only Veo Lite at 1080p with sound gets to 64%.</td></tr>
+<tr><td>Google (all)</td><td>Savings plan</td><td class="num">80–90%</td><td>1-year or 3-year spending commitment.</td></tr>
+<tr><td>Google (Gemini voice)</td><td>Launch promotion</td><td class="num">50%</td><td>Gemini 3.8 Flash voice "50% credits back" until 31 December 2026 (Vertex price page). <strong>Checked 30 October:</strong> it covers our model (the same billing code we pay). It is a rebate, not a lower price, so the bill shows the full rate and half comes back as a credit later. That's why our 21 October bill showed full price. Google's matching offer on reserved capacity pays out on the 7th of the next month. Unknown: whether usage paid by the $300 free-trial credit counts. October voice: 32 runs, $0.10, all our own tests, so about 5¢ is at stake.</td></tr>
+<tr><td>Kling</td><td>Prepaid API packs</td><td class="num">90%</td><td>Only from 30,000 units ($3,780); packs expire after 180 days. Bigger deals "by enquiry". Pack sizes read on third-party sites.</td></tr>
+<tr><td>ByteDance (Seedance 2.0, 2.5)</td><td>none</td><td class="num">100%</td><td>BytePlus offers no batch or offline discount for Seedance 2.x (only for the old 1.0).</td></tr>
+<tr><td>xAI (Grok video)</td><td>Batch</td><td class="num">100%</td><td>Batch is "billed at standard rates" for video and images.</td></tr>
+<tr><td>ElevenLabs</td><td>Business yearly</td><td class="num">83%</td><td>Resale allowed only on Scale, Business or Enterprise, under its OEM terms.</td></tr>
+<tr><td>MiniMax (Hailuo video)</td><td>Monthly packs</td><td class="num">80%</td><td>$6,000 a month for the biggest 20% saving; not valid for H3.</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Signs of how rivals do it</h3>
+      <ul class="plain">
+        <li><strong>Lovart sells "Nano Banana Pro &amp; 2 Off-peak half price"</strong>, which matches Google's half-price tiers. Its night-time image pack (22:00–03:00) works out to about $0.015 a picture, below even Google's half price, so that part is a promotion or a loss.</li>
+        <li><strong>Topview sells Seedance 2.5 at about $0.12–0.15 a second</strong>, against ByteDance's published $0.231. No published route explains that.</li>
+        <li><strong>Higgsfield says it is "the only platform with an official ByteDance partnership"</strong> (its own blog; no ByteDance page confirms it).</li>
+        <li><strong>Imagine.art's case study on Google's own site</strong> says over half its AI costs go to Google, and names a Google Cloud partner (Tridorian) that manages its credits and quota.</li>
+        <li><strong>"Unlimited" almost always means a slow queue:</strong> Lovart "processed as system GPU resources become available", Topview "wait times may be lengthy", Krea unlimited only on its own in-house models, Dzine under a "Fair Usage Policy".</li>
+      </ul>
+      <p class="small"><strong>What remains unknown:</strong> any rival's real cost per video, its share of unused credits, and its margins; none publishes them. Sources: Sunra's terms and API page and Canaan's post were re-read by me today; the rest came from two research helpers reading each maker's and rival's own pages (Google Vertex pricing and Provisioned Throughput docs, kling.ai/dev/pricing, BytePlus ModelArk pricing, docs.x.ai pricing, elevenlabs.io/pricing/api and OEM terms, platform.minimax.io pricing, rival pricing pages).</p>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section id="ladder" class="stack">
+    <h2><span class="n">3</span>The cost-cutting ladder</h2>
+    <div class="col stack">
+      <p>Steps open to Solorender, cheapest up-front first. "Cut" is against what we pay today. Every cost cut goes to the customer at the 2.5× rule, so the new credit price is shown too. Google's models stay on Google, so for them only Google's own discounts count.</p>
+      <p class="small">Today's spend, for scale: about $20 at Runware in October (76 jobs recorded), $4 at Google video, plus picture and fal costs that aren't stored per job. October's usage was 45,411 credits, about $182 of supplier cost at 2.5×. All of it was your own testing.</p>
+    </div>
+    <div class="tbl">
+      <table class="sortable">
+        <thead><tr><th>Step</th><th class="num">Up front</th><th>Cut per job (credits now → after)</th><th>When it opens up</th><th>Reselling terms (exact words)</th><th>Proof</th></tr></thead>
+        <tbody>
+<tr class="grp"><td colspan="6">Free: no money up front</td></tr>
+<tr><td><strong>A. Google "Batch" lane</strong> for Nano Banana Pro and Nano Banana 2</td><td class="num">$0</td><td>NB Pro $0.134 → $0.067 (50% off), <strong>35 → 17 cr</strong>. NB 2 $0.067 → $0.034 (50% off), <strong>17 → 9 cr</strong>.</td><td>Now. The catch is the wait: Google's "target turnaround time is 24 hours, but in majority of cases, it is much quicker". This would be a "Saver: ready later" choice beside the normal instant one.</td><td>Google Cloud's terms, which Solorender already runs on. It buys Nano Banana through Google Cloud, not the Gemini API, and Google Cloud's price page shows the same half price under "Flex/Batch" (Nano Banana Pro picture output $60 instead of $120 per million tokens; Nano Banana 2 $30 instead of $60). Corrected 30 October: this cell first quoted the Gemini API's terms, which don't apply.</td><td><span class="chip">2 pages</span> Google price page + Batch docs</td></tr>
+<tr><td><strong>B. Google "Flex" lane</strong> for Nano Banana Pro</td><td class="num">$0</td><td>Same 50% off: <strong>35 → 17 cr</strong>, with results in about 1–15 minutes instead of 24 hours</td><td>Tested 30 October: one picture in 55 seconds, $0.0687 (one run, so busy-hour speed is still unknown). Built as "Nano Banana Pro Saver", 18 credits. Google Cloud's own Flex page lists both Nano Banana Pro (gemini-3-pro-image) and Nano Banana 2 (gemini-3.1-flash-image), on the global address Solorender already uses (checked 30 October; the earlier conflict came from the Gemini API's docs). Flex is "best-effort": a busy Google can refuse the job (we'd refund).</td><td>Same as A</td><td><span class="chip">2 pages</span> Google Cloud price page + Flex PayGo docs</td></tr>
+<tr><td><strong>C. Sell the cheaper Kling 2.5 Turbo Standard (720p)</strong> beside the 1080p Pro</td><td class="num">$0</td><td>$0.35 → $0.21 per 5 s (40% off), <strong>88 → 53 cr</strong>. This is a cheaper version, not a discount on the same clip.</td><td>Now (fal). Magnific and Higgsfield both sell Kling 2.5 at 720p.</td><td>fal terms already in use (see F)</td><td><span class="chip one">one source</span> fal model page</td></tr>
+<tr><td><strong>D. Free startup credits</strong></td><td class="num">$0</td><td>Lowers cash spent, not the price per job. Runware Starter already paid $500. Open: Cloudflare $10,000 (Workers AI part capped at $2,500), AWS $1,000–5,000, Google Start $2,000 (applied).</td><td>Now, for a bootstrapped company</td><td>ElevenLabs' grant "cannot exchange or resell", so it's no use for customers</td><td><span class="chip">2 reads</span> 10-20 check + today</td></tr>
+<tr class="grp"><td colspan="6">Monthly fee</td></tr>
+<tr><td><strong>E. ElevenLabs direct</strong>, Scale plan</td><td class="num">$299 a month</td><td>$0.10 → $0.08 per 1,000 characters (20% off), <strong>25 → 20 cr</strong></td><td>Only worth it above about 3 million characters a month, the point where fal would also cost $299. That's about 3,000 full 1,000-character scripts.</td><td>ElevenLabs OEM terms §2.B: the cheaper plans are "expressly prohibited from Making Available the Services". Only Scale or Business may be built into our app. Orders are non-cancellable (§5.B).</td><td><span class="chip">2 reads</span> price page + 10-18 research</td></tr>
+<tr class="grp"><td colspan="6">Deposits</td></tr>
+<tr><td><strong>F. Runware Growth</strong></td><td class="num">$25,000</td><td>Pay $25,000, get $35,000 of credit: 30% off everything bought at Runware (exact 28.57%). Kling <strong>88 → 63 cr</strong>, Seedance 2.0 <strong>200 → 142 cr</strong>, Grok Lite <strong>40 → 29 cr</strong>, plus Seedream, OmniHuman, Ideogram Character, Qwen and the rest.</td><td>Open to bootstrapped teams ("Bootstrapped and pre-seed teams with a product in use"). It pays its way only as sales use the credit. At $1,000 a month of Runware spend the $35,000 lasts 35 months; at $2,917 it lasts 12 months; at $10,000, 3.5 months.</td><td>Runware terms: you may not "resell or provide the Services on a standalone basis (e.g. as a competing API/service) without Runware's written permission". Apps for "end users" are allowed (its "Customer Solutions" section; also confirmed in writing by Runware sales on 10-16). Deposit and bonus "not refundable and not transferable"; credits "do not expire".</td><td><span class="chip">2 pages</span> startup page + terms, re-read today</td></tr>
+<tr><td><strong>G. Runware Scale</strong></td><td class="num">$50,000</td><td>Pay $50,000, get $80,000: 40% off (exact 37.5%). Kling <strong>88 → 55 cr</strong>, Seedance <strong>200 → 125 cr</strong>, Grok Lite <strong>40 → 25 cr</strong>.</td><td>The page says "best fit: Seed to Series A companies". After the raise Solorender would be seed-funded, but whether Runware counts a $150,000 SAFE is unknown, so ask Runware in writing. Lasts 80 months at $1,000 a month and 8 months at $10,000.</td><td>Same as F</td><td><span class="chip">2 pages</span></td></tr>
+<tr class="grp"><td colspan="6">Spend commitments</td></tr>
+<tr><td><strong>H. Google savings plan</strong> (promise a monthly spend for 1 or 3 years)</td><td class="num">A monthly promise</td><td>10% off (1 year) or 20% off (3 years). On Veo that's 200 → 180 cr or 160 cr, <em>if</em> Veo is covered.</td><td>Unconfirmed: the list of covered Google products wasn't readable. Worth asking Google once Veo spend is steady.</td><td>Same Gemini/Cloud terms</td><td><span class="chip one">one source</span></td></tr>
+<tr class="grp"><td colspan="6">Checked and skipped</td></tr>
+<tr><td>Grok direct from xAI</td><td class="num">$0</td><td><strong>No saving.</strong> xAI's own price table: Grok 1.5 Lite 720p $0.03/s + $0.01 per input picture = $0.16 for 5 s, the same as Runware. (The helper first reported $0.10; that was the 480p price.)</td><td>n/a</td><td>xAI terms page blocked (403)</td><td><span class="chip">read by me</span> docs.x.ai</td></tr>
+<tr><td>Google Provisioned Throughput (rent Google capacity for a year)</td><td class="num">≈ $24,000 a year</td><td>Veo: under 5% saving, and only if the rented capacity runs around the clock. NB 2 and Pro about 25% saving, but Batch (A) is 50% with no commitment.</td><td>Can't cancel mid-term</td><td>Same Gemini terms</td><td><span class="chip">2 pages</span> helper arithmetic</td></tr>
+<tr><td>Kling direct packs</td><td class="num">$3,780</td><td>10% off, credits valid only 180 days. The cost per 5 s Turbo clip isn't published. Kling Trial packs (30% off, 30 days, max 5 buys) were seen 10-16.</td><td>Revisit when Kling customer spend exists</td><td>Kling terms page script-only, not read</td><td><span class="chip one">secondary</span></td></tr>
+<tr><td>Running open video models on rented computers</td><td class="num">$750–3,000 trial</td><td>Costs more, not less. Wan 2.2 (14B) takes about 1,056 s for a 720p clip on one H100; at $3.95–3.99 an hour that is about $1.16 per clip, against Kling's $0.35. The smaller Wan 5B is about $0.13 per clip, but its quality isn't tested and it isn't a model customers ask for.</td><td>n/a</td><td>Wan and Qwen-Image are Apache 2.0 (free to sell). LTX-2 needs a paid licence above $10M a year in revenue. Hunyuan excludes the EU, UK and South Korea.</td><td><span class="chip">2 pages</span> Wan README + GPU price pages</td></tr>
+<tr><td>BytePlus (ByteDance direct) for Seedance</td><td class="num">n/a</td><td>About 5% cheaper on paper</td><td>Not usable: "not available in the United States", plus a ban on reselling in creation tools without written permission (10-12 research)</td><td>see note</td><td><span class="chip one">secondary</span></td></tr>
+<tr><td>fal / Google / Runware "contact sales"</td><td class="num">unknown</td><td>Not published, so no figure can be claimed</td><td>"High-usage" customers; no threshold given</td><td>fal terms §4(b)(ii): we "will not expose any of the Services APIs directly to any End Users". Our app doesn't.</td><td><span class="chip">pages read</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section id="after" class="stack">
+    <h2><span class="n">4</span>Where the ladder leaves us</h2>
+    <p class="col">Here is each model after its best step, priced at the 2.5× rule, beside the cheapest rival. Even our own cost after the cut is still above the cheapest rival's retail price on most rows. That gap can't come from cost cuts, so it has to be the unused-credit and investor-money effects in section 2.</p>
+    <div class="tbl">
+      <table class="sortable">
+        <thead><tr><th>Model and job</th><th>Best step</th><th class="num">Our cost after $</th><th class="num">Credits now → after</th><th class="num">Ours, Super Max $</th><th>Cheapest rival</th><th class="num">Rival $</th><th class="num">Ours ÷ rival</th><th class="num">Average of rivals $</th><th class="num">Rivals with a price</th><th class="num">Range $ (cheapest – dearest)</th></tr></thead>
+        <tbody>
+<tr><td>Nano Banana Pro</td><td>A · Google Batch</td><td class="num">0.067</td><td class="num">35 → 17</td><td class="num">0.119</td><td>Magnific</td><td class="num">0.050</td><td class="num">2.4×</td><td class="num">0.119</td><td class="num">24 of 50</td><td class="num">0.023 – 0.400<br><span class="small">Invideo – NightCafe</span></td></tr>
+<tr><td>Nano Banana 2</td><td>A · Google Batch</td><td class="num">0.034</td><td class="num">17 → 9</td><td class="num">0.063</td><td>Sunra</td><td class="num">0.026</td><td class="num">2.5×</td><td class="num">0.059</td><td class="num">21 of 50</td><td class="num">0.011 – 0.132<br><span class="small">Invideo – Fliki</span></td></tr>
+<tr><td>Kling 2.5 Turbo 1080p</td><td>G · Runware Scale</td><td class="num">0.219</td><td class="num">88 → 55</td><td class="num">0.386</td><td>OpenArt</td><td class="num">0.165</td><td class="num">2.3×</td><td class="num">0.255</td><td class="num">13 of 50</td><td class="num">0.081 – 0.411<br><span class="small">Lovart – Getimg</span></td></tr>
+<tr><td>Kling 2.5 Turbo 720p</td><td>C · Standard version</td><td class="num">0.210</td><td class="num">88 → 53</td><td class="num">0.372</td><td>Magnific</td><td class="num">0.092</td><td class="num">4.0×</td><td class="num">0.111</td><td class="num">7 of 50</td><td class="num">0.061 – 0.177<br><span class="small">Lovart – Poe</span></td></tr>
+<tr><td>Seedance 2.0 720p</td><td>G · Runware Scale</td><td class="num">0.497</td><td class="num">200 → 125</td><td class="num">0.877</td><td>Sunra</td><td class="num">0.264</td><td class="num">3.3×</td><td class="num">0.831</td><td class="num">18 of 50</td><td class="num">0.264 – 1.800<br><span class="small">Sunra – Adobe Firefly</span></td></tr>
+<tr><td>Veo 3.1 Fast 8 s</td><td>none found</td><td class="num">0.800</td><td class="num">200 → 200</td><td class="num">1.404</td><td>Sunra</td><td class="num">0.293</td><td class="num">4.8×</td><td class="num">1.206</td><td class="num">15 of 50</td><td class="num">0.293 – 5.070<br><span class="small">Sunra – VEED</span></td></tr>
+<tr><td>Grok 1.5 Lite 720p</td><td>G · Runware Scale</td><td class="num">0.100</td><td class="num">40 → 25</td><td class="num">0.175</td><td>Higgsfield ("Grok Video")</td><td class="num">0.210</td><td class="num gr">0.8×, we'd be cheaper</td><td class="num">0.320</td><td class="num">9 of 50</td><td class="num">0.128 – 0.669<br><span class="small">Sunra – OpenArt</span></td></tr>
+<tr><td>ElevenLabs, 1,000 characters</td><td>E · ElevenLabs Scale</td><td class="num">0.080</td><td class="num">25 → 20</td><td class="num">0.140</td><td>Sunra (v4)</td><td class="num">0.029</td><td class="num">4.8×</td><td class="num">0.060</td><td class="num">8 of 50</td><td class="num">0.027 – 0.138<br><span class="small">Mage.space – ElevenLabs</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col stack">
+      <p class="small"><strong>The last three columns (added 30 October, your comment):</strong> the 50 biggest rival studios by September 2026 web traffic (Semrush, cross-checked with Similarweb and a16z's October list), each priced on its own pricing pages today. Each rival's price is its <em>best</em> plan (usually the biggest yearly one), the same basis as "Rival $". Only 30 of the 50 publish a usable price for any of these models: Canva, Grok, CapCut, SeaArt, Genspark, Leonardo, Pixlr, Pollo, Tensor.art, Aiease, LTX Studio, Kaiber, Media.io, HeyGen, Pippit and Monica show prices only after login, and Kling's own app no longer lists 2.5 Turbo. Left out on purpose: prices worked back from "up to N" counts (Pixelcut), third-party figures, other settings (2K-only pictures, Seedance at 480p), and a voice that isn't ElevenLabs. Artlist's video credits are counted per second, as its help center labels them (corrected later on 30 October; this moved Seedance to 18 rivals and Veo to 15). The range can sit below "Cheapest rival", because that column came from the first seven rivals checked. Veo's average is pulled up by VEED ($5.07, 400 credits a clip); the middle rival on that row charges $0.91. I re-read six of the range ends myself (VEED, Invideo, Lovart, NightCafe, Adobe, Artlist); Lovart's biggest yearly plan had gone from $99 to $109 a month, so its figures use $109. "Grok" rows compare our Grok 1.5 Lite with each rival's own Grok Imagine video.</p>
+      <p><strong>What this means:</strong> after every cut, Solorender's best price is still about 2½ to 5 times the cheapest rival's yearly price, on everything but Grok. The cuts still matter. They take 25–50% off our prices on the most-used models, and they close the gap with the rivals' <em>monthly</em> prices. Against OpenArt's $14 Starter plan, our Super Max Nano Banana Pro would go from $0.246 to $0.119, against their $0.14.</p>
+      <p>To go further there are only two levers, and both are yours to pull or not. Neither is a supplier question:</p>
+      <ul class="plain">
+        <li><strong>The 2.5× rule.</strong> At 2× instead of 2.5×, every price drops by a fifth. Your standing rule (16 October) is 2.5× on every model.</li>
+        <li><strong>Credits that never expire.</strong> Rivals sell yearly credits cheaply because many are never used. Solorender's "never expires" promise is its stated edge in the letter, and it rules this out. I recommend keeping it. Competing on the rivals' own terms (expiring yearly credits) means competing with Higgsfield's $400M.</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- 4b -->
+  <section id="where" class="stack">
+    <h2><span class="n">4b</span>Where we sit, every model</h2>
+    <div class="col stack">
+      <p>Each row is one job on a model Solorender sells, priced at our best rate (Super Max, $300 for 42,750 credits, 0.70¢ a credit) against every rival that publishes a price for the same model and settings. The rivals are the 50 biggest studios by web traffic, each priced at its own best plan today. The strip runs from the cheapest rival on the left to the dearest on the right, spaced so each step is the same percentage jump, so one very dear rival doesn't squash the rest.</p>
+      <div class="callout"><p><strong>Today we're above the average rival on 25 of the 31 models that rivals price.</strong> On most rows the orange dot sits at the right-hand end. The planned cuts in sections 3 and 4 (orange rings) move six rows left. Nano Banana Pro, Nano Banana 2 and Seedance 2.0 end up just above the average. Kling 2.5 Turbo Pro and ElevenLabs stay well above it. Grok, already below, goes lower. So the count stays 25. Where we're cheaper than the average: Grok video, FLUX.2 Klein, Ideogram V4, Recraft V4.1, FLUX Krea and Topaz upscaling.</p></div>
+      <div class="legend" aria-hidden="true">
+        <span><i style="width:15px;height:15px;background:var(--orange)"></i>Solorender today</span>
+        <span><i style="width:15px;height:15px;border:2px solid var(--orange)"></i>Solorender after planned cuts</span>
+        <span><i style="width:9px;height:9px;background:#8a8780"></i>One rival (point at it for the name and price)</span>
+        <span><i style="width:2px;height:16px;border-radius:0;background:#fff"></i>Rival average</span>
+      </div>
+    </div>
+    <div class="tools"><label for="q4b">Filter</label><input id="q4b" type="search" placeholder="e.g. Kling, Seedance, voice"></div>
+    <div class="tbl">
+      <table class="sortable" id="whereTable">
+        <thead><tr><th>Model and job</th><th class="num">Our credits</th><th class="num">Ours today $</th><th class="num">Rival average $</th><th class="num">Rivals</th><th>Where we sit (cheapest → dearest)</th><th class="num">Rivals cheaper than us</th></tr></thead>
+        <tbody>
+<tr class="grp"><td colspan="7">Pictures</td></tr>
+<tr><td>Nano Banana Pro, 1 picture 1K</td><td class="num">35 → 18</td><td class="num">$0.246<br><span class=small>after: $0.126</span></td><td class="num">$0.119</td><td class="num">24</td><td><div class="strip" role="img" aria-label="24 rivals from $0.023 to $0.400; Solorender $0.246"><i class="r" style="left:3.0%" title="Invideo: $0.023"></i><i class="r" style="left:19.5%" title="Luma: $0.038"></i><i class="r" style="left:26.5%" title="Magnific: $0.047"></i><i class="r" style="left:29.4%" title="Sunra: $0.051"></i><i class="r" style="left:30.2%" title="Akool: $0.052"></i><i class="r" style="left:32.6%" title="Lovart: $0.057"></i><i class="r" style="left:34.6%" title="Higgsfield: $0.060"></i><i class="r" style="left:37.7%" title="OpenArt: $0.066"></i><i class="r" style="left:42.8%" title="Krea: $0.077"></i><i class="r" style="left:44.0%" title="Topview: $0.080"></i><i class="r" style="left:45.3%" title="Artlist: $0.083"></i><i class="r" style="left:51.4%" title="Picsart: $0.100"></i><i class="r" style="left:53.0%" title="Weavy: $0.105"></i><i class="r" style="left:55.4%" title="Poe: $0.113"></i><i class="r" style="left:62.4%" title="Imagine.art: $0.140"></i><i class="r" style="left:62.7%" title="Magic Hour: $0.141"></i><i class="r" style="left:63.4%" title="Flora: $0.144"></i><i class="r" style="left:64.7%" title="Hedra: $0.150"></i><i class="r" style="left:66.8%" title="Adobe Firefly: $0.160"></i><i class="r" style="left:68.3%" title="Dzine: $0.167"></i><i class="r" style="left:68.4%" title="Fotor: $0.168"></i><i class="r" style="left:72.8%" title="Getimg: $0.192"></i><i class="r" style="left:81.5%" title="Vidnoz: $0.250"></i><i class="r" style="left:97.0%" title="NightCafe: $0.400"></i><i class="avg" style="left:57.2%" title="Rival average: $0.119"></i><i class="after" style="left:59.1%" title="Solorender after planned cuts: $0.126"></i><i class="me" style="left:80.9%" title="Solorender today: $0.246"></i></div><div class="ends"><span>$0.023 Invideo</span><span>NightCafe $0.400</span></div></td><td class="num">92%<br><span class="small">22 of 24</span><br><span class="small">after cuts: 14 of 24</span></td></tr>
+<tr><td>Nano Banana 2, 1 picture 1K</td><td class="num">17 → 9</td><td class="num">$0.119<br><span class=small>after: $0.063</span></td><td class="num">$0.059</td><td class="num">21</td><td><div class="strip" role="img" aria-label="21 rivals from $0.011 to $0.132; Solorender $0.119"><i class="r" style="left:3.0%" title="Invideo: $0.011"></i><i class="r" style="left:35.0%" title="Sunra: $0.026"></i><i class="r" style="left:43.7%" title="Lovart: $0.032"></i><i class="r" style="left:49.9%" title="Luma: $0.038"></i><i class="r" style="left:51.8%" title="Topview: $0.040"></i><i class="r" style="left:55.4%" title="Krea: $0.044"></i><i class="r" style="left:56.3%" title="Fotor: $0.045"></i><i class="r" style="left:57.1%" title="Mage.space: $0.046"></i><i class="r" style="left:57.8%" title="Artlist: $0.047"></i><i class="r" style="left:57.9%" title="Magnific: $0.047"></i><i class="r" style="left:60.3%" title="Dzine: $0.050"></i><i class="r" style="left:64.6%" title="Weavy: $0.056"></i><i class="r" style="left:65.2%" title="Poe: $0.057"></i><i class="r" style="left:67.2%" title="Higgsfield: $0.060"></i><i class="r" style="left:69.6%" title="Flora: $0.064"></i><i class="r" style="left:78.1%" title="Adobe Firefly: $0.080"></i><i class="r" style="left:78.1%" title="Hedra: $0.080"></i><i class="r" style="left:80.8%" title="Imagine.art: $0.086"></i><i class="r" style="left:84.2%" title="Magic Hour: $0.094"></i><i class="r" style="left:85.0%" title="Getimg: $0.096"></i><i class="r" style="left:97.0%" title="Fliki: $0.132"></i><i class="avg" style="left:66.3%" title="Rival average: $0.059"></i><i class="after" style="left:69.1%" title="Solorender after planned cuts: $0.063"></i><i class="me" style="left:93.2%" title="Solorender today: $0.119"></i></div><div class="ends"><span>$0.011 Invideo</span><span>Fliki $0.132</span></div></td><td class="num">95%<br><span class="small">20 of 21</span><br><span class="small">after cuts: 14 of 21</span></td></tr>
+<tr><td>Nano Banana 2.1, 1 picture 1K</td><td class="num">9</td><td class="num">$0.063</td><td class="num">$0.045</td><td class="num">15</td><td><div class="strip" role="img" aria-label="15 rivals from $0.015 to $0.094; Solorender $0.063"><i class="r" style="left:3.0%" title="Sunra: $0.015"></i><i class="r" style="left:18.9%" title="Luma: $0.020"></i><i class="r" style="left:23.7%" title="Krea: $0.022"></i><i class="r" style="left:45.1%" title="Fotor: $0.034"></i><i class="r" style="left:52.6%" title="Artlist: $0.039"></i><i class="r" style="left:54.4%" title="Lovart: $0.040"></i><i class="r" style="left:56.1%" title="Flora: $0.042"></i><i class="r" style="left:60.9%" title="Mage.space: $0.046"></i><i class="r" style="left:62.0%" title="Imagine.art: $0.047"></i><i class="r" style="left:62.1%" title="Magic Hour: $0.047"></i><i class="r" style="left:63.0%" title="Getimg: $0.048"></i><i class="r" style="left:64.1%" title="Weavy: $0.049"></i><i class="r" style="left:65.1%" title="OpenArt: $0.050"></i><i class="r" style="left:88.9%" title="Hedra: $0.080"></i><i class="r" style="left:97.0%" title="NightCafe: $0.094"></i><i class="avg" style="left:59.6%" title="Rival average: $0.045"></i><i class="me" style="left:76.9%" title="Solorender today: $0.063"></i></div><div class="ends"><span>$0.015 Sunra</span><span>NightCafe $0.094</span></div></td><td class="num">87%<br><span class="small">13 of 15</span></td></tr>
+<tr><td>GPT Image 2.5, 1 picture high</td><td class="num">14</td><td class="num">$0.098</td><td class="num">$0.066</td><td class="num">5</td><td><div class="strip" role="img" aria-label="5 rivals from $0.022 to $0.147; Solorender $0.098"><i class="r" style="left:3.0%" title="Sunra: $0.022"></i><i class="r" style="left:21.5%" title="Luma: $0.032"></i><i class="r" style="left:32.6%" title="Picsart: $0.040"></i><i class="r" style="left:71.8%" title="Artlist: $0.088"></i><i class="r" style="left:97.0%" title="NightCafe: $0.147"></i><i class="avg" style="left:57.3%" title="Rival average: $0.066"></i><i class="me" style="left:77.1%" title="Solorender today: $0.098"></i></div><div class="ends"><span>$0.022 Sunra</span><span>NightCafe $0.147</span></div></td><td class="num">80%<br><span class="small">4 of 5</span></td></tr>
+<tr><td>GPT Image 2, 1 picture high (our Edit)</td><td class="num">53</td><td class="num">$0.372</td><td class="num">$0.205</td><td class="num">9</td><td><div class="strip" role="img" aria-label="9 rivals from $0.070 to $0.589; Solorender $0.372"><i class="r" style="left:3.0%" title="Dzine: $0.070"></i><i class="r" style="left:9.2%" title="Sunra: $0.081"></i><i class="r" style="left:18.7%" title="Picsart: $0.100"></i><i class="r" style="left:27.9%" title="Luma: $0.123"></i><i class="r" style="left:36.8%" title="Getimg: $0.150"></i><i class="r" style="left:51.7%" title="Flora: $0.211"></i><i class="r" style="left:51.7%" title="Hedra: $0.211"></i><i class="r" style="left:69.0%" title="Artlist: $0.312"></i><i class="r" style="left:97.0%" title="NightCafe: $0.589"></i><i class="avg" style="left:50.5%" title="Rival average: $0.205"></i><i class="me" style="left:76.7%" title="Solorender today: $0.372"></i></div><div class="ends"><span>$0.070 Dzine</span><span>NightCafe $0.589</span></div></td><td class="num">89%<br><span class="small">8 of 9</span></td></tr>
+<tr><td>Seedream 4.5, 1 picture</td><td class="num">10</td><td class="num">$0.070</td><td class="num">$0.039</td><td class="num">13</td><td><div class="strip" role="img" aria-label="13 rivals from $0.012 to $0.121; Solorender $0.070"><i class="r" style="left:3.0%" title="Lovart: $0.012"></i><i class="r" style="left:9.2%" title="Invideo: $0.014"></i><i class="r" style="left:10.7%" title="Sunra: $0.015"></i><i class="r" style="left:35.3%" title="Dzine: $0.027"></i><i class="r" style="left:35.6%" title="Flora: $0.027"></i><i class="r" style="left:39.1%" title="Krea: $0.029"></i><i class="r" style="left:45.2%" title="Poe: $0.034"></i><i class="r" style="left:51.8%" title="Hedra: $0.040"></i><i class="r" style="left:51.8%" title="Picsart: $0.040"></i><i class="r" style="left:53.8%" title="Imagine.art: $0.042"></i><i class="r" style="left:62.5%" title="Artlist: $0.052"></i><i class="r" style="left:65.5%" title="Fotor: $0.056"></i><i class="r" style="left:97.0%" title="NightCafe: $0.121"></i><i class="avg" style="left:50.9%" title="Rival average: $0.039"></i><i class="me" style="left:74.8%" title="Solorender today: $0.070"></i></div><div class="ends"><span>$0.012 Lovart</span><span>NightCafe $0.121</span></div></td><td class="num">92%<br><span class="small">12 of 13</span></td></tr>
+<tr><td>Seedream 5 Flash, 1 picture</td><td class="num">5</td><td class="num">$0.035</td><td class="num">$0.025</td><td class="num">7</td><td><div class="strip" role="img" aria-label="7 rivals from $0.008 to $0.054; Solorender $0.035"><i class="r" style="left:3.0%" title="Invideo: $0.008"></i><i class="r" style="left:11.8%" title="Luma: $0.010"></i><i class="r" style="left:51.6%" title="Fliki: $0.022"></i><i class="r" style="left:58.1%" title="Poe: $0.025"></i><i class="r" style="left:61.4%" title="Dzine: $0.027"></i><i class="r" style="left:62.7%" title="Getimg: $0.027"></i><i class="r" style="left:97.0%" title="NightCafe: $0.054"></i><i class="avg" style="left:57.7%" title="Rival average: $0.025"></i><i class="me" style="left:75.2%" title="Solorender today: $0.035"></i></div><div class="ends"><span>$0.008 Invideo</span><span>NightCafe $0.054</span></div></td><td class="num">86%<br><span class="small">6 of 7</span></td></tr>
+<tr><td>FLUX 2 Pro, 1 picture</td><td class="num">8</td><td class="num">$0.056</td><td class="num">$0.047</td><td class="num">15</td><td><div class="strip" role="img" aria-label="15 rivals from $0.016 to $0.190; Solorender $0.056"><i class="r" style="left:3.0%" title="Lovart: $0.016"></i><i class="r" style="left:11.3%" title="Picsart: $0.020"></i><i class="r" style="left:19.8%" title="Poe: $0.025"></i><i class="r" style="left:22.3%" title="Dzine: $0.027"></i><i class="r" style="left:25.1%" title="Flora: $0.029"></i><i class="r" style="left:26.7%" title="Hedra: $0.030"></i><i class="r" style="left:26.7%" title="Higgsfield: $0.030"></i><i class="r" style="left:29.2%" title="Magnific: $0.032"></i><i class="r" style="left:32.6%" title="Weavy: $0.035"></i><i class="r" style="left:38.7%" title="Getimg: $0.041"></i><i class="r" style="left:44.9%" title="Krea: $0.048"></i><i class="r" style="left:45.4%" title="Imagine.art: $0.049"></i><i class="r" style="left:50.5%" title="Fotor: $0.056"></i><i class="r" style="left:64.1%" title="NightCafe: $0.080"></i><i class="r" style="left:97.0%" title="VEED: $0.190"></i><i class="avg" style="left:44.0%" title="Rival average: $0.047"></i><i class="me" style="left:50.6%" title="Solorender today: $0.056"></i></div><div class="ends"><span>$0.016 Lovart</span><span>VEED $0.190</span></div></td><td class="num">87%<br><span class="small">13 of 15</span></td></tr>
+<tr><td>FLUX Krea, 1 picture <span class="chip one">only 2</span></td><td class="num">4</td><td class="num">$0.028</td><td class="num">$0.029</td><td class="num">2</td><td><div class="strip" role="img" aria-label="2 rivals from $0.018 to $0.040; Solorender $0.028"><i class="r" style="left:3.0%" title="Poe: $0.018"></i><i class="r" style="left:97.0%" title="NightCafe: $0.040"></i><i class="avg" style="left:59.1%" title="Rival average: $0.029"></i><i class="me" style="left:55.3%" title="Solorender today: $0.028"></i></div><div class="ends"><span>$0.018 Poe</span><span>NightCafe $0.040</span></div></td><td class="num">50%<br><span class="small">1 of 2</span></td></tr>
+<tr><td>FLUX.2 Klein 4B, 1 picture</td><td class="num">1</td><td class="num">$0.007</td><td class="num">$0.014</td><td class="num">5</td><td><div class="strip" role="img" aria-label="5 rivals from free to $0.027; Solorender $0.007"><i class="r" style="left:3.0%" title="Picsart: free on its plan"></i><i class="r" style="left:24.9%" title="Flora: $0.010"></i><i class="r" style="left:40.4%" title="Poe: $0.012"></i><i class="r" style="left:76.1%" title="Adobe Firefly: $0.020"></i><i class="r" style="left:97.0%" title="NightCafe: $0.027"></i><i class="avg" style="left:49.8%" title="Rival average: $0.014"></i><i class="me" style="left:3.0%" title="Solorender today: $0.007"></i></div><div class="ends"><span>Picsart (free on its plan)</span><span>NightCafe $0.027</span></div></td><td class="num">20%<br><span class="small">1 of 5</span></td></tr>
+<tr><td>Ideogram V4, 1 picture</td><td class="num">3</td><td class="num">$0.021</td><td class="num">$0.047</td><td class="num">5</td><td><div class="strip" role="img" aria-label="5 rivals from $0.020 to $0.063; Solorender $0.021"><i class="r" style="left:3.0%" title="Picsart: $0.020"></i><i class="r" style="left:45.5%" title="Fotor: $0.034"></i><i class="r" style="left:89.7%" title="Flora: $0.058"></i><i class="r" style="left:93.0%" title="Hedra: $0.060"></i><i class="r" style="left:97.0%" title="Imagine.art: $0.063"></i><i class="avg" style="left:72.7%" title="Rival average: $0.047"></i><i class="me" style="left:7.2%" title="Solorender today: $0.021"></i></div><div class="ends"><span>$0.020 Picsart</span><span>Imagine.art $0.063</span></div></td><td class="num">20%<br><span class="small">1 of 5</span></td></tr>
+<tr><td>Recraft V4.1, 1 picture</td><td class="num">10</td><td class="num">$0.070</td><td class="num">$0.084</td><td class="num">5</td><td><div class="strip" role="img" aria-label="5 rivals from $0.038 to $0.263; Solorender $0.070"><i class="r" style="left:3.0%" title="Magnific: $0.038"></i><i class="r" style="left:3.5%" title="Flora: $0.038"></i><i class="r" style="left:5.5%" title="Picsart: $0.040"></i><i class="r" style="left:7.4%" title="Artlist: $0.042"></i><i class="r" style="left:97.0%" title="Imagine.art: $0.263"></i><i class="avg" style="left:41.7%" title="Rival average: $0.084"></i><i class="me" style="left:32.8%" title="Solorender today: $0.070"></i></div><div class="ends"><span>$0.038 Magnific</span><span>Imagine.art $0.263</span></div></td><td class="num">80%<br><span class="small">4 of 5</span></td></tr>
+<tr><td>Grok Imagine, 1 picture</td><td class="num">5</td><td class="num">$0.035</td><td class="num">$0.032</td><td class="num">10</td><td><div class="strip" role="img" aria-label="10 rivals from $0.011 to $0.068; Solorender $0.035"><i class="r" style="left:3.0%" title="Sunra: $0.011"></i><i class="r" style="left:25.5%" title="Poe: $0.017"></i><i class="r" style="left:33.8%" title="Picsart: $0.020"></i><i class="r" style="left:36.4%" title="Imagine.art: $0.021"></i><i class="r" style="left:37.3%" title="Hedra: $0.021"></i><i class="r" style="left:61.1%" title="Flora: $0.034"></i><i class="r" style="left:71.0%" title="Getimg: $0.041"></i><i class="r" style="left:71.6%" title="Artlist: $0.042"></i><i class="r" style="left:74.5%" title="Magnific: $0.044"></i><i class="r" style="left:97.0%" title="Mage.space: $0.068"></i><i class="avg" style="left:57.9%" title="Rival average: $0.032"></i><i class="me" style="left:62.9%" title="Solorender today: $0.035"></i></div><div class="ends"><span>$0.011 Sunra</span><span>Mage.space $0.068</span></div></td><td class="num">60%<br><span class="small">6 of 10</span></td></tr>
+<tr class="grp"><td colspan="7">Video</td></tr>
+<tr><td>Kling 2.5 Turbo Pro, 5 s 1080p</td><td class="num">88 → 55</td><td class="num">$0.618<br><span class=small>after: $0.386</span></td><td class="num">$0.255</td><td class="num">13</td><td><div class="strip" role="img" aria-label="13 rivals from $0.081 to $0.411; Solorender $0.618"><i class="r" style="left:3.0%" title="Lovart: $0.081"></i><i class="r" style="left:25.4%" title="Invideo: $0.131"></i><i class="r" style="left:33.1%" title="Krea: $0.155"></i><i class="r" style="left:40.1%" title="Higgsfield: $0.180"></i><i class="r" style="left:48.7%" title="Dzine: $0.217"></i><i class="r" style="left:52.4%" title="Flora: $0.235"></i><i class="r" style="left:54.3%" title="Weavy: $0.245"></i><i class="r" style="left:62.9%" title="Poe: $0.295"></i><i class="r" style="left:63.7%" title="Adobe Firefly: $0.300"></i><i class="r" style="left:69.4%" title="Fotor: $0.340"></i><i class="r" style="left:70.8%" title="Hedra: $0.350"></i><i class="r" style="left:73.3%" title="Imagine.art: $0.370"></i><i class="r" style="left:78.2%" title="Getimg: $0.411"></i><i class="avg" style="left:56.1%" title="Rival average: $0.255"></i><i class="after" style="left:75.3%" title="Solorender after planned cuts: $0.386"></i><i class="me" style="left:97.0%" title="Solorender today: $0.618"></i></div><div class="ends"><span>$0.081 Lovart</span><span>Getimg $0.411</span></div></td><td class="num">100%<br><span class="small">13 of 13</span><br><span class="small">after cuts: 12 of 13</span></td></tr>
+<tr><td>Kling 2.5 Turbo Standard, 5 s 720p</td><td class="num">53</td><td class="num">$0.372</td><td class="num">$0.111</td><td class="num">7</td><td><div class="strip" role="img" aria-label="7 rivals from $0.061 to $0.177; Solorender $0.372"><i class="r" style="left:3.0%" title="Lovart: $0.061"></i><i class="r" style="left:16.7%" title="Invideo: $0.079"></i><i class="r" style="left:22.3%" title="Magnific: $0.088"></i><i class="r" style="left:28.9%" title="Dzine: $0.100"></i><i class="r" style="left:38.4%" title="Higgsfield: $0.120"></i><i class="r" style="left:51.7%" title="Krea: $0.155"></i><i class="r" style="left:58.5%" title="Poe: $0.177"></i><i class="avg" style="left:34.5%" title="Rival average: $0.111"></i><i class="me" style="left:97.0%" title="Solorender today: $0.372"></i></div><div class="ends"><span>$0.061 Lovart</span><span>Poe $0.177</span></div></td><td class="num">100%<br><span class="small">7 of 7</span></td></tr>
+<tr><td>Kling 3.0 Pro, 5 s 1080p with sound</td><td class="num">210</td><td class="num">$1.47</td><td class="num">$0.653</td><td class="num">11</td><td><div class="strip" role="img" aria-label="11 rivals from $0.240 to $1.41; Solorender $1.47"><i class="r" style="left:3.0%" title="Higgsfield: $0.240"></i><i class="r" style="left:11.7%" title="Magnific: $0.284"></i><i class="r" style="left:15.8%" title="Sunra: $0.307"></i><i class="r" style="left:28.1%" title="Artlist: $0.390"></i><i class="r" style="left:30.5%" title="Luma: $0.408"></i><i class="r" style="left:35.9%" title="Magic Hour: $0.453"></i><i class="r" style="left:47.3%" title="Flora: $0.565"></i><i class="r" style="left:67.9%" title="Hedra: $0.840"></i><i class="r" style="left:74.7%" title="Getimg: $0.958"></i><i class="r" style="left:91.3%" title="Fliki: $1.32"></i><i class="r" style="left:94.9%" title="Poe: $1.41"></i><i class="avg" style="left:54.8%" title="Rival average: $0.653"></i><i class="me" style="left:97.0%" title="Solorender today: $1.47"></i></div><div class="ends"><span>$0.240 Higgsfield</span><span>Poe $1.41</span></div></td><td class="num">100%<br><span class="small">11 of 11</span></td></tr>
+<tr><td>Kling 3.0 Turbo Pro, 5 s</td><td class="num">175</td><td class="num">$1.23</td><td class="num">$0.605</td><td class="num">3</td><td><div class="strip" role="img" aria-label="3 rivals from $0.408 to $0.735; Solorender $1.23"><i class="r" style="left:3.0%" title="Luma: $0.408"></i><i class="r" style="left:45.6%" title="Flora: $0.672"></i><i class="r" style="left:53.2%" title="Imagine.art: $0.735"></i><i class="avg" style="left:36.6%" title="Rival average: $0.605"></i><i class="me" style="left:97.0%" title="Solorender today: $1.23"></i></div><div class="ends"><span>$0.408 Luma</span><span>Imagine.art $0.735</span></div></td><td class="num">100%<br><span class="small">3 of 3</span></td></tr>
+<tr><td>Kling O3 Standard (Entities), 5 s</td><td class="num">140</td><td class="num">$0.982</td><td class="num">$0.505</td><td class="num">3</td><td><div class="strip" role="img" aria-label="3 rivals from $0.385 to $0.707; Solorender $0.982"><i class="r" style="left:3.0%" title="Imagine.art: $0.385"></i><i class="r" style="left:12.5%" title="Flora: $0.423"></i><i class="r" style="left:64.0%" title="Poe: $0.707"></i><i class="avg" style="left:30.3%" title="Rival average: $0.505"></i><i class="me" style="left:97.0%" title="Solorender today: $0.982"></i></div><div class="ends"><span>$0.385 Imagine.art</span><span>Poe $0.707</span></div></td><td class="num">100%<br><span class="small">3 of 3</span></td></tr>
+<tr><td>Seedance 2.0, 5 s 720p</td><td class="num">200 → 125</td><td class="num">$1.40<br><span class=small>after: $0.877</span></td><td class="num">$0.831</td><td class="num">18</td><td><div class="strip" role="img" aria-label="18 rivals from $0.264 to $1.80; Solorender $1.40"><i class="r" style="left:3.0%" title="Sunra: $0.264"></i><i class="r" style="left:18.2%" title="Dreamina: $0.360"></i><i class="r" style="left:18.6%" title="Lovart: $0.363"></i><i class="r" style="left:22.1%" title="Fotor: $0.390"></i><i class="r" style="left:26.3%" title="Luma: $0.425"></i><i class="r" style="left:34.3%" title="Topview: $0.500"></i><i class="r" style="left:47.9%" title="Higgsfield: $0.660"></i><i class="r" style="left:53.0%" title="Dzine: $0.733"></i><i class="r" style="left:56.1%" title="Artlist: $0.780"></i><i class="r" style="left:60.1%" title="Flora: $0.847"></i><i class="r" style="left:62.0%" title="Magnific: $0.880"></i><i class="r" style="left:62.5%" title="Weavy: $0.890"></i><i class="r" style="left:66.2%" title="Imagine.art: $0.960"></i><i class="r" style="left:69.1%" title="Magic Hour: $1.02"></i><i class="r" style="left:71.6%" title="Hedra: $1.07"></i><i class="r" style="left:87.6%" title="DomoAI: $1.49"></i><i class="r" style="left:89.4%" title="Fliki: $1.54"></i><i class="r" style="left:97.0%" title="Adobe Firefly: $1.80"></i><i class="avg" style="left:59.2%" title="Rival average: $0.831"></i><i class="after" style="left:61.8%" title="Solorender after planned cuts: $0.877"></i><i class="me" style="left:84.8%" title="Solorender today: $1.40"></i></div><div class="ends"><span>$0.264 Sunra</span><span>Adobe Firefly $1.80</span></div></td><td class="num">83%<br><span class="small">15 of 18</span><br><span class="small">after cuts: 10 of 18</span></td></tr>
+<tr><td>Seedance 2.5, 5 s 720p</td><td class="num">288</td><td class="num">$2.02</td><td class="num">$1.30</td><td class="num">17</td><td><div class="strip" role="img" aria-label="17 rivals from $0.428 to $3.35; Solorender $2.02"><i class="r" style="left:3.0%" title="Sunra: $0.428"></i><i class="r" style="left:15.3%" title="Fotor: $0.560"></i><i class="r" style="left:18.4%" title="Topview: $0.600"></i><i class="r" style="left:22.1%" title="Luma: $0.650"></i><i class="r" style="left:25.5%" title="Picsart: $0.700"></i><i class="r" style="left:25.9%" title="Lovart: $0.707"></i><i class="r" style="left:30.6%" title="Dreamina: $0.784"></i><i class="r" style="left:34.9%" title="Krea: $0.861"></i><i class="r" style="left:56.8%" title="Magnific: $1.39"></i><i class="r" style="left:62.1%" title="Artlist: $1.56"></i><i class="r" style="left:62.8%" title="Magic Hour: $1.58"></i><i class="r" style="left:63.4%" title="Hedra: $1.61"></i><i class="r" style="left:64.4%" title="Getimg: $1.64"></i><i class="r" style="left:67.6%" title="Fliki: $1.76"></i><i class="r" style="left:72.1%" title="Poe: $1.94"></i><i class="r" style="left:73.1%" title="Flora: $1.98"></i><i class="r" style="left:97.0%" title="NightCafe: $3.35"></i><i class="avg" style="left:53.8%" title="Rival average: $1.30"></i><i class="me" style="left:73.9%" title="Solorender today: $2.02"></i></div><div class="ends"><span>$0.428 Sunra</span><span>NightCafe $3.35</span></div></td><td class="num">94%<br><span class="small">16 of 17</span></td></tr>
+<tr><td>Veo 3.1 Fast, 8 s with sound</td><td class="num">200</td><td class="num">$1.40</td><td class="num">$1.21</td><td class="num">15</td><td><div class="strip" role="img" aria-label="15 rivals from $0.293 to $5.07; Solorender $1.40"><i class="r" style="left:3.0%" title="Sunra: $0.293"></i><i class="r" style="left:6.2%" title="Lovart: $0.323"></i><i class="r" style="left:22.7%" title="Dzine: $0.533"></i><i class="r" style="left:28.8%" title="Adobe Firefly: $0.640"></i><i class="r" style="left:32.6%" title="Topview: $0.720"></i><i class="r" style="left:37.4%" title="Artlist: $0.832"></i><i class="r" style="left:37.7%" title="Weavy: $0.840"></i><i class="r" style="left:40.3%" title="Poe: $0.909"></i><i class="r" style="left:42.1%" title="Higgsfield: $0.960"></i><i class="r" style="left:47.9%" title="Hedra: $1.14"></i><i class="r" style="left:48.1%" title="Flora: $1.15"></i><i class="r" style="left:50.2%" title="Imagine.art: $1.23"></i><i class="r" style="left:53.1%" title="Fotor: $1.34"></i><i class="r" style="left:68.1%" title="Fliki: $2.11"></i><i class="r" style="left:97.0%" title="VEED: $5.07"></i><i class="avg" style="left:49.7%" title="Rival average: $1.21"></i><i class="me" style="left:54.7%" title="Solorender today: $1.40"></i></div><div class="ends"><span>$0.293 Sunra</span><span>VEED $5.07</span></div></td><td class="num">87%<br><span class="small">13 of 15</span></td></tr>
+<tr><td>Veo 3.1 Lite, 8 s 720p</td><td class="num">100</td><td class="num">$0.702</td><td class="num">$0.348</td><td class="num">7</td><td><div class="strip" role="img" aria-label="7 rivals from $0.176 to $0.543; Solorender $0.702"><i class="r" style="left:3.0%" title="Krea: $0.176"></i><i class="r" style="left:39.9%" title="Poe: $0.303"></i><i class="r" style="left:43.6%" title="Adobe Firefly: $0.320"></i><i class="r" style="left:43.6%" title="Picsart: $0.320"></i><i class="r" style="left:56.1%" title="Flora: $0.385"></i><i class="r" style="left:57.2%" title="Artlist: $0.391"></i><i class="r" style="left:79.6%" title="Magic Hour: $0.543"></i><i class="avg" style="left:49.4%" title="Rival average: $0.348"></i><i class="me" style="left:97.0%" title="Solorender today: $0.702"></i></div><div class="ends"><span>$0.176 Krea</span><span>Magic Hour $0.543</span></div></td><td class="num">100%<br><span class="small">7 of 7</span></td></tr>
+<tr><td>Grok video, 5 s 720p (ours: 1.5 Lite)</td><td class="num">40 → 25</td><td class="num">$0.281<br><span class=small>after: $0.175</span></td><td class="num">$0.320</td><td class="num">9</td><td><div class="strip" role="img" aria-label="9 rivals from $0.128 to $0.669; Solorender $0.281"><i class="r" style="left:3.0%" title="Sunra: $0.128"></i><i class="r" style="left:31.1%" title="Higgsfield: $0.210"></i><i class="r" style="left:31.1%" title="Weavy: $0.210"></i><i class="r" style="left:31.4%" title="Poe: $0.211"></i><i class="r" style="left:47.5%" title="Fotor: $0.280"></i><i class="r" style="left:58.5%" title="Mage.space: $0.340"></i><i class="r" style="left:69.2%" title="Getimg: $0.410"></i><i class="r" style="left:70.5%" title="Imagine.art: $0.420"></i><i class="r" style="left:97.0%" title="OpenArt: $0.669"></i><i class="avg" style="left:55.0%" title="Rival average: $0.320"></i><i class="after" style="left:20.9%" title="Solorender after planned cuts: $0.175"></i><i class="me" style="left:47.6%" title="Solorender today: $0.281"></i></div><div class="ends"><span>$0.128 Sunra</span><span>OpenArt $0.669</span></div></td><td class="num">56%<br><span class="small">5 of 9</span><br><span class="small">after cuts: 1 of 9</span></td></tr>
+<tr><td>MiniMax H3 Max Turbo, 5 s</td><td class="num">50</td><td class="num">$0.351</td><td class="num">$0.149</td><td class="num">4</td><td><div class="strip" role="img" aria-label="4 rivals from $0.100 to $0.200; Solorender $0.351"><i class="r" style="left:3.0%" title="Picsart: $0.100"></i><i class="r" style="left:20.3%" title="Magnific: $0.126"></i><i class="r" style="left:41.8%" title="Flora: $0.168"></i><i class="r" style="left:54.9%" title="Hedra: $0.200"></i><i class="avg" style="left:32.6%" title="Rival average: $0.149"></i><i class="me" style="left:97.0%" title="Solorender today: $0.351"></i></div><div class="ends"><span>$0.100 Picsart</span><span>Hedra $0.200</span></div></td><td class="num">100%<br><span class="small">4 of 4</span></td></tr>
+<tr class="grp"><td colspan="7">Voice and music</td></tr>
+<tr><td>ElevenLabs voice, 1,000 characters</td><td class="num">25 → 20</td><td class="num">$0.175<br><span class=small>after: $0.140</span></td><td class="num">$0.060</td><td class="num">8</td><td><div class="strip" role="img" aria-label="8 rivals from $0.027 to $0.138; Solorender $0.175"><i class="r" style="left:3.0%" title="Mage.space: $0.027"></i><i class="r" style="left:7.1%" title="Sunra: $0.029"></i><i class="r" style="left:8.3%" title="Invideo: $0.030"></i><i class="r" style="left:16.0%" title="Luma: $0.035"></i><i class="r" style="left:43.1%" title="Adobe Firefly: $0.060"></i><i class="r" style="left:45.6%" title="Poe: $0.063"></i><i class="r" style="left:68.8%" title="Hedra: $0.100"></i><i class="r" style="left:84.8%" title="ElevenLabs: $0.138"></i><i class="avg" style="left:43.3%" title="Rival average: $0.060"></i><i class="after" style="left:85.8%" title="Solorender after planned cuts: $0.140"></i><i class="me" style="left:97.0%" title="Solorender today: $0.175"></i></div><div class="ends"><span>$0.027 Mage.space</span><span>ElevenLabs $0.138</span></div></td><td class="num">100%<br><span class="small">8 of 8</span><br><span class="small">after cuts: 8 of 8</span></td></tr>
+<tr><td>MiniMax Speech 2.8, 1,000 characters</td><td class="num">25</td><td class="num">$0.175</td><td class="num">—</td><td class="num">0</td><td class="small">No rival publishes a price for this model at these settings.</td><td class="num">—</td></tr>
+<tr><td>Gemini voice, 1,000 characters</td><td class="num">8</td><td class="num">$0.056</td><td class="num">—</td><td class="num">0</td><td class="small">No rival publishes a price for this model at these settings.</td><td class="num">—</td></tr>
+<tr><td>Lyria 2 music, one clip <span class="chip one">only 1</span></td><td class="num">15</td><td class="num">$0.105</td><td class="num">$0.035</td><td class="num">1</td><td><div class="strip" role="img" aria-label="1 rivals from $0.035 to $0.035; Solorender $0.105"><i class="r" style="left:3.0%" title="Poe: $0.035"></i><i class="avg" style="left:3.0%" title="Rival average: $0.035"></i><i class="me" style="left:97.0%" title="Solorender today: $0.105"></i></div><div class="ends"><span>$0.035 Poe</span><span>Poe $0.035</span></div></td><td class="num">100%<br><span class="small">1 of 1</span></td></tr>
+<tr><td>Lyria 3 / 3.5 song, one generation</td><td class="num">25</td><td class="num">$0.175</td><td class="num">$0.068</td><td class="num">4</td><td><div class="strip" role="img" aria-label="4 rivals from $0.034 to $0.101; Solorender $0.175"><i class="r" style="left:3.0%" title="Poe: $0.034"></i><i class="r" style="left:35.5%" title="Picsart: $0.060"></i><i class="r" style="left:50.6%" title="Artlist: $0.078"></i><i class="r" style="left:65.4%" title="Magnific: $0.101"></i><i class="avg" style="left:42.9%" title="Rival average: $0.068"></i><i class="me" style="left:97.0%" title="Solorender today: $0.175"></i></div><div class="ends"><span>$0.034 Poe</span><span>Magnific $0.101</span></div></td><td class="num">100%<br><span class="small">4 of 4</span></td></tr>
+<tr class="grp"><td colspan="7">Talking and clip tools</td></tr>
+<tr><td>Kling Lip Sync, 5 s <span class="chip one">only 2</span></td><td class="num">18</td><td class="num">$0.126</td><td class="num">$0.043</td><td class="num">2</td><td><div class="strip" role="img" aria-label="2 rivals from $0.026 to $0.060; Solorender $0.126"><i class="r" style="left:3.0%" title="Invideo: $0.026"></i><i class="r" style="left:52.4%" title="Higgsfield: $0.060"></i><i class="avg" style="left:32.7%" title="Rival average: $0.043"></i><i class="me" style="left:97.0%" title="Solorender today: $0.126"></i></div><div class="ends"><span>$0.026 Invideo</span><span>Higgsfield $0.060</span></div></td><td class="num">100%<br><span class="small">2 of 2</span></td></tr>
+<tr><td>OmniHuman talking photo, 10 s</td><td class="num">240</td><td class="num">$1.68</td><td class="num">$1.07</td><td class="num">4</td><td><div class="strip" role="img" aria-label="4 rivals from $1.00 to $1.18; Solorender $1.68"><i class="r" style="left:3.0%" title="Picsart: $1.00"></i><i class="r" style="left:10.1%" title="Artlist: $1.04"></i><i class="r" style="left:11.8%" title="Hedra: $1.05"></i><i class="r" style="left:32.5%" title="Poe: $1.18"></i><i class="avg" style="left:14.7%" title="Rival average: $1.07"></i><i class="me" style="left:97.0%" title="Solorender today: $1.68"></i></div><div class="ends"><span>$1.00 Picsart</span><span>Poe $1.18</span></div></td><td class="num">100%<br><span class="small">4 of 4</span></td></tr>
+<tr><td>VEED Fabric talking photo, 10 s 480p <span class="chip one">only 2</span></td><td class="num">200</td><td class="num">$1.40</td><td class="num">$0.883</td><td class="num">2</td><td><div class="strip" role="img" aria-label="2 rivals from $0.624 to $1.14; Solorender $1.40"><i class="r" style="left:3.0%" title="Artlist: $0.624"></i><i class="r" style="left:73.2%" title="Hedra: $1.14"></i><i class="avg" style="left:43.3%" title="Rival average: $0.883"></i><i class="me" style="left:97.0%" title="Solorender today: $1.40"></i></div><div class="ends"><span>$0.624 Artlist</span><span>Hedra $1.14</span></div></td><td class="num">100%<br><span class="small">2 of 2</span></td></tr>
+<tr><td>Topaz video upscale to 1080p, 10 s</td><td class="num">50</td><td class="num">$0.351</td><td class="num">$0.393</td><td class="num">5</td><td><div class="strip" role="img" aria-label="5 rivals from $0.167 to $1.04; Solorender $0.351"><i class="r" style="left:3.0%" title="Luma: $0.167"></i><i class="r" style="left:12.3%" title="Adobe Firefly: $0.200"></i><i class="r" style="left:15.7%" title="Hedra: $0.214"></i><i class="r" style="left:39.8%" title="Getimg: $0.342"></i><i class="r" style="left:97.0%" title="Artlist: $1.04"></i><i class="avg" style="left:46.9%" title="Rival average: $0.393"></i><i class="me" style="left:41.2%" title="Solorender today: $0.351"></i></div><div class="ends"><span>$0.167 Luma</span><span>Artlist $1.04</span></div></td><td class="num">80%<br><span class="small">4 of 5</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col stack">
+      <p class="small"><strong>How it was built (30 October):</strong> 30 of the 50 rivals publish per-model prices; the other 20 show them only after login. Counted only when the rival names the same model at the same settings, or states its own per-second price (then scaled to the job's length, e.g. 4 s to 5 s). Left out: a different model version standing in ("Kling 3.0 Omni" for O3, Veo 3.1 Fast for Lite, Seedream 5.0 Lite for 5 Flash), prices given only as a range, voices that don't name the model, and anything shown only after login. "Rivals" counts how many prices sit behind each row; rows with fewer than three are marked. Several rivals also include some of these models "unlimited" on their top plans (NightCafe's Nano Banana 2.1, Picsart's FLUX.2 Klein, Topview's GPT Image 2.5); this table uses their credit prices. Grok compares our Grok 1.5 Lite with each rival's own Grok Imagine video. Seven range ends were re-read by me (VEED, Invideo, Lovart, NightCafe, Adobe, Artlist, Poe); the rest came from five research helpers reading each site's own pricing pages. Not covered: no rival publishes a comparable price for MiniMax Speech 2.8 or our Gemini 3.8 voice.</p>
+    </div>
+  </section>
+  <!-- 5 -->
+  <section id="raise" class="stack">
+    <h2><span class="n">5</span>The $150,000 raise</h2>
+    <div class="col stack">
+      <p>The letter now budgets <strong>$25,750–$28,000</strong> for "Lower prices": the $25,000 Runware Growth deposit, plus $750–$3,000 to trial open voice and music models on rented servers, plus free credit programs ($0). Here's what today's research says about each part:</p>
+      <ul class="plain">
+        <li><strong>Runware Growth $25,000: still right.</strong> The live page and terms were re-read today and nothing changed. It cuts 30% off every Runware model (Kling, Seedance, Grok Lite and more), and the $10,000 bonus is never lost because credits don't expire. The risks are the cash sitting idle until sales arrive, and money stuck at Runware if a model moves to a cheaper supplier (your rule says it must).</li>
+        <li><strong>Server trial $750–$3,000: the case is weaker.</strong> Open video models cost more per clip on rented computers than Kling does through Runware. Voice and music were under 10% of credits used in the last 60 days, and Gemini voice is already cheap. The voice and music trial itself was never run, so this is a judgement, not a measurement.</li>
+        <li><strong>Google Batch / Flex: costs $0</strong> in money, only building time. It belongs in the letter as a step that's already possible, not as a budget line.</li>
+      </ul>
+    </div>
+    <div class="opts">
+      <div><span class="tag">Option 1 · keep as is</span><span class="amt">$25,750–$28,000</span><p class="small">Growth deposit + server trial + free credits. No change to the letter.</p></div>
+      <div class="pick"><span class="tag">Option 2 · my recommendation</span><span class="amt">$25,000</span><p class="small">Growth deposit only, <strong>paid as soon as the raise comes in</strong> (your call, 30 October; I had first suggested waiting until Runware spend reached about $2,900 a month). The $750–$3,000 trial moves to growth money. Add the free Google half-price lane and the Kling 720p version as $0 steps.</p></div>
+      <div><span class="tag">Option 3 · go bigger</span><span class="amt">$50,000</span><p class="small">Runware Scale: 40% off instead of 30%. The second $25,000 brings $20,000 of extra bonus on its own, the best rate on the page. But it's a third of the raise, it takes $80,000 of Runware spend to use up, and Runware may not accept a bootstrapped-then-SAFE company. Growth money falls by $22,000–$24,250.</p></div>
+      <div><span class="tag">Option 4 · wait</span><span class="amt">$0 now</span><p class="small">Do only the free steps and hold the whole $25,000 for growth until sales prove Runware volume. Simplest, but the letter loses its main "prices drop 30%" line for investors.</p></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section id="unused" class="stack">
+    <h2><span class="n">6</span>Unused credits: the data and the math</h2>
+    <div class="col stack">
+      <p class="small">Added 30 October, from your comment: how many credits go unused, how often, and how much would have to go unused to cut prices and keep the margin. Every outside figure below was read on its own page.</p>
+      <div class="callout">
+        <p><strong>In short:</strong></p>
+        <ul class="plain">
+          <li><strong>Solorender has no data of its own yet.</strong> No outside customer has used credits. The only live purchase was your own refunded test.</li>
+          <li><strong>No AI studio publishes how many credits go unused.</strong> A search across 13 found nothing, including Midjourney, Runway, Adobe Firefly, Kling, Higgsfield, Krea, OpenArt and Freepik. The closest clue: one pricing writer sees 70–80% of AI usage come from 10% of users. In other words, most people use little.</li>
+          <li><strong>Long-lived prepaid value goes unused only 5–9% of the time.</strong> That's gift cards and loyalty notes in five company filings (none says whether its cards expire). Starbucks cards never expire, and the breakage it books each year is about 1.5% of what's loaded that year.</li>
+          <li><strong>Removing expiry can mean more gets used.</strong> Southwest stopped its flight credits expiring in 2022. In 2024 it took back $116 million of breakage it had already counted as income on those credits.</li>
+          <li><strong>The rule of thumb:</strong> to keep the same margin as a percentage, the share of credits left unused must about equal the price cut. To keep the same dollars per customer, it must be about twice the cut.</li>
+          <li><strong>So:</strong> with credits that never expire, the evidence (5–9% unused on long-lived prepaid value) pays for a price cut of about 5% while holding the margin percentage. Bigger cuts (10–30%) need 11–72% unused. That's what software seats show (36–53%), and it happens where unused allowance is lost each month, which your "never expire" promise rules out.</li>
+        </ul>
+      </div>
+      <h3>What the data says</h3>
+      <p class="small">"Breakage" is the accounting word for prepaid value that is never used. Click a heading to sort; type to filter.</p>
+    </div>
+    <div class="tools">
+      <label for="q6">Filter</label>
+      <input id="q6" type="search" placeholder="e.g. gift card, software, never expires">
+    </div>
+    <div class="tbl">
+      <table class="sortable" id="unusedTable">
+        <thead><tr><th>Source</th><th>What it measures</th><th>Never used</th><th>Does it expire?</th><th>Year</th><th>Kind</th></tr></thead>
+        <tbody>
+<tr><td>Solorender's own database</td><td>Credits used by outside customers</td><td>No data: no outside customer yet</td><td>Never expires</td><td>2026</td><td>Our data</td></tr>
+<tr><td>13 AI studios' pages and press</td><td>Share of plan credits used</td><td>Not published by any of them</td><td>Most reset each month</td><td>2026</td><td>AI tools</td></tr>
+<tr><td><a href="https://kylepoyar.substack.com/p/ai-credit-pricing">Kyle Poyar, Growth Unhinged</a></td><td>"70-80% of token consumption comes from just 10% of users" (his experience, one source)</td><td>Not a breakage rate</td><td>—</td><td>2025</td><td>AI tools</td></tr>
+<tr><td><a href="https://www.sec.gov/Archives/edgar/data/912463/000091246325000028/ges-20250201.htm">Guess, annual report</a></td><td>Gift card value never redeemed</td><td>8.5% (US), 8.4% (Canada)</td><td>Not stated</td><td>2025</td><td>Prepaid, long-lived</td></tr>
+<tr><td><a href="https://www.sec.gov/Archives/edgar/data/72333/000007233323000037/jwn-20230128.htm">Nordstrom, annual report</a></td><td>Loyalty Notes and points never used</td><td>About 7%</td><td>Not stated</td><td>2023</td><td>Prepaid, long-lived</td></tr>
+<tr><td><a href="https://www.sec.gov/Archives/edgar/data/1017712/000115752313001515/a50590453.htm">Hot Topic, annual report</a></td><td>Gift card breakage rate</td><td>6%</td><td>Not stated</td><td>2013</td><td>Prepaid, long-lived</td></tr>
+<tr><td><a href="https://www.sec.gov/Archives/edgar/data/1289460/000104746914001564/a2218257z10-k.htm">Texas Roadhouse, annual report</a></td><td>Gift card value never redeemed</td><td>About 5%</td><td>Not stated</td><td>2014</td><td>Prepaid, long-lived</td></tr>
+<tr><td><a href="https://www.sec.gov/Archives/edgar/data/1058090/000119312510035029/d10k.htm">Chipotle, annual report</a></td><td>Gift card sales never redeemed</td><td>5%</td><td>Not stated</td><td>2010</td><td>Prepaid, long-lived</td></tr>
+<tr><td><a href="https://www.sec.gov/Archives/edgar/data/829224/000082922425000114/sbux-20250928.htm">Starbucks, annual report</a></td><td>Breakage booked in a year ($200.4M + $22.0M) against that year's card loads and Stars ($15,245.8M)</td><td>About 1.5% of the year's loads (my calculation; not a lifetime rate)</td><td>Never, in the US</td><td>2025</td><td>Prepaid, never expires</td></tr>
+<tr><td><a href="https://www.sec.gov/Archives/edgar/data/92380/000009238025000024/luv-20241231.htm">Southwest Airlines, annual report</a></td><td>Flight credits made non-expiring in 2022; $116M of breakage it had already booked was reversed in 2024</td><td>Fell once expiry was removed</td><td>No longer expires</td><td>2024</td><td>Prepaid, never expires</td></tr>
+<tr><td><a href="https://zylo.com/news/2026-saas-management-index">Zylo (vendor data)</a></td><td>Business software licences paid for but unused</td><td>36% (2026); only 49% used in 2024</td><td>Lost each billing period</td><td>2026</td><td>Subscriptions</td></tr>
+<tr><td><a href="https://www.helpnetsecurity.com/2023/07/04/saas-spend-management/">Productiv via Help Net Security (vendor data)</a></td><td>Licences with no use in 90 days</td><td>53% (47% used)</td><td>Lost each billing period</td><td>2023</td><td>Subscriptions</td></tr>
+<tr><td><a href="https://eml.berkeley.edu/%7Eulrike/Papers/gym.pdf">DellaVigna &amp; Malmendier, American Economic Review</a></td><td>Gym members on $70+ a month went 4.3 times a month, paying over $17 a visit against $10 pay-per-visit</td><td>$600 of savings forgone per member</td><td>Lost each month</td><td>2006</td><td>Subscriptions</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="small col">Couldn't be read on their own pages, so left out: two UK surveys on unused mobile data (the Uswitch page now 404; MoneySavingExpert 403). Also left out because the helpers found them only in search summaries: Mercator's "2–4%" gift-card figure and a claim that US gift-card breakage fell below 1% after 2009.</p>
+
+    <div class="col stack">
+      <h3>The math: how much has to go unused to cut prices</h3>
+      <p>Each plan below starts from the letter's worst case: every credit used. That gives Solo $10.87 left per customer, a 54% margin. A price cut keeps the same credits but takes less money, so the unused credits have to make up the gap. Two ways to measure "keep my margin":</p>
+      <ul class="plain">
+        <li><strong>Same margin %:</strong> the share of each payment you keep stays the same. The unused share needed is about the size of the cut.</li>
+        <li><strong>Same dollars per customer:</strong> you keep the same $10.87 (Solo) per customer. The unused share needed is about twice the cut, because the cheaper price also shrinks the margin.</li>
+      </ul>
+      <p class="small">AI cost if every credit is used: Solo $8.00, Studio $17.80, Max $37.80, Super Max $171.00, plus tech (about 0.0056¢ a credit) and card fees (3.6% + 30¢ on plans, 2.9% + 30¢ on Super Max), all from the letter's sections 6 and 7. "Unused needed" is rounded up, so it never understates.</p>
+    </div>
+    <div class="tbl">
+      <table class="sortable" id="cutTable">
+        <thead><tr><th>Plan</th><th class="num">Price cut</th><th class="num">New price $</th><th class="num">Unused needed: same margin %</th><th class="num">Unused needed: same $ per customer</th></tr></thead>
+        <tbody>
+<tr><td>Solo</td><td class="num">5%</td><td class="num">19.00</td><td class="num">6%</td><td class="num">12%</td></tr>
+<tr><td>Solo</td><td class="num">10%</td><td class="num">18.00</td><td class="num">11%</td><td class="num">24%</td></tr>
+<tr><td>Solo</td><td class="num">15%</td><td class="num">17.00</td><td class="num">16%</td><td class="num">36%</td></tr>
+<tr><td>Solo</td><td class="num">20%</td><td class="num">16.00</td><td class="num">21%</td><td class="num">48%</td></tr>
+<tr><td>Solo</td><td class="num">25%</td><td class="num">15.00</td><td class="num">26%</td><td class="num">60%</td></tr>
+<tr><td>Solo</td><td class="num">30%</td><td class="num">14.00</td><td class="num">32%</td><td class="num">72%</td></tr>
+<tr><td>Studio</td><td class="num">5%</td><td class="num">38.00</td><td class="num">6%</td><td class="num">11%</td></tr>
+<tr><td>Studio</td><td class="num">10%</td><td class="num">36.00</td><td class="num">11%</td><td class="num">22%</td></tr>
+<tr><td>Studio</td><td class="num">15%</td><td class="num">34.00</td><td class="num">16%</td><td class="num">33%</td></tr>
+<tr><td>Studio</td><td class="num">20%</td><td class="num">32.00</td><td class="num">21%</td><td class="num">43%</td></tr>
+<tr><td>Studio</td><td class="num">25%</td><td class="num">30.00</td><td class="num">26%</td><td class="num">54%</td></tr>
+<tr><td>Studio</td><td class="num">30%</td><td class="num">28.00</td><td class="num">31%</td><td class="num">65%</td></tr>
+<tr><td>Max</td><td class="num">5%</td><td class="num">76.00</td><td class="num">6%</td><td class="num">11%</td></tr>
+<tr><td>Max</td><td class="num">10%</td><td class="num">72.00</td><td class="num">11%</td><td class="num">21%</td></tr>
+<tr><td>Max</td><td class="num">15%</td><td class="num">68.00</td><td class="num">16%</td><td class="num">31%</td></tr>
+<tr><td>Max</td><td class="num">20%</td><td class="num">64.00</td><td class="num">21%</td><td class="num">41%</td></tr>
+<tr><td>Max</td><td class="num">25%</td><td class="num">60.00</td><td class="num">26%</td><td class="num">51%</td></tr>
+<tr><td>Max</td><td class="num">30%</td><td class="num">56.00</td><td class="num">31%</td><td class="num">61%</td></tr>
+<tr><td>Super Max</td><td class="num">5%</td><td class="num">285.00</td><td class="num">6%</td><td class="num">9%</td></tr>
+<tr><td>Super Max</td><td class="num">10%</td><td class="num">270.00</td><td class="num">11%</td><td class="num">17%</td></tr>
+<tr><td>Super Max</td><td class="num">15%</td><td class="num">255.00</td><td class="num">16%</td><td class="num">26%</td></tr>
+<tr><td>Super Max</td><td class="num">20%</td><td class="num">240.00</td><td class="num">21%</td><td class="num">34%</td></tr>
+<tr><td>Super Max</td><td class="num">25%</td><td class="num">225.00</td><td class="num">26%</td><td class="num">43%</td></tr>
+<tr><td>Super Max</td><td class="num">30%</td><td class="num">210.00</td><td class="num">31%</td><td class="num">51%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col stack">
+      <p><strong>The other way round: your margin today if some credits go unused</strong> (prices unchanged, rounded to the nearest percent):</p>
+    </div>
+    <div class="tbl">
+      <table class="sortable" id="nowTable">
+        <thead><tr><th>Plan</th><th class="num">Price $</th><th class="num">Left if all used $</th><th class="num">Margin, 0% unused</th><th class="num">5% unused</th><th class="num">10% unused</th><th class="num">20% unused</th><th class="num">30% unused</th></tr></thead>
+        <tbody>
+<tr><td>Solo</td><td class="num">20</td><td class="num">10.87</td><td class="num">54%</td><td class="num">56%</td><td class="num">58%</td><td class="num">62%</td><td class="num">67%</td></tr>
+<tr><td>Studio</td><td class="num">40</td><td class="num">20.21</td><td class="num">51%</td><td class="num">53%</td><td class="num">55%</td><td class="num">60%</td><td class="num">64%</td></tr>
+<tr><td>Max</td><td class="num">80</td><td class="num">38.49</td><td class="num">48%</td><td class="num">51%</td><td class="num">53%</td><td class="num">58%</td><td class="num">62%</td></tr>
+<tr><td>Super Max</td><td class="num">300</td><td class="num">117.65</td><td class="num">39%</td><td class="num">42%</td><td class="num">45%</td><td class="num">51%</td><td class="num">57%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col stack">
+      <h3>What this means for Solorender</h3>
+      <ul class="plain">
+        <li><strong>Unused credits that never expire aren't money in the bank.</strong> A customer can come back and use them any time. They only turn into margin once the customer is truly gone. That's why the long-lived examples (5–9%, Starbucks about 1.5% a year) are far below the examples where unused allowance is lost each month (36–53%).</li>
+        <li><strong>A cut of about 5% is the most the evidence supports today</strong> while keeping the margin percentage. Bigger cuts would be a bet on behaviour Solorender hasn't seen yet.</li>
+        <li><strong>A note on your 2.5× rule:</strong> a price cut paid for by unused credits means a customer who uses everything gets credits at below 2.5× cost. That's a change to the rule, not a cost saving, so it's your call.</li>
+        <li><strong>The cheapest way to get real numbers:</strong> once customers arrive, the database can show each month how many plan credits are still unspent after 30, 60 and 90 days, and how many sit on cancelled accounts. A few months of that replaces every borrowed figure on this page.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- decisions -->
+  <section id="decide" class="col stack">
+    <h2>Your decisions</h2>
+    <p>Nothing has been changed in the letter, the site or any supplier account. These are the choices this research puts in front of you:</p>
+    <ol class="plain">
+      <li><strong>Raise line:</strong> Option 1, 2, 3 or 4 above. I recommend 2.</li>
+      <li><strong>Google half-price lane for Nano Banana Pro: done, 30 October.</strong> The test on the live site made a picture in 55 seconds for $0.0687, half of $0.1373 (Google labelled it "ON_DEMAND_FLEX"). "Nano Banana Pro Saver" is built at <strong>18 credits</strong> ($0.0687 × 2.5 = 17.2, rounded up; the 17 quoted earlier came from the list price, not a real run). It goes live at the next twice-daily release. If Google is too busy, the customer is refunded; it never goes to fal. The test page is removed. <strong>Nano Banana 2 Saver is skipped (your call, 30 October):</strong> it would cost 9 credits, the same as Nano Banana 2.1, which is newer and answers in about 15 seconds.</li>
+      <li><strong>Kling 2.5 Turbo 720p Standard: done 30 October.</strong> Added beside the 1080p Pro at 53 credits for 5 seconds (106 for 10), bought on Runware. The one test clip billed $0.21 and took 52 seconds. It reaches the live site with the next twice-daily release.</li>
+      <li><strong>Written questions to Runware:</strong> does a company funded by a $150,000 SAFE qualify for Scale, and is there volume pricing between Growth and Scale?</li>
+    </ol>
+  </section>
+
+  <!-- sources -->
+  <section id="sources" class="col stack">
+    <h2>Sources</h2>
+    <p class="small">"Me" = read by me today. "Helper" = read today by a research helper and spot-checked where noted. Exact figures here; the text above rounds percentages up to the next 5.</p>
+    <ol class="src">
+      <li>Solorender database, read only, 29 Oct: creations (1,804 rows, credits by model, by account), video_jobs and supplier_runs (real supplier bills). Me.</li>
+      <li>studio/src/lib/config.ts: current credit prices, cost notes, plan prices (Solo $20/2,000; Super Max $300/42,750). Me.</li>
+      <li><a href="https://fal.ai/models/fal-ai/kling-video/v2.5-turbo/standard/image-to-video">fal Kling 2.5 Turbo Standard</a> ($0.21 per 5 s, $0.042/s) and <a href="https://fal.ai/models/fal-ai/kling-video/v2.5-turbo/pro/image-to-video">Pro</a> ($0.35, $0.07/s). Me.</li>
+      <li><a href="https://ai.google.dev/gemini-api/docs/pricing">Gemini API pricing</a>: NB Pro standard $0.134, Batch and Flex $0.067; NB 2 standard $0.067, Batch $0.034; Enterprise "Volume-based discounts". Me + helper.</li>
+      <li><a href="https://ai.google.dev/gemini-api/docs/batch-api">Gemini Batch API</a> ("50% of the standard cost", "target turnaround time is 24 hours") and <a href="https://ai.google.dev/gemini-api/docs/flex-inference">Flex inference</a> ("Minutes (1–15 min target)", "Best-effort (Sheddable)"). Me.</li>
+      <li><a href="https://runware.ai/startup-program">Runware startup program</a>: Growth $25,000 → $35,000, Scale $50,000 → $80,000, "not refundable and not transferable", "do not expire". Me + helper.</li>
+      <li><a href="https://runware.ai/terms">Runware terms</a>: standalone-resale clause, "Customer Solutions", "All purchases are non-refundable." Me.</li>
+      <li><a href="https://docs.x.ai/docs/models">xAI models and pricing</a>: grok-imagine-video-1.5-lite 480p $0.02/s, 720p $0.03/s, $0.01 per input image. Me.</li>
+      <li><a href="https://www.magnific.com/pricing">Magnific pricing</a> (plans, credits per model, "How does Unlimited work?") and <a href="https://www.magnific.com/ai/docs/plans-and-pricing">plans docs</a> (credits per plan, forfeit on cancel). Me.</li>
+      <li><a href="https://higgsfield.ai/pricing">Higgsfield pricing</a>: plans, Ultra 3,000/6,000/9,000 tiers, credits per model, unlimited note. Me. <a href="https://higgsfield.ai/blog/higgsfield-all-unlimited-explained">Higgsfield unlimited explained</a>. Helper.</li>
+      <li><a href="https://sunra.ai/api/models">Sunra model prices</a> and <a href="https://sunra.ai/api/pricing">plans data</a>, plus sunra.ai/pricing ("do not roll over"). Helper; NB Pro and Veo rows re-read by me.</li>
+      <li><a href="https://openart.ai/pricing">OpenArt pricing</a> + its site code (credits per model) + FAQ ("do not carry over", lost on cancel). Helper.</li>
+      <li>Artlist: <a href="https://help.artlist.io/hc/en-us/articles/38815633707421">credits for AI image and video</a> + artlist.io pricing ("set to zero"). Helper (blocked to plain download; read in a browser).</li>
+      <li>VEED pricing page + its rate-table data. Helper.</li>
+      <li><a href="https://www.krea.ai/pricing">Krea pricing</a> (units derived from "~N generations"). Helper.</li>
+      <li>Higgsfield funding: <a href="https://thenextweb.com/news/higgsfield-series-b-400m-5-4bn-valuation-700m-revenue">TNW</a>, <a href="https://bnnbloomberg.ca/business/company-news/2026/08/17/higgsfields-valuation-soars-fourfold-to-us54-billion-in-six-months-on-ai-content-demand">BNN Bloomberg</a>, <a href="https://pulse2.com/higgsfield-raises-400-million-series-b-at-5-4-billion-valuation-as-annualized-revenue-hits-700-million/">Pulse 2.0</a>. Helper + my search.</li>
+      <li>36Kr on Higgsfield "near-cost" pricing: <a href="https://eu.36kr.com/en/p/3933070123089287">eu.36kr.com</a>. Helper, one source.</li>
+      <li>Magnific/Freepik: <a href="https://fortune.com/2026/04/28/freepik-magnific-joaquin-cuenca-abela-230-million-arr-video-generation-ai-pivot/">Fortune</a> and <a href="https://en.wikipedia.org/wiki/Magnific">Wikipedia</a>. Helper.</li>
+      <li>Freepik on rented GPUs: <a href="https://verda.com/blog/how-freepik-scaled-flux-media-generation-to-millions-of-requests-per-day">Verda case study</a>. Helper.</li>
+      <li>ElevenLabs: <a href="https://elevenlabs.io/pricing/api">API pricing</a> and OEM terms §2.B, §5.B. Helper; price matches the 10-18 research.</li>
+      <li>fal: <a href="https://fal.ai/enterprise">enterprise</a>, pricing docs ("custom per-endpoint pricing and volume discounts"), terms §4(b)(ii). Helper.</li>
+      <li>Google Cloud: Vertex Provisioned Throughput pricing (1-year $2.739726 per unit-hour) and the flexible savings plans doc (10% / 20%). Helper; the savings-plan figure is one source.</li>
+      <li>Wan 2.2 GitHub README (I2V-A14B 720P: 1,055.9 s on one H100) + RunPod, Lambda and Modal GPU price pages (H100 $3.95–4.29/hr). Helper.</li>
+      <li>Earlier Solorender research: supplier savings 10-12, lower prices 10-18, startup credits 10-20, Sunra 10-28 (memory notes and their pages).</li>
+    </ol>
+    <h3>Blocked or unreadable today</h3>
+    <ul class="plain">
+      <li>kling.ai/dev/pricing and Kling's billing docs (script-only), so no Kling-direct price per clip.</li>
+      <li>openai.com pricing and terms, x.ai legal terms (403).</li>
+      <li>docs.byteplus.com ModelArk prices (script-only).</li>
+      <li>Google's list of products covered by the savings plan; the Google for Startups pages (cut short).</li>
+      <li>Magnific blog post on the Freepik history (403); Hedra billing docs (404); runware.ai/case-studies (not loaded), so the earlier "OpenArt is a Runware customer" lead is <strong>not confirmed</strong> today.</li>
+      <li>Vast.ai live prices (script-only); FLUX.1/FLUX.2 dev licences on Hugging Face (gated); LTX-2 licence file (404).</li>
+      <li>VEED's larger add-on plans and Artlist plans above 80,000 credits: prices not shown.</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+(function () {
+  function cellVal(td) {
+    var t = (td.textContent || "").trim();
+    var n = parseFloat(t.replace(/[^0-9.\-]/g, ""));
+    return /^[\s$]*-?[0-9]/.test(t) && !isNaN(n) ? n : t.toLowerCase();
+  }
+  document.querySelectorAll("table.sortable").forEach(function (table) {
+    var ths = table.querySelectorAll("thead th");
+    ths.forEach(function (th, i) {
+      th.tabIndex = 0;
+      function sort() {
+        var dir = th.getAttribute("aria-sort") === "ascending" ? "descending" : "ascending";
+        ths.forEach(function (o) { o.removeAttribute("aria-sort"); });
+        th.setAttribute("aria-sort", dir);
+        var body = table.tBodies[0];
+        var rows = Array.prototype.slice.call(body.rows).filter(function (r) { return !r.classList.contains("grp"); });
+        body.querySelectorAll("tr.grp").forEach(function (g) { g.hidden = true; });
+        rows.sort(function (a, b) {
+          var x = cellVal(a.cells[i]), y = cellVal(b.cells[i]);
+          var c = (typeof x === "number" && typeof y === "number") ? x - y : String(x).localeCompare(String(y));
+          return dir === "ascending" ? c : -c;
+        });
+        rows.forEach(function (r) { body.appendChild(r); });
+      }
+      th.addEventListener("click", sort);
+      th.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); sort(); } });
+    });
+  });
+  var q = document.getElementById("q");
+  q.addEventListener("input", function () {
+    var v = q.value.trim().toLowerCase();
+    document.querySelectorAll("#gapTable tbody tr").forEach(function (r) {
+      r.hidden = v && r.textContent.toLowerCase().indexOf(v) < 0;
+    });
+  });
+  var q6 = document.getElementById("q6");
+  q6.addEventListener("input", function () {
+    var v = q6.value.trim().toLowerCase();
+    document.querySelectorAll("#unusedTable tbody tr").forEach(function (r) {
+      r.hidden = v && r.textContent.toLowerCase().indexOf(v) < 0;
+    });
+  });
+  var q4b = document.getElementById("q4b");
+  q4b.addEventListener("input", function () {
+    var v = q4b.value.trim().toLowerCase();
+    document.querySelectorAll("#whereTable tbody tr").forEach(function (r) {
+      r.hidden = v && r.textContent.toLowerCase().indexOf(v) < 0;
+    });
+  });
+})();
+</script>

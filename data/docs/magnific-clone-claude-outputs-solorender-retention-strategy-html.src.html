@@ -1,0 +1,335 @@
+<title>Solorender Retention Plan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one calm reading column (~46rem) with wide tables allowed to scroll; Solorender's own always-dark palette. */
+:root {
+  --bg: #0a0a0a;
+  --panel: #141412;
+  --line: #2a2924;
+  --ink: #ffffff;
+  --green: #6ee05a;
+  --orange: #f7931a;
+  --red: #ff6b5a;
+  --display: "Syne", "Avenir Next", "Segoe UI", sans-serif;
+  --body: "Manrope", "Helvetica Neue", Arial, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--body);
+  font-size: 17px; line-height: 1.65; margin: 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 80px;
+}
+.wrap { max-width: 46rem; margin: 0 auto; display: flex; flex-direction: column; gap: 48px; }
+h1, h2, h3 { font-family: var(--display); color: var(--ink); text-wrap: balance; margin: 0; line-height: 1.2; }
+h1 { font-size: 32px; font-weight: 800; }
+h2 { font-size: 24px; font-weight: 700; display: flex; gap: 12px; align-items: baseline; }
+h2 .n { color: var(--green); font-size: 16px; font-family: var(--body); font-weight: 700; }
+h3 { font-size: 18px; font-weight: 700; }
+p { margin: 0; }
+section { display: flex; flex-direction: column; gap: 16px; }
+.eyebrow { color: var(--green); font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.intro { font-size: 15px; }
+a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--green); text-underline-offset: 3px; }
+a:focus-visible, summary:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+b, strong { font-weight: 700; }
+.or { color: var(--orange); font-weight: 700; }
+sup { font-size: 11px; color: var(--green); font-weight: 700; }
+sup a { color: var(--green); text-decoration: none; }
+ul, ol { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; }
+
+.minute { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--orange); border-radius: 10px; padding: 22px 24px; display: flex; flex-direction: column; gap: 12px; }
+.minute h2 { font-size: 20px; }
+
+.tablebox { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 13px; color: var(--green); text-transform: uppercase; letter-spacing: .06em; font-weight: 700; background: var(--panel); white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+td.num { text-align: right; white-space: nowrap; }
+tr.total td { font-weight: 700; background: var(--panel); }
+.note { font-size: 15px; }
+
+/* Payback chart */
+.chart { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 20px 18px 16px; display: flex; flex-direction: column; gap: 14px; }
+.rows { position: relative; display: flex; flex-direction: column; gap: 12px; }
+.row { display: grid; grid-template-columns: 11.5rem 1fr; gap: 12px; align-items: center; }
+.row .lab { font-size: 14px; line-height: 1.3; }
+.track { position: relative; height: 26px; }
+.bar { height: 100%; border-radius: 4px; background: var(--green); display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 13px; font-weight: 700; color: #0a0a0a; min-width: 3.2rem; }
+.bar.y { background: var(--orange); }
+.lines { position: absolute; inset: 0 0 0 calc(11.5rem + 12px); pointer-events: none; z-index: 2; }
+.vl { position: absolute; top: -6px; bottom: -6px; border-left: 2px dashed var(--ink); }
+.vl span { position: absolute; top: -24px; transform: translateX(-50%); font-size: 12px; font-weight: 700; white-space: nowrap; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 13px; }
+.sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+@media (max-width: 560px) {
+  .row { grid-template-columns: 1fr; gap: 4px; }
+  .lines { inset: 0; display: none; }
+  .vlmobile { display: block !important; }
+}
+.vlmobile { display: none; font-size: 13px; }
+
+/* Options */
+.opts { display: flex; flex-direction: column; gap: 14px; }
+.opt { border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; }
+.opt.rec { border-color: var(--orange); }
+.opt header { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: baseline; justify-content: space-between; }
+.tag { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; border: 1px solid var(--green); color: var(--green); border-radius: 999px; padding: 2px 10px; white-space: nowrap; }
+.tag.o { border-color: var(--orange); color: var(--orange); }
+dl { display: grid; grid-template-columns: 8.5rem 1fr; gap: 6px 14px; margin: 0; font-size: 15px; }
+dt { color: var(--green); font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; padding-top: 2px; }
+dd { margin: 0; min-width: 0; }
+@media (max-width: 560px) { dl { grid-template-columns: 1fr; gap: 2px; } dd { margin-bottom: 8px; } }
+
+.ask { background: var(--panel); border: 1px solid var(--orange); border-radius: 10px; padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+.ask ol { gap: 14px; }
+
+.sources ol { font-size: 14px; gap: 10px; }
+.sources li { word-break: break-word; }
+footer { font-size: 14px; border-top: 1px solid var(--line); padding-top: 18px; }
+</style>
+
+<div class="wrap">
+
+<header style="display:flex;flex-direction:column;gap:10px">
+  <span class="eyebrow">Solorender · Keeping customers and growing their spend · October 29, 2026</span>
+  <h1>Keeping customers longer, and getting them to spend more than the plan</h1>
+  <p class="intro">A discussion page, not a build. It brings together Solorender's own numbers, how six rivals hold on to customers, and what published studies say. It ends with my recommendation and four choices only you can make. Nothing has been built or changed.</p>
+</header>
+
+<div class="minute">
+  <h2>In one minute</h2>
+  <ul>
+    <li><b>Yearly plans are the strongest lever we have.</b> A yearly Studio customer leaves about <span class="or">$179</span> on day one. That beats even the cautious cost to win a customer on Meta ($172). A monthly Solo customer leaves about $40 in a typical year.</li>
+    <li><b>Keeping customers longer cannot rescue Solo on its own.</b> A monthly Solo customer would need to pay for 8 or more months in year one to cover a typical $92 ad cost. Published averages for AI apps are nowhere near that.</li>
+    <li><b>The course does not force top-ups by itself.</b> On the course's own rules, a careful student finishes the film with about 1,260 credits, well inside one Studio month (4,450). Only a student who uses the character model and two takes everywhere goes over, by about one $25 pack. The real extra spending comes after the course, when students make a series.</li>
+    <li><b>Some customers are leaving through holes we can plug for free.</b> In published data, a quarter to two-fifths of lost subscribers leave because a card payment failed. About half of those can be won back with tools Stripe already includes.</li>
+    <li><b>We have no customer data of our own yet.</b> Every purchase on record is a house or test account. So step one of any plan is to start measuring from the first real customer.</li>
+  </ul>
+</div>
+
+<section>
+  <h2><span class="n">1</span>The problem, in dollars</h2>
+  <p>Section 5 of your investor letter uses three cases for what it costs to win one paying customer on Meta: best $57, middle $92, cautious $172.<sup><a href="#s1">1</a></sup> The chart shows what one customer leaves you in their first year, after AI and card costs, against those three costs. Every bar assumes the customer uses every credit, the same rule the letter uses.</p>
+  <div class="chart" role="img" aria-label="Bar chart: year-one money left per customer. Solo monthly $40, Studio monthly $74, Studio monthly plus one $25 pack $87, Studio monthly plus two packs $100, Solo yearly $100, Studio yearly $179. Cost to win a customer: best $57, middle $92, cautious $172.">
+    <div class="rows" style="padding-top:30px">
+      <div class="lines" aria-hidden="true">
+        <div class="vl" style="left:28.5%"><span>Best $57</span></div>
+        <div class="vl" style="left:46%"><span>Middle $92</span></div>
+        <div class="vl" style="left:86%"><span>Cautious $172</span></div>
+      </div>
+      <div class="row"><div class="lab">Solo, monthly</div><div class="track"><div class="bar" style="width:20%">$40</div></div></div>
+      <div class="row"><div class="lab">Studio, monthly</div><div class="track"><div class="bar" style="width:37%">$74</div></div></div>
+      <div class="row"><div class="lab">Studio, monthly + one $25 pack</div><div class="track"><div class="bar" style="width:43.5%">$87</div></div></div>
+      <div class="row"><div class="lab">Studio, monthly + two $25 packs</div><div class="track"><div class="bar" style="width:50%">$100</div></div></div>
+      <div class="row"><div class="lab">Solo, yearly ($204 up front)</div><div class="track"><div class="bar y" style="width:50%">$100</div></div></div>
+      <div class="row"><div class="lab">Studio, yearly ($408 up front)</div><div class="track"><div class="bar y" style="width:89.5%">$179</div></div></div>
+    </div>
+    <p class="vlmobile">Cost to win one customer on Meta: best $57 · middle $92 · cautious $172.</p>
+    <div class="legend"><span><i class="sw" style="background:var(--green)"></i>Monthly, middle-case months paid</span><span><i class="sw" style="background:var(--orange)"></i>Yearly, paid once up front</span><span>Scale: $0 to $200</span></div>
+  </div>
+  <p class="note"><b>How each bar is worked out.</b> Monthly bars are the letter's middle case: Solo $40, Studio $74.<sup><a href="#s1">1</a></sup> A $25 pack on a monthly Studio plan gives 2,750 credits (packs come at the buyer's own plan rate).<sup><a href="#s2">2</a></sup> It costs $11.00 in AI if all used, plus a $1.03 card fee, so it leaves $12.97. Solo yearly: $204, minus $96 AI for 24,000 credits, minus a $7.64 card fee, leaves $100.36. Studio yearly: $408, minus $213.60 AI for 53,400 credits, minus $14.99, leaves $179.41. AI cost is $0.004 a credit (your 2.5× rule) and card fees are the letter's 3.6% + 30¢ on plans and 2.9% + 30¢ on one-off buys.</p>
+  <p><b>What this tells us.</b> To cover the middle $92, a monthly Studio customer needs about $18 more in year one. That is between one and two $25 packs per customer, on average. A monthly Solo customer needs $52 more, almost four packs. A yearly customer of either plan covers the middle case on the day they pay, and a yearly Studio customer covers even the cautious case. Yearly money also stays if they never come back: in RevenueCat's data, AI apps keep about 21 in 100 yearly subscribers for a year, against about 6 in 100 on monthly plans.<sup><a href="#s4">4</a></sup></p>
+  <p><b>The catch with yearly.</b> A yearly Studio customer gets all 53,400 credits up front, so they will almost never buy a pack in year one. Yearly plans and top-up packs pull against each other. That is fine: the yearly money is larger and arrives first.</p>
+</section>
+
+<section>
+  <h2><span class="n">2</span>What we know about Solorender's own customers</h2>
+  <p>Nothing usable yet. I read the live database on October 29.<sup><a href="#s3">3</a></sup></p>
+  <ul>
+    <li>9 accounts in total.</li>
+    <li>The subscriptions table is empty. The one plan payment on record (October 14) belongs to the staff preview account.</li>
+    <li>Every other purchase is yours or a test buyer: test checkouts on August 29, your own live checks on September 19, and the $8 test on October 10, which was refunded.</li>
+    <li>One course lesson has been ticked, by one account.</li>
+  </ul>
+  <p>So I cannot tell you today how long Solorender customers stay, how many buy packs, or whether course students stay longer. The letter already says this will take months of real data. It also means the first thing to build is a simple way to see it: renewals by plan, packs per customer, and course progress beside who renews.</p>
+</section>
+
+<section>
+  <h2><span class="n">3</span>Does the course really need more credits than Studio gives?</h2>
+  <p>I priced a student's journey using the course's own rules and today's live prices.<sup><a href="#s2">2</a></sup> The course tells students that a 60-second film is "4 to 10 clips", and to make "two takes at most". The careful route uses the course's cheapest clip with sound (Veo 3.1 Lite, 75 credits for 6 seconds). The heavy route uses the course's saved-character model (Kling O3 · Entities, 140 credits for 5 seconds) with two takes of everything. This is my estimate from those rules, not a measurement of real students.</p>
+  <div class="tablebox"><table>
+    <thead><tr><th>Step (lessons)</th><th>Careful route</th><th class="num">Credits</th><th>Heavy route</th><th class="num">Credits</th></tr></thead>
+    <tbody>
+      <tr><td>Practice runs (3–7)</td><td>As shown in the lessons</td><td class="num">201</td><td>Same</td><td class="num">201</td></tr>
+      <tr><td>Hero portrait + 5 views (8)</td><td>1 picture + 5 edits</td><td class="num">90</td><td>Same</td><td class="num">90</td></tr>
+      <tr><td>Key pictures (9–10)</td><td>10 pictures, 1 take</td><td class="num">50</td><td>12 pictures, 2 takes</td><td class="num">120</td></tr>
+      <tr><td>Film clips (11–13)</td><td>10 × 6 s Veo Lite, 1 take</td><td class="num">750</td><td>12 × 5 s Kling O3, 2 takes</td><td class="num">3,360</td></tr>
+      <tr><td>Voice + talking clip (14)</td><td>Gemini voice + 4 s talk</td><td class="num">88</td><td>ElevenLabs + 10 s talk</td><td class="num">225</td></tr>
+      <tr><td>Own acting (15)</td><td>Skipped</td><td class="num">0</td><td>5 s Act It Out</td><td class="num">63</td></tr>
+      <tr><td>Music, sound effect, added sound (19)</td><td>One each</td><td class="num">30</td><td>Same</td><td class="num">30</td></tr>
+      <tr><td>Fixes (13, 20)</td><td>2 picture edits</td><td class="num">34</td><td>Same</td><td class="num">34</td></tr>
+      <tr><td>Render film</td><td>10 clips</td><td class="num">15</td><td>12 clips</td><td class="num">17</td></tr>
+      <tr><td>Trailer, wide + tall (22)</td><td>Cut from the film; tall via free Make vertical</td><td class="num">0</td><td>4 new tall clips, 2 takes</td><td class="num">1,120</td></tr>
+      <tr class="total"><td>Whole course</td><td></td><td class="num">≈ 1,260</td><td></td><td class="num">≈ 5,260</td></tr>
+    </tbody>
+  </table></div>
+  <p><b>Against one Studio month of 4,450 credits:</b> the careful student has about 3,190 left over. The heavy student is short by about 810 credits, which one $25 pack covers. And because Solorender credits never expire, a student who takes two months has 8,900 credits to work with.</p>
+  <p><b>Where the real extra spending is.</b> Lesson 24 plans a series: 6–8 shots an episode, starting with 3–4 episodes. At the same clip prices, that is roughly 450 to 1,120 credits an episode for one take, so 1,350 to 4,480 credits for a first run of episodes, on top of the course. That is the natural point where students run out. The course also teaches thrift on purpose ("Spend credits wisely", "Rescue a shot"), which is right for keeping students happy but works against pack sales during the course itself.</p>
+</section>
+
+<section>
+  <h2><span class="n">4</span>How six rivals keep customers</h2>
+  <p>Read on each company's own pages on October 29. Kling, Pika and Midjourney were not covered.</p>
+  <div class="tablebox"><table>
+    <thead><tr><th>Company</th><th>Monthly credits roll over?</th><th>Top-up packs</th><th>When you cancel</th><th>Courses</th><th>Contests</th></tr></thead>
+    <tbody>
+      <tr><td><b>OpenArt</b><sup><a href="#s15">15</a></sup></td><td>No, reset monthly</td><td>Monthly add-on, active plan only</td><td>Unused credits lost</td><td>Free tutorials</td><td>Ad and music video awards</td></tr>
+      <tr><td><b>Higgsfield</b><sup><a href="#s16">16</a></sup></td><td>No</td><td>Plan needed to buy; expire after 90 days</td><td>Plan credits end; pack credits last their 90 days</td><td>Not read</td><td>Weekly challenges, credit and cash prizes</td></tr>
+      <tr><td><b>Runway</b><sup><a href="#s17">17</a></sup></td><td>Only on Max, up to 1 month</td><td>Never expire</td><td>Access to period end</td><td>Free Academy</td><td>Gen:48 film challenge, $5,000 + credits</td></tr>
+      <tr><td><b>Krea</b><sup><a href="#s18">18</a></sup></td><td>No (Business yes)</td><td>Paid plans only; expire after 90 days</td><td>Access to period end</td><td>Not read</td><td>Not read</td></tr>
+      <tr><td><b>Magnific / Freepik</b><sup><a href="#s19">19</a></sup></td><td>Yearly credit pot</td><td>Sold; prices hidden</td><td>Extra credits need an active plan</td><td>Not read</td><td>Creative partners</td></tr>
+      <tr><td><b>Leonardo</b><sup><a href="#s20">20</a></sup></td><td>Bank up to 3 months</td><td>Never expire; active plan needed</td><td>Rollover bank cancelled</td><td>Not read</td><td>Not read</td></tr>
+      <tr class="total"><td><b>Solorender</b><sup><a href="#s2">2</a></sup></td><td>Yes, forever</td><td>Active plan only; never expire</td><td>Every credit kept</td><td>Course, Studio and up</td><td>None yet</td></tr>
+    </tbody>
+  </table></div>
+  <p><b>The pattern.</b> Most rivals hold customers with loss: leave, and you lose the credits you paid for. You decided on October 16 that Solorender credits never pause or expire, and the letter sells that as an edge. I am not suggesting you change it. It does mean Solorender has to hold customers with what they lose by leaving and with reasons to stay. Today a customer who cancels loses the course, the right to buy discounted packs, extra runs at once, and storage above 5 GB. They keep every credit.</p>
+  <p><b>What rivals have that we don't.</b> At least three run film contests with credit prizes (Higgsfield, Runway, OpenArt). Higgsfield sells automatic refills. Rivals give courses away free to win sign-ups. None I read puts a course behind a plan, so Solorender's course is unusual. None I read documents a pause button or a discount offer at cancel.</p>
+</section>
+
+<section>
+  <h2><span class="n">5</span>What published studies say</h2>
+  <p>None of these studies covers exactly our case (web app, pay up front, $20–$80 a month, AI video). Most are mobile apps or business software, so treat them as rough guides. Exact figures are in the source list.</p>
+  <div class="tablebox"><table>
+    <thead><tr><th>Question</th><th>What the sources say</th><th>How solid</th></tr></thead>
+    <tbody>
+      <tr><td>Do yearly plans keep more customers?</td><td>Yes. AI apps: about 21 in 100 yearly vs 6 in 100 monthly still paying after a year.<sup><a href="#s4">4</a></sup> Software under $25: 62 in 100 vs 41 in 100.<sup><a href="#s6">6</a></sup></td><td>Two large sources</td></tr>
+      <tr><td>How many lost customers are failed card payments?</td><td>25% of lost consumer subscribers (Stripe data via Churnkey), 35% at prices under $10.<sup><a href="#s7">7</a></sup> About 35–40% in Recurly's network.<sup><a href="#s8">8</a></sup></td><td>Two sources</td></tr>
+      <tr><td>How many failed payments can be won back?</td><td>Stripe's automatic retries alone: 55% (Churnkey's table).<sup><a href="#s7">7</a></sup> Stripe says 55% on average.<sup><a href="#s9">9</a></sup></td><td>Two sources, both tied to Stripe</td></tr>
+      <tr><td>Does a pause option save customers?</td><td>55% of paused subscribers come back,<sup><a href="#s11">11</a></sup> about 65% within 90 days.<sup><a href="#s12">12</a></sup> 40% of consumers would rather pause than cancel.<sup><a href="#s12">12</a></sup></td><td>Two sellers of these tools; no independent study</td></tr>
+      <tr><td>Does a discount at cancel save customers?</td><td>About 25% kept.<sup><a href="#s11">11</a></sup></td><td>One source</td></tr>
+      <tr><td>Do lost customers come back by themselves?</td><td>20 in 100 lost monthly subscribers come back within a year; 5 in 100 for yearly.<sup><a href="#s5">5</a></sup></td><td>One large source</td></tr>
+      <tr><td>Does a good first week matter?</td><td>Calm: users who set a daily reminder kept about 3 times better.<sup><a href="#s14">14</a></sup></td><td>One old case</td></tr>
+      <tr><td>Does teaching customers keep them?</td><td>A 25% retention rise, self-reported by 122 business buyers in a study paid for by a training-software company.<sup><a href="#s13">13</a></sup></td><td>One source, paid for by a seller</td></tr>
+      <tr><td>How many subscribers buy top-up packs?</td><td>No published figure found.</td><td>No data</td></tr>
+      <tr><td>Do rollover credits change how long people stay?</td><td>No published figure found.</td><td>No data</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2><span class="n">6</span>The options</h2>
+  <p>Six options, each with what changes for the customer and what it could mean for money. Where no study gives an effect, I say so and give the break-even point instead.</p>
+  <div class="opts">
+
+    <article class="opt rec">
+      <header><h3>A. Plug the leaks</h3><span class="tag o">Part of my pick</span></header>
+      <dl>
+        <dt>What</dt><dd>Turn on Stripe's automatic payment retries, failed-payment emails and card updates (check they are on in your Stripe dashboard). In the cancel page, let customers switch to a smaller plan instead of leaving. Show a plain "come back anytime, your credits are waiting" message on the way out.</dd>
+        <dt>Customer sees</dt><dd>A payment that bounces gets retried and an email asks them to update their card. Someone cancelling sees "switch to Solo instead".</dd>
+        <dt>Money</dt><dd>If retries are not already on, the two studies imply about 12 to 21 of every 100 customers you would lose could be kept (25–40% of losses are failed cards, and about half of those are won back). Every month kept is about $11 on Solo and $20.46 on Studio.</dd>
+        <dt>Cost</dt><dd>No build needed for the Stripe part: these are settings in Stripe Billing, which your plan payments already use.<sup><a href="#s10">10</a></sup> I haven't checked whether Stripe charges extra for any of them. The site today ignores failed payments, and I can't see your Stripe settings, so I don't know yet which are on. The smaller-plan switch is a small change on our side.</dd>
+        <dt>Evidence</dt><dd>Two sources each.</dd>
+      </dl>
+    </article>
+
+    <article class="opt rec">
+      <header><h3>B. Make yearly the first thing people see</h3><span class="tag o">Part of my pick</span></header>
+      <dl>
+        <dt>What</dt><dd>On /plans and /pricing, open on the yearly prices, with the dollar saving and the day-one credits spelled out. Course ads link to Studio yearly.</dd>
+        <dt>Customer sees</dt><dd>The yearly price first ($34 a month for Studio), with a switch to monthly.</dd>
+        <dt>Money</dt><dd>Each yearly Solo customer leaves $100 on day one; each yearly Studio customer $179. Unknown: how many will choose yearly. I found no published share for web apps, so we would measure it.</dd>
+        <dt>Cost</dt><dd>Small page change.</dd>
+        <dt>Evidence</dt><dd>Strong that yearly customers stay; no data on how many choose it.</dd>
+      </dl>
+    </article>
+
+    <article class="opt rec">
+      <header><h3>C. Turn the course into a road that keeps going</h3><span class="tag o">Part of my pick</span></header>
+      <dl>
+        <dt>What</dt><dd>Show students a credit budget for the film, using the table in section 3. After lesson 25, start a "Series" track: a monthly episode challenge for course students, with a showcase and credit prizes. When a student's balance drops below what their next step needs, show the right pack.</dd>
+        <dt>Customer sees</dt><dd>A clear plan for what the film will cost, and a reason to come back every month once the course ends.</dd>
+        <dt>Money</dt><dd>Break-even: about 1.4 Studio packs ($25) per course customer in year one covers the middle $92 ad cost. Prizes cost you the credits ÷ 2.5, so a 10,000-credit prize costs $40. No published figure tells us how many will buy.</dd>
+        <dt>Cost</dt><dd>Medium: a few days to build.</dd>
+        <dt>Evidence</dt><dd>Rivals use contests; no study measures the effect on spending.</dd>
+      </dl>
+    </article>
+
+    <article class="opt">
+      <header><h3>D. Low-balance warnings and automatic refills</h3><span class="tag">Later</span></header>
+      <dl>
+        <dt>What</dt><dd>Warn when credits fall below a set level, before a run fails. Offer an optional "refill me with a $25 pack when I run low" switch, as Higgsfield does.</dd>
+        <dt>Money</dt><dd>Each $25 Studio pack leaves $12.97. No published data on how many turn it on.</dd>
+        <dt>Cost</dt><dd>Medium. Automatic charges need extra care with refunds and consent.</dd>
+      </dl>
+    </article>
+
+    <article class="opt">
+      <header><h3>E. Welcome, nudge and win-back emails</h3><span class="tag">Later</span></header>
+      <dl>
+        <dt>What</dt><dd>A welcome that walks new customers to their first clip in week one. A note when credits run low. A "your credits are still here" email 30 and 60 days after someone leaves.</dd>
+        <dt>Money</dt><dd>About 20 in 100 lost monthly subscribers come back within a year with no help.<sup><a href="#s5">5</a></sup> No study tells us how much an email adds.</dd>
+        <dt>Cost</dt><dd>Medium. Today the site sends only "your video is ready" emails.</dd>
+      </dl>
+    </article>
+
+    <article class="opt">
+      <header><h3>F. A discount or pause at cancel</h3><span class="tag">Not yet</span></header>
+      <dl>
+        <dt>What</dt><dd>Stripe's cancel page can offer a coupon (for example, a month at a lower price).<sup><a href="#s10">10</a></sup> It has no pause button; a pause would have to be built.</dd>
+        <dt>Money</dt><dd>One vendor source says about 25% of offered customers stay.<sup><a href="#s11">11</a></sup> Discounts cut the margin on the customers who would have stayed anyway.</dd>
+        <dt>Why not yet</dt><dd>Solorender customers already keep their credits after cancelling, so cancelling works much like a pause. Better to see real cancel reasons first. The cancel page already asks why.</dd>
+      </dl>
+    </article>
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">7</span>My recommendation</h2>
+  <p><b>Do A, B and C together, in that order, plus the measuring page.</b></p>
+  <ol>
+    <li><b>This week, close to free:</b> plug the leaks (A) and make yearly the first price people see (B). Both pay off from the first customer, and A has the best evidence of anything here.</li>
+    <li><b>At the same time:</b> a simple owner page showing renewals by plan, packs per customer, yearly vs monthly sign-ups, and course progress beside who renews. Without it, none of this can be judged.</li>
+    <li><b>Alongside the course launch:</b> the course budget and the Series track (C). It fits the plan in your letter, where the course is the main way you win customers for the next 60 days.</li>
+    <li><b>Once there are 30 or more paying customers:</b> look at the numbers and the cancel reasons, then decide on D, E and F.</li>
+  </ol>
+  <p>Why this order: B can cover the ad cost on day one, A stops customers leaving for no reason, and C creates the extra spend your course example points to, at the moment students actually run out.</p>
+</section>
+
+<div class="ask" id="choices">
+  <h2>Four choices only you can make</h2>
+  <ol>
+    <li><b>Which package first?</b> My pick: A + B + measuring, then C. Or start with the course road (C) first.</li>
+    <li><b>Yearly first on the price pages?</b> Show yearly as the default, or keep monthly as the default.</li>
+    <li><b>The course and yearly Solo.</b> Keep the course on Studio and up only (my pick, it keeps the reason to choose Studio), or also include it with yearly Solo ($204 up front leaves $100, more than a monthly Studio customer's $74 in a typical year).</li>
+    <li><b>Series challenge prizes.</b> How many credits a month you are willing to give as prizes. For scale, 10,000 credits cost you $40 and 25,000 cost $100.</li>
+  </ol>
+  <p>I'll also need you to open Stripe once so I can check which payment-retry settings are already on. View only.</p>
+</div>
+
+<section class="sources" id="sources">
+  <h2>Sources</h2>
+  <p class="note">Read October 29, 2026. Percentages in the text are rounded up to the next 5; exact figures are here.</p>
+  <ol>
+    <li id="s1">Solorender investor letter, sections 2 and 5 (Claude outputs/solorender-investor-letter.html). Cost to win a customer $57 / $92 / $172; year-one money left Solo $28 / $40 / $58, Studio $53 / $74 / $109; Solo $10.98 and Studio $20.46 a month after AI and card costs. The letter cites its own sources for these.</li>
+    <li id="s2">Solorender code, read October 29: plans and packs (src/lib/config.ts, live values in the store_offers table, same numbers); pack credits at the buyer's plan rate (src/lib/offers-shared.ts, used by checkout); course lessons and live model prices (src/app/(app)/course/lessons.tsx: "4 to 10 clips", "Two takes at most"); Veo 3.1 Lite 6 s = 75, Kling O3 · Entities 5 s = 140, Act It Out 12.5 a second; cancel page settings (src/app/api/portal/route.ts); payment events handled (src/app/api/stripe/webhook/route.ts: no failed-payment event).</li>
+    <li id="s3">Solorender live database (Supabase), read October 29: 9 profiles, 0 subscriptions rows, 7 purchase rows (all house or test accounts), 1 course_progress row.</li>
+    <li id="s4">RevenueCat, "AI app retention study", August 18, 2026. <a href="https://www.revenuecat.com/blog/growth/ai-app-retention-study">revenuecat.com</a>. One-year retention on monthly plans: AI apps 6.1%, non-AI 9.5%; yearly plans: AI 21.1%. Mobile apps, 50M+ subscriptions.</li>
+    <li id="s5">RevenueCat, State of Subscription Apps 2026, part 2. <a href="https://www.revenuecat.com/sosa-2026-insights-part-2">revenuecat.com</a>. "20% of churned monthly subscribers reactivate within a year"; yearly 5%.</li>
+    <li id="s6">ChartMogul, SaaS Billing Report, May 18, 2025 (2024 data). <a href="https://chartmogul.com/reports/saas-billing-report/">chartmogul.com</a>. Under $25 a month per customer: median retention 62% yearly vs 41% monthly.</li>
+    <li id="s7">Churnkey, involuntary churn benchmarks, November 2025 (Stripe data). <a href="https://churnkey.co/blog/involuntary-churn-benchmarks">churnkey.co</a>. 24% of churn for consumer companies is failed payments; 35% for prices under $10; Stripe retries alone recover 51%.</li>
+    <li id="s8">Recurly, churn rate benchmarks, July 2026 (median yearly churn). <a href="https://www.recurly.com/research/churn-rate-benchmarks">recurly.com</a>. Involuntary 1.06% of 3.22% total for software (33%); 1.59% of 4.14% for digital media (38%).</li>
+    <li id="s9">Stripe Billing page. <a href="https://stripe.com/billing">stripe.com/billing</a>. "Businesses using Stripe recover 55% of failed payments on average." No method given.</li>
+    <li id="s10">Stripe docs: cancellation page retention coupon (<a href="https://docs.stripe.com/customer-management/cancellation-page">link</a>); plan switching in the portal (<a href="https://docs.stripe.com/customer-management/configure-portal">link</a>); failed-payment emails (<a href="https://docs.stripe.com/billing/revenue-recovery/customer-emails">link</a>); automatic card updates (<a href="https://docs.stripe.com/payments/cards/overview">link</a>). No pause option found in the portal docs.</li>
+    <li id="s11">Churnkey, pause offer at cancellation. <a href="https://churnkey.co/growth/library/pause-offer-at-cancellation">churnkey.co</a>. Paused subscribers resume at 54%; save discounts retain 22%. Vendor data, sample size not stated.</li>
+    <li id="s12">Recurly docs, subscription pause. <a href="https://docs.recurly.com/recurly-subscriptions/docs/navigate-retain-subscription-pause-why-it-matters">recurly.com</a>. 38% would rather pause than cancel ("2026 State of Subscriptions"); nearly two-thirds of paused subscribers resume within 90 days (no study named).</li>
+    <li id="s13">Forrester Consulting for Intellum, customer education study, March 2024. <a href="https://thoughtleadership.forrester.com/go/intellum/customer_education_ebook/43">forrester.com</a>. "Increased retention by 22.2%", self-reported by 122 US education decision-makers; commissioned by Intellum.</li>
+    <li id="s14">Amplitude, Calm case study, July 14, 2016. <a href="https://amplitude.com/blog/2016/07/14/calm-increased-retention-amplitude/">amplitude.com</a>. Users who set a daily reminder had "3x the retention"; the post says causation was not proven from that comparison alone.</li>
+    <li id="s15">OpenArt pricing and help: <a href="https://openart.ai/pricing">pricing</a>, <a href="https://openart.ai/help/">help</a>. "Credits reset each month and do not carry over"; on cancel "unused credits don't roll over and will be lost".</li>
+    <li id="s16">Higgsfield help: <a href="https://higgsfield.ai/creator-hub/help-center/credits/how-credit-packs-work">credit packs</a> ("valid for 90 days from purchase"; plan needed to buy; credits "stay available even if you cancel"), <a href="https://higgsfield.ai/creator-hub/help-center/community/how-do-contests-work">contests</a>.</li>
+    <li id="s17">Runway: <a href="https://runway.com/pricing">pricing</a> (Max: "up to one month of unused credits rolls over"; bought credits "never expire"), <a href="https://runway.com/gen48/terms">Gen:48 terms</a>.</li>
+    <li id="s18">Krea: <a href="https://www.krea.ai/pricing">pricing</a> (packs "expire after 90 days"), <a href="https://www.krea.ai/docs/user-guide/help-and-support/compute-units">compute units docs</a>.</li>
+    <li id="s19">Magnific / Freepik: <a href="https://www.magnific.com/pricing">pricing</a>. Freepik's subscriptions help page was blocked (403); its cancel terms came from a search result only.</li>
+    <li id="s20">Leonardo help: <a href="https://intercom.help/leonardo-ai/en/articles/9560707-token-rollover">token rollover</a> (bank holds up to 3 months; cancelled on cancel), <a href="https://intercom.help/leonardo-ai/en/articles/9044700-tokens-faq">tokens FAQ</a>. Pricing page blocked by a verification wall.</li>
+  </ol>
+</section>
+
+<footer>Prepared for Eddie, October 29, 2026. Nothing in Solorender has been changed. The course credit estimate is mine, built from the course's own rules and live prices; real students will vary.</footer>
+
+</div>

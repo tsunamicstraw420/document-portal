@@ -1,0 +1,249 @@
+<title>Email Finder Test</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Manrope:wght@400;600;700&display=swap">
+<style>
+/* Layout: one reading column for the plan and steps; the 20-channel table runs full width with search + sort. */
+:root{
+  color-scheme:dark;
+  --bg:#0a0a0a; --panel:#151412; --line:#2a2823; --ink:#ffffff;
+  --green:#6ee05a; --orange:#f7931a;
+  --display:"Syne","Avenir Next",Arial,sans-serif;
+  --body:"Manrope","Avenir Next","Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;margin:0;
+  padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));padding-block:40px 80px}
+.wrap{max-width:1180px;margin:0 auto;display:grid;gap:36px}
+.wrap > *{min-width:0}
+.col{max-width:780px}
+h1{font-family:var(--display);font-weight:800;font-size:1.625rem;line-height:1.2;margin:0;text-wrap:balance}
+h2{font-family:var(--display);font-weight:700;font-size:1.125rem;margin:0 0 8px;text-wrap:balance}
+h3{font-family:var(--display);font-weight:700;font-size:1rem;margin:0}
+p{margin:10px 0 0}
+a{color:var(--ink);text-decoration-color:var(--green);text-underline-offset:3px}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+.label{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--green)}
+.intro{font-size:.9375rem}
+ul.plain,ol.steps{margin:10px 0 0;padding-left:22px;display:grid;gap:8px}
+ol.steps li::marker{color:var(--green);font-weight:700}
+.box{border:1px solid var(--line);border-radius:6px;padding:16px 18px;background:var(--panel)}
+.box.o{border-color:var(--orange)}
+.hl{color:var(--orange);font-weight:700}
+.small{font-size:.875rem}
+.tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+.tools input{font:600 .95rem var(--body);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:9px 12px;flex:1 1 260px;min-width:0}
+.count{font-size:.8125rem;color:var(--green)}
+.tablebox{overflow-x:auto;border:1px solid var(--line);border-radius:6px;margin-top:12px}
+table{border-collapse:collapse;width:100%;font-size:.875rem;min-width:960px}
+th{background:#1d1c19;text-align:left}
+th button{all:unset;cursor:pointer;display:block;padding:10px 12px;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green);white-space:nowrap}
+th button::after{content:" ↕";opacity:.5}
+th[aria-sort="ascending"] button::after{content:" ↑";opacity:1}
+th[aria-sort="descending"] button::after{content:" ↓";opacity:1}
+td{padding:10px 12px;border-top:1px solid var(--line);vertical-align:top}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.tag{display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--green);border:1px solid var(--line);border-radius:4px;padding:1px 6px;white-space:nowrap}
+.copy{font:700 .75rem var(--body);color:var(--bg);background:var(--green);border:0;border-radius:4px;padding:3px 8px;cursor:pointer;margin-left:6px}
+.trials{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.trial{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px;display:grid;gap:8px;align-content:start;min-width:0}
+.trial.pay{border-color:var(--orange)}
+.trial .cost{font-weight:700;color:var(--orange)}
+.score{width:100%;border-collapse:collapse;font-size:.9rem;min-width:640px}
+.score th,.score td{padding:9px 10px;border-top:1px solid var(--line);text-align:left}
+.score th{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--green)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header class="col">
+  <div class="label">solorender · partner recruiting · test set built October 29, 2026</div>
+  <h1>Which tool finds the emails YouTube hides?</h1>
+  <p class="intro">Below are 20 YouTube creators who fit solorender's partner program and show <strong>no email anywhere in their channel description</strong>. Look each one up in every free trial. A tool is worth paying for only if it finds real business emails for these people, because the emails it can find for everyone else, you already get for free.</p>
+</header>
+
+<section class="col box o">
+  <h2>Where things stand</h2>
+  <ul class="plain">
+    <li>Today's free YouTube search found <span class="hl">178 channels</span> in the 5,000–250,000 subscriber range across the five niches. <span class="hl">79 of them (45%)</span> already show an email in their description. The other 99 don't.</li>
+    <li>I picked these 20 from the 99: English-language, real creators (not brands or software companies), close to what solorender does, and every one posted a new video in the last two weeks.</li>
+    <li><strong>Free no-account lookups, done October 29:</strong> Heepsy's free finder found <span class="hl">0 new emails for the 20</span>. Modash's and Influencers.club's free finders wouldn't run in my browser. Details are in the next section.</li>
+    <li>Nothing has been bought, and no account has been opened. You start each trial yourself; the steps are further down.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>The 20 test channels</h2>
+  <p class="small col">Subscriber counts come from the official YouTube API, read October 29, 2026. YouTube rounds them to 3 digits (for example 68,100). If a tool's count differs by more than a few percent, its data is old. "Newest video" comes from YouTube's own public feed for each channel.</p>
+  <div class="tools">
+    <input id="q" type="search" placeholder="Search name, niche, country…" aria-label="Search the 20 channels">
+    <span class="count" id="c"></span>
+  </div>
+  <div class="tablebox"><table id="t"></table></div>
+</section>
+
+<section class="col box o">
+  <h2>Free lookups I ran (October 29, $0, public channel names only)</h2>
+  <ol class="steps">
+    <li><strong>Heepsy free finder: <span class="hl">0 new emails out of 20</span>.</strong> 11 of the 20 channels are in Heepsy's database. All 11 said "This profile does not provide a public email". The other 9 aren't in its database at all; it only offers to "request a report". As a control, I looked up a famous channel (MKBHD), and Heepsy returned its email. But that email is already in MKBHD's YouTube description (checked with the YouTube API), so it isn't a hidden one. <strong>Conclusion: Heepsy finds only emails you already see for free.</strong></li>
+    <li><strong>Heepsy's subscriber counts are out of date.</strong> All 11 were lower than YouTube's live count. Only 2 of 11 were within 5%, and the typical gap was about 30%. The full list is below.</li>
+    <li><strong>Modash free finder: wouldn't run.</strong> Every lookup said "Something went wrong", including the famous control channel. Its server refused my browser ("Forbidden"). I didn't try to get around that. Your Modash trial still covers this tool.</li>
+    <li><strong>Influencers.club free finder: needs a "prove you're human" check (reCAPTCHA).</strong> I don't solve those, so I stopped. Your Influencers.club trial still covers this tool.</li>
+  </ol>
+  <div class="tablebox" style="margin-top:14px">
+  <table class="score">
+    <thead><tr><th>Channel</th><th>Heepsy's count</th><th>YouTube live (Oct 29)</th><th>Heepsy is low by</th></tr></thead>
+    <tbody>
+      <tr><td>Wade McMaster</td><td>92,600</td><td>93,900</td><td>1.4%</td></tr>
+      <tr><td>Grace Leung</td><td>143,000</td><td>149,000</td><td>4.0%</td></tr>
+      <tr><td>Future Tech Pilot</td><td>86,800</td><td>97,900</td><td>11.3%</td></tr>
+      <tr><td>Greg Edits Video</td><td>28,100</td><td>31,800</td><td>11.6%</td></tr>
+      <tr><td>Mira AI</td><td>28,900</td><td>36,300</td><td>20.4%</td></tr>
+      <tr><td>Jake Dawson</td><td>49,800</td><td>68,100</td><td>26.9%</td></tr>
+      <tr><td>AI with Hassan</td><td>27,100</td><td>39,400</td><td>31.2%</td></tr>
+      <tr><td>Ads with Cami</td><td>4,600</td><td>9,190</td><td>49.9%</td></tr>
+      <tr><td>Steffen Miro</td><td>11,200</td><td>22,700</td><td>50.7%</td></tr>
+      <tr><td>Diego Galvao</td><td>5,800</td><td>14,100</td><td>58.9%</td></tr>
+      <tr><td>Alicia Lyttle</td><td>60,000</td><td>208,000</td><td>71.2%</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="small">Not in Heepsy's database: Mark Gadala-Maria, Jacksons AI, Woollyfern, 1 Guy With AI, Gavin Herman, Zane Hoyer, Pat Simmons, Caleb Boxx, Tim Danilov Biz. Source: heepsy.com/free-tools/youtube-email-finder, read October 29, 2026; live counts from the YouTube Data API the same day.</p>
+</section>
+
+<section class="col box o">
+  <h2>One yes still open</h2>
+  <p><strong>NanoInfluencer trial: <span class="hl">$1.99</span>, paid by you.</strong> It's the only test that costs money. Its page says "$1.99 / 3-day trial then $29 / month" and calls the trial fee "nonrefundable". If you don't cancel within 3 days, the next charge is <span class="hl">$29</span>. I'd still wait for your free trials first, since it's the "stay free + X" backup.</p>
+</section>
+
+<section class="col">
+  <h2>Start the free trials</h2>
+  <p>You do the sign-ups. I never sign up, log in or type anything into your accounts. Use whatever email you want for these. Each step was checked against the tool's own page on October 29, 2026.</p>
+  <div class="box" style="margin-top:14px">
+    <h3>The same routine in every tool</h3>
+    <ol class="steps">
+      <li>Search each of the 20 channels by name or handle (the Copy buttons in the table above help).</li>
+      <li>Before unlocking anything, check whether the tool marks an email as available. If it does, spend your free unlocks only on those channels. The number marked is a useful result in itself.</li>
+      <li>Note the subscriber count the tool shows for 3 or 4 channels so I can compare it with today's live count.</li>
+      <li>When you're done, leave the results tab open in Chrome and tell me. I'll read it (view only, no clicks) and fill in the scorecard. Or paste what you saw into chat.</li>
+    </ol>
+  </div>
+</section>
+
+<section>
+  <div class="trials">
+    <div class="trial">
+      <div class="label">Account trial · free</div>
+      <h3>Modash</h3>
+      <div class="small">14 days, no card. Up to 20 profiles viewed and <span class="hl">6 email unlocks</span>. Paid plan afterwards is $199 a month, but the page doesn't say the trial turns into it on its own.</div>
+      <ol class="steps small">
+        <li>Open <a href="https://marketer.modash.io/register/marketer" target="_blank" rel="noopener">marketer.modash.io/register/marketer</a> and create the account.</li>
+        <li>Choose YouTube, then search a channel by name, or paste its YouTube link.</li>
+        <li>Open the profile and look for the email or an unlock button.</li>
+      </ol>
+      <div class="small">With only 6 unlocks, use them on the channels where it shows an email exists.</div>
+    </div>
+    <div class="trial">
+      <div class="label">Account trial · free</div>
+      <h3>Clickanalytic</h3>
+      <div class="small">14 days, no card. <span class="hl">10 email unlocks</span>, 10 creator analyses, 100 searches a day. Its page says it unlocks "the emails creators list publicly", so it may only repeat what's visible.</div>
+      <ol class="steps small">
+        <li>Open <a href="https://app.clickanalytic.com/register" target="_blank" rel="noopener">app.clickanalytic.com/register</a> and create the account.</li>
+        <li>Search the channel by name in its YouTube search.</li>
+        <li>Unlock the email on channels that show one.</li>
+      </ol>
+      <div class="small">Its terms (section 9.12) limit collecting personal data about others. Read only for this test; ask them in writing before any paid use.</div>
+    </div>
+    <div class="trial">
+      <div class="label">Account trial · free</div>
+      <h3>Influencers.club</h3>
+      <div class="small">10 free credits plus Pro features. "No payment details are required to start." It claims verified emails, "weekly updated".</div>
+      <ol class="steps small">
+        <li>Open <a href="https://dashboard.influencers.club/register" target="_blank" rel="noopener">dashboard.influencers.club/register</a> and create the account.</li>
+        <li>Look each channel up by username or channel ID. The channel ID is the code after /channel/ in each table link.</li>
+        <li>Spend the 10 credits on the channels that show an email.</li>
+      </ol>
+    </div>
+    <div class="trial">
+      <div class="label">Account · free search</div>
+      <h3>ChannelCrawler</h3>
+      <div class="small">Free search, "No credit card required". Each email costs one email credit ("View Email" button). Paid plans have a 7-day trial; I couldn't confirm whether that needs a card.</div>
+      <ol class="steps small">
+        <li>Open <a href="https://app.channelcrawler.com/auth/register" target="_blank" rel="noopener">app.channelcrawler.com/auth/register</a> and create a free account.</li>
+        <li>Search a channel name as the keyword.</li>
+        <li>Count which of the 20 show a "View Email" button. Don't start the paid trial without telling me first.</li>
+      </ol>
+      <div class="small">It searches by filters (views, subscribers, keyword), not by one channel's link, so some of the 20 may be hard to find.</div>
+    </div>
+    <div class="trial">
+      <div class="label">No account · done by me · nothing for you to do</div>
+      <h3>Heepsy free email finder</h3>
+      <div class="small">Tested on all 20 on October 29: <span class="hl">0 new emails</span>, 9 channels not in its database, and subscriber counts typically about 30% low. Results are in the section above.</div>
+      <div class="small"><a href="https://www.heepsy.com/free-tools/youtube-email-finder" target="_blank" rel="noopener">heepsy.com/free-tools/youtube-email-finder</a></div>
+    </div>
+    <div class="trial pay">
+      <div class="label">Paid trial · needs your yes</div>
+      <h3>NanoInfluencer</h3>
+      <div class="cost">$1.99 for 3 days, then $29 a month</div>
+      <div class="small">The trial fee is nonrefundable. It finds "publicly listed email addresses across influencer accounts and linked pages" and charges a credit only when it finds one. It's the only tool that follows a creator's website and link-in-bio pages. Only 3 of the 20 have website links in their description.</div>
+      <div class="small">I couldn't find its sign-up page or cancel steps (its pricing and FAQ pages return errors). If you do it, set a reminder to cancel within 3 days.</div>
+    </div>
+  </div>
+</section>
+
+<section class="col">
+  <h2>What I'll record for each tool</h2>
+  <div class="tablebox">
+  <table class="score">
+    <thead><tr><th>Tool</th><th>New emails found (of 20)</th><th>Subscriber counts current?</th><th>Price per useful email</th></tr></thead>
+    <tbody>
+      <tr><td>Modash</td><td>waiting for your trial (free finder refused my browser)</td><td>not tested yet</td><td>—</td></tr>
+      <tr><td>Clickanalytic</td><td>waiting for your trial</td><td>not tested yet</td><td>—</td></tr>
+      <tr><td>Influencers.club</td><td>waiting for your trial (free finder needs a reCAPTCHA)</td><td>not tested yet</td><td>—</td></tr>
+      <tr><td>ChannelCrawler</td><td>waiting for your trial</td><td>not tested yet</td><td>—</td></tr>
+      <tr><td>Heepsy (free finder)</td><td><span class="hl">0 of 20</span> (9 not in its database)</td><td>No: 2 of 11 within 5%, typically about 30% low</td><td>none found, so no price per email</td></tr>
+      <tr><td>NanoInfluencer</td><td>waiting for your yes</td><td>—</td><td>—</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <ul class="plain small">
+    <li><strong>"New" email</strong> means a business address that isn't already in the channel description. Every one of these 20 has an empty description, so any email a tool finds counts.</li>
+    <li><strong>Price per useful email</strong> is the tool's 6-month cost divided by how many emails it would give in 6 months at the rate it hit on these 20.</li>
+    <li><strong>Deliverability</strong> gets checked with free methods only. I confirm the email's domain exists and accepts mail, and I flag throwaway domains. No test emails get sent.</li>
+    <li>When the results are in, I'll recommend one option (or "stay free + one tool") with the numbers, on a separate page, and you decide.</li>
+  </ul>
+</section>
+</div>
+
+<script>
+const R=[["AI video/image tools","Alicia Lyttle","@alicialyttle","UCchfCBPdLeDf5hjKUmGpVqQ",208000,"US","2026-10-29","AI Innovision won a Diamond SaaSpreneur Award",3],["AI video/image tools","Jake Dawson","@jake.dawson","UCa5OAoQETuYHkx9Vh_TsMCg",68100,"US","2026-10-29","AI News: Big AI Launches That Just Dropped!",1],["AI video/image tools","Mira AI","@miramakesai","UCLmBFlpNOjLxpFEV5_Ax0mg",36300,"—","2026-10-28","How To Start Making AI Animations in 2027",0],["AI video/image tools","Mark Gadala-Maria","@markgadala","UC7dDxcJywuKqzvsoJLCM4bQ",18300,"—","2026-10-28","I Let AI Hack My Smart TV (No Ads, No Tracking).",0],["AI video/image tools","Jacksons AI","@jacksons_ai","UCKOTiVw2u_e5LK40-YBTVlQ",69200,"—","2026-10-29","FREE & UNLIMITED | Make VIRAL Stick Animations With AI FREE FOREVER",0],["Creative tools","Future Tech Pilot","@futuretechpilot","UCEuQ7YIThAps6wERHfsY7fQ",97900,"CA","2026-10-21","The Simple Trick That Turns Concept Art Into a Playable Game",0],["Creative tools","Woollyfern","@woollyferncreative","UC2LUqhg0ZqCTPeBbP7rEUlw",31400,"US","2026-10-16","Midjourney CHARACTER Consistency | How to Use the Edit Model | 2026",0],["Creative tools","Wade McMaster - Creator Impact","@wademcmaster","UCcCzzSbdw5-qmdF_NuTtb2w",93900,"AU","2026-10-27","Kling 4.0 is here - is it the new AI VIDEO KING??",0],["Creative tools","Diego Galvao","@dgikaos","UC3jsobxlad8dw5u_LaWyF0w",14100,"US","2026-10-20","How to Render Higgsfield Video Directly from a Claude Skill",0],["Creative tools","1 Guy With AI","@1guywithai_fm","UCnEMpOhNU3LWYKkL3HlICtA",112000,"US","2026-10-26","Turn Anything Into 3D With AI No Blender: Artlist 3D Tutorial",0],["Video editing","Gavin Herman","@gavinherman","UCkMnDDRy3TjuEPo2hitP4kg",131000,"US","2026-10-21","Give me 10 minutes and I'll make your editing 97% Better",0],["Video editing","Zane Hoyer","@zanehoyer","UC5g1kvyNO83VDWfb6sOVHeg",129000,"—","2026-10-24","How to Automate Your ENTIRE Editing Job ($49,540/Mo)",0],["Video editing","Greg Edits Video","@gregeditsvideo","UC4TxGM1QyuPt2RzWB4dAkFQ",31800,"—","2026-10-27","How I Use the Fusion Page to Edit Better Videos",0],["Video editing","Pat Simmons","@per_simmons","UCY8ZKVxXj0FgIvSfeiSDclg",30300,"US","2026-10-27","Kimi K3.1: No Hype Full Review & Testing",2],["Faceless YouTube","Caleb Boxx","@calebboxxmedia","UCvECOOdYbkLThq4YTfQNkOg",66100,"US","2026-10-17","How I Made $3,400,000 with Faceless YouTube Channels Using AI",0],["Faceless YouTube","Steffen Miro","@officialsteffenmiro","UCkEj6ePNBpVtBz3-uNh54yg",22700,"US","2026-10-28","It's BORING, But I Make $3,937 a MONTH Working Just 1 Hour at 24",0],["Faceless YouTube","Tim Danilov Biz","@timdanilovhi","UCgBFjxP5qd5L06N0WyMdTPg",28600,"US","2026-10-28","The 17 BEST Faceless YouTube Niches To Finish 2026",0],["UGC / marketing","Ads with Cami","@adswithcami","UC1XFxMVRpOuxQQdCMWJdmwg",9190,"GB","2026-10-29","What makes AI UGC feel real?",0],["UGC / marketing","AI with Hassan","@ai.with.hassan","UC7JIdd6JEcDHe1nQNbA8lvg",39400,"DE","2026-10-29","Mistral Large 4 \"le Chonk\": Europe's 1 Trillion Open Model",0],["UGC / marketing","Grace Leung","@graceleungyl","UCrB7UFnkosBjAhOg3a9NdWw",149000,"CA","2026-10-16","ChatGPT Work: 10 AI Agents to Automate Your Work Right Now",4]];
+const COLS=[["Channel",1],["Handle",2],["Niche",0],["Subscribers",4],["Country",5],["Newest video",6],["Website links in description",8]];
+let sortCol=-1,dir=1;
+const t=document.getElementById("t"),q=document.getElementById("q"),c=document.getElementById("c");
+function esc(s){return String(s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]))}
+function cell(r,i){
+  if(i===1) return `<td><strong><a href="https://www.youtube.com/channel/${r[3]}" target="_blank" rel="noopener">${esc(r[1])}</a></strong></td>`;
+  if(i===2) return `<td style="white-space:nowrap">${esc(r[2])}<button class="copy" type="button" data-copy="${esc(r[2])}" aria-label="Copy ${esc(r[2])}">Copy</button></td>`;
+  if(i===0) return `<td><span class="tag">${esc(r[0])}</span></td>`;
+  if(i===4) return `<td class="num">${r[4].toLocaleString("en-US")}</td>`;
+  if(i===6) return `<td><span class="num">${esc(r[6])}</span><br><span class="small">${esc(r[7])}</span></td>`;
+  if(i===8) return `<td class="num">${r[8]}</td>`;
+  return `<td>${esc(r[i])}</td>`;
+}
+function draw(){
+  const term=q.value.trim().toLowerCase();
+  let rows=R.filter(r=>!term||r.join(" ").toLowerCase().includes(term));
+  if(sortCol>=0){const k=COLS[sortCol][1];rows=[...rows].sort((a,b)=>(typeof a[k]==="number"?a[k]-b[k]:String(a[k]).localeCompare(String(b[k])))*dir)}
+  t.innerHTML="<thead><tr>"+COLS.map((h,i)=>`<th aria-sort="${i===sortCol?(dir>0?"ascending":"descending"):"none"}"><button type="button" data-i="${i}">${h[0]}</button></th>`).join("")+"</tr></thead><tbody>"+
+    rows.map(r=>"<tr>"+COLS.map(h=>cell(r,h[1])).join("")+"</tr>").join("")+"</tbody>";
+  c.textContent=rows.length+" of "+R.length+" channels shown";
+}
+t.addEventListener("click",e=>{
+  const cp=e.target.closest("button[data-copy]");
+  if(cp){const v=cp.dataset.copy;try{navigator.clipboard.writeText(v).then(()=>{cp.textContent="Copied"},()=>{cp.textContent=v})}catch(_){cp.textContent=v}return}
+  const b=e.target.closest("button[data-i]");if(!b)return;const i=+b.dataset.i;dir=(i===sortCol)?-dir:1;sortCol=i;draw();
+});
+q.addEventListener("input",draw);
+draw();
+</script>

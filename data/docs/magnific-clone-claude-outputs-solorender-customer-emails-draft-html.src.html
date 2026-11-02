@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Customer Emails Draft</title>
+<style>
+  :root { --bg:#0a0a0a; --card:#141414; --line:#262626; --text:#ffffff; --green:#6ee05a; --orange:#f7931a; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:Manrope,system-ui,-apple-system,"Segoe UI",sans-serif; font-size:16px; line-height:1.6; }
+  .wrap { max-width:1100px; margin:0 auto; padding:32px 16px 64px; }
+  h1 { font-size:32px; line-height:1.2; margin:0 0 8px; }
+  h2 { font-size:24px; margin:48px 0 8px; }
+  .label { font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--green); margin:0 0 6px; }
+  .intro { font-size:15px; max-width:760px; }
+  .box { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px 20px; margin:16px 0; }
+  .pair { display:grid; grid-template-columns: 320px 1fr; gap:24px; align-items:start; margin-top:16px; }
+  .facts dt { font-size:12px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--green); margin-top:14px; }
+  .facts dd { margin:2px 0 0; }
+  .inbox { border:1px solid var(--line); border-radius:14px; overflow:hidden; background:#0a0a0a; }
+  .inbox-head { background:#1c1c1c; padding:12px 16px; border-bottom:1px solid var(--line); font-size:14px; }
+  .inbox-head b { font-size:16px; }
+  .mail { padding:24px 12px; }
+  table { border-collapse:collapse; }
+  .choices { width:100%; }
+  .choices th, .choices td { text-align:left; vertical-align:top; padding:12px 10px; border-bottom:1px solid var(--line); }
+  .choices th { font-size:12px; letter-spacing:1.5px; text-transform:uppercase; color:var(--green); }
+  .pick { color:var(--green); font-weight:800; }
+  .note { font-size:14px; }
+  a { color:#fff; text-decoration-color:var(--green); }
+  @media (max-width:820px) {
+    .pair { grid-template-columns:1fr; }
+    .choices thead { display:none; }
+    .choices tr { display:block; border-bottom:1px solid var(--line); padding:8px 0; }
+    .choices td { display:block; border:0; padding:4px 0; }
+  }
+  @media (max-width:520px) { .col { display:block !important; width:100% !important; padding:0 0 16px 0 !important; } .pad { padding-left:18px !important; padding-right:18px !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<p class="label">Draft for Eddie · October 30, 2026 · nothing built or sent</p>
+<h1>Three customer emails, plus low-balance warnings</h1>
+<p class="intro">These are drafts of the three emails from option E: welcome, low credits and "your credits are still here". They use the same dark look and sender as your gift and winner emails. Every price comes from today's price list. Each email shows one example customer; real emails fill in that person's own numbers. Your choices are at the bottom, including option D.</p>
+
+<!-- ============ EMAIL 1 ============ -->
+<h2>1. Welcome: your first clip in three steps</h2>
+<div class="pair">
+  <dl class="facts box">
+    <dt>Who gets it</dt><dd>Someone who has just paid for the first time: the $8 intro offer or a first plan.</dd>
+    <dt>When</dt><dd>A few minutes after the payment goes through. Once per person, ever.</dd>
+    <dt>What it does</dt><dd>Walks them to a first picture and a first clip, the two steps where a new customer either gets hooked or drifts away.</dd>
+    <dt>Example shown</dt><dd>The $8 intro offer: 1,100 credits.</dd>
+    <dt>Studio and Max</dt><dd>Also get a course card: "Start the AI Filmmaking course".</dd>
+    <dt>Numbers used</dt><dd>Seedream 4.5 picture: 10 credits. The "🎬 Animate this" button picks Kling 2.5 Turbo Pro: 88 credits for 5 seconds (help page "Make it move"). 1,100 ÷ 98 = about 11 clips, each with its starting picture. Veo 3.1 Lite: 6 seconds with sound, 75 credits.</dd>
+  </dl>
+  <div class="inbox">
+    <div class="inbox-head"><b>Welcome to Solorender: your first clip in three steps</b><br>Solorender &lt;support@solorender.com&gt;</div>
+    <div class="mail">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:#141414;border:1px solid #262626;border-radius:16px;color:#ffffff">
+<tr><td class="pad" style="padding:28px 28px 18px"><img src="https://solorender.com/email/solorender-badge.png" width="160" height="42" alt="Solorender" style="display:block;border:0"></td></tr>
+<tr><td class="pad" style="padding:0 28px"><img src="https://solorender.com/email/gift/hero.jpg" width="504" alt="A golden retriever in a yellow raincoat holds a lantern by a lighthouse in a storm" style="display:block;width:100%;height:auto;border:0;border-radius:12px"></td></tr>
+<tr><td class="pad" style="padding:0 28px">
+<p style="margin:22px 0 4px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#f7931a">Welcome to Solorender</p>
+<h1 style="margin:0 0 14px;font-size:28px;line-height:1.2;font-weight:800;color:#ffffff">Your first clip is three steps away</h1>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 18px"><tr><td style="padding:14px 18px;border:1px solid #f7931a;border-radius:12px;background:#1f1407"><span style="font-size:32px;font-weight:800;color:#f7931a">1,100</span> <span style="font-size:15px;color:#ffffff">credits in your balance &middot; enough for about 11 pictures turned into clips &middot; they never expire</span></td></tr></table>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 6px">
+<tr><td valign="top" style="padding:6px 12px 10px 0;font-size:22px;font-weight:800;color:#6ee05a">1</td><td style="padding:6px 0 10px;font-size:16px;line-height:1.5;color:#ffffff"><b>Make a picture.</b> Describe a scene in one sentence. Seedream 4.5 draws it for 10 credits.</td></tr>
+<tr><td valign="top" style="padding:6px 12px 10px 0;font-size:22px;font-weight:800;color:#6ee05a">2</td><td style="padding:6px 0 10px;font-size:16px;line-height:1.5;color:#ffffff"><b>Bring it to life.</b> Under your picture, click &ldquo;🎬 Animate this&rdquo; and press Generate: a 5-second clip for 88 credits. Want sound too? Pick Veo 3.1 Lite in the model list: 6 seconds with sound for 75.</td></tr>
+<tr><td valign="top" style="padding:6px 12px 10px 0;font-size:22px;font-weight:800;color:#6ee05a">3</td><td style="padding:6px 0 10px;font-size:16px;line-height:1.5;color:#ffffff"><b>Or skip the blank page.</b> A Recipe turns one photo and a line of text into a finished product ad, short film or talking video.</td></tr>
+</table>
+<p style="margin:10px 0 22px"><span style="display:inline-block;background:#6ee05a;color:#0a0a0a;padding:13px 22px;border-radius:10px;font-size:16px;font-weight:800">Make your first picture</span></p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+<td class="col" width="50%" valign="top" style="padding:0 8px 16px 0"><div style="border:1px solid #4d4d4d;border-radius:12px;overflow:hidden;background:#1c1c1c"><img src="https://solorender.com/email/gift/recipes.jpg" width="232" alt="" style="display:block;width:100%;height:auto;border-bottom:1px solid #4d4d4d"><div style="padding:12px 14px 14px"><div style="font-size:16px;font-weight:800">Recipes <span style="color:#6ee05a">&rarr;</span></div><div style="margin-top:4px;font-size:14px;line-height:1.5">One-click flows from a photo and a line of text.</div></div></div></td>
+<td class="col" width="50%" valign="top" style="padding:0 0 16px 8px"><div style="border:1px solid #4d4d4d;border-radius:12px;overflow:hidden;background:#1c1c1c"><img src="https://solorender.com/email/gift/learn.jpg" width="232" alt="" style="display:block;width:100%;height:auto;border-bottom:1px solid #4d4d4d"><div style="padding:12px 14px 14px"><div style="font-size:16px;font-weight:800">How to prompt <span style="color:#6ee05a">&rarr;</span></div><div style="margin-top:4px;font-size:14px;line-height:1.5">What to write so the picture comes out the way you see it.</div></div></div></td>
+</tr></table>
+</td></tr>
+<tr><td class="pad" style="padding:18px 28px 26px;border-top:1px solid #262626;font-size:14px;line-height:1.6;color:#ffffff">Stuck? Just reply to this email, a real person reads it.<br>solorender.com &middot; <u>Email settings</u></td></tr>
+</table>
+    </div>
+  </div>
+</div>
+
+<!-- ============ EMAIL 2 ============ -->
+<h2>2. Low credits: a heads-up before a run fails</h2>
+<div class="pair">
+  <dl class="facts box">
+    <dt>Who gets it</dt><dd>Anyone whose balance drops below their warning level after a run.</dd>
+    <dt>When</dt><dd>Right after the run that crossed the line. At most once a month per person, so heavy users aren't nagged.</dd>
+    <dt>What it does</dt><dd>Says how far their balance still goes and when their plan's next credits arrive. Then it offers the pack at their own plan's rate.</dd>
+    <dt>Example shown</dt><dd>A Studio monthly customer down to 380 credits.</dd>
+    <dt>Numbers used</dt><dd>380 ÷ 75 = 5 Veo 3.1 Lite clips. A $25 pack on Studio monthly = 2,750 credits (the same rule checkout uses). Studio's monthly 4,450 credits.</dd>
+    <dt>Pack by plan, $25</dt><dd>Solo 2,500 (yearly 2,900) · Studio 2,750 (yearly 3,250) · Max 2,950 (yearly 3,450).</dd>
+  </dl>
+  <div class="inbox">
+    <div class="inbox-head"><b>You're down to 380 Solorender credits</b><br>Solorender &lt;support@solorender.com&gt;</div>
+    <div class="mail">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:#141414;border:1px solid #262626;border-radius:16px;color:#ffffff">
+<tr><td class="pad" style="padding:28px 28px 18px"><img src="https://solorender.com/email/solorender-badge.png" width="160" height="42" alt="Solorender" style="display:block;border:0"></td></tr>
+<tr><td class="pad" style="padding:0 28px">
+<p style="margin:4px 0 4px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#f7931a">Low credits</p>
+<h1 style="margin:0 0 12px;font-size:28px;line-height:1.2;font-weight:800;color:#ffffff">You&rsquo;re down to 380 credits</h1>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#ffffff">That&rsquo;s about 5 more six-second clips with sound. Your next 4,450 Studio credits arrive on November 14.</p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 18px"><tr><td style="padding:14px 18px;border:1px solid #6ee05a;border-radius:12px;background:#16200f"><span style="font-size:26px;font-weight:800;color:#6ee05a">+2,750</span> <span style="font-size:15px;color:#ffffff">credits for $25 at your Studio rate &middot; they never expire</span></td></tr></table>
+<p style="margin:0 0 14px"><span style="display:inline-block;background:#6ee05a;color:#0a0a0a;padding:13px 22px;border-radius:10px;font-size:16px;font-weight:800">Top up $25</span></p>
+<p style="margin:0 0 26px;font-size:16px;line-height:1.6;color:#ffffff">In the middle of a project? <u>Turn on automatic refill</u> and a $25 pack is added whenever you run low. You can switch it off anytime.</p>
+</td></tr>
+<tr><td class="pad" style="padding:18px 28px 26px;border-top:1px solid #262626;font-size:14px;line-height:1.6;color:#ffffff">Questions? Just reply to this email.<br>solorender.com &middot; <u>Email settings</u></td></tr>
+</table>
+    </div>
+  </div>
+</div>
+<p class="note box">The "Turn on automatic refill" line appears only if you approve option D below. Without it, the email ends at the Top up button.</p>
+
+<!-- ============ EMAIL 3 ============ -->
+<h2>3. "Your credits are still here": 30 and 60 days after leaving</h2>
+<div class="pair">
+  <dl class="facts box">
+    <dt>Who gets it</dt><dd>Someone whose plan has ended, not just someone who clicked cancel. Their plan keeps running to the end of the paid month.</dd>
+    <dt>When</dt><dd>30 days after the plan ends. A shorter reminder at 60 days. Then nothing more. If they come back, both stop.</dd>
+    <dt>What it does</dt><dd>Uses your edge: rivals take credits away when people leave, Solorender doesn't. It shows their real balance and that they can spend it today without a plan.</dd>
+    <dt>Example shown</dt><dd>A former Studio customer with 1,240 credits left.</dd>
+    <dt>Fact checked</dt><dd>Without a plan, the site lets a customer spend their credits one creation at a time (the Studio's run rules, read today).</dd>
+    <dt>Legal</dt><dd>This one is a sales email, so US law requires an unsubscribe link and your postal address. Details below.</dd>
+  </dl>
+  <div class="inbox">
+    <div class="inbox-head"><b>Your 1,240 Solorender credits are still here</b><br>Solorender &lt;support@solorender.com&gt;</div>
+    <div class="mail">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:#141414;border:1px solid #262626;border-radius:16px;color:#ffffff">
+<tr><td class="pad" style="padding:28px 28px 18px"><img src="https://solorender.com/email/solorender-badge.png" width="160" height="42" alt="Solorender" style="display:block;border:0"></td></tr>
+<tr><td class="pad" style="padding:0 28px"><img src="https://solorender.com/course/agnes-finish.jpg" width="504" alt="A grandmother races a wooden soapbox cart down a cobbled street" style="display:block;width:100%;height:auto;border:0;border-radius:12px"></td></tr>
+<tr><td class="pad" style="padding:0 28px">
+<p style="margin:22px 0 4px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#f7931a">Still yours</p>
+<h1 style="margin:0 0 12px;font-size:28px;line-height:1.2;font-weight:800;color:#ffffff">Your 1,240 credits are waiting</h1>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#ffffff">Your Studio plan ended on September 30, but every credit you paid for is still in your account. They never expire, and you can use them today. No plan needed.</p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 18px"><tr><td style="padding:14px 18px;border:1px solid #f7931a;border-radius:12px;background:#1f1407"><span style="font-size:32px;font-weight:800;color:#f7931a">1,240</span> <span style="font-size:15px;color:#ffffff">credits &middot; about 16 clips with sound</span></td></tr></table>
+<p style="margin:0 0 22px"><span style="display:inline-block;background:#6ee05a;color:#0a0a0a;padding:13px 22px;border-radius:10px;font-size:16px;font-weight:800">Use my credits</span></p>
+<p style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#6ee05a">Want the full studio back?</p>
+<p style="margin:0 0 26px;font-size:16px;line-height:1.6;color:#ffffff">Studio yearly is $408 with 53,400 credits up front, the whole year on day one. You get the film course, 4 creations at once and the Prompt Library back too. <u>See plans</u></p>
+</td></tr>
+<tr><td class="pad" style="padding:18px 28px 26px;border-top:1px solid #262626;font-size:13px;line-height:1.6;color:#ffffff">You&rsquo;re getting this because you had a Solorender plan. <u>Unsubscribe from these emails</u>.<br>Solorender &middot; [your postal address goes here]</td></tr>
+</table>
+    </div>
+  </div>
+</div>
+<p class="note box"><b>The 60-day reminder</b> is the same email, shorter. Subject: "Still here: your 1,240 Solorender credits". It has the balance box and the "Use my credits" button only. <b>Anyone with no credits left</b> gets the same email without the balance box. It leads with what's new on the site and the plans link instead.</p>
+
+<!-- ============ D ============ -->
+<h2>Option D: low-balance warning on the site, and automatic refill</h2>
+<div class="box">
+<p style="margin-top:0"><b>The warning on the site.</b> A thin bar in the Studio when the balance is below the warning level: "380 credits left · about 5 clips · Top up". It costs nothing to run. It matches email 2, so the customer sees the same warning in both places.</p>
+<p><b>Automatic refill.</b> An off-by-default switch on Credits &amp; billing: "Add a $25 pack whenever I drop below my warning level." When it fires, Stripe charges the card on file without the customer present.</p>
+<ul>
+<li><b>New for Solorender:</b> the site has never charged a card without the customer clicking. Today, every pack is bought by hand at checkout.</li>
+<li><b>Money:</b> each $25 Studio pack leaves you $12.97 after the AI cost and Stripe's fee (retention page, 10-29). No published data says how many people turn it on.</li>
+<li><b>Care needed:</b> the customer ticks a clear "yes, charge my card automatically" box. Every refill sends a receipt email. A monthly limit stops runaway charges. Some cards, mostly in Europe, ask the bank to confirm a charge, and an automatic charge can't answer that. Those refills fail, and the customer gets an "approve this top-up" email instead.</li>
+</ul>
+</div>
+
+<!-- ============ CHOICES ============ -->
+<h2>Your choices</h2>
+<div class="box">
+<table class="choices">
+<thead><tr><th>Question</th><th>My pick</th><th>Other option</th></tr></thead>
+<tbody>
+<tr><td>Who gets the welcome email?</td><td><span class="pick">First payment only.</span> They have credits, so the three steps work.</td><td>Every new sign-up too. Sign-ups get 0 credits, so theirs would be a sales email for the $8 offer. That needs the unsubscribe link and address.</td></tr>
+<tr><td>A second welcome nudge on day 3 if they've made nothing yet?</td><td><span class="pick">Yes.</span> One short "your 1,100 credits are waiting for a first picture".</td><td>Welcome only, nothing after.</td></tr>
+<tr><td>Warning level for low credits (email 2 and the site bar)</td><td><span class="pick">10% of the plan's monthly credits</span> (Solo 200, Studio 445, Max 945). 150 credits without a plan, which is 2 clips with sound.</td><td>One fixed number for everyone.</td></tr>
+<tr><td>Win-back timing</td><td><span class="pick">30 and 60 days</span> after the plan ends, then stop.</td><td>30 days only.</td></tr>
+<tr><td>A discount in the win-back email?</td><td><span class="pick">No.</span> You chose "not yet" for discounts (option F). The kept credits are the reason to come back.</td><td>A one-time offer, for example a cheaper first month back.</td></tr>
+<tr><td>Postal address for the win-back email</td><td colspan="2">Required by law in sales emails. A registered USPS P.O. box is allowed. <b>Only you know this. Which address should it show?</b></td></tr>
+<tr><td>Automatic refill (D)</td><td><span class="pick">Yes, $25 pack, at most 2 refills a month ($50)</span>, off unless the customer turns it on.</td><td>Build only the warning bar now, and refill later.</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>The law, in short</h2>
+<div class="box note">
+<p style="margin-top:0">I read the US Federal Trade Commission's CAN-SPAM guide for businesses on October 30.</p>
+<ul>
+<li>A sales email must explain how to opt out and must include "your valid physical postal address". A P.O. box counts if it's registered with the Postal Service.</li>
+<li>Opt-outs must be honored within 10 business days.</li>
+<li>The fine can be up to $53,088 per email.</li>
+<li>Emails about an account the customer already has are exempt from most rules. The guide warns not to assume every email to a customer qualifies. It doesn't mention welcome or low-balance emails by name.</li>
+<li><b>So I'd treat all three the safe way:</b> each one gets an "Email settings" link where the customer can turn it off, and the win-back email also gets your address.</li>
+</ul>
+<p>Source: ftc.gov, "CAN-SPAM Act: A Compliance Guide for Business". Prices are from Solorender's price list, read October 30: Seedream 4.5 = 10, Veo 3.1 Lite 6 s = 75. Pack credits come from the rule checkout uses (<code>packCredits</code>). The $12.97 figure is from the retention page of October 29. Today the site has no email on/off setting, so building these includes one.</p>
+</div>
+
+</div>
+</body>
+</html>

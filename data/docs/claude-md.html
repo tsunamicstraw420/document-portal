@@ -87,6 +87,14 @@
 <li><strong>A price Eddie calls absurd is not a budget.</strong> Never quote it back as a limit (&quot;under your $30&quot;).</li>
 </ul>
 <p>Keep his exact meaning when writing his words into a rule. [10-22]</p>
+<ul>
+<li><strong>Deploys cost money: solorender ships twice a day (1 pm + 9 pm), never per change.</strong> Commit + push,</li>
+</ul>
+<p>test on localhost; the <code>solorender-ship</code> task deploys. Emergencies only: <code>npm run deploy:now -- &quot;reason&quot;</code>. 45 one-change deploys on 10-27 cost ~$30 in Vercel builds. Watch for free habits that start costing money after a plan change (Vercel Hobby → Pro on 10-16). [10-27]</p>
+<ul>
+<li><strong>Never put video/audio in solorender&#x27;s <code>public/</code>; it goes on media.solorender.com (R2).</strong> 241 MB of</li>
+</ul>
+<p>clips in public/ stretched every build&#x27;s copy step 24 s → 10 min, so Vercel auto-moved builds to its 30-core machine (10-23) and billed idle copying ×30. Keep build machine pinned <code>standard</code>/<code>fixed</code>. [10-28]</p>
 <h3>B. Look at every result before Eddie sees it (he is not the QA)</h3>
 <ul>
 <li><strong>A test passes only after I have LOOKED at every output</strong>: a frame strip (start, middle, end)</li>
@@ -121,6 +129,10 @@
 <li>Anything the model drew that wasn&#x27;t in the start picture (a door, a prop, a person): check its</li>
 </ul>
 <p>kind, size and direction against the script. If a crop removed a prop the action needs, make a new start picture that shows it. [10-22]</p>
+<ul>
+<li>Shape: every test picture and clip is 16:9 unless Eddie asks otherwise. Check a picture&#x27;s pixel</li>
+</ul>
+<p>size before making a clip from it; a square picture makes a square clip. [10-27]</p>
 <ul>
 <li>Cuts: trim every shot to an exact frame count, confirm real cut times with scene detection</li>
 </ul>
@@ -172,6 +184,10 @@
 </ul>
 <p>(image sizes, columns, counts). Customer-facing pages are checked at desktop AND phone width. A change to a shared frame (header, footer, wrapper) is checked on a short page, a long scrolling page and an app page, by measuring where content ends against the footer. [10-12, 10-14, 10-22]</p>
 <ul>
+<li>**Every table gets fixed column widths (<code>table-layout: fixed</code> + <code>&lt;col&gt;</code> widths) with the main text column</li>
+</ul>
+<p>taking the leftover space, and no <code>nowrap</code> on name/sender columns.** Measure lines per row at 1280, 1024 and 375 px before sending; any row over 5 lines on desktop = switch to cards at that width. Morning Mail&#x27;s From column grew to the longest sender and squeezed Subject to 13-line rows; Eddie: &quot;Stop designing like an amateur.&quot; [10-31]</p>
+<ul>
 <li><strong>Every sentence of explanation needs its own check</strong>, not just the headline finding. If I</li>
 </ul>
 <p>haven&#x27;t checked the cause, say &quot;I checked X; I haven&#x27;t checked why&quot;. [10-18]</p>
@@ -208,6 +224,10 @@
 </ul>
 <p>for the top sellers beside each competitor&#x27;s retail price for the SAME unit, in dollars. If we come out dearer, say so up front and name the real edge, if any. [10-12]</p>
 <ul>
+<li><strong>&quot;Find out everything about a company&quot; starts with a full page list.</strong> Pull its sitemap plus</li>
+</ul>
+<p>docs/app/API subdomains, list every unique page, and mark each one read or skipped (with the reason). Then check npm/PyPI/app-store/company-register listings for the people behind it. On Sunra, topic searches missed its whole developer API (/api), which Eddie had to point out. [10-28]</p>
+<ul>
 <li><strong>Research means depth.</strong> Competitor research reads each competitor&#x27;s own catalog, not its</li>
 </ul>
 <p>revenue; report how many were covered in depth vs. only mentioned, and meet the scale Eddie names. Supplier research is a full MATRIX: every model × every source (maker, resellers, marketplaces, partners, credits, self-hosting), gaps written down as &quot;not carried&quot;, and blocked routes get their legal workaround checked in the same pass. [10-10, 10-12]</p>
@@ -228,9 +248,33 @@
 </ul>
 <p>Told him &quot;Render Manual Scaling → type 0&quot;; Render&#x27;s minimum is 1 (&quot;it won&#x27;t let me&quot;). The real way was Settings → Suspend. Look at the screen or the provider&#x27;s docs first. [10-25]</p>
 <ul>
+<li><strong>A message counts as delivered only when the provider says ok or Eddie confirms.</strong> Told him &quot;you</li>
+</ul>
+<p>should have three Telegram alerts&quot; from solorender&#x27;s watch_alerts rows, which were written BEFORE a send that ignored Telegram&#x27;s reply; none arrived. alerts.ts now records only on Telegram&#x27;s ok. [10-27]</p>
+<ul>
 <li><strong>Never assume a guardrail runs because it&#x27;s configured.</strong> Check where it executes (project hooks</li>
 </ul>
 <p>never fire in Cowork). [08-07]</p>
+<ul>
+<li><strong>&quot;What&#x27;s slowing the Mac&quot; needs a sustained sample, not one snapshot.</strong> Run <code>top -l 3 -s 4</code> and</li>
+</ul>
+<p>name only processes that stay high in every sample. One <code>ps</code> snapshot wrongly blamed NordVPN. [10-27]</p>
+<ul>
+<li><strong>Never state how long something will take unless I measured it.</strong> Said a deploy &quot;takes about 10</li>
+</ul>
+<p>minutes&quot; with no measurement. Quote the log&#x27;s own start/now times, or say &quot;I don&#x27;t know yet&quot;. [10-27]</p>
+<ul>
+<li><strong>A cost spike&#x27;s &quot;cause&quot; is proven only by removing it and re-measuring.</strong> Called Portland &quot;the real</li>
+</ul>
+<p>cause&quot; of the Vercel bill from a pattern; the cause was 241 MB of video in public/ (it also set off Vercel&#x27;s auto Turbo). One test build after removing it: 14 s copy, $0.03. Lead with the bill&#x27;s own numbers. [10-28]</p>
+<ul>
+<li><strong>Never guess a number — every figure is backed by data.</strong> Put &quot;$10,000 to test our own servers&quot; into</li>
+</ul>
+<p>solorender&#x27;s investor letter when my own research said $750–3,000; Eddie: &quot;Do not guess anything and back everything up with data.&quot; Build budgets bottom-up from sourced unit costs, name the source of each figure, and ASK for numbers only Eddie knows (his living costs, his runway). [10-28]</p>
+<ul>
+<li><strong>Never build a forecast on one source, and never pass on a helper&#x27;s figure unread.</strong> solorender&#x27;s investor</li>
+</ul>
+<p>letter modelled churn on RevenueCat alone and quoted renewal rates (65–77%, 73–82%) a helper reported but RevenueCat&#x27;s text doesn&#x27;t contain; conversion came from free-trial data that didn&#x27;t match the pay-first funnel. Eddie: &quot;do not use a lone source.&quot; Every outside figure gets 2+ independent sources (or is labelled as one dataset), is re-read on its own page before it ships, and must match our situation (web vs mobile, trial vs pay-first). Show low/middle/high where sources disagree. [10-28] The same goes for answers in chat: before answering a benchmark question (&quot;is my pay too high?&quot;), read 3+ sources on their own pages and say which pages were blocked. Eddie 10-29: &quot;check more. never rely on one source&quot;. [10-29]</p>
 <h3>D. Copy the working example, never improvise</h3>
 <ul>
 <li>**Before building any media step (captions, encoding, stitching, thumbnails, audio), grep the</li>
@@ -274,6 +318,14 @@
 <p>solorender tool** in a step → tool table checked in the code. No equivalent = &quot;no solorender tool yet&quot; on the gap list. Never a reason to drop the source; never show the outside brand. [10-23]</p>
 <h3>E. Creative quality: ideas first, never bland</h3>
 <ul>
+<li><strong>Load <code>visual-prompting</code> BEFORE the first paid picture, every time, incl. built-in style pictures.</strong> Write the</li>
+</ul>
+<p>look as one plain-language scene (subject → setting → light → style), describe only what SHOULD be there. &quot;no tray&quot; drew trays, &quot;hanging&quot; drew strings, &quot;VIP&quot; got printed as text. [10-27: &quot;You gotta prompt them correctly&quot;]</p>
+<ul>
+<li><strong>NEVER BE BLAND, emails included.</strong> Every customer email gets a concept and a bold hero picture picked for</li>
+</ul>
+<p>that concept from our own images (contact sheet first), never a reused page header or a text-only body. Draft emails 10-30: Eddie rejected a reused course header and a &quot;pure text&quot; low-credit email. [10-30] Every email also gets a pack of 4–6 picture cards (real pages, checked live) right under the green button: &quot;90% of them stop right after the green action button&quot;. Copy <code>cardPack()</code> in solorender&#x27;s <code>lib/email.ts</code>. [10-30]</p>
+<ul>
 <li><strong>The IDEA is judged first.</strong> Every sample, demo or test picture starts from a concept with a</li>
 </ul>
 <p>hook (humour, surprise, impossible scale, a story moment, real emotion). Read the idea list back and cut anything that could be a stock photo. Light and style can&#x27;t rescue a dull idea. [10-21]</p>
@@ -297,6 +349,10 @@
 <li><strong>Anything customers read (help, docs, guides) is product design</strong>: a real screenshot for every</li>
 </ul>
 <p>how-to step, a short video for multi-step processes, structured layouts for reference lists, body text ≥16px with comfortable line height. [10-12]</p>
+<ul>
+<li><strong>A public list page is picture cards (copy /learn, /styles), never a text-only table.</strong> Every card gets a</li>
+</ul>
+<p>real, vetted result; search and sort sit on top of the cards. Built /models as a table; Eddie: &quot;is all text&quot;. [10-27]</p>
 <h3>F. Working with Eddie</h3>
 <ul>
 <li><strong>Anything Eddie reads is a designed HTML page, never a <code>.md</code> file.</strong> Markdown is only for</li>

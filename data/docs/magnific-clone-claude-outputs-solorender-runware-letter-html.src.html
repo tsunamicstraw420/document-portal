@@ -1,0 +1,103 @@
+<title>Runware Tier Letter</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one narrow column; a short "before you send" list, then the email itself on a paper-like sheet with copy buttons. */
+:root{
+  --bg:#121417; --panel:#1b1e23; --sheet:#20242a; --line:#30353d;
+  --fg:#f3f4f6; --muted:#aab0b9; --accent:#f7931a; --ok:#57c785;
+  --display:"Archivo",system-ui,sans-serif; --body:"Source Serif 4",Georgia,serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+body{background:var(--bg);color:var(--fg);font-family:var(--display);font-size:15px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 56px}
+.wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+h1{font-size:26px;font-weight:800;line-height:1.15;margin:4px 0 6px;text-wrap:balance}
+@media (min-width:640px){h1{font-size:32px}}
+.intro{color:var(--muted);margin:0;max-width:62ch}
+.check{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.check h2{font-size:15px;margin:0 0 8px}
+.check ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;color:var(--fg)}
+.meta{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px}
+.meta dt{color:var(--muted)} .meta dd{margin:0;min-width:0}
+.sheet{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:22px clamp(16px,4vw,32px);font-family:var(--body);font-size:16.5px;line-height:1.65}
+.sheet h3{font-family:var(--display);font-size:15px;font-weight:700;margin:20px 0 4px}
+.sheet p{margin:0 0 12px;max-width:65ch}
+.sheet ul{margin:0 0 12px;padding-left:20px}
+.sheet li{margin-bottom:6px}
+.blank{color:var(--bg);background:var(--accent);border-radius:4px;padding:0 5px;font-family:var(--display);font-size:14px;font-weight:700}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+button{font:700 14px var(--display);background:var(--accent);color:#1a1205;border:0;border-radius:8px;padding:9px 14px;cursor:pointer}
+button.ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
+button:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.done{color:var(--ok);font-size:14px}
+.src{font-size:13px;color:var(--muted)}
+.src a{color:var(--muted)}
+code{font-family:var(--mono);font-size:13px}
+</style>
+
+<div class="wrap">
+  <div>
+    <div class="eyebrow">Draft · not sent</div>
+    <h1>Runware: which tier fits us?</h1>
+    <p class="intro">A reply to Brandon Neustadter at Runware. It asks whether a SAFE raise puts Solorender in the bigger Scale tier, and whether there's a step between the two deposit sizes. Send it yourself from eddie@solorender.com.</p>
+  </div>
+
+  <section class="check">
+    <h2>Before you send</h2>
+    <ul>
+      <li><strong>Send it as a reply in Brandon's thread from 16 October</strong>, in the eddie@solorender.com mailbox. I can't reach that mailbox; my Gmail connector is a different account.</li>
+      <li><strong>Fill in the orange blank</strong> with call times, or delete that line.</li>
+      <li><strong>Check you're happy naming the $200,000 raise.</strong> Runware's tiers depend on funding stage, so the letter says it. The SAFE cap isn't mentioned.</li>
+    </ul>
+  </section>
+
+  <dl class="meta">
+    <dt>To</dt><dd>Brandon Neustadter, Enterprise Lead, Runware (reply in his thread)</dd>
+    <dt>Subject</dt><dd id="subj">Re: Runware for Solorender: Which Startup Program tier fits us?</dd>
+  </dl>
+
+  <div class="row">
+    <button id="copyBody" type="button">Copy email text</button>
+    <button id="copySubj" class="ghost" type="button">Copy subject</button>
+    <span id="msg" class="done" role="status"></span>
+  </div>
+
+  <article class="sheet" id="letter">
+    <p>Hi Brandon,</p>
+    <p>Thanks again for confirming in writing that our customers can generate through Runware. Before I apply to the Startup Program I have two questions, and I owe you answers to yours.</p>
+
+    <h3>Where Solorender is today</h3>
+    <p>Solorender (solorender.com) is an AI image, video and voice studio. The site is live and in final testing, and our affiliate program rolls out shortly. Runware already runs 33 of our model options, including the Seedance family, Kling 2.5 Turbo Pro and Standard, Grok Video 1.5 Lite, OmniHuman, Topaz Video Upscale, PixVerse V5, FLUX, Seedream and Qwen.</p>
+    <p>We're raising $200,000 on a SAFE now, and we plan to put the Runware deposit down as soon as that money arrives.</p>
+
+    <h3>1. Which tier fits us?</h3>
+    <p>Your Startup Program page puts Growth at bootstrapped and pre-seed teams, and Scale at seed to Series A companies with inference running in production. After a $200,000 SAFE, would you see us as pre-seed (Growth: $25,000 deposit, $35,000 to spend) or as seed (Scale: $50,000 deposit, $80,000 to spend)?</p>
+
+    <h3>2. Is there anything between the two?</h3>
+    <p>Your page says the more we deposit, the better the rate. Is there a step between $25,000 and $50,000, for example $35,000 with a bonus somewhere between 40% and 60%? And apart from the program, do you offer lower per-model prices on video (Kling, Seedance) once monthly spend passes a set level? If so, at what levels?</p>
+
+    <h3>Your earlier questions</h3>
+    <ul>
+      <li><strong>Volume per model:</strong> it's too early for real numbers. Our Runware use so far is our own testing, about $20 on video in October. I'll send real per-model figures once customers are on.</li>
+      <li><strong>Webhooks:</strong> we already use them. Video jobs go out async with a webhook URL, and we also check the result ourselves.</li>
+      <li><strong>A call:</strong> happy to. <span class="blank">[EDDIE: two or three times that suit you]</span></li>
+    </ul>
+
+    <p>Thanks,<br>Eddie Barna<br>Founder, Solorender<br>solorender.com</p>
+  </article>
+
+  <p class="src">Sources, checked 30 October 2026: Runware's <a href="https://runware.ai/startup-program">Startup Program page</a> and its FAQ (tiers, "Best fit" lines, no refunds on deposits, credits never expire); our video job records (81 Runware jobs, $20.01 in October); our model list (<code>runware-models.ts</code>, 33 entries); Brandon's 16 October reply (end-user generation allowed; asked about call times, volume per model and webhooks).</p>
+</div>
+
+<script>
+const msg=document.getElementById('msg');
+function copy(text,label){
+  const done=()=>{msg.textContent=label+' copied';setTimeout(()=>msg.textContent='',2500)};
+  navigator.clipboard?.writeText(text).then(done,()=>select()) ?? select();
+  function select(){const r=document.createRange();r.selectNodeContents(document.getElementById('letter'));const s=getSelection();s.removeAllRanges();s.addRange(r);msg.textContent='Selected — press Copy'}
+}
+document.getElementById('copyBody').addEventListener('click',()=>copy(document.getElementById('letter').innerText.trim(),'Email text'));
+document.getElementById('copySubj').addEventListener('click',()=>copy(document.getElementById('subj').textContent,'Subject'));
+</script>

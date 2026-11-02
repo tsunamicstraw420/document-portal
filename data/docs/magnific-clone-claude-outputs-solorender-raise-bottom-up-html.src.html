@@ -1,0 +1,329 @@
+<title>The Raise, Bottom-Up</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+/* Same look as the "Matching Rival Prices" report: one reading column, wide tables scroll inside their own frames, sticky contents strip. Always dark. */
+:root {
+  --bg: #0a0a0a;
+  --panel: #141414;
+  --panel-2: #1b1b1a;
+  --line: #2b2a27;
+  --ink: #ffffff;
+  --green: #6ee05a;
+  --orange: #f7931a;
+  --red: #ff6b5a;
+  --display: "Syne", "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+  --body: "Manrope", "Helvetica Neue", Arial, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 16px/1.6 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 28px 80px; display: grid; gap: 44px; }
+.col { max-width: 46rem; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: clamp(26px, 4vw, 32px); line-height: 1.15; }
+h2 { font-size: 22px; line-height: 1.25; display: flex; gap: 12px; align-items: baseline; }
+h2 .n { color: var(--green); font-size: 15px; font-weight: 700; }
+h3 { font-size: 17px; }
+p { margin: 0; }
+.stack { display: grid; gap: 14px; }
+.eyebrow { color: var(--green); font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+.intro { font-size: 15px; }
+a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--green); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, input:focus-visible, th:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+strong { font-weight: 700; }
+.or { color: var(--orange); }
+.gr { color: var(--green); }
+
+nav.toc { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); padding-block: 10px; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; }
+nav.toc a { text-decoration: none; font-weight: 600; }
+nav.toc a:hover { color: var(--green); }
+
+.minute { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 22px; display: grid; gap: 14px; }
+.minute ol { margin: 0; padding-left: 20px; display: grid; gap: 10px; }
+.big { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.big > div { border-top: 3px solid var(--orange); background: var(--panel-2); padding: 14px 16px; display: grid; gap: 4px; align-content: start; }
+.big .v { font-family: var(--display); font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.big .l { font-size: 14px; }
+
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
+th, td { padding: 9px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+th { background: var(--panel-2); font-weight: 700; font-size: 13px; white-space: nowrap; position: sticky; top: 0; }
+table.sortable th { cursor: pointer; user-select: none; }
+table.sortable th::after { content: " ↕"; color: var(--green); font-size: 11px; }
+table.sortable th[aria-sort="ascending"]::after { content: " ↑"; }
+table.sortable th[aria-sort="descending"]::after { content: " ↓"; }
+td.num, th.num { text-align: right; white-space: nowrap; }
+tr.tot td { background: #10140f; font-weight: 700; }
+tr.new td:first-child { border-left: 3px solid var(--orange); }
+.tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.tools input { background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; font: 14px var(--body); min-width: 0; width: 280px; max-width: 100%; }
+.tools label { font-size: 13px; font-weight: 600; }
+
+.chip { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--green); color: var(--green); white-space: nowrap; }
+.chip.one { border-color: var(--orange); color: var(--orange); }
+.chip.guess { border-color: var(--ink); color: var(--ink); }
+blockquote { margin: 0; border-left: 3px solid var(--green); padding: 2px 0 2px 12px; font-size: 14px; }
+.callout { border: 1px solid var(--orange); border-radius: 8px; padding: 16px 18px; display: grid; gap: 8px; background: #17110a; }
+.opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.opts > div { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.opts > div.pick { border-color: var(--green); }
+.opts .tag { font-size: 12px; font-weight: 700; color: var(--green); letter-spacing: 0.08em; text-transform: uppercase; }
+.opts .amt { font-family: var(--display); font-size: 22px; font-weight: 800; }
+ol.src { margin: 0; padding-left: 22px; display: grid; gap: 6px; font-size: 14px; }
+ul.plain { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 14px; }
+.small { font-size: 14px; }
+@media (max-width: 520px) { body { font-size: 15px; } .big .v { font-size: 22px; } }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<div class="wrap">
+  <header class="col stack">
+    <div class="eyebrow">Solorender · investor letter · built 30 October 2026</div>
+    <h1>How much should Solorender raise, counted from the bottom up?</h1>
+    <p class="intro">The letter asks for up to $150,000. That figure came first: on 29 September you picked "Small: under $150k" from a list of sizes, and the budget was fitted to it, with "growth money" taking whatever was left. This page does it the other way round. It prices every line on its own, adds the costs the letter doesn't have yet, sizes the growth money for a stated goal, then adds them up. <strong>Nothing in the letter has changed.</strong> It stays as it is until you pick an option below.</p>
+  </header>
+
+  <nav class="toc" aria-label="Contents">
+    <a href="#minute">In one minute</a>
+    <a href="#lines">1 · Every line, priced</a>
+    <a href="#reserve">2 · Sizing the growth money</a>
+    <a href="#buffer">3 · Buffer and runway</a>
+    <a href="#total">4 · What it adds up to</a>
+    <a href="#options">5 · Options</a>
+    <a href="#sources">Sources</a>
+  </nav>
+
+  <section id="minute" class="minute">
+    <div class="eyebrow">In one minute</div>
+    <div class="big">
+      <div><span class="v">$152,084</span><span class="l">the whole plan with every price at the top of its range, before any buffer</span></div>
+      <div><span class="v">$167,292</span><span class="l">the same plan with the 10% buffer that startup budgeting guides advise</span></div>
+      <div><span class="v">251</span><span class="l">Studio customers paying at once before sales cover your $5,000 a month (or 466 on Solo)</span></div>
+      <div><span class="v">18–24 months</span><span class="l">how long most investor guides say a seed raise should last. The letter funds 12 months of your pay.</span></div>
+    </div>
+    <ol>
+      <li><strong>The letter is missing about $6,600–$14,900 of real costs:</strong> a lawyer to check the SAFE, the state filing, bookkeeping, the company tax return and California's $800 minimum tax in year two.</li>
+      <li><strong>The growth money can now be sized for a goal</strong> instead of being the leftover. The goal: enough paying customers that sales cover your pay by month 12. On the letter's middle-case figures, with customers on the Studio plan (the course comes with every plan except Solo, and Studio is the smallest of those), that takes <strong>$15,931</strong> of cash at the worst point. If customers mostly buy Solo, it takes <strong>$67,361</strong>.</li>
+      <li><strong>$150,000 works if prices land low, but not at the top of every range.</strong> Low prices leave $29,641 spare. With every price high, it falls $2,084 short, with no buffer at all.</li>
+      <li><strong>My recommendation: $170,000.</strong> It covers every line at its highest price plus the Studio goal, and leaves $17,916 spare, more than a 10% buffer. At the letter's $5M cap, investors would own 3.4% instead of 3.0%. If you also want the 18 months most guides advise, it's $200,000 (section 5).</li>
+    </ol>
+  </section>
+
+  <!-- 1 -->
+  <section id="lines" class="stack">
+    <h2><span class="n">1</span>Every line, priced on its own</h2>
+    <div class="col stack">
+      <p>Lines with an <span class="or">orange edge</span> are new: the letter doesn't have them yet. Everything else is already in the letter (section 11) with its sources. "Low" and "High" are the two ends of the published prices. Where a <strong>count</strong> (10 segments, 20 free plans) is my plan choice rather than a published figure, the last column says so.</p>
+      <p class="small">Click any heading to sort. Type in the box to filter.</p>
+    </div>
+    <div class="tools">
+      <label for="q">Filter</label>
+      <input id="q" type="search" placeholder="e.g. legal, ads, new">
+    </div>
+    <div class="tbl">
+      <table class="sortable" id="lineTable">
+        <thead><tr><th>Line</th><th>What it buys</th><th class="num">Low $</th><th class="num">High $</th><th>Price source</th><th>Status</th></tr></thead>
+        <tbody>
+<tr><td>Lower prices</td><td>Runware deposit: $25,000 becomes $35,000 of credit (30% off), paid as soon as the raise comes in</td><td class="num">25,000</td><td class="num">25,000</td><td>Runware startup page (letter #1)</td><td>In letter</td></tr>
+<tr><td>Lower prices</td><td>Google half price for customers who wait; Kling 720p version</td><td class="num">0</td><td class="num">0</td><td>Google, fal price pages (letter #49)</td><td>In letter</td></tr>
+<tr><td>Creators</td><td>10 sponsored YouTube segments</td><td class="num">3,250</td><td class="num">8,670</td><td>Letter #17, #18</td><td>In letter; count is my plan choice</td></tr>
+<tr><td>Creators</td><td>10 sponsored how-to threads on X</td><td class="num">1,000</td><td class="num">12,000</td><td>Letter #48</td><td>In letter; count is my plan choice</td></tr>
+<tr><td>Creators</td><td>Free Studio plan for 20 creators for a year</td><td class="num">4,272</td><td class="num">4,272</td><td>Letter #3, #25</td><td>In letter; count is my plan choice</td></tr>
+<tr><td>Creators</td><td>Creator search tool, 6 months</td><td class="num">534</td><td class="num">534</td><td>Letter #27</td><td>In letter</td></tr>
+<tr><td>Creators</td><td>Affiliate tracking, a year</td><td class="num">348</td><td class="num">348</td><td>Letter #28</td><td>In letter</td></tr>
+<tr><td>Ads test</td><td>Meta, 200 sign-ups</td><td class="num">1,493</td><td class="num">3,947</td><td>Letter #6–#10</td><td>In letter</td></tr>
+<tr><td>Ads test</td><td>TikTok, 200 sign-ups</td><td class="num">732</td><td class="num">5,263</td><td>Letter #8</td><td>In letter</td></tr>
+<tr><td>Ads test</td><td>AI tool directories</td><td class="num">636</td><td class="num">636</td><td>Letter #15, #16</td><td>In letter</td></tr>
+<tr><td>Video editor</td><td>Remotion Editor Starter, one time</td><td class="num">600</td><td class="num">600</td><td>Letter #35</td><td>In letter</td></tr>
+<tr><td>Founder pay</td><td>$5,000 a month for 12 months</td><td class="num">60,000</td><td class="num">60,000</td><td>Your number (benchmarks: letter #46, #47)</td><td>In letter</td></tr>
+<tr class="new"><td>Legal</td><td>A startup lawyer checks the standard SAFE and the filings</td><td class="num">2,500</td><td class="num">7,000</td><td>Acevedo, Silicon Hills, LeanLaw [3–5]</td><td>New</td></tr>
+<tr class="new"><td>Legal</td><td>Securities notices: federal Form D is free; California charges $50 or $300 depending on the exemption used</td><td class="num">50</td><td class="num">300</td><td>SEC, California DFPI, state law [6–8]</td><td>New</td></tr>
+<tr class="new"><td>Accounting</td><td>Monthly bookkeeping for 12 months ($99 to $359 a month)</td><td class="num">1,188</td><td class="num">4,308</td><td>Pilot, SDO CPA price pages [13, 14]</td><td>New</td></tr>
+<tr class="new"><td>Accounting</td><td>Federal company tax return (starting prices; a California return is extra and wasn't priced on its own)</td><td class="num">2,000</td><td class="num">2,450</td><td>SDO CPA, Pilot [13, 14]</td><td>New</td></tr>
+<tr class="new"><td>California</td><td>$800 minimum tax in year two (year one is exempt) and the $25 yearly company statement</td><td class="num">825</td><td class="num">825</td><td>LAO, LegalZoom, Secretary of State, Zenind [9–12]</td><td>New</td></tr>
+<tr class="new"><td>Growth money</td><td>Sized for a goal: sales cover your pay by month 12, Studio customers, middle case (section 2)</td><td class="num">15,931</td><td class="num">15,931</td><td>Letter sections 5 and 7; my calculation</td><td>New size (replaces the leftover)</td></tr>
+<tr class="tot"><td>Subtotal</td><td>Everything above</td><td class="num">120,359</td><td class="num">152,084</td><td></td><td></td></tr>
+<tr class="tot"><td>With a 10% buffer</td><td>Subtotal × 1.10 (section 3)</td><td class="num">132,395</td><td class="num">167,292</td><td>Stripe, Eagle Rock CFO, Operations Optimist [15–17]</td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="small col">The California notice is $50 under the "limited offering" route (section 25102(f), for $100,001–$500,000) or a flat $300 under the Rule 506 route (section 25102.1(d)). Which route applies is a question for the lawyer. The letter itself never covered these costs: its running-costs section (7) counts only the website and AI, which sales pay for.</p>
+  </section>
+
+  <!-- 2 -->
+  <section id="reserve" class="stack">
+    <h2><span class="n">2</span>Sizing the growth money for a goal</h2>
+    <div class="col stack">
+      <p><strong>The goal:</strong> by month 12, enough customers paying at the same time that what they leave you covers your $5,000 a month plus the $62 of fixed services. After that, your pay comes from sales, which is what the letter's pay rule already promises.</p>
+      <p><strong>How many customers that is,</strong> from the letter's section 7 (what each customer leaves after AI, card and tech costs, every credit used):</p>
+      <ul class="plain">
+        <li>Studio leaves $20.21 a month → $5,062 ÷ $20.21 = <strong>251 customers</strong>.</li>
+        <li>Solo leaves $10.87 a month → $5,062 ÷ $10.87 = <strong>466 customers</strong>.</li>
+      </ul>
+      <p><strong>What winning them costs.</strong> Ads are the only channel with a published cost per paying customer: $57, $92 or $172 on Meta in the letter's best, middle and cautious cases. The letter's 6- and 12-month figures show how many stay. Customers are won evenly over 12 months. The money they pay along the way is counted back in. "Most cash needed at once" is the deepest the account goes, so it's the amount the growth money has to hold.</p>
+    </div>
+    <div class="tbl">
+      <table class="sortable" id="resTable">
+        <thead><tr><th>Plan</th><th>Case</th><th class="num">Win a month</th><th class="num">Won in the year</th><th class="num">Ad spend $</th><th class="num">Paid back in the year $</th><th class="num">Most cash needed at once $</th></tr></thead>
+        <tbody>
+<tr><td>Studio</td><td>Best</td><td class="num">40</td><td class="num">481</td><td class="num">27,437</td><td class="num">40,212</td><td class="num">2,438</td></tr>
+<tr><td>Studio</td><td>Middle</td><td class="num">54</td><td class="num">653</td><td class="num">60,048</td><td class="num">44,185</td><td class="num gr"><strong>15,931</strong></td></tr>
+<tr><td>Studio</td><td>Cautious</td><td class="num">70</td><td class="num">846</td><td class="num">145,460</td><td class="num">47,888</td><td class="num">97,572</td></tr>
+<tr><td>Solo</td><td>Best</td><td class="num">74</td><td class="num">894</td><td class="num">50,940</td><td class="num">40,154</td><td class="num">12,642</td></tr>
+<tr><td>Solo</td><td>Middle</td><td class="num">101</td><td class="num">1,212</td><td class="num">111,483</td><td class="num">44,122</td><td class="num">67,361</td></tr>
+<tr><td>Solo</td><td>Cautious</td><td class="num">131</td><td class="num">1,570</td><td class="num">270,057</td><td class="num">47,819</td><td class="num">222,238</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col stack">
+      <p><strong>Why I picked Studio, middle case.</strong> The course is your main way to win customers for at least the next 60 days, and it comes with every plan except Solo (Studio, Max and Super Max), so the customers it brings are on Studio or bigger. I sized for Studio, the smallest of those: a Max customer leaves $38.49 a month, so fewer would be needed. The middle case is the middle of the letter's published figures. In the cautious case, ads don't pay back, so the letter's own rule stops them, and no budget should be sized for that.</p>
+      <div class="callout">
+        <p><strong>What this sizing can't see, in both directions:</strong></p>
+        <ul class="plain">
+          <li><strong>Cheaper:</strong> affiliates cost nothing until a customer pays. Creators may win customers for less than ads. No published figure says by how much, so they aren't counted.</li>
+          <li><strong>Cheaper:</strong> yearly plans, now shown first on the site, collect 12 months up front. That lowers the cash needed. No published figure tells me how many customers will pick yearly, so it isn't counted.</li>
+          <li><strong>Dearer:</strong> an affiliate's 25% comes out of the first 12 months, so an affiliate customer leaves less (Studio $10.21 a month), and it takes more of them to cover your pay.</li>
+          <li><strong>My calculation:</strong> the letter gives how many customers stay at 6 and 12 months. I spread the losses evenly between those points, month by month. A real drop is usually steepest in month one.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section id="buffer" class="stack">
+    <h2><span class="n">3</span>Buffer and runway: what the guides say</h2>
+    <div class="col stack">
+      <p><strong>A buffer for surprises.</strong> Stripe's guide says set aside "5%–10% of your total budget." Two finance guides say 10–15%. 10% is where they overlap, so this page uses 10%.</p>
+      <p><strong>How long a raise should last.</strong> Most guides say 18 months or more. The letter pays you for 12 months. After that, your pay continues only if sales cover it.</p>
+    </div>
+    <div class="tbl">
+      <table class="sortable" id="normTable">
+        <thead><tr><th>Who</th><th>What they say</th><th>Date</th><th>Topic</th></tr></thead>
+        <tbody>
+<tr><td>Stripe [15]</td><td>"A general rule is to allocate 5%–10% of your total budget" as a contingency</td><td>Jan 2026</td><td>Buffer</td></tr>
+<tr><td>Eagle Rock CFO [16]</td><td>"Add 10-15% to your total for unexpected costs"; also "keep 2-3 months of expenses as a buffer"</td><td>2025</td><td>Buffer</td></tr>
+<tr><td>Operations Optimist [17]</td><td>"Add 10-15% buffer for unexpected expenses"</td><td>Mar 2025</td><td>Buffer</td></tr>
+<tr><td>NextView Ventures [18]</td><td>"Conventional VC wisdom says entrepreneurs should raise 18 months of runway"</td><td>Oct 2015</td><td>Runway</td></tr>
+<tr><td>Coding VC (Leo Polovets) [19]</td><td>"Eighteen months is a good default for most seed stage startups"</td><td>Jun 2014</td><td>Runway</td></tr>
+<tr><td>CRV [20]</td><td>For pre-seed and seed, "a target of 18 to 24 months"</td><td>Aug 2026</td><td>Runway</td></tr>
+<tr><td>TechCrunch [21]</td><td>Seed companies "should plan to have at least 12 to 18 months of runway"</td><td>Apr 2022</td><td>Runway</td></tr>
+<tr><td>SaaStr, using Carta data [22]</td><td>39% of companies that raised a seed round took 3+ years to raise the next round (Q3 2025)</td><td>2025</td><td>Runway</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="small col">Runway advice is written for companies that live on investor money until the next round. Your plan is different: sales are meant to cover your pay from month 12. So 18 months is a safety margin for if sales come slower, not a requirement of the plan.</p>
+  </section>
+
+  <!-- 4 -->
+  <section id="total" class="stack">
+    <h2><span class="n">4</span>What it adds up to</h2>
+    <div class="tbl">
+      <table class="sortable" id="sumTable">
+        <thead><tr><th>Version of the plan</th><th class="num">Prices low $</th><th class="num">Prices high $</th><th class="num">High, with 10% buffer $</th></tr></thead>
+        <tbody>
+<tr><td>Letter's lines only (no new costs, no growth money)</td><td class="num">97,865</td><td class="num">121,270</td><td class="num">133,397</td></tr>
+<tr><td>+ new costs (legal, accounting, California)</td><td class="num">104,428</td><td class="num">136,153</td><td class="num">149,768</td></tr>
+<tr><td><strong>+ growth money for Studio customers (recommended)</strong></td><td class="num">120,359</td><td class="num">152,084</td><td class="num">167,292</td></tr>
+<tr><td>+ growth money for Solo customers instead</td><td class="num">171,789</td><td class="num">203,514</td><td class="num">223,865</td></tr>
+<tr><td>Studio version + 6 more months of your pay (18 months)</td><td class="num">150,359</td><td class="num">182,084</td><td class="num">200,292</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="small col">Founder pay adds $30,000 for 6 more months at $5,000. Investor share = raise ÷ the letter's $5,000,000 cap.</p>
+  </section>
+
+  <!-- 5 -->
+  <section id="options" class="stack">
+    <h2><span class="n">5</span>Options</h2>
+    <div class="opts">
+      <div><span class="tag">A · Keep</span><span class="amt">$150,000</span><p class="small">Investors get 3.0%. It fits when prices land low ($29,641 spare). With every price high it is <strong>$2,084 short</strong>, with no buffer. The letter would name the new costs and the growth-money goal, and admit the squeeze.</p></div>
+      <div class="pick"><span class="tag">B · My recommendation</span><span class="amt">$170,000</span><p class="small">Investors get 3.4%. Covers every line at its high price, the new costs and the Studio goal, with <strong>$17,916 spare</strong> (more than a 10% buffer). With low prices, $49,641 is spare and goes to whichever channel sells. Founder pay stays 12 months.</p></div>
+      <div><span class="tag">C · Standard runway</span><span class="amt">$200,000</span><p class="small">Investors get 4.0%. B plus 6 more months of your pay ($30,000), matching the 18 months most guides advise. It's the safest choice if sales come slower than the plan.</p></div>
+      <div><span class="tag">D · Plan for Solo customers</span><span class="amt">about $224,000</span><p class="small">Investors get about 4.5%. Only needed if most customers buy the $20 plan. The course points them to Studio, so I don't recommend sizing for this now.</p></div>
+    </div>
+    <div class="col stack">
+      <p><strong>Why B and not C:</strong> B is the amount the plan itself needs, priced line by line. C buys time in case the plan runs slow. Both are defensible. B keeps more of the company, and C is what an investor following the 18-month rule would expect.</p>
+      <p><strong>What changes in the letter if you pick B or C:</strong> the raise amount everywhere it appears, the section 11 table, a new "Legal and accounting" line, growth money explained as a goal ("sales cover my pay by month 12") instead of a leftover, a buffer line, the key numbers panel, and 3.0% in the terms. The share copy is rebuilt the same way. If you pick A, only the new costs and the goal wording go in.</p>
+      <p class="small">Lawyer note, from the letter's earlier research: stating terms in a widely shared letter may count as "general solicitation" under Rule 506(b). The lawyer in the Legal line would check that too.</p>
+    </div>
+  </section>
+
+  <section id="sources" class="col stack">
+    <h2>Sources</h2>
+    <p class="small">All read on their own pages on 29–30 October 2026. Every outside figure has two or more sources, except the SEC's $0 fee (the SEC's own page) and the bookkeeping and tax prices (each is that firm's own price). Lines marked "letter #" use the investor letter's numbered sources, already checked there.</p>
+    <ol class="src">
+      <li>Investor letter, sections 5 (cost to win a customer, how many stay), 7 (what each plan leaves, $62 fixed services) and 11 (line items with their own sources).</li>
+      <li>Your size choice "Small: under $150k", 29 September 2026 (memory note on the investor letter).</li>
+      <li>Acevedo Venture Law, "A SAFE financing with minimal changes… typically costs $2,500–$5,000", June 2026: <a href="https://www.acevedoventurelaw.com/articles/how-much-does-startup-lawyer-cost/">acevedoventurelaw.com</a></li>
+      <li>Silicon Hills Lawyer, a SAFE round "at most a few thousand dollars in legal fees ($2.5K-$5K)", May 2023: <a href="https://siliconhillslawyer.com/2023/05/17/seed-round-costs-expenses/">siliconhillslawyer.com</a></li>
+      <li>LeanLaw, SAFE rounds "typically range from $3,000 to $7,000", January 2026: <a href="https://www.leanlaw.co/blog/a-guide-to-series-seed-fixed-fees-defining-the-scope-clearly-e-g-standard-nvca-docs-only/">leanlaw.co</a>. For context, Pilot: the average pre-seed round cost "just shy of $10k in legal fees" (all round types): <a href="https://pilot.com/insights/how-much-does-it-cost-to-raise-a-round">pilot.com</a></li>
+      <li>SEC, "The SEC does not charge any filing fee for a Form D notice or amendment": <a href="https://www.sec.gov/info/smallbus/secg/formdguide">sec.gov</a></li>
+      <li>California DFPI, securities FAQ: 25102(f) fee table ($100,001 to $500,000: $50) and the Rule 506 notice under 25102.1(d), "A filing fee of $300": <a href="https://dfpi.ca.gov/rules-enforcement/laws-and-regulations/law-and-regulations-corporate-securities-law/securities-frequently-asked-questions-and-answers/">dfpi.ca.gov</a></li>
+      <li>California Corporations Code 25608 ("fifty dollars ($50)" tier) and 25608.1 (25102.1(d) notice "three hundred dollars ($300)"): <a href="https://california.public.law/codes/ca_corp_code_section_25608">25608</a>, <a href="https://california.public.law/codes/ca_corp_code_section_25608.1">25608.1</a></li>
+      <li>Legislative Analyst's Office, new corporations "exempted from paying the $800 minimum franchise tax in their first year", March 2020: <a href="https://www.lao.ca.gov/Publications/Report/4207">lao.ca.gov</a></li>
+      <li>LegalZoom, "Newly incorporated corporations are not required to pay the minimum franchise tax in their first year", July 2024: <a href="https://legalzoom.com/articles/what-is-the-annual-california-franchise-tax">legalzoom.com</a></li>
+      <li>California Secretary of State, Statement of Information "$25 for California stock and foreign corporations": <a href="https://www.sos.ca.gov/business-programs/customer-alerts/misleading-statement-information-solicitations">sos.ca.gov</a></li>
+      <li>Zenind, "California stock corporations… $25": <a href="https://www.zenind.com/help/post/california-statement-of-information-filing-requirements-for-llcs-and-corporations">zenind.com</a></li>
+      <li>Pilot pricing: bookkeeping "Essentials $99/month"; tax "For C-Corps Starts at $2,450+ /year" (sold with Pilot bookkeeping): <a href="https://pilot.com/pricing">pilot.com/pricing</a></li>
+      <li>SDO CPA pricing: bookkeeping "starting at $399/month ($359/month billed annually)"; "Form 1120 (C-Corporation) Starting at $2,000", typical "$2,000–$4,000+": <a href="https://sdocpa.com/pricing">sdocpa.com/pricing</a></li>
+      <li>Stripe, startup budget guide, January 2026: <a href="https://stripe.com/en-mt/resources/more/how-to-create-a-business-budget-for-your-startup-a-guide">stripe.com</a></li>
+      <li>Eagle Rock CFO, first annual budget: <a href="https://www.eaglerockcfo.com/blog/startup-budgeting/first-annual-budget">eaglerockcfo.com</a></li>
+      <li>Operations Optimist, "The exact math behind your fundraise", March 2025: <a href="https://operationsoptimist.substack.com/p/the-exact-math-behind-your-fundraise">substack.com</a></li>
+      <li>NextView Ventures, October 2015: <a href="https://nextview.vc/blog/how-much-seed-capital-should-you-actually-raise/">nextview.vc</a></li>
+      <li>Coding VC, June 2014: <a href="https://www.codingvc.com/how-much-runway-should-you-raise/">codingvc.com</a></li>
+      <li>CRV, August 2026: <a href="https://www.crv.com/content/startup-runway">crv.com</a></li>
+      <li>TechCrunch, April 2022: <a href="https://techcrunch.com/2022/04/08/does-your-startup-have-enough-runway-5-factors-to-consider/amp/">techcrunch.com</a></li>
+      <li>SaaStr (Jason Lemkin), Carta data, Q3 2025: <a href="https://www.saastr.com/your-seed-round-now-needs-to-last-3-years-what-3365-startups-tell-us-about-the-new-series-a-timeline">saastr.com</a></li>
+    </ol>
+    <p class="small"><strong>Blocked or not used:</strong> California's tax board pages (ftb.ca.gov, three pages, all "403 forbidden"), so the $800 rule rests on the Legislative Analyst's Office and LegalZoom instead of the tax board itself. Also blocked: DFPI's Release 112-C (403; the same fee table is on the DFPI FAQ and in the statute), startupfundraising.com (403), contractscounsel.com (connection dropped), calcorporatelaw.com (security error), and two SEC and Secretary of State pages that no longer exist (404). Not priced: a separate California company tax return (no firm publishes one on its own), and Kruze bookkeeping ($650–$850 a month), left out because Kruze takes only funded Delaware companies.</p>
+  </section>
+</div>
+
+<script>
+(function () {
+  function cellVal(td) {
+    var t = (td.textContent || "").trim();
+    var n = parseFloat(t.replace(/[^0-9.\-]/g, ""));
+    return /^[\s$]*-?[0-9]/.test(t) && !isNaN(n) ? n : t.toLowerCase();
+  }
+  document.querySelectorAll("table.sortable").forEach(function (table) {
+    var ths = table.querySelectorAll("thead th");
+    ths.forEach(function (th, i) {
+      th.tabIndex = 0;
+      function sort() {
+        var dir = th.getAttribute("aria-sort") === "ascending" ? "descending" : "ascending";
+        ths.forEach(function (o) { o.removeAttribute("aria-sort"); });
+        th.setAttribute("aria-sort", dir);
+        var body = table.tBodies[0];
+        var rows = Array.prototype.slice.call(body.rows).filter(function (r) { return !r.classList.contains("tot"); });
+        var tots = Array.prototype.slice.call(body.rows).filter(function (r) { return r.classList.contains("tot"); });
+        rows.sort(function (a, b) {
+          var x = cellVal(a.cells[i]), y = cellVal(b.cells[i]);
+          var c = (typeof x === "number" && typeof y === "number") ? x - y : String(x).localeCompare(String(y));
+          return dir === "ascending" ? c : -c;
+        });
+        rows.concat(tots).forEach(function (r) { body.appendChild(r); });
+      }
+      th.addEventListener("click", sort);
+      th.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); sort(); } });
+    });
+  });
+  var q = document.getElementById("q");
+  q.addEventListener("input", function () {
+    var v = q.value.trim().toLowerCase();
+    document.querySelectorAll("#lineTable tbody tr").forEach(function (r) {
+      r.hidden = !r.classList.contains("tot") && v && r.textContent.toLowerCase().indexOf(v) < 0;
+    });
+  });
+})();
+</script>

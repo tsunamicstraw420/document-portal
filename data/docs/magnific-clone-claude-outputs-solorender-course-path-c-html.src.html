@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Course Path C Report</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Manrope:wght@400;600;700&display=swap">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --panel: #141712;
+    --line: #2a3126;
+    --ink: #ffffff;
+    --green: #6ee05a;
+    --orange: #f7931a;
+    --yellow: #ffd23f;
+    --display: "Syne", "Avenir Next", "Segoe UI", sans-serif;
+    --body: "Manrope", "Helvetica Neue", Arial, sans-serif;
+    color-scheme: dark;
+  }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.6 var(--body); }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 40px 16px 64px; display: grid; gap: 44px; }
+  h1 { font: 800 32px/1.15 var(--display); margin: 0; text-wrap: balance; }
+  h2 { font: 700 23px/1.25 var(--display); margin: 0; text-wrap: balance; }
+  h3 { font: 700 18px/1.3 var(--body); margin: 0; }
+  .label { color: var(--green); font: 700 13px/1 var(--body); letter-spacing: .08em; text-transform: uppercase; }
+  section { display: grid; gap: 14px; }
+  p { margin: 0; max-width: 68ch; }
+  ul { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; }
+  li { max-width: 66ch; }
+  a { color: var(--ink); text-decoration-color: var(--green); text-underline-offset: 3px; }
+  .lead { font-size: 18px; }
+  .minute { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--green); border-radius: 10px; padding: 20px 22px; display: grid; gap: 10px; }
+  .notice { border: 1px solid var(--orange); border-radius: 12px; padding: 14px 16px; background: #1d1508; display: grid; gap: 8px; }
+  .notice b { color: var(--orange); }
+  .tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; min-width: 520px; font-size: 16px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+  th { color: var(--green); font: 700 13px/1.4 var(--body); letter-spacing: .06em; text-transform: uppercase; background: var(--panel); }
+  tr:last-child td { border-bottom: 0; }
+  td.n { white-space: nowrap; font-weight: 700; }
+  .shots { display: grid; grid-template-columns: 2.2fr 1fr; gap: 16px; align-items: start; }
+  figure { margin: 0; display: grid; gap: 8px; min-width: 0; }
+  figure img { width: 100%; border: 1px solid var(--line); border-radius: 8px; display: block; }
+  figcaption { font-size: 15px; }
+  .src { font-size: 15px; }
+  @media (max-width: 640px) { .shots { grid-template-columns: 1fr; } h1 { font-size: 27px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header style="display:grid;gap:12px">
+  <div class="label">Solorender · Keeping customers · October 30, 2026</div>
+  <h1>Course path C: Built, checked, ships at the next run</h1>
+  <p class="lead">The AI Filmmaking course now shows students what their film costs. When they're short, it offers the right pack at the moment they need it. After lesson 25 it keeps them coming back with a monthly Series challenge, paid in credits.</p>
+</header>
+
+<section class="minute">
+  <div class="label">In one minute</div>
+  <ul>
+    <li><b>Film budget.</b> Lesson "Checkpoint: your plan" now prices the whole film two ways from today's price list. The careful route costs about <b>1,258 credits</b> and the heavy route about <b>4,678</b>. One Studio month gives 4,450.</li>
+    <li><b>Top-up prompt.</b> When a student's balance is below what the lesson in front of them needs, a box offers the one pack that covers it, at their plan's rate. A Studio student short of credits sees "$25 adds 2,750 credits".</li>
+    <li><b>Series challenge.</b> One episode a month, 12,500 / 7,500 / 5,000 credits to the top three, and a public showcase of the episodes you approve. You pick the winners on a new owner page, and the prize lands on your click.</li>
+    <li><b>Cost.</b> The prize pool costs you <b>$100 a month</b>. About 8 extra $25 Studio packs a month pay for it. No published figure says how many students will buy, so treat that as the break-even point, not a forecast.</li>
+    <li><b>First challenge is November.</b> The code ships tonight at 9 pm or tomorrow at 1 pm, a day before October ends. So November 1–30 is the first month, and anything entered earlier counts for November.</li>
+  </ul>
+</section>
+
+<section>
+  <div class="label">Part 1</div>
+  <h2>What the film costs, shown where students plan it</h2>
+  <p>It sits in "Checkpoint: your plan", the end of Module 1, where students put their plan in one document. Every number comes from the same price list the lessons use, so a price change on the site updates the table too. It follows the course's own rules: a 60-second film is "4 to 10 clips" (the table uses 10), and "two takes at most".</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Route</th><th>What it assumes</th><th>Whole course</th><th>Against one Studio month (4,450)</th></tr></thead>
+    <tbody>
+      <tr><td>Careful</td><td>Veo 3.1 Lite clips with sound, one take of everything</td><td class="n">≈ 1,258</td><td>About 3,192 left over</td></tr>
+      <tr><td>Heavy</td><td>Saved character on Kling O3 · Entities, two takes everywhere, a new tall trailer</td><td class="n">≈ 4,678</td><td>About 228 short: one $25 pack (2,750 credits at the Studio rate) covers it</td></tr>
+    </tbody>
+  </table></div>
+  <div class="notice">
+    <p><b>One change from the 10-29 page.</b> That page put the heavy route at about 5,260 credits, but it counted 12 clips. The course itself says a 60-second film is 4 to 10 clips. Held to 10 clips, the heavy route is about 4,678. It's still over one Studio month, so the 10-29 conclusion stands: the course alone rarely forces a top-up. The series is where the extra spending is.</p>
+  </div>
+  <div class="shots">
+    <figure><img src="course-path-c-shots/budget-desktop.png" alt="The budget table on desktop: each course step with its careful-route and heavy-route credits, totals 1,258 and 4,678."><figcaption>Desktop: both routes side by side.</figcaption></figure>
+    <figure><img src="course-path-c-shots/budget-phone.png" alt="The budget on a phone: one table for the careful route, then one for the heavy route."><figcaption>Phone: one table per route, so nothing hides off the edge of the screen.</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <div class="label">Part 2</div>
+  <h2>The "top up" box, at the right moment</h2>
+  <p>It appears at the top of a lesson only when the student's balance is below what that lesson's runs need on the careful route. For example, lesson 11 (the film clips) needs about 750 credits. The box names the one pack that covers the gap at the student's own plan rate, read from your live offers. If you change prices on /admin/offers, the box follows. Students with enough credits never see it. It also sits on the Series page, against the cost of one episode (about 461 credits).</p>
+  <div class="shots">
+    <figure><img src="course-path-c-shots/topup-lesson-desktop.png" alt="Lesson 11 with a green box: this lesson needs about 750 credits, you have 300, a $25 pack adds 2,750 credits at your Studio rate, with a Buy button."><figcaption>Tested with a Studio student holding 300 credits. The Buy button opens the normal Stripe checkout. I did not click it.</figcaption></figure>
+    <figure><img src="course-path-c-shots/topup-lesson-phone.png" alt="The same top-up box on a phone."><figcaption>Phone.</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <div class="label">Part 3</div>
+  <h2>The monthly Series challenge</h2>
+  <p>Built to your five answers from today:</p>
+  <ul>
+    <li><b>Entries.</b> A course student picks a finished video from their Library, names the series and the episode, and ticks a box agreeing it can be shown publicly. One entry per person per month. They can change it or take it back until the month closes.</li>
+    <li><b>Judging.</b> You do it on the new <b>Admin → Series challenge</b> tab. "Approve" puts an entry on the public showcase. Once the month has closed, buttons for 1st, 2nd and 3rd appear. Your click pays the prize at once, using the same credit-granting step as your gifts and sponsor deals. The database refuses a second payout of the same place.</li>
+    <li><b>Prizes.</b> 12,500 / 7,500 / 5,000 credits, shown to students as about 2.8, 1.7 and 1.1 Studio months. On the student's Credits page the row reads "Series challenge prize".</li>
+    <li><b>Showcase.</b> solorender.com/series is public and in the sitemap. It shows approved episodes only, newest month first, with winners at the front. It has a search box and a sort menu, like the Prompt Library. Your owner page has them too.</li>
+    <li><b>Timing.</b> Calendar months, Pacific time. Entries close at midnight on the last day, and you pick winners in the first week of the next month.</li>
+  </ul>
+  <div class="shots">
+    <figure><img src="course-path-c-shots/series-november-desktop.png" alt="The Series challenge page: November 2026, three prize tiles, how it works, what an episode costs, the entry form."><figcaption>The students' page as it will open: November, three prizes, episode cost, entry form.</figcaption></figure>
+    <figure><img src="course-path-c-shots/series-november-phone.png" alt="The Series challenge page on a phone."><figcaption>Phone.</figcaption></figure>
+  </div>
+  <div class="shots">
+    <figure><img src="course-path-c-shots/admin-series-desktop.png" alt="The owner page: a search box and sort menu, then entries by month, one placed 1st with 12,500 credits paid."><figcaption>Your owner page during the test: one entry approved, one placed 1st and paid.</figcaption></figure>
+    <figure><img src="course-path-c-shots/public-showcase-phone.png" alt="The public showcase on a phone: picture cards by month, a 1st place badge."><figcaption>Public showcase on a phone, with the test entries (since removed).</figcaption></figure>
+  </div>
+  <p>The course home also gets an "After the course" card leading to the challenge. Lesson 24 and the final checkpoint now link to it, and lesson 24's episode cost uses the same numbers as the challenge page.</p>
+</section>
+
+<section>
+  <h2>What it costs and what it earns</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Item</th><th>Figure</th><th>Where it comes from</th></tr></thead>
+    <tbody>
+      <tr><td>Prize pool, each month</td><td class="n">$100</td><td>25,000 credits × $0.004 (your 2.5× rule: $0.01 a credit ÷ 2.5). Only spent credits cost anything, so unspent prize credits cost less.</td></tr>
+      <tr><td>Prize pool, a year</td><td class="n">$1,200</td><td>12 months × $100</td></tr>
+      <tr><td>One $25 Studio pack leaves you</td><td class="n">$12.97</td><td>The retention page of 10-29, section 1: 2,750 credits cost $11.00 in AI if all used, plus a $1.03 card fee</td></tr>
+      <tr><td>Packs that pay for one month of prizes</td><td class="n">about 8</td><td>$100 ÷ $12.97 = 7.7</td></tr>
+      <tr><td>Course break-even from the 10-29 page</td><td class="n">1.4 packs</td><td>Per course customer in year one, to cover the middle $92 Meta cost</td></tr>
+      <tr><td>One episode</td><td class="n">461–1,133 credits</td><td>Today's prices: 6 clips on Veo 3.1 Lite up to 8 on Kling O3 · Entities, one take each, joined</td></tr>
+      <tr><td>A first run of 3–4 episodes</td><td class="n">1,383–4,532 credits</td><td>Same prices. At the top end that is more than one Studio month, which is where packs come in.</td></tr>
+    </tbody>
+  </table></div>
+  <p class="src">What isn't known: how many students will enter, buy packs or stay subscribed because of this. No published figure covers it. Your <b>Keeping customers</b> page will show packs per customer and course progress once real customers arrive.</p>
+</section>
+
+<section>
+  <h2>How I checked it</h2>
+  <ul>
+    <li>On localhost at desktop (1280 px) and phone (390 px) widths. No page scrolls sideways on a phone; I measured the page width at 390.</li>
+    <li>As a real student: with your OK, the house test account studio-preview@onda.dev got a free Studio plan, a balance of 300 and two course videos. It sent an entry, saw its status, and took it back. Then it got a 1st-place prize: its balance went from 300 to 12,800, with one ledger row "series:2026-09:1". A second payout of the same place was refused by the database.</li>
+    <li>Afterwards I undid every test change. The account is back to 2,483 credits with no free plan, no entries and no test rows. I checked this in the database.</li>
+    <li>The new entries table was added to the live database today with your yes. The code itself reaches customers at the next 1 pm / 9 pm ship (commits b7c5cca and 806bfe9).</li>
+  </ul>
+</section>
+
+<section class="notice">
+  <h2 style="color:var(--orange)">Left open</h2>
+  <ul>
+    <li><b>Terms page.</b> The student's permission to show their episode is written into the tick box itself. Your terms (section 6) cover only Prompt Library sharing. I recommend adding a matching paragraph for the Series showcase. I didn't change your legal text without asking.</li>
+    <li><b>No winner email yet.</b> Winners see the prize on their Credits page and the Series page, but nothing is emailed. A short "you won" email can be added later.</li>
+    <li><b>Not testable on this Mac.</b> Approving an entry whose video still sits at the AI supplier copies it to our storage. This Mac has no storage keys, which is the same limit as approving Prompt Library videos locally. Videos already in our storage (Video editor exports) are used as they are, and that path is tested.</li>
+  </ul>
+</section>
+
+</div>
+</body>
+</html>
