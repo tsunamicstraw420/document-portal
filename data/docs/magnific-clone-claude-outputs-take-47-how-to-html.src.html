@@ -50,7 +50,7 @@ tr.total td{font-weight:700;border-top:2px solid var(--orange)}
 <div class="wrap">
 
 <header>
-  <span class="eyebrow">How-to · built live while we make the film · 6–7 Nov 2026 · updated after Shot 7</span>
+  <span class="eyebrow">How-to · built live while we make the film · 6–8 Nov 2026 · updated after the last clip</span>
   <h1>How We Made Take 47</h1>
   <p>This is the step-by-step for making a 60-second film with Solorender. Every stage shows both ways. <b>Way 1</b> is telling Claude, which runs Solorender for you through the connection. <b>Way 2</b> is clicking through the app yourself.</p>
   <p>The page grows with the film. After each stage, I add the exact words used, what it cost and what went wrong. A stage marked Later is the plan until we reach it. This page is also the source for the video how-tos, one for each way, which get scripted once the film is finished.</p>
@@ -69,7 +69,7 @@ tr.total td{font-weight:700;border-top:2px solid var(--orange)}
 </section>
 
 <section class="block" id="lessons">
-  <h2>What the first seven shots taught us</h2>
+  <h2>What the sixteen clips taught us</h2>
   <p>Each of these cost real money to learn. Every one is now part of how the rest of the film gets made.</p>
   <ul>
     <li><b>Place things with screen words.</b> Write screen-left, center and screen-right, never "behind him" or "on the far side of him". In Shot 7, three pictures in a row put the lunch table in front of the dragon. The fourth, written only in screen positions, got it right the first time.</li>
@@ -83,6 +83,22 @@ tr.total td{font-weight:700;border-top:2px solid var(--orange)}
     <li><b>Give every character small life.</b> Never write "does not move". A Grok clip told that froze Dottie like a still picture, and the dragon shot fire instead of sneezing.</li>
     <li><b>Words shape bodies.</b> "Heavy" and "barrel-chested" made the dragon fat ("He looks fat"). "Huge, powerful and muscular" keeps him right.</li>
     <li><b>Feet and American spelling</b> in every prompt: "let's not use European."</li>
+    <li><b>Hold eye color with one sentence.</b> In Shot 9 the dragon's eyes went bright orange. The redo added "his eyes exactly the same color as in the first frame", and they stayed amber, in Shot 11 too.</li>
+    <li><b>Print props at the giant's size.</b> Your note on Shot 8: "That's a really small footprint for a dragon." A straight claw gouge then read as a knife: "a giant sandwich cut in half". What worked was part of one huge toe print, running off the edge of the bread.</li>
+    <li><b>Three quick gags, three cheap clips.</b> The fast cuts became three Grok clips, one per painted picture, each cut to 1.5 seconds. That cost less than one Kling clip with cuts, and each gag kept its own picture.</li>
+    <li><b>A speaker faces who she's talking to.</b> A new close-up of Dottie for lip sync looked into the lens: "Why is she facing away from the dragon?" You kept the hero shot instead ("that defeats the purpose of using our hero shot"), and OmniHuman V2 lip-synced her side-on.</li>
+    <li><b>Make a voice faster for free.</b> "The delivery must be faster": her long pauses were shortened inside the silences, then the whole line sped up 1.2 times with the pitch kept. 11.8 seconds became 8.5.</li>
+    <li><b>Two views in every prompt.</b> "Facing screen-right" can mean the dragon's own right, and two prompts that both said "toward screen-left" came out facing opposite ways. Your fix: "broken into two separate views. One, when you're describing the actual character, and two, when you're describing the camera's view." The camera view uses frame edges ("his snout points toward the left edge of the frame"); the character uses his own left and right.</li>
+    <li><b>Say where an effect starts, travels and ends.</b> In Shot 12, "straight up, away from him" still let Grok pour the fire onto the floor, and the first Kling clip split it down both sides of his body. Your note, "be hyper descriptive", fixed it: the fire starts at the back of his jaws, only after his head tips back, and travels in one line to the top-left corner.</li>
+    <li><b>One change per edit.</b> One edit asked for his head up, fire and spread wings; only the head and fire changed. A second edit that named only the wings worked.</li>
+    <li><b>Write the end of every small move.</b> "He blinks once, slowly" left the dragon's eyes shut for the rest of Shot 11, and a "very small" nod never showed. Say "and opens his eyes again", and make a nod a clear dip of the head.</li>
+    <li><b>Words don't blur a background.</b> "In soft focus" was ignored twice in Shot 13. And when the crying crew were moved far back, their tears stopped reading. A background reaction has to stay big enough to see.</li>
+    <li><b>Moving a held object leaves the hand behind.</b> Lowering Dottie's megaphone left her hand up by her face as an empty fist. An edit that named only her arm fixed it.</li>
+    <li><b>A screen faces whoever is watching it.</b> "Screen angled toward the camera" lost to "her eyes on the screen". A new angle from over her shoulder put the screen square to the camera.</li>
+    <li><b>A prop under something needs its own sentence.</b> "Squashed under his belly" drew the sandwich whole beside the cat. Saying exactly what pokes out from under his paw fixed it.</li>
+    <li><b>Don't ask clip models for rhythm.</b> "A kitchen clock ticking" came back as clicks every time Dottie's finger moved. Ask for quiet room tone and lay real sounds in the edit.</li>
+    <li><b>Judge an action by what makes it that action.</b> Twice I called an open mouth a sneeze, and the second had bread flying out of his mouth. Your own prompt worked: it used the guide's shape (opening frame, motion arc, ground contact, end frame), kept his mouth closed and aimed the sneeze down at the plate.</li>
+    <li><b>Same-angle joins show.</b> Two takes from the same start picture drift apart, so cutting from one to the other looks like a glitch, not a cut.</li>
   </ul>
 </section>
 
@@ -245,7 +261,7 @@ tr.total td{font-weight:700;border-top:2px solid var(--orange)}
 </section>
 
 <section class="stage now" id="s5">
-  <div class="top"><span class="eyebrow">Stage 5</span><span class="pill next">In progress: Shot 8</span><span class="pill">Needs your yes</span></div>
+  <div class="top"><span class="eyebrow">Stage 5</span><span class="pill">Done for every shot</span><span class="pill">Needs your yes</span></div>
   <h2>Make the keyframes from the names</h2>
   <p><b>Saved 6 Nov:</b> @dottie, @dragon, @maine_coon, @megaphone, @directors_chair, @film_set and @kitchen are all in your Library.</p>
   <p>Each keyframe is a new picture built in the Edit tab with no source photo. The prompt names who and what is in the shot, then says what's happening. That's how the course made Agnes's start picture. Each shot also gets its own angle, so no cut is just a zoom.</p>
@@ -301,7 +317,7 @@ tr.total td{font-weight:700;border-top:2px solid var(--orange)}
 </section>
 
 <section class="stage" id="s7">
-  <div class="top"><span class="eyebrow">Stage 7</span><span class="pill next">In progress: 7 of 16 approved</span><span class="pill">Needs your yes</span></div>
+  <div class="top"><span class="eyebrow">Stage 7</span><span class="pill">Done: 16 of 16 approved</span><span class="pill">Needs your yes</span></div>
   <h2>Turn the pictures into clips</h2>
   <p>Each approved keyframe becomes the first frame of a clip. The prompt only describes movement, because the picture already holds everything else. Each clip gets one action and one camera move.</p>
   <div class="stop"><b>Stop for your yes on each clip.</b> Five-second prices at 720p, customer then you: Grok Video 1.5 Lite $0.40 and $0.16; Kling 2.5 Turbo Pro $0.88 and $0.35; Kling 4.0 · Entities $1.97 and $0.79; Seedance 2.5 $2.88 and $1.15. Ten seconds costs double, which the real Kling 4.0 runs confirmed.</div>
@@ -347,6 +363,16 @@ tr.total td{font-weight:700;border-top:2px solid var(--orange)}
       <tr><td>5</td><td>Kling 2.5 Turbo Pro, start and end picture (1921)</td><td class="n">$0.88 / $0.35</td><td>Seedance (1919, $1.15 for you) skipped the glasses move. An end picture of her glasses lowered forced it.</td></tr>
       <tr><td>6</td><td>Grok, 5 s (1923)</td><td class="n">$0.40 / $0.16</td><td>He bit the card. You kept it: "Nice screw up. In our favor."</td></tr>
       <tr><td>7</td><td>Kling 4.0 · Entities, start and end picture, 5 s (1939)</td><td class="n">$1.97 / $0.79</td><td>The sit became your tail-wag gag. Kling added its own close-up at the end, and you kept it.</td></tr>
+      <tr><td>8</td><td>Grok, 5 s (1943), from picture 1942</td><td class="n">$0.40 / $0.16</td><td>Three sandwich pictures to get a print at his size. Approved for now; it may be redone.</td></tr>
+      <tr><td>9</td><td>Three Grok clips, 5 s each (1948, 1950, 1951)</td><td class="n">$1.20 / $0.48</td><td>The falling backdrop replaced a repeat of Shot 7's tail sweep. Use 1.5 seconds of each clip.</td></tr>
+      <tr><td>10</td><td>OmniHuman V2 on your hero picture, 9 s (1957)</td><td class="n">$2.43 / $0.97</td><td>The new Direction box gave the push-in and the finger wag. She smiles in places, so the edit cuts to the dragon there.</td></tr>
+      <tr><td>11</td><td>Grok, 5 s (1959), from picture 1958</td><td class="n">$0.40 / $0.16</td><td>The tear rolls and drips with his eyes amber. His eyes close at 2.5 seconds and the nod barely shows, so use 0.25 to 2.25 seconds.</td></tr>
+      <tr><td>12</td><td>Kling 2.5 Turbo Pro, start and end picture, 5 s (1966)</td><td class="n">$0.88 / $0.35</td><td>Grok poured the fire onto the floor and the first Kling split it down his body. The hyper-descriptive retry gave one rising plume.</td></tr>
+      <tr><td>13</td><td>Kling 2.5 Turbo Pro, start and end picture, 5 s (1972)</td><td class="n">$0.88 / $0.35</td><td>You chose Kling over Seedance at a third of the price. The end picture needed a second edit for her hand.</td></tr>
+      <tr><td>14</td><td>Grok, 5 s (1975), over-the-shoulder kitchen</td><td class="n">$0.40 / $0.16</td><td>The first kitchen picture's laptop faced Dottie. The over-the-shoulder angle put the screen square to the camera for the real Take 47 clip.</td></tr>
+      <tr><td>15</td><td>The real Solorender screen, recorded at the rough cut</td><td class="n">$0.00</td><td>Not recorded yet.</td></tr>
+      <tr><td>16</td><td>Grok, 5 s (1979), its sound muted</td><td class="n">$0.40 / $0.16</td><td>The sandwich first sat beside him; a remove-and-add edit put it under his paw. Grok's clicks get muted in the edit.</td></tr>
+      <tr><td>17</td><td>Your own Kling 2.5 Turbo Pro run, 5 s (1983)</td><td class="n">$0.88 / $0.35</td><td>Two Grok tries showed an open mouth, not a sneeze. Yours kept his mouth closed and aimed the sneeze at the plate.</td></tr>
     </tbody>
   </table>
   </div>
@@ -390,6 +416,7 @@ tr.total td{font-weight:700;border-top:2px solid var(--orange)}
   <div class="top"><span class="eyebrow">Stage 8</span><span class="pill later">Later</span><span class="pill">Needs your yes</span></div>
   <h2>Record the voices</h2>
   <p>There are seven lines. Voices get checked by ear, because a word-checking tool can't hear a bad pronunciation.</p>
+  <p><b>Dottie's voice, 7 Nov:</b> three samples of the finger-wag line on Gemini 3.8 Voice, all with one note: a stern old headmistress, quiet, slow and terrifyingly calm, who never shouts (Gacrux 1952, Kore 1953, Sulafat 1954). You picked Gacrux, then said "The delivery must be faster." The free fix shortened her three long pauses inside the silences, then sped the line up 1.2 times with her pitch kept. You approved it: "Yes, that's it." Her other lines use the same voice, note and speed-up.</p>
   <div class="stop"><b>Stop for your yes on each line:</b> $0.08 for a customer, $0.03 for you.</div>
   <div class="ways">
     <div class="way"><b class="t">Way 1: With Claude</b>
@@ -546,7 +573,7 @@ tr.total td{font-weight:700;border-top:2px solid var(--orange)}
 <section class="stage" id="cost">
   <span class="eyebrow">Real spending so far, and the cost to finish</span>
   <h2>What the film has cost</h2>
-  <p>These are every paid run for the film in your Library, pictures 1849 to 1940. "You pay" is your owner price, the customer price ÷ 2.5 rounded per run. Shot 7's figures match your balance changes exactly. Earlier totals are within 4 credits of the balance records.</p>
+  <p>These are every paid run for the film in your Library, runs 1849 to 1983. "You pay" is your owner price, the customer price ÷ 2.5 rounded per run. Shots 7 to 17 match your balance changes exactly. Earlier totals are within 4 credits of the balance records.</p>
   <div class="tablewrap">
   <table>
     <colgroup><col><col style="width:14%"><col style="width:20%"><col style="width:20%"></colgroup>
@@ -560,12 +587,20 @@ tr.total td{font-weight:700;border-top:2px solid var(--orange)}
       <tr><td>Shot 5</td><td class="n">4</td><td class="n">$3.96</td><td class="n">$1.58</td></tr>
       <tr><td>Shot 6</td><td class="n">2</td><td class="n">$0.50</td><td class="n">$0.20</td></tr>
       <tr><td>Shot 7, with the @film_set fix</td><td class="n">16</td><td class="n">$11.15</td><td class="n">$4.47</td></tr>
-      <tr><td>Shot 8 so far</td><td class="n">1</td><td class="n">$0.10</td><td class="n">$0.04</td></tr>
-      <tr class="total"><td>Spent so far</td><td class="n">89</td><td class="n">$33.25</td><td class="n">$13.31</td></tr>
+      <tr><td>Shot 8</td><td class="n">4</td><td class="n">$0.70</td><td class="n">$0.28</td></tr>
+      <tr><td>Shot 9, the fast cuts</td><td class="n">8</td><td class="n">$2.00</td><td class="n">$0.80</td></tr>
+      <tr><td>Shot 10, with Dottie's voice</td><td class="n">6</td><td class="n">$5.20</td><td class="n">$2.07</td></tr>
+      <tr><td>Shot 11</td><td class="n">2</td><td class="n">$0.50</td><td class="n">$0.20</td></tr>
+      <tr><td>Shot 12, with the fire retries</td><td class="n">7</td><td class="n">$2.96</td><td class="n">$1.18</td></tr>
+      <tr><td>Shot 13, with her line</td><td class="n">6</td><td class="n">$1.36</td><td class="n">$0.54</td></tr>
+      <tr><td>Shot 14, the kitchen</td><td class="n">3</td><td class="n">$0.60</td><td class="n">$0.24</td></tr>
+      <tr><td>Shot 16, the cat, with her line</td><td class="n">4</td><td class="n">$0.68</td><td class="n">$0.27</td></tr>
+      <tr><td>Shot 17, the sneeze, with your run</td><td class="n">4</td><td class="n">$1.78</td><td class="n">$0.71</td></tr>
+      <tr class="total"><td>Spent so far</td><td class="n">132</td><td class="n">$48.93</td><td class="n">$19.56</td></tr>
     </tbody>
   </table>
   </div>
-  <p>Not counted: your own three style tries in the app (1880 to 1882) and the hero pictures made before the film started.</p>
+  <p>Not counted: your own three style tries in the app (1880 to 1882) and the hero pictures made before the film started. Shot 10 includes two OmniHuman runs: yours (1957) and a feature test another session ran at the same time on her portrait (1956), $0.97 for you each.</p>
   <p class="note"><b>One record to check:</b> the two 10-second Kling 4.0 runs (1931, 1932) show 197 credits in the Library, but each charged 394 credits ($1.58 for you), which your balance confirms. The table uses what was charged.</p>
   <h3>To finish, one try each</h3>
   <div class="tablewrap">
@@ -573,16 +608,14 @@ tr.total td{font-weight:700;border-top:2px solid var(--orange)}
     <colgroup><col><col style="width:22%"><col style="width:22%"></colgroup>
     <thead><tr><th>What's left</th><th class="n">Customer</th><th class="n">You pay</th></tr></thead>
     <tbody>
-      <tr><td>7 more keyframes</td><td class="n">$0.70</td><td class="n">$0.28</td></tr>
-      <tr><td>9 more clips: 3 Seedance (one at 10 s), 6 Grok (one at 10 s)</td><td class="n">$14.32</td><td class="n">$5.72</td></tr>
-      <tr><td>7 voice lines</td><td class="n">$0.56</td><td class="n">$0.21</td></tr>
+      <tr><td>4 voice lines</td><td class="n">$0.32</td><td class="n">$0.12</td></tr>
       <tr><td>3 music tracks</td><td class="n">$0.45</td><td class="n">$0.18</td></tr>
       <tr><td>3 special sounds</td><td class="n">$0.18</td><td class="n">$0.06</td></tr>
-      <tr class="total"><td>Left to spend</td><td class="n">$16.21</td><td class="n">$6.45</td></tr>
+      <tr class="total"><td>Left to spend</td><td class="n">$0.95</td><td class="n">$0.36</td></tr>
     </tbody>
   </table>
   </div>
-  <p>Spent plus one try of the rest comes to about <b>$49.46</b> for a customer and <b>$19.76</b> for you. The 10-second Seedance price assumes it doubles like Kling 4.0 did; it hasn't been run yet. Redos are extra, and each needs its own yes.</p>
+  <p>Spent plus one try of the rest comes to about <b>$49.88</b> for a customer and <b>$19.92</b> for you. Redos are extra, and each needs its own yes.</p>
 </section>
 
 <section class="block">

@@ -1,0 +1,154 @@
+<title>ToAPIs Price Check</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column — verdict strip, then one sortable ledger of every model we sell, then the gaps. Dark only (Eddie's pages are dark). */
+:root{
+  --bg:#0f1114; --panel:#171a1f; --line:#2a2f37; --fg:#f2f3f5; --muted:#9aa3ae;
+  --accent:#f7931a; --good:#3ecf8e; --warn:#f2c14e; --bad:#ff6b6b;
+  --display:"Archivo",system-ui,sans-serif; --body:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.55;margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding-block:32px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:28px}
+h1{font-family:var(--display);font-weight:800;font-size:32px;line-height:1.15;margin:0;text-wrap:balance}
+h2{font-family:var(--display);font-weight:700;font-size:21px;margin:0 0 10px;text-wrap:balance}
+p{margin:0;max-width:72ch}
+.intro{display:grid;gap:10px}
+.intro p{color:var(--muted);font-size:15px}
+.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.verdict{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.v{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:6px;align-content:start}
+.v b{font-family:var(--display);font-size:26px;font-variant-numeric:tabular-nums}
+.v span{color:var(--muted);font-size:14px}
+.v.g b{color:var(--good)} .v.w b{color:var(--warn)} .v.a b{color:var(--accent)}
+.tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+input[type=search]{background:var(--panel);border:1px solid var(--line);color:var(--fg);border-radius:8px;padding:10px 12px;font:inherit;font-size:15px;min-width:0;flex:1 1 240px}
+input[type=search]:focus-visible,button:focus-visible,th:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:6px 12px;font:inherit;font-size:14px;cursor:pointer}
+.chip[aria-pressed=true]{border-color:var(--accent);color:var(--fg);background:rgba(247,147,26,.12)}
+.tablebox{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{width:100%;min-width:900px;border-collapse:collapse;table-layout:fixed;font-size:14.5px}
+th,td{padding:10px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--panel);cursor:pointer;user-select:none;position:sticky;top:0}
+th[aria-sort=ascending]::after{content:" ▲";color:var(--accent)} th[aria-sort=descending]::after{content:" ▼";color:var(--accent)}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+td small{display:block;color:var(--muted);font-family:var(--body);font-size:12.5px;line-height:1.4;margin-top:2px}
+.m{font-weight:600}
+.pill{display:inline-block;font-family:var(--mono);font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.pill.g{color:var(--good)} .pill.w{color:var(--warn)} .pill.b{color:var(--bad)} .pill.n{color:var(--muted)}
+tbody tr:hover{background:rgba(255,255,255,.025)}
+.gaps{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.gap{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:6px;align-content:start}
+.gap h3{font-family:var(--display);font-size:16px;margin:0}
+.gap p{color:var(--muted);font-size:14.5px}
+.notes{display:grid;gap:8px;color:var(--muted);font-size:14.5px}
+.notes li{max-width:90ch}
+ul{margin:0;padding-left:20px;display:grid;gap:6px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="intro">
+    <div class="kicker">ToAPIs vs. what Solorender pays now · checked 2026-11-08</div>
+    <h1>ToAPIs price check</h1>
+    <p>Every ToAPIs price was read from Eddie's signed-in dashboard (toapis.com/dashboard/pricing): all 99 model groups across 13 pages, 190 models and 338 media price rows, plus 71 GPT Image rows. "We pay" is the supplier cost written beside each model in Solorender's model list (real bills where noted). Prices are compared like for like: same length, resolution and sound.</p>
+  </header>
+
+  <section class="verdict" aria-label="Summary">
+    <div class="v a"><b>20–29%</b><span>Typical saving on ToAPIs' "-official" and plainly listed routes (Veo, Nano Banana, Kling v3, Kling O3).</span></div>
+    <div class="v g"><b>45–82%</b><span>Saving on the cheap unlabelled routes (Veo, Nano Banana, GPT Image). Their own announcements show these get pulled and repriced.</span></div>
+    <div class="v w"><b>≈ $15 / month</b><span>Rough saving at the last 30 days' usage if the official routes were used (≈ $31 on the cheap routes). All of that usage came from one account.</span></div>
+    <div class="v"><b>0</b><span>Saving on our two biggest costs this month: Kling 2.5 Turbo Pro and Grok Video 1.5 Lite. ToAPIs doesn't sell them.</span></div>
+  </section>
+
+  <section>
+    <h2>Every model we sell that ToAPIs also lists</h2>
+    <div class="tools">
+      <input id="q" type="search" placeholder="Search a model…" aria-label="Search models">
+      <div class="chips" role="group" aria-label="Filter">
+        <button class="chip" data-f="all" aria-pressed="true">All</button>
+        <button class="chip" data-f="Video" aria-pressed="false">Video</button>
+        <button class="chip" data-f="Image" aria-pressed="false">Image</button>
+        <button class="chip" data-f="save" aria-pressed="false">Cheaper there</button>
+      </div>
+    </div>
+    <div class="tablebox" style="margin-top:12px">
+      <table id="t">
+        <colgroup><col style="width:21%"><col style="width:8%"><col style="width:13%"><col style="width:20%"><col style="width:20%"><col style="width:9%"><col style="width:9%"></colgroup>
+        <thead><tr>
+          <th data-k="0" tabindex="0">Model · unit</th><th data-k="1" tabindex="0">Kind</th><th data-k="2" tabindex="0" data-n="1">We pay</th><th data-k="3" tabindex="0" data-n="1">ToAPIs "-official"</th><th data-k="4" tabindex="0" data-n="1">ToAPIs other listing</th><th data-k="5" tabindex="0" data-n="1">Best saving</th><th data-k="6" tabindex="0" data-n="1">Runs, 30 days</th>
+        </tr></thead>
+        <tbody id="tb"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>What ToAPIs doesn't sell</h2>
+    <div class="gaps">
+      <div class="gap"><h3>Video tools</h3><p>Kling 2.5 Turbo Pro and Standard, Kling Lip Sync, Kling Add Sound, OmniHuman and OmniHuman V2, VEED Fabric, Lip Sync and Dubbing, Topaz upscale, DreamActor, H3 Max Reframe, Grok Imagine Extend, P-Video. Kling 2.5 Turbo Pro alone was about $45 of the last 30 days.</p></div>
+      <div class="gap"><h3>Pictures</h3><p>FLUX Krea, FLUX 3 Klein, FLUX.2 Klein 4B, FLUX Erase, Ideogram V4 and Character, Recraft V4.1 and Crisp Upscale, Bria Expand.</p></div>
+      <div class="gap"><h3>Voice and music</h3><p>None of ours: ElevenLabs, MiniMax Speech, HeyGen voice, Gemini voice, Lyria 2 and 3.5, CassetteAI, Stable Audio. Their only music model is Suno.</p></div>
+      <div class="gap"><h3>They have, we don't</h3><p>Wan 3.0 and 2.6, Qwen Image 3.0, Seedance 2 Mini and Fast, Hailuo 02 and 2.3, HappyHorse 1.1, Vidu Q4, Midjourney, Suno, Gemini Omni video edit, GPT Image 2.6.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>How to read this</h2>
+    <ul class="notes">
+      <li>Only some ToAPIs models carry an "-official" name: Veo, Nano Banana / Gemini image, GPT Image and Grok video. Kling, Seedance, Seedream and FLUX have just one listing each, so they sit in "other listing". The Kling v3 prices I described earlier as an "official route" have no such label.</li>
+      <li>Nano Banana and GPT Image "-official" prices are ToAPIs' own per-picture estimates. Those routes bill by tokens, so the real bill can differ. Seedance 2.0 and 2.5 are token-billed too ("from" estimates).</li>
+      <li>Several cheap listings don't say whether sound is included. The cheap Veo price ($0.14 for 8 s) is one of them.</li>
+      <li>"Runs, 30 days" counts Solorender's own creations table. Every model's runs came from a single account. The dollar figures in the summary are estimates from those runs (credits ÷ 2.5).</li>
+      <li>ToAPIs credits: $1 = 200. Prices on the dashboard say "price multiplier is 1x" for the default user group, so a bigger account could be quoted lower.</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+// [model+unit, note, kind, ourCost, ourNote, official, officialNote, other, otherNote, runs]
+const R=[
+ ["Veo 3.1 Fast","8 s · 720p · with sound","Video",0.80,"Google direct, real bill",0.64,"$0.08/s",0.14,"per 8 s clip; sound not stated",8],
+ ["Veo 3.1 Lite","8 s · 720p · with sound","Video",0.40,"fal",0.32,"$0.04/s",0.07,"per 8 s clip; sound not stated",9],
+ ["Kling v3 Pro","5 s · 1080p · with sound","Video",0.84,"fal, $0.168/s",null,"",0.60,"$0.12/s",0],
+ ["Kling v3 Turbo Pro","5 s · 1080p","Video",0.70,"fal",null,"",0.50,"$0.10/s; sound not stated",1],
+ ["Kling v3 Turbo","5 s · 720p","Video",0.56,"fal",null,"",0.40,"$0.08/s; sound not stated",0],
+ ["Kling O3 · Entities","5 s · 720p · with sound","Video",0.56,"fal",null,"",0.40,"kling-v3-omni, $0.08/s",8],
+ ["Kling O3 4K Edit","per second","Video",0.42,"fal",null,"",0.30,"kling-v3-omni 4K",0],
+ ["Kling 4.0","5 s · 720p","Video",0.785,"Runware, $0.157/s",null,"",0.785,"$0.157/s, same",3],
+ ["Seedance 2.0","5 s · 720p","Video",0.80,"Runware, $0.16/s",null,"",0.71,"token-billed, from $0.1423/s",6],
+ ["Seedance 2.5","5 s · 720p","Video",1.152,"Runware, $0.2304/s",null,"",1.08,"token-billed, from $0.2158/s",4],
+ ["Grok Video 1.5 Lite","5 s · 720p","Video",0.15,"fal, $0.03/s",0.56,"full Grok 1.5, $0.112/s (different model)",0.10,"full Grok 1.5, $0.019/s (different model)",148],
+ ["H3 Max Turbo","5 s · 768p","Video",0.20,"fal, $0.04/s",null,"",0.32,"H3 Max 768p $0.064/s (H3 Lite: $0.04/s, same as ours)",6],
+ ["Nano Banana 2 (+ Edit)","1 picture · 1K","Image",0.0672,"Google direct, real bill",0.0536,"estimate, token-billed",0.025,"gemini-3.1-flash-image-preview",323],
+ ["Nano Banana 2.1 (+ Edit)","1 picture · 1K","Image",0.034,"Google direct (edit $0.039)",0.0269,"estimate, token-billed",0.015,"",154],
+ ["Nano Banana Pro","1 picture · 1K","Image",0.1373,"Google direct, real bill",0.1072,"estimate, token-billed",null,"listed, price unavailable",46],
+ ["Nano Banana Pro Saver","1 picture · 1K","Image",0.0687,"Google Flex",0.1072,"estimate (no Flex there)",null,"",0],
+ ["GPT Image 2.5 Sunburst (+ Edit)","1 picture · high","Image",0.053,"fal bill, square",0.0289,"estimate, 1K high",0.0225,"1K",132],
+ ["GPT Image 2 Edit","1 picture · high","Image",0.211,"fal, square",0.1156,"estimate, 1K high",0.0675,"gpt-image-2-vip high ($0.015 plain)",15],
+ ["Seedream 4.5 (+ Edit)","1 picture","Image",0.04,"fal",null,"",0.0357,"doubao-seedream-4-5",46],
+ ["Seedream 5 Flash (+ Edit)","1 picture","Image",0.0193,"Runware, real bill",null,"",0.0315,"seedream-5-0-lite (may not be the same model)",319],
+ ["FLUX 2 Pro","1 picture · ~1 MP","Image",0.03,"fal, $0.03/MP",null,"",0.025,"1K",0],
+ ["Grok Imagine","1 picture","Image",0.02,"fal",null,"",0.016,"grok-image",0]
+];
+const $=s=>document.querySelector(s), tb=$('#tb');
+const money=v=>v==null?null:(v<0.1?'$'+v.toFixed(4).replace(/0+$/,'').replace(/\.$/,''):'$'+v.toFixed(2));
+const best=r=>{const c=[r[5],r[7]].filter(x=>x!=null);if(!c.length)return null;return (Math.min(...c)-r[3])/r[3];};
+function pill(p){if(p==null)return '<span class="pill n">—</span>';const v=Math.round(p*100);if(v<0)return `<span class="pill g">${v}%</span>`;if(v===0)return '<span class="pill n">same</span>';return `<span class="pill b">+${v}%</span>`;}
+let rows=R.map(r=>({r,b:best(r)})), sortK=5, dir=1, filt='all';
+function cell(v,n){if(v==null)return `<td class="num">—${n?`<small>${n}</small>`:''}</td>`;return `<td class="num">${money(v)}${n?`<small>${n}</small>`:''}</td>`;}
+function key(o,k){const r=o.r;return [r[0],r[2],r[3],r[5]??1e9,r[7]??1e9,o.b??1e9,r[9]][k];}
+function draw(){const q=$('#q').value.trim().toLowerCase();
+ let list=rows.filter(o=>(filt==='all'||o.r[2]===filt||(filt==='save'&&o.b!=null&&o.b<0))&&(!q||(o.r[0]+' '+o.r[1]).toLowerCase().includes(q)));
+ list.sort((a,b)=>{const x=key(a,sortK),y=key(b,sortK);return (typeof x==='string'?x.localeCompare(y):x-y)*dir;});
+ tb.innerHTML=list.map(({r,b})=>`<tr><td><span class="m">${r[0]}</span><small>${r[1]}</small></td><td>${r[2]}</td>${cell(r[3],r[4])}${cell(r[5],r[6])}${cell(r[7],r[8])}<td>${pill(b)}</td><td class="num">${r[9]}</td></tr>`).join('')||'<tr><td colspan="7">No model matches that search.</td></tr>';
+ document.querySelectorAll('th').forEach(th=>th.removeAttribute('aria-sort'));
+ document.querySelector(`th[data-k="${sortK}"]`).setAttribute('aria-sort',dir>0?'ascending':'descending');}
+document.querySelectorAll('th').forEach(th=>{const go=()=>{const k=+th.dataset.k;if(k===sortK)dir=-dir;else{sortK=k;dir=1;}draw();};th.addEventListener('click',go);th.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}});});
+document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{filt=c.dataset.f;document.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x===c));draw();}));
+$('#q').addEventListener('input',draw);
+draw();
+</script>
